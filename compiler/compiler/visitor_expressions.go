@@ -345,7 +345,27 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 		return v.ctx.Builder.CreateAlignOf(typ, "")
 	}
 	
-	// Get arguments for function-style intrinsics
+	// Special handling for va_start - it needs to allocate a va_list first
+	if ctx.VA_START() != nil {
+		v.logger.Debug("Creating va_start intrinsic")
+		
+		// Allocate va_list structure on stack
+		vaListType := v.ctx.namedTypes["va_list"]
+		if vaListType == nil {
+			// Create a va_list type if it doesn't exist
+			// System V AMD64 ABI va_list is a struct with specific layout
+			vaListType = types.NewPointer(types.I8)
+			v.ctx.namedTypes["va_list"] = vaListType
+		}
+		
+		vaListPtr := v.ctx.Builder.CreateAlloca(vaListType, "va_list")
+		v.ctx.Builder.CreateVaStart(vaListPtr)
+		
+		// Return the va_list pointer so it can be used by va_arg
+		return vaListPtr
+	}
+	
+	// Get arguments for other function-style intrinsics
 	var args []ir.Value
 	for _, expr := range ctx.AllExpression() {
 		argVal := v.Visit(expr)
@@ -417,16 +437,7 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 		return v.ctx.Builder.CreateMemCmp(args[0], args[1], args[2], "")
 	}
 	
-	// Handle variadic argument intrinsics
-	if ctx.VA_START() != nil {
-		if len(args) != 1 {
-			v.ctx.Logger.Error("va_start requires 1 argument (va_list)")
-			return nil
-		}
-		v.logger.Debug("Creating va_start intrinsic")
-		return v.ctx.Builder.CreateVaStart(args[0])
-	}
-	
+	// Handle va_arg
 	if ctx.VA_ARG() != nil {
 		if len(args) != 1 {
 			v.ctx.Logger.Error("va_arg requires 1 argument (va_list)")
@@ -437,6 +448,7 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 		return v.ctx.Builder.CreateVaArg(args[0], targetType, "")
 	}
 	
+	// Handle va_end
 	if ctx.VA_END() != nil {
 		if len(args) != 1 {
 			v.ctx.Logger.Error("va_end requires 1 argument (va_list)")
