@@ -1,7 +1,6 @@
 package amd64
 
 import (
-	"fmt"
 	"github.com/arc-language/arc-lang/builder/ir"
 )
 
