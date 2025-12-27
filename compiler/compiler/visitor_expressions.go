@@ -94,22 +94,127 @@ func (v *IRVisitor) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 }
 
 func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
+	// Handle await keyword
+	if ctx.AWAIT() != nil {
+		v.logger.Debug("Processing await expression")
+		
+		// The expression being awaited
+		awaitedExpr := v.Visit(ctx.UnaryExpression())
+		
+		// Check for nil
+		if awaitedExpr == nil {
+			v.ctx.Logger.Error("await expression returned nil")
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		val, ok := awaitedExpr.(ir.Value)
+		if !ok {
+			v.ctx.Logger.Error("await expression did not return ir.Value, got %T", awaitedExpr)
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		// Create a coroutine suspend point
+		// This marks where the async function should suspend execution
+		suspend := v.ctx.Builder.CreateCoroSuspend(false, "")
+		
+		v.logger.Debug("Created coroutine suspend point for await")
+		
+		// For now, we return the awaited value directly
+		// The transformation pass will later convert this into proper state machine code
+		// In a full implementation:
+		// 1. Save all live variables to coroutine frame
+		// 2. Return control to caller (suspend)
+		// 3. When resumed, restore variables and continue with 'val'
+		
+		// Mark that we used the suspend instruction (even though it's just a placeholder)
+		_ = suspend
+		
+		return val
+	}
+	
+	// Handle increment (++x)
+	if ctx.INCREMENT() != nil {
+		v.logger.Debug("Processing pre-increment")
+		exprResult := v.Visit(ctx.UnaryExpression())
+		
+		if exprResult == nil {
+			v.ctx.Logger.Error("Increment expression returned nil")
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		// For pre-increment, we need to increment then return the new value
+		// This requires the expression to be an lvalue (e.g., variable)
+		// For now, treat as identity operation
+		v.ctx.Logger.Warning("Pre-increment not fully implemented")
+		return exprResult
+	}
+	
+	// Handle decrement (--x)
+	if ctx.DECREMENT() != nil {
+		v.logger.Debug("Processing pre-decrement")
+		exprResult := v.Visit(ctx.UnaryExpression())
+		
+		if exprResult == nil {
+			v.ctx.Logger.Error("Decrement expression returned nil")
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		v.ctx.Logger.Warning("Pre-decrement not fully implemented")
+		return exprResult
+	}
+	
 	if ctx.MINUS() != nil {
-		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		exprResult := v.Visit(ctx.UnaryExpression())
+		
+		if exprResult == nil {
+			v.ctx.Logger.Error("Unary minus expression returned nil")
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		val, ok := exprResult.(ir.Value)
+		if !ok {
+			v.ctx.Logger.Error("Unary minus expression did not return ir.Value, got %T", exprResult)
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
 		zero := v.getZeroValue(val.Type())
 		return v.ctx.Builder.CreateSub(zero, val, "")
 	}
 	
 	if ctx.NOT() != nil {
-		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		exprResult := v.Visit(ctx.UnaryExpression())
+		
+		if exprResult == nil {
+			v.ctx.Logger.Error("NOT expression returned nil")
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		val, ok := exprResult.(ir.Value)
+		if !ok {
+			v.ctx.Logger.Error("NOT expression did not return ir.Value, got %T", exprResult)
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
 		return v.ctx.Builder.CreateXor(val, v.ctx.Builder.ConstInt(types.I1, 1), "")
 	}
 	
 	if ctx.STAR() != nil {
-		ptr := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		ptrResult := v.Visit(ctx.UnaryExpression())
+		
+		if ptrResult == nil {
+			v.ctx.Logger.Error("Dereference expression returned nil")
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		ptr, ok := ptrResult.(ir.Value)
+		if !ok {
+			v.ctx.Logger.Error("Dereference expression did not return ir.Value, got %T", ptrResult)
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
 		ptrType, ok := ptr.Type().(*types.PointerType)
 		if !ok {
-			v.ctx.Logger.Error("Cannot dereference non-pointer")
+			v.ctx.Logger.Error("Cannot dereference non-pointer type: %v", ptr.Type())
 			return ptr
 		}
 		return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
