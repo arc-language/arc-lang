@@ -5,7 +5,7 @@ import (
 
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
-	"github.com/arc-language/arc-lang/builder/parser"
+	"github.com/arc-language/arc-lang/parser"
 )
 
 func (v *IRVisitor) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
