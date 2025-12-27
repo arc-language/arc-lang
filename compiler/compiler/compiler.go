@@ -11,8 +11,9 @@ import (
 
 // Compiler represents the Arc language compiler
 type Compiler struct {
-	context *Context
-	logger  *Logger
+	context               *Context
+	logger                *Logger
+	asyncTransformEnabled bool // Controls async transformation
 }
 
 // NewCompiler creates a new compiler instance
@@ -21,8 +22,9 @@ func NewCompiler(moduleName string, entryFile string) *Compiler {
 	logger.Info("Creating compiler for module '%s' with entry file '%s'", moduleName, entryFile)
 	
 	return &Compiler{
-		context: NewContext(entryFile, moduleName),
-		logger:  logger,
+		context:               NewContext(entryFile, moduleName),
+		logger:                logger,
+		asyncTransformEnabled: true, // Enabled by default
 	}
 }
 
@@ -202,4 +204,111 @@ func (c *Compiler) GetModule() *ir.Module {
 // GetContext returns the compilation context
 func (c *Compiler) GetContext() *Context {
 	return c.context
+}
+
+// EnableAsyncTransformation controls whether async transformation is applied
+// This can be set via a compiler flag
+func (c *Compiler) EnableAsyncTransformation(enable bool) {
+	c.asyncTransformEnabled = enable
+	if enable {
+		c.logger.Info("Async transformation enabled")
+	} else {
+		c.logger.Info("Async transformation disabled")
+	}
+}
+
+// IsAsyncTransformationEnabled returns whether async transformation is enabled
+func (c *Compiler) IsAsyncTransformationEnabled() bool {
+	return c.asyncTransformEnabled
+}
+
+// SetOptimizationLevel sets the optimization level for compilation
+func (c *Compiler) SetOptimizationLevel(level int) {
+	// Future: implement optimization levels
+	c.logger.Debug("Optimization level set to: %d (not yet implemented)", level)
+}
+
+// SetTargetTriple sets the target architecture triple
+func (c *Compiler) SetTargetTriple(triple string) {
+	if c.context.Module != nil {
+		c.context.Module.TargetTriple = triple
+		c.logger.Info("Target triple set to: %s", triple)
+	}
+}
+
+// SetDataLayout sets the data layout string
+func (c *Compiler) SetDataLayout(layout string) {
+	if c.context.Module != nil {
+		c.context.Module.DataLayout = layout
+		c.logger.Info("Data layout set to: %s", layout)
+	}
+}
+
+// Reset resets the compiler state for a new compilation
+func (c *Compiler) Reset() {
+	c.logger.Info("Resetting compiler state")
+	
+	// Reset the context but keep the configuration
+	moduleName := c.context.Module.Name
+	entryFile := c.context.Importer.entryDir
+	
+	c.context = NewContext(entryFile, moduleName)
+	c.logger.Info("Compiler reset complete")
+}
+
+// GetStatistics returns compilation statistics
+func (c *Compiler) GetStatistics() CompilerStatistics {
+	stats := CompilerStatistics{
+		ModuleName:     c.context.Module.Name,
+		FunctionCount:  len(c.context.Module.Functions),
+		GlobalCount:    len(c.context.Module.Globals),
+		TypeCount:      len(c.context.Module.Types),
+		ErrorCount:     c.context.Logger.ErrorCount(),
+		WarningCount:   c.context.Logger.WarningCount(),
+		NamespaceCount: len(c.context.NamespaceRegistry),
+	}
+	
+	// Count async functions
+	for _, fn := range c.context.Module.Functions {
+		for _, attr := range fn.Attributes {
+			if attr == ir.AttrCoroutine {
+				stats.AsyncFunctionCount++
+				break
+			}
+		}
+	}
+	
+	return stats
+}
+
+// CompilerStatistics holds compilation statistics
+type CompilerStatistics struct {
+	ModuleName         string
+	FunctionCount      int
+	AsyncFunctionCount int
+	GlobalCount        int
+	TypeCount          int
+	ErrorCount         int
+	WarningCount       int
+	NamespaceCount     int
+}
+
+// PrintStatistics prints compilation statistics
+func (s CompilerStatistics) Print() {
+	fmt.Println("=== Compilation Statistics ===")
+	fmt.Printf("Module:            %s\n", s.ModuleName)
+	fmt.Printf("Functions:         %d\n", s.FunctionCount)
+	if s.AsyncFunctionCount > 0 {
+		fmt.Printf("  Async Functions: %d\n", s.AsyncFunctionCount)
+	}
+	fmt.Printf("Globals:           %d\n", s.GlobalCount)
+	fmt.Printf("Types:             %d\n", s.TypeCount)
+	fmt.Printf("Namespaces:        %d\n", s.NamespaceCount)
+	if s.ErrorCount > 0 {
+		fmt.Printf("Errors:            %d\n", s.ErrorCount)
+	}
+	if s.WarningCount > 0 {
+		fmt.Printf("Warnings:          %d\n", s.WarningCount)
+	}
+	fmt.Println("=============================")
 }

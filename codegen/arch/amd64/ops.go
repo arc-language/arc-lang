@@ -125,6 +125,18 @@ func (c *compiler) compileInstruction(inst ir.Instruction) error {
 	case ir.OpRaise:
 		return c.raiseOp(inst.(*ir.RaiseInst))
 
+	// Coroutine operations
+	case ir.OpCoroId:
+		return c.coroIdOp(inst.(*ir.CoroIdInst))
+	case ir.OpCoroBegin:
+		return c.coroBeginOp(inst.(*ir.CoroBeginInst))
+	case ir.OpCoroSuspend:
+		return c.coroSuspendOp(inst.(*ir.CoroSuspendInst))
+	case ir.OpCoroEnd:
+		return c.coroEndOp(inst.(*ir.CoroEndInst))
+	case ir.OpCoroFree:
+		return c.coroFreeOp(inst.(*ir.CoroFreeInst))
+
 	default:
 		return fmt.Errorf("unsupported opcode: %s", inst.Opcode())
 	}

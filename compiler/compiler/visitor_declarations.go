@@ -120,6 +120,9 @@ func (v *IRVisitor) VisitExternFunctionDecl(ctx *parser.ExternFunctionDeclContex
 func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
 	
+	// Check if this is an async function
+	isAsync := ctx.ASYNC() != nil
+	
 	// Check if this is a method inside a class/struct
 	var methodPrefix string
 	if parent := ctx.GetParent(); parent != nil {
@@ -148,12 +151,20 @@ func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		irName = v.ctx.currentNamespace.Name + "_" + name
 	}
 
-	v.logger.Debug("Declaring function: %s (IR: %s)", name, irName)
+	if isAsync {
+		v.logger.Debug("Declaring async function: %s (IR: %s)", name, irName)
+	} else {
+		v.logger.Debug("Declaring function: %s (IR: %s)", name, irName)
+	}
 	
 	var retType types.Type = types.Void
 	if ctx.Type_() != nil {
 		retType = v.resolveType(ctx.Type_())
 	}
+	
+	// If async, wrap return type in a Future/Promise
+	// For now, we'll keep the return type as-is and mark the function
+	// The transformation pass will handle the actual conversion
 	
 	paramTypes := make([]types.Type, 0)
 	paramNames := make([]string, 0)
@@ -173,6 +184,12 @@ func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	}
 
 	fn := v.ctx.Builder.CreateFunction(irName, retType, paramTypes, variadic)
+	
+	// Mark as coroutine if async
+	if isAsync {
+		fn.Attributes = append(fn.Attributes, ir.AttrCoroutine)
+		v.logger.Info("Marked function '%s' as async/coroutine", irName)
+	}
 	
 	// Register function in the current namespace
 	if v.ctx.currentNamespace != nil {
@@ -196,10 +213,20 @@ func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			v.ctx.currentScope.Define(paramNames[i], alloc)
 		}
 		
+		// If async, emit coroutine setup
+		if isAsync {
+			v.emitAsyncFunctionPrologue(fn)
+		}
+		
 		v.Visit(ctx.Block())
 		
 		// Add default return if needed
 		if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
+			// If async, emit coroutine cleanup
+			if isAsync {
+				v.emitAsyncFunctionEpilogue(fn)
+			}
+			
 			if retType.Kind() == types.VoidKind {
 				v.ctx.Builder.CreateRetVoid()
 			} else {
@@ -211,6 +238,52 @@ func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	
 	v.ctx.ExitFunction()
 	return nil
+}
+
+// emitAsyncFunctionPrologue emits the coroutine initialization code
+func (v *IRVisitor) emitAsyncFunctionPrologue(fn *ir.Function) {
+	v.logger.Debug("Emitting async function prologue for %s", fn.Name())
+	
+	// Create coroutine ID
+	coroId := v.ctx.Builder.CreateCoroId("")
+	
+	// Begin coroutine (allocate frame)
+	coroHandle := v.ctx.Builder.CreateCoroBegin(coroId, "")
+	
+	// Store the handle somewhere accessible (in a stack slot for now)
+	// In a full implementation, this would be saved in the function's context
+	handleAlloca := v.ctx.Builder.CreateAlloca(coroHandle.Type(), "coro.handle")
+	v.ctx.Builder.CreateStore(coroHandle, handleAlloca)
+	
+	// Store in scope so we can access it later
+	v.ctx.currentScope.Define("__coro_handle__", handleAlloca)
+	v.ctx.currentScope.Define("__coro_id__", coroId)
+}
+
+// emitAsyncFunctionEpilogue emits the coroutine cleanup code
+func (v *IRVisitor) emitAsyncFunctionEpilogue(fn *ir.Function) {
+	v.logger.Debug("Emitting async function epilogue for %s", fn.Name())
+	
+	// Retrieve the coroutine handle
+	if handleSym, ok := v.ctx.currentScope.Lookup("__coro_handle__"); ok {
+		if alloca, isAlloca := handleSym.Value.(*ir.AllocaInst); isAlloca {
+			ptrType := alloca.Type().(*types.PointerType)
+			handle := v.ctx.Builder.CreateLoad(ptrType.ElementType, alloca, "")
+			
+			// Mark end of coroutine
+			v.ctx.Builder.CreateCoroEnd(handle)
+			
+			// Get memory to free
+			if idSym, ok := v.ctx.currentScope.Lookup("__coro_id__"); ok {
+				coroId := idSym.Value
+				mem := v.ctx.Builder.CreateCoroFree(coroId, handle, "")
+				
+				// Free the memory (would call free or a custom allocator)
+				// For now, just create the instruction
+				_ = mem
+			}
+		}
+	}
 }
 
 // ============================================================================
