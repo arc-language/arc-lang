@@ -1,7 +1,7 @@
 package compiler
 
 import (
-	"github.com/arc-language/arc-lang/ir"
+	"github.com/arc-language/arc-lang/builder/ir"
 )
 
 // Symbol represents a named value in the symbol table

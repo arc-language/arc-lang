@@ -3,9 +3,9 @@ package compiler
 import (
 	"fmt"
 
-	"github.com/arc-language/arc-lang/ir"
-	"github.com/arc-language/arc-lang/types"
-	"github.com/arc-language/arc-lang/parser"
+	"github.com/arc-language/arc-lang/builder/ir"
+	"github.com/arc-language/arc-lang/builder/types"
+	"github.com/arc-language/arc-lang/builder/parser"
 )
 
 func (v *IRVisitor) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
