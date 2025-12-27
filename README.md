@@ -35,7 +35,7 @@ Clone and build the Arc compiler:
 
 ```bash
 git clone https://github.com/arc-language/arc-lang
-cd arc-lang/compiler
+cd arc-lang/compiler/cmd
 go build main.go -o arc
 ```
 
