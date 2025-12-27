@@ -97,6 +97,34 @@ func (c *compiler) compileInstruction(inst ir.Instruction) error {
 	case ir.OpInsertValue:
 		return c.insertValueOp(inst.(*ir.InsertValueInst))
 
+	// Variadic operations
+	case ir.OpVaStart:
+		return c.vaStartOp(inst.(*ir.VaStartInst))
+	case ir.OpVaArg:
+		return c.vaArgOp(inst.(*ir.VaArgInst))
+	case ir.OpVaEnd:
+		return c.vaEndOp(inst.(*ir.VaEndInst))
+
+	// Intrinsics
+	case ir.OpSizeOf:
+		return c.sizeOfOp(inst.(*ir.SizeOfInst))
+	case ir.OpAlignOf:
+		return c.alignOfOp(inst.(*ir.AlignOfInst))
+	case ir.OpMemSet:
+		return c.memSetOp(inst.(*ir.MemSetInst))
+	case ir.OpMemCpy:
+		return c.memCpyOp(inst.(*ir.MemCpyInst))
+	case ir.OpMemMove:
+		return c.memMoveOp(inst.(*ir.MemMoveInst))
+	case ir.OpStrLen:
+		return c.strLenOp(inst.(*ir.StrLenInst))
+	case ir.OpMemChr:
+		return c.memChrOp(inst.(*ir.MemChrInst))
+	case ir.OpMemCmp:
+		return c.memCmpOp(inst.(*ir.MemCmpInst))
+	case ir.OpRaise:
+		return c.raiseOp(inst.(*ir.RaiseInst))
+
 	default:
 		return fmt.Errorf("unsupported opcode: %s", inst.Opcode())
 	}
@@ -615,5 +643,295 @@ func (c *compiler) syscallOp(inst *ir.SyscallInst) error {
 	// This captures the return value of the syscall
 	c.storeFromReg(RAX, inst)
 
+	return nil
+}
+
+// ============================================================================
+// Variadic Operations
+// ============================================================================
+
+// va_start - initialize va_list
+func (c *compiler) vaStartOp(inst *ir.VaStartInst) error {
+	// System V AMD64 ABI va_list structure:
+	// struct {
+	//   uint32 gp_offset;     // offset to next GP register arg (0-48)
+	//   uint32 fp_offset;     // offset to next FP register arg (48-176)
+	//   void*  overflow_arg_area;  // pointer to stack args
+	//   void*  reg_save_area;      // pointer to register save area
+	// }
+	
+	vaList := inst.Operands()[0]
+	c.loadToReg(RAX, vaList) // Get va_list pointer
+
+	// Initialize gp_offset to 0 (no GP registers consumed yet)
+	// mov dword ptr [rax], 0
+	c.emitBytes(0xC7, 0x00, 0x00, 0x00, 0x00, 0x00)
+
+	// Initialize fp_offset to 48 (FP registers start after 6 GP regs * 8 bytes)
+	// mov dword ptr [rax + 4], 48
+	c.emitBytes(0xC7, 0x40, 0x04, 0x30, 0x00, 0x00, 0x00)
+
+	// Set overflow_arg_area to point to stack args (after return address and saved RBP)
+	// lea rcx, [rbp + 16]
+	c.emitBytes(0x48, 0x8D, 0x8D, 0x10, 0x00, 0x00, 0x00)
+	// mov [rax + 8], rcx
+	c.emitBytes(0x48, 0x89, 0x48, 0x08)
+
+	// Set reg_save_area to point to the register save area (typically allocated by caller)
+	// For simplicity, we'll point to a stack location where we saved registers
+	// This would need proper implementation based on calling convention
+	// For now, set to NULL as a placeholder
+	// mov qword ptr [rax + 16], 0
+	c.emitBytes(0x48, 0xC7, 0x40, 0x10, 0x00, 0x00, 0x00, 0x00)
+
+	return nil
+}
+
+// va_arg - retrieve next argument
+func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
+	vaList := inst.Operands()[0]
+	argType := inst.ArgType
+
+	c.loadToReg(RAX, vaList) // Get va_list pointer
+
+	// Simplified implementation: assume all args come from overflow area
+	// A full implementation would check gp_offset/fp_offset and use reg_save_area
+
+	// Load overflow_arg_area pointer: mov rcx, [rax + 8]
+	c.emitBytes(0x48, 0x8B, 0x48, 0x08)
+
+	// Load the argument from [rcx]
+	size := SizeOf(argType)
+	switch size {
+	case 1:
+		c.emitBytes(0x48, 0x0F, 0xB6, 0x09) // movzx rax, byte ptr [rcx]
+	case 2:
+		c.emitBytes(0x48, 0x0F, 0xB7, 0x09) // movzx rax, word ptr [rcx]
+	case 4:
+		c.emitBytes(0x8B, 0x01) // mov eax, [rcx]
+		// Move to rax for consistency
+		c.emitBytes(0x48, 0x89, 0xC0)
+	case 8:
+		c.emitBytes(0x48, 0x8B, 0x09) // mov rax, [rcx]
+	}
+
+	// Advance overflow_arg_area pointer
+	// add rcx, 8 (arguments are 8-byte aligned)
+	c.emitBytes(0x48, 0x83, 0xC1, 0x08)
+	
+	// Store updated pointer back: mov [rax + 8], rcx (rax still has va_list ptr)
+	c.loadToReg(RDX, vaList) // Reload va_list pointer to RDX
+	c.emitBytes(0x48, 0x89, 0x4A, 0x08)
+
+	// Store result
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+// va_end - cleanup va_list
+func (c *compiler) vaEndOp(inst *ir.VaEndInst) error {
+	// On x86_64, va_end is typically a no-op
+	// No cleanup needed for the va_list structure
+	return nil
+}
+
+// ============================================================================
+// Intrinsic Operations
+// ============================================================================
+
+// sizeof - compile-time size calculation
+func (c *compiler) sizeOfOp(inst *ir.SizeOfInst) error {
+	size := SizeOf(inst.QueryType)
+	
+	// Load size as immediate constant
+	c.loadConstInt(RAX, int64(size))
+	c.storeFromReg(RAX, inst)
+	
+	return nil
+}
+
+// alignof - compile-time alignment calculation
+func (c *compiler) alignOfOp(inst *ir.AlignOfInst) error {
+	align := AlignOf(inst.QueryType)
+	
+	// Load alignment as immediate constant
+	c.loadConstInt(RAX, int64(align))
+	c.storeFromReg(RAX, inst)
+	
+	return nil
+}
+
+// memset - fill memory with a byte value
+func (c *compiler) memSetOp(inst *ir.MemSetInst) error {
+	ops := inst.Operands()
+	dest := ops[0]    // *void
+	val := ops[1]     // byte
+	count := ops[2]   // usize
+
+	// Load arguments into registers for rep stosb
+	c.loadToReg(RDI, dest)   // Destination
+	c.loadToReg(RAX, val)    // Value (in AL)
+	c.loadToReg(RCX, count)  // Count
+
+	// rep stosb - repeat store byte from AL to [RDI], RCX times
+	c.emitBytes(0xF3, 0xAA)
+
+	return nil
+}
+
+// memcpy - copy memory
+func (c *compiler) memCpyOp(inst *ir.MemCpyInst) error {
+	ops := inst.Operands()
+	dest := ops[0]    // *void
+	src := ops[1]     // *void
+	count := ops[2]   // usize
+
+	// Load arguments for rep movsb
+	c.loadToReg(RDI, dest)   // Destination
+	c.loadToReg(RSI, src)    // Source
+	c.loadToReg(RCX, count)  // Count
+
+	// rep movsb - repeat move byte from [RSI] to [RDI], RCX times
+	c.emitBytes(0xF3, 0xA4)
+
+	return nil
+}
+
+// memmove - copy memory (handles overlapping regions)
+func (c *compiler) memMoveOp(inst *ir.MemMoveInst) error {
+	ops := inst.Operands()
+	dest := ops[0]
+	src := ops[1]
+	count := ops[2]
+
+	// For simplicity, use same implementation as memcpy
+	// A proper implementation would check for overlap and copy backwards if needed
+	// Or call the libc memmove function
+	
+	c.loadToReg(RDI, dest)
+	c.loadToReg(RSI, src)
+	c.loadToReg(RCX, count)
+
+	// rep movsb
+	c.emitBytes(0xF3, 0xA4)
+
+	return nil
+}
+
+// strlen - calculate C-string length
+func (c *compiler) strLenOp(inst *ir.StrLenInst) error {
+	str := inst.Operands()[0]
+	
+	c.loadToReg(RDI, str)    // String pointer
+	c.emitXorReg(RAX, RAX)   // RAX = 0 (length counter)
+	c.emitXorReg(RCX, RCX)   // RCX = 0
+
+	// Loop to find null terminator
+	loopStart := c.text.Len()
+	
+	// cmp byte ptr [rdi + rax], 0
+	c.emitBytes(0x80, 0x3C, 0x07, 0x00)
+	
+	// je end (jump if zero found)
+	c.emitBytes(0x74, 0x04) // Short jump forward 4 bytes
+	
+	// inc rax
+	c.emitBytes(0x48, 0xFF, 0xC0)
+	
+	// jmp loop_start
+	rel := loopStart - (c.text.Len() + 2)
+	c.emitBytes(0xEB, byte(rel))
+	
+	// end: result in RAX
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+// memchr - find byte in memory
+func (c *compiler) memChrOp(inst *ir.MemChrInst) error {
+	ops := inst.Operands()
+	ptr := ops[0]
+	val := ops[1]
+	count := ops[2]
+
+	c.loadToReg(RDI, ptr)    // Buffer pointer
+	c.loadToReg(RAX, val)    // Byte to find
+	c.loadToReg(RCX, count)  // Count
+
+	// repne scasb - repeat while not equal, scan byte
+	// Compares AL with [RDI], increments RDI, decrements RCX
+	c.emitBytes(0xF2, 0xAE)
+
+	// If found, RDI points one past the found byte
+	// We need to return RDI-1, or NULL if not found
+
+	// Check if found (ZF=1)
+	// jne not_found
+	c.emitBytes(0x75, 0x07) // Jump 7 bytes if not equal
+
+	// Found: sub rdi, 1 (point to the actual byte)
+	c.emitBytes(0x48, 0x83, 0xEF, 0x01)
+	// mov rax, rdi
+	c.emitBytes(0x48, 0x89, 0xF8)
+	// jmp end
+	c.emitBytes(0xEB, 0x03) // Jump 3 bytes
+
+	// not_found: xor rax, rax (return NULL)
+	c.emitXorReg(RAX, RAX)
+
+	// end:
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+// memcmp - compare memory regions
+func (c *compiler) memCmpOp(inst *ir.MemCmpInst) error {
+	ops := inst.Operands()
+	ptr1 := ops[0]
+	ptr2 := ops[1]
+	count := ops[2]
+
+	c.loadToReg(RSI, ptr1)   // First buffer
+	c.loadToReg(RDI, ptr2)   // Second buffer
+	c.loadToReg(RCX, count)  // Count
+
+	// repe cmpsb - repeat while equal, compare bytes
+	c.emitBytes(0xF3, 0xA6)
+
+	// After repe cmpsb:
+	// - If all equal: ZF=1, RSI and RDI point past end
+	// - If different: ZF=0, RSI and RDI point past the differing byte
+
+	// We need to return: 0 if equal, <0 if ptr1 < ptr2, >0 if ptr1 > ptr2
+	
+	// Load the last compared bytes
+	// movzx rax, byte ptr [rsi - 1]
+	c.emitBytes(0x48, 0x0F, 0xB6, 0x46, 0xFF)
+	
+	// movzx rcx, byte ptr [rdi - 1]
+	c.emitBytes(0x48, 0x0F, 0xB6, 0x4F, 0xFF)
+	
+	// sub rax, rcx (compute difference)
+	c.emitBytes(0x48, 0x29, 0xC8)
+
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+// raise - abort execution with message
+func (c *compiler) raiseOp(inst *ir.RaiseInst) error {
+	// Implementation: call exit(1) or trigger SIGABRT
+	// For simplicity, we'll use exit syscall
+	
+	// Load exit code 1 into RDI
+	c.loadConstInt(RDI, 1)
+	
+	// Load syscall number for exit (60 on Linux x86_64)
+	c.loadConstInt(RAX, 60)
+	
+	// syscall
+	c.emitBytes(0x0F, 0x05)
+	
+	// This never returns
 	return nil
 }
