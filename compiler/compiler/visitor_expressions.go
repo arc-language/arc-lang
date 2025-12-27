@@ -335,32 +335,17 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 	// Handle sizeof and alignof (compile-time constants)
 	if ctx.SIZEOF() != nil {
 		typ := v.resolveType(ctx.Type_())
-		size := v.calculateSizeOf(typ)
-		v.logger.Debug("sizeof(%v) = %d", typ, size)
-		return v.ctx.Builder.ConstInt(types.U64, int64(size))
+		v.logger.Debug("Creating sizeof intrinsic for type: %v", typ)
+		return v.ctx.Builder.CreateSizeOf(typ, "")
 	}
 	
 	if ctx.ALIGNOF() != nil {
 		typ := v.resolveType(ctx.Type_())
-		align := v.calculateAlignOf(typ)
-		v.logger.Debug("alignof(%v) = %d", typ, align)
-		return v.ctx.Builder.ConstInt(types.U64, int64(align))
+		v.logger.Debug("Creating alignof intrinsic for type: %v", typ)
+		return v.ctx.Builder.CreateAlignOf(typ, "")
 	}
 	
-	// Handle bit_cast<T>(value)
-	if ctx.BIT_CAST() != nil {
-		if len(ctx.AllExpression()) != 1 {
-			v.ctx.Logger.Error("bit_cast requires exactly one argument")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
-		value := v.Visit(ctx.Expression(0)).(ir.Value)
-		targetType := v.resolveType(ctx.Type_())
-		v.logger.Debug("bit_cast to type %v", targetType)
-		return v.ctx.Builder.CreateBitCast(value, targetType, "")
-	}
-	
-	// Get arguments for function-style intrinsics with nil safety
+	// Get arguments for function-style intrinsics
 	var args []ir.Value
 	for _, expr := range ctx.AllExpression() {
 		argVal := v.Visit(expr)
@@ -378,74 +363,109 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 	
 	// Handle memory intrinsics
 	if ctx.MEMSET() != nil {
-		v.logger.Debug("Calling memset intrinsic")
-		return v.ctx.Builder.CreateCallByName("memset", types.NewPointer(types.Void), args, "")
+		if len(args) != 3 {
+			v.ctx.Logger.Error("memset requires 3 arguments (dest, val, count)")
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		v.logger.Debug("Creating memset intrinsic")
+		return v.ctx.Builder.CreateMemSet(args[0], args[1], args[2])
 	}
 	
 	if ctx.MEMCPY() != nil {
-		v.logger.Debug("Calling memcpy intrinsic")
-		return v.ctx.Builder.CreateCallByName("memcpy", types.NewPointer(types.Void), args, "")
+		if len(args) != 3 {
+			v.ctx.Logger.Error("memcpy requires 3 arguments (dest, src, count)")
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		v.logger.Debug("Creating memcpy intrinsic")
+		return v.ctx.Builder.CreateMemCpy(args[0], args[1], args[2])
 	}
 	
 	if ctx.MEMMOVE() != nil {
-		v.logger.Debug("Calling memmove intrinsic")
-		return v.ctx.Builder.CreateCallByName("memmove", types.NewPointer(types.Void), args, "")
+		if len(args) != 3 {
+			v.ctx.Logger.Error("memmove requires 3 arguments (dest, src, count)")
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		v.logger.Debug("Creating memmove intrinsic")
+		return v.ctx.Builder.CreateMemMove(args[0], args[1], args[2])
 	}
 	
 	// Handle string intrinsics
 	if ctx.STRLEN() != nil {
-		v.logger.Debug("Calling strlen intrinsic")
-		return v.ctx.Builder.CreateCallByName("strlen", types.U64, args, "")
+		if len(args) != 1 {
+			v.ctx.Logger.Error("strlen requires 1 argument")
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		v.logger.Debug("Creating strlen intrinsic")
+		return v.ctx.Builder.CreateStrLen(args[0], "")
 	}
 	
 	if ctx.MEMCHR() != nil {
-		v.logger.Debug("Calling memchr intrinsic")
-		return v.ctx.Builder.CreateCallByName("memchr", types.NewPointer(types.Void), args, "")
+		if len(args) != 3 {
+			v.ctx.Logger.Error("memchr requires 3 arguments (ptr, val, count)")
+			return v.ctx.Builder.ConstNull(types.NewPointer(types.Void))
+		}
+		v.logger.Debug("Creating memchr intrinsic")
+		return v.ctx.Builder.CreateMemChr(args[0], args[1], args[2], "")
 	}
 	
 	if ctx.MEMCMP() != nil {
-		v.logger.Debug("Calling memcmp intrinsic")
-		return v.ctx.Builder.CreateCallByName("memcmp", types.I32, args, "")
+		if len(args) != 3 {
+			v.ctx.Logger.Error("memcmp requires 3 arguments (ptr1, ptr2, count)")
+			return v.ctx.Builder.ConstInt(types.I32, 0)
+		}
+		v.logger.Debug("Creating memcmp intrinsic")
+		return v.ctx.Builder.CreateMemCmp(args[0], args[1], args[2], "")
 	}
 	
-	// Handle va_arg intrinsics
+	// Handle variadic argument intrinsics
 	if ctx.VA_START() != nil {
-		if len(args) < 1 {
-			v.ctx.Logger.Error("va_start requires at least one argument")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
+		if len(args) != 1 {
+			v.ctx.Logger.Error("va_start requires 1 argument (va_list)")
+			return nil
 		}
-		return v.ctx.Builder.CreateCallByName("llvm.va_start", types.Void, args, "")
+		v.logger.Debug("Creating va_start intrinsic")
+		return v.ctx.Builder.CreateVaStart(args[0])
 	}
 	
 	if ctx.VA_ARG() != nil {
-		if len(args) < 1 {
-			v.ctx.Logger.Error("va_arg requires at least one argument")
+		if len(args) != 1 {
+			v.ctx.Logger.Error("va_arg requires 1 argument (va_list)")
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
 		targetType := v.resolveType(ctx.Type_())
-		return v.ctx.Builder.CreateCallByName("llvm.va_arg", targetType, args, "")
+		v.logger.Debug("Creating va_arg intrinsic with type: %v", targetType)
+		return v.ctx.Builder.CreateVaArg(args[0], targetType, "")
 	}
 	
 	if ctx.VA_END() != nil {
-		if len(args) < 1 {
-			v.ctx.Logger.Error("va_end requires at least one argument")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
+		if len(args) != 1 {
+			v.ctx.Logger.Error("va_end requires 1 argument (va_list)")
+			return nil
 		}
-		return v.ctx.Builder.CreateCallByName("llvm.va_end", types.Void, args, "")
+		v.logger.Debug("Creating va_end intrinsic")
+		return v.ctx.Builder.CreateVaEnd(args[0])
 	}
 	
-	// Handle raise
+	// Handle raise (abort execution)
 	if ctx.RAISE() != nil {
-		v.logger.Debug("Calling raise intrinsic")
-		v.ctx.Builder.CreateCallByName("raise", types.Void, args, "")
+		if len(args) != 1 {
+			v.ctx.Logger.Error("raise requires 1 argument (message)")
+			// Still create the raise with a default message
+			defaultMsg := v.ctx.Builder.ConstInt(types.I64, 0)
+			v.ctx.Builder.CreateRaise(defaultMsg)
+			v.ctx.Builder.CreateUnreachable()
+			return nil
+		}
+		v.logger.Debug("Creating raise intrinsic")
+		v.ctx.Builder.CreateRaise(args[0])
 		v.ctx.Builder.CreateUnreachable()
-		return v.ctx.Builder.ConstInt(types.I64, 0)
+		return nil
 	}
 	
-	// Fallback for IDENTIFIER-based intrinsics
+	// Unknown intrinsic
 	if ctx.IDENTIFIER() != nil {
 		intrinsicName := ctx.IDENTIFIER().GetText()
-		v.ctx.Logger.Error("Unknown intrinsic: %s", intrinsicName)
+		v.ctx.Logger.Error("Unknown intrinsic function: %s", intrinsicName)
 	}
 	
 	return v.ctx.Builder.ConstInt(types.I64, 0)
