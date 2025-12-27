@@ -112,6 +112,17 @@ const (
 	OpMemChr
 	OpMemCmp
 	OpRaise
+
+	// Coroutine operations
+    OpCoroId
+    OpCoroBegin
+    OpCoroSuspend
+    OpCoroEnd
+    OpCoroFree
+    OpCoroResume
+    OpCoroDestroy
+    OpCoroPromise
+    OpCoroDone	
 )
 
 var opcodeNames = map[Opcode]string{
@@ -174,6 +185,15 @@ var opcodeNames = map[Opcode]string{
 	OpMemChr:        "memchr",
 	OpMemCmp:        "memcmp",
 	OpRaise:         "raise",
+	OpCoroId:       "coro.id",
+	OpCoroBegin:    "coro.begin",
+	OpCoroSuspend:  "coro.suspend",
+	OpCoroEnd:      "coro.end",
+	OpCoroFree:     "coro.free",
+	OpCoroResume:   "coro.resume",
+	OpCoroDestroy:  "coro.destroy",
+	OpCoroPromise:  "coro.promise",
+	OpCoroDone:     "coro.done",
 }
 
 func (op Opcode) String() string {
@@ -504,6 +524,7 @@ const (
 	AttrReadNone
 	AttrAlwaysInline
 	AttrNoInline
+	AttrCoroutine
 )
 
 func NewFunction(name string, fnType *types.FunctionType) *Function {

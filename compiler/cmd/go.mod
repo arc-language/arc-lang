@@ -4,6 +4,6 @@ go 1.25.4
 
 require (
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
-	github.com/arc-language/arc-lang v0.0.0-20251227225046-0dc2ca111780 // indirect
+	github.com/arc-language/arc-lang v0.0.0-20251227230850-f36b7b033a31 // indirect
 	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
 )

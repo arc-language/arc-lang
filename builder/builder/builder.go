@@ -1015,3 +1015,75 @@ func (b *Builder) CreateRaise(message ir.Value) *ir.RaiseInst {
 	b.insert(inst)
 	return inst
 }
+
+// ============================================================================
+// Coroutine operations
+// ============================================================================
+
+// CreateCoroId creates a coroutine ID (start of coroutine)
+func (b *Builder) CreateCoroId(name string) *ir.CoroIdInst {
+    if name == "" {
+        name = b.generateName()
+    }
+    inst := &ir.CoroIdInst{}
+    inst.Op = ir.OpCoroId
+    inst.SetName(name)
+    // coro.id returns a token type (opaque handle)
+    inst.SetType(types.NewInt(64, false)) // Simplified - LLVM uses "token" type
+    b.insert(inst)
+    return inst
+}
+
+// CreateCoroBegin creates coroutine begin (allocates frame)
+func (b *Builder) CreateCoroBegin(id ir.Value, name string) *ir.CoroBeginInst {
+    if name == "" {
+        name = b.generateName()
+    }
+    inst := &ir.CoroBeginInst{}
+    inst.Op = ir.OpCoroBegin
+    inst.SetName(name)
+    inst.SetType(types.NewPointer(types.I8)) // Returns ptr to coroutine frame
+    inst.SetOperand(0, id)
+    b.insert(inst)
+    return inst
+}
+
+// CreateCoroSuspend creates a suspend point (await)
+func (b *Builder) CreateCoroSuspend(isFinal bool, name string) *ir.CoroSuspendInst {
+    if name == "" {
+        name = b.generateName()
+    }
+    inst := &ir.CoroSuspendInst{
+        Final: isFinal,
+    }
+    inst.Op = ir.OpCoroSuspend
+    inst.SetName(name)
+    inst.SetType(types.I8) // Returns i8 (0=suspend, 1=resume, -1=destroy)
+    b.insert(inst)
+    return inst
+}
+
+// CreateCoroEnd marks end of coroutine scope
+func (b *Builder) CreateCoroEnd(handle ir.Value) *ir.CoroEndInst {
+    inst := &ir.CoroEndInst{}
+    inst.Op = ir.OpCoroEnd
+    inst.SetType(types.I1)
+    inst.SetOperand(0, handle)
+    b.insert(inst)
+    return inst
+}
+
+// CreateCoroFree gets the memory to free for coroutine
+func (b *Builder) CreateCoroFree(id ir.Value, handle ir.Value, name string) *ir.CoroFreeInst {
+    if name == "" {
+        name = b.generateName()
+    }
+    inst := &ir.CoroFreeInst{}
+    inst.Op = ir.OpCoroFree
+    inst.SetName(name)
+    inst.SetType(types.NewPointer(types.I8))
+    inst.SetOperand(0, id)
+    inst.SetOperand(1, handle)
+    b.insert(inst)
+    return inst
+}
