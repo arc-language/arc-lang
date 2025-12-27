@@ -218,34 +218,39 @@ func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 // ============================================================================
 
 func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
-	name := ctx.IDENTIFIER().GetText()
-	
-	v.logger.Debug("Declaring variable: %s", name)
-	
-	var varType types.Type
-	if ctx.Type_() != nil {
-		varType = v.resolveType(ctx.Type_())
-	}
-	
-	var initValue ir.Value
-	if ctx.Expression() != nil {
-		initValue = v.Visit(ctx.Expression()).(ir.Value)
-		if varType == nil {
-			varType = initValue.Type()
-		}
-	} else {
-		if varType == nil {
-			v.ctx.Logger.Error("Variable '%s' needs type annotation or initializer", name)
-			return nil
-		}
-		initValue = v.getZeroValue(varType)
-	}
+    name := ctx.IDENTIFIER().GetText()
+    
+    v.logger.Debug("Declaring variable: %s", name)
+    
+    var varType types.Type
+    if ctx.Type_() != nil {
+        varType = v.resolveType(ctx.Type_())
+    }
+    
+    var initValue ir.Value
+    if ctx.Expression() != nil {
+        initValue = v.Visit(ctx.Expression()).(ir.Value)
+        if varType == nil {
+            varType = initValue.Type()
+        } else {
+            // ADD THIS: Cast init value to declared type if needed
+            if !initValue.Type().Equal(varType) {
+                initValue = v.castValue(initValue, varType)
+            }
+        }
+    } else {
+        if varType == nil {
+            v.ctx.Logger.Error("Variable '%s' needs type annotation or initializer", name)
+            return nil
+        }
+        initValue = v.getZeroValue(varType)
+    }
 
-	alloca := v.ctx.Builder.CreateAlloca(varType, name+".addr")
-	v.ctx.Builder.CreateStore(initValue, alloca)
-	v.ctx.currentScope.Define(name, alloca)
-	
-	return nil
+    alloca := v.ctx.Builder.CreateAlloca(varType, name+".addr")
+    v.ctx.Builder.CreateStore(initValue, alloca)
+    v.ctx.currentScope.Define(name, alloca)
+    
+    return nil
 }
 
 func (v *IRVisitor) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {

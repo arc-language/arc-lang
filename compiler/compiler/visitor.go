@@ -289,17 +289,29 @@ func (v *IRVisitor) findFieldIndex(structType *types.StructType, fieldName strin
 }
 
 func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
-	srcType := val.Type()
-	
-	if types.IsInteger(srcType) && types.IsInteger(targetType) {
-		srcBits := srcType.(*types.IntType).BitWidth
-		destBits := targetType.(*types.IntType).BitWidth
-		if srcBits > destBits {
-			return v.ctx.Builder.CreateTrunc(val, targetType, "")
-		} else if srcBits < destBits {
-			return v.ctx.Builder.CreateSExt(val, targetType, "")
-		}
-	}
-	
-	return val
+    srcType := val.Type()
+    
+    // Integer to integer
+    if types.IsInteger(srcType) && types.IsInteger(targetType) {
+        srcBits := srcType.(*types.IntType).BitWidth
+        destBits := targetType.(*types.IntType).BitWidth
+        if srcBits > destBits {
+            return v.ctx.Builder.CreateTrunc(val, targetType, "")
+        } else if srcBits < destBits {
+            return v.ctx.Builder.CreateSExt(val, targetType, "")
+        }
+    }
+    
+    // ADD THIS: Float to float conversion
+    if types.IsFloat(srcType) && types.IsFloat(targetType) {
+        srcBits := srcType.(*types.FloatType).BitWidth
+        destBits := targetType.(*types.FloatType).BitWidth
+        if srcBits > destBits {
+            return v.ctx.Builder.CreateFPTrunc(val, targetType, "")
+        } else if srcBits < destBits {
+            return v.ctx.Builder.CreateFPExt(val, targetType, "")
+        }
+    }
+    
+    return val
 }
