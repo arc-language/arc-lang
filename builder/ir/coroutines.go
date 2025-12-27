@@ -3,7 +3,6 @@ package ir
 
 import (
     "fmt"
-    "github.com/arc-language/arc-lang/builder/types"
 )
 
 // CoroIdInst represents llvm.coro.id intrinsic
