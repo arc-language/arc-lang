@@ -886,3 +886,132 @@ func (b *Builder) CreateVaEnd(vaList ir.Value) *ir.VaEndInst {
 	b.insert(inst)
 	return inst
 }
+
+
+// ============================================================================
+// Intrinsic operations
+// ============================================================================
+
+// CreateSizeOf creates a sizeof intrinsic (compile-time constant size in bytes)
+func (b *Builder) CreateSizeOf(typ types.Type, name string) *ir.SizeOfInst {
+	if name == "" {
+		name = b.generateName()
+	}
+	inst := &ir.SizeOfInst{
+		QueryType: typ,
+	}
+	inst.Op = ir.OpSizeOf
+	inst.SetName(name)
+	// sizeof returns usize (platform-dependent pointer-sized unsigned int)
+	inst.SetType(types.U64) // Could be platform-specific
+	b.insert(inst)
+	return inst
+}
+
+// CreateAlignOf creates an alignof intrinsic (compile-time alignment requirement)
+func (b *Builder) CreateAlignOf(typ types.Type, name string) *ir.AlignOfInst {
+	if name == "" {
+		name = b.generateName()
+	}
+	inst := &ir.AlignOfInst{
+		QueryType: typ,
+	}
+	inst.Op = ir.OpAlignOf
+	inst.SetName(name)
+	// alignof returns usize
+	inst.SetType(types.U64)
+	b.insert(inst)
+	return inst
+}
+
+// CreateMemSet creates a memset intrinsic: memset(dest, val, count)
+func (b *Builder) CreateMemSet(dest ir.Value, val ir.Value, count ir.Value) *ir.MemSetInst {
+	inst := &ir.MemSetInst{}
+	inst.Op = ir.OpMemSet
+	inst.SetType(types.Void)
+	inst.SetOperand(0, dest)
+	inst.SetOperand(1, val)
+	inst.SetOperand(2, count)
+	b.insert(inst)
+	return inst
+}
+
+// CreateMemCpy creates a memcpy intrinsic: memcpy(dest, src, count)
+func (b *Builder) CreateMemCpy(dest ir.Value, src ir.Value, count ir.Value) *ir.MemCpyInst {
+	inst := &ir.MemCpyInst{}
+	inst.Op = ir.OpMemCpy
+	inst.SetType(types.Void)
+	inst.SetOperand(0, dest)
+	inst.SetOperand(1, src)
+	inst.SetOperand(2, count)
+	b.insert(inst)
+	return inst
+}
+
+// CreateMemMove creates a memmove intrinsic: memmove(dest, src, count)
+func (b *Builder) CreateMemMove(dest ir.Value, src ir.Value, count ir.Value) *ir.MemMoveInst {
+	inst := &ir.MemMoveInst{}
+	inst.Op = ir.OpMemMove
+	inst.SetType(types.Void)
+	inst.SetOperand(0, dest)
+	inst.SetOperand(1, src)
+	inst.SetOperand(2, count)
+	b.insert(inst)
+	return inst
+}
+
+// CreateStrLen creates a strlen intrinsic: strlen(str) -> usize
+func (b *Builder) CreateStrLen(str ir.Value, name string) *ir.StrLenInst {
+	if name == "" {
+		name = b.generateName()
+	}
+	inst := &ir.StrLenInst{}
+	inst.Op = ir.OpStrLen
+	inst.SetName(name)
+	inst.SetType(types.U64) // usize
+	inst.SetOperand(0, str)
+	b.insert(inst)
+	return inst
+}
+
+// CreateMemChr creates a memchr intrinsic: memchr(ptr, val, count) -> *void
+func (b *Builder) CreateMemChr(ptr ir.Value, val ir.Value, count ir.Value, name string) *ir.MemChrInst {
+	if name == "" {
+		name = b.generateName()
+	}
+	inst := &ir.MemChrInst{}
+	inst.Op = ir.OpMemChr
+	inst.SetName(name)
+	inst.SetType(types.NewPointer(types.Void)) // *void
+	inst.SetOperand(0, ptr)
+	inst.SetOperand(1, val)
+	inst.SetOperand(2, count)
+	b.insert(inst)
+	return inst
+}
+
+// CreateMemCmp creates a memcmp intrinsic: memcmp(ptr1, ptr2, count) -> i32
+func (b *Builder) CreateMemCmp(ptr1 ir.Value, ptr2 ir.Value, count ir.Value, name string) *ir.MemCmpInst {
+	if name == "" {
+		name = b.generateName()
+	}
+	inst := &ir.MemCmpInst{}
+	inst.Op = ir.OpMemCmp
+	inst.SetName(name)
+	inst.SetType(types.I32)
+	inst.SetOperand(0, ptr1)
+	inst.SetOperand(1, ptr2)
+	inst.SetOperand(2, count)
+	b.insert(inst)
+	return inst
+}
+
+// CreateRaise creates a raise intrinsic for aborting execution
+func (b *Builder) CreateRaise(message ir.Value) *ir.RaiseInst {
+	inst := &ir.RaiseInst{}
+	inst.Op = ir.OpRaise
+	inst.SetType(types.Void)
+	inst.SetOperand(0, message)
+	b.insert(inst)
+	return inst
+}

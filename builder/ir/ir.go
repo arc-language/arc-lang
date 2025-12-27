@@ -9,7 +9,7 @@ import (
 	"github.com/arc-language/arc-lang/builder/types"
 )
 
-// Value is the interface for all IR values
+// Value is the interface all IR values implement
 type Value interface {
 	Type() types.Type
 	Name() string
@@ -101,6 +101,17 @@ const (
 	OpVaStart
 	OpVaArg
 	OpVaEnd
+	
+	// Intrinsic operations
+	OpSizeOf
+	OpAlignOf
+	OpMemSet
+	OpMemCpy
+	OpMemMove
+	OpStrLen
+	OpMemChr
+	OpMemCmp
+	OpRaise
 )
 
 var opcodeNames = map[Opcode]string{
@@ -154,6 +165,15 @@ var opcodeNames = map[Opcode]string{
 	OpVaStart:       "va_start",
 	OpVaArg:         "va_arg",
 	OpVaEnd:         "va_end",
+	OpSizeOf:        "sizeof",
+	OpAlignOf:       "alignof",
+	OpMemSet:        "memset",
+	OpMemCpy:        "memcpy",
+	OpMemMove:       "memmove",
+	OpStrLen:        "strlen",
+	OpMemChr:        "memchr",
+	OpMemCmp:        "memcmp",
+	OpRaise:         "raise",
 }
 
 func (op Opcode) String() string {
