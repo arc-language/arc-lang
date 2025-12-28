@@ -335,23 +335,22 @@ func (v *IRVisitor) visitForInVector(ctx *parser.ForStmtContext, varName string,
 	// Get the runtime struct type
 	structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
 	
-	// Collection is a pointer to the vector struct (from alloca)
-	// Cast it to the correct pointer type
+	// Collection should already be a pointer to the vector struct
+	// (from the variable's alloca in VisitVariableDecl)
 	var vecPtr ir.Value
-	if _, ok := collection.Type().(*types.PointerType); ok {
-		// It's already a pointer - just cast it to point to the struct type
-		vecPtr = v.ctx.Builder.CreateBitCast(collection, types.NewPointer(structType), "vec.ptr")
+	if ptrType, ok := collection.Type().(*types.PointerType); ok {
+		// It's already a pointer - use it directly
+		vecPtr = collection
 	} else {
-		// It's a value - allocate and store
-		vecPtr = v.ctx.Builder.CreateAlloca(structType, "vec.addr")
-		v.ctx.Builder.CreateStore(collection, vecPtr)
+		v.ctx.Logger.Error("Expected pointer to vector struct, got %v", collection.Type())
+		return nil
 	}
 	
-	// Get length field (field index 1)
+	// Get length field (field index 1) - do this ONCE before the loop
 	lenGEP := v.ctx.Builder.CreateStructGEP(structType, vecPtr, 1, "")
 	vecLen := v.ctx.Builder.CreateLoad(types.I64, lenGEP, "vec.len")
 	
-	// Get data pointer (field index 0)
+	// Get data pointer (field index 0) - do this ONCE before the loop
 	dataGEP := v.ctx.Builder.CreateStructGEP(structType, vecPtr, 0, "")
 	vecData := v.ctx.Builder.CreateLoad(types.NewPointer(vecType.ElementType), dataGEP, "vec.data")
 	
