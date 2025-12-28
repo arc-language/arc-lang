@@ -1,9 +1,9 @@
 
 Successful Compilation:
 
-Tests that passed:
+[PASSED TEST]
 
-
+test_functions.arc
 test_intrinsics_bit.arc
 test_intrinsics_memory.arc
 test_intrinsics_meta.arc

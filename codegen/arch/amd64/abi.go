@@ -63,6 +63,15 @@ func SizeOf(t types.Type) int {
 		return GetStructSize(st)
 
 	case types.VectorKind:
+		// Check if it's a dynamic vector or SIMD vector
+		if dvt, ok := t.(*types.DynamicVectorType); ok {
+			// Dynamic vector (runtime-sized): struct { *T data; i64 len; i64 cap }
+			// 3 x 8 bytes = 24 bytes
+			_ = dvt // Use the variable
+			return 24
+		}
+		
+		// SIMD vector (fixed-size)
 		vt := t.(*types.VectorType)
 		if vt.Scalable {
 			// Scalable vectors are runtime-determined
@@ -75,6 +84,11 @@ func SizeOf(t types.Type) int {
 			return totalSize
 		}
 		return ((totalSize + 15) / 16) * 16
+
+	case types.MapKind:
+		// Map (runtime hash table): struct { *Entry buckets; i64 len; i64 cap }
+		// 3 x 8 bytes = 24 bytes
+		return 24
 
 	case types.FunctionKind:
 		return 8 // Function pointers
@@ -145,12 +159,23 @@ func AlignOf(t types.Type) int {
 		return maxAlign
 
 	case types.VectorKind:
+		// Check if it's a dynamic vector or SIMD vector
+		if _, ok := t.(*types.DynamicVectorType); ok {
+			// Dynamic vector: aligned like a struct with pointers
+			return 8 // Pointer alignment
+		}
+		
+		// SIMD vector (fixed-size)
 		vt := t.(*types.VectorType)
 		totalSize := SizeOf(vt.ElementType) * vt.Length
 		if totalSize <= 16 {
 			return totalSize
 		}
 		return 16
+
+	case types.MapKind:
+		// Map: aligned like a struct with pointers
+		return 8 // Pointer alignment
 
 	case types.FunctionKind:
 		return 8

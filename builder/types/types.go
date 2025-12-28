@@ -11,15 +11,16 @@ import (
 type TypeKind int
 
 const (
-	VoidKind TypeKind = iota
-	IntegerKind
-	FloatKind
-	PointerKind
-	ArrayKind
-	StructKind
-	FunctionKind
-	VectorKind
-	LabelKind
+    VoidKind TypeKind = iota
+    IntegerKind
+    FloatKind
+    PointerKind
+    ArrayKind
+    StructKind
+    FunctionKind
+    VectorKind
+    MapKind
+    LabelKind
 )
 
 // Type is the interface all types implement
@@ -339,4 +340,72 @@ func IsPointer(t Type) bool { return t.Kind() == PointerKind }
 // IsAggregate returns true if the type is an aggregate (struct or array)
 func IsAggregate(t Type) bool {
 	return t.Kind() == StructKind || t.Kind() == ArrayKind
+}
+
+// IsDynamicVector returns true if the type is a runtime-sized vector
+func IsDynamicVector(t Type) bool {
+	_, ok := t.(*DynamicVectorType)
+	return ok
+}
+
+// IsMap returns true if the type is a map
+func IsMap(t Type) bool {
+	_, ok := t.(*MapType)
+	return ok
+}
+
+
+// DynamicVectorType - runtime-sized vector (like std::vector)
+// Represented at runtime as a struct { *T data, i64 len, i64 cap }
+type DynamicVectorType struct {
+    ElementType Type
+}
+
+func NewDynamicVector(elem Type) *DynamicVectorType {
+    return &DynamicVectorType{ElementType: elem}
+}
+
+func (t *DynamicVectorType) Kind() TypeKind { return VectorKind }
+
+func (t *DynamicVectorType) String() string {
+    return fmt.Sprintf("vector<%s>", t.ElementType)
+}
+
+func (t *DynamicVectorType) BitSize() int { 
+    return 24 * 8 // 3 pointers worth (data ptr + len + cap) = 24 bytes on 64-bit
+}
+
+func (t *DynamicVectorType) Equal(o Type) bool {
+    if ot, ok := o.(*DynamicVectorType); ok {
+        return t.ElementType.Equal(ot.ElementType)
+    }
+    return false
+}
+
+// MapType - runtime hash map
+// Represented at runtime as a struct { *Entry buckets, i64 len, i64 cap }
+type MapType struct {
+    KeyType   Type
+    ValueType Type
+}
+
+func NewMap(key, value Type) *MapType {
+    return &MapType{KeyType: key, ValueType: value}
+}
+
+func (t *MapType) Kind() TypeKind { return MapKind }
+
+func (t *MapType) String() string {
+    return fmt.Sprintf("map<%s, %s>", t.KeyType, t.ValueType)
+}
+
+func (t *MapType) BitSize() int {
+    return 24 * 8 // Similar to vector: buckets ptr + len + cap
+}
+
+func (t *MapType) Equal(o Type) bool {
+    if ot, ok := o.(*MapType); ok {
+        return t.KeyType.Equal(ot.KeyType) && t.ValueType.Equal(ot.ValueType)
+    }
+    return false
 }

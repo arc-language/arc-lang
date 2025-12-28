@@ -348,3 +348,68 @@ func (c *Context) CurrentLoop() *LoopInfo {
 	}
 	return &c.loopStack[len(c.loopStack)-1]
 }
+
+// GetVectorRuntimeType returns the runtime struct type for a vector
+func (c *Context) GetVectorRuntimeType(elemType types.Type) *types.StructType {
+    name := fmt.Sprintf("__vector_%s", elemType.String())
+    
+    // Check cache
+    if typ, ok := c.GetType(name); ok {
+        return typ.(*types.StructType)
+    }
+    
+    // Create: struct { *T data; i64 length; i64 capacity }
+    fields := []types.Type{
+        types.NewPointer(elemType), // data
+        types.I64,                   // length
+        types.I64,                   // capacity
+    }
+    
+    structType := types.NewStruct(name, fields, false)
+    c.RegisterType(name, structType)
+    
+    return structType
+}
+
+// GetMapRuntimeType returns the runtime struct type for a map
+func (c *Context) GetMapRuntimeType(keyType, valueType types.Type) *types.StructType {
+    name := fmt.Sprintf("__map_%s_%s", keyType.String(), valueType.String())
+    
+    // Check cache
+    if typ, ok := c.GetType(name); ok {
+        return typ.(*types.StructType)
+    }
+    
+    // Create: struct { *Entry buckets; i64 length; i64 capacity }
+    // Entry is a struct { key K; value V; i32 hash; *Entry next }
+    entryName := fmt.Sprintf("__map_entry_%s_%s", keyType.String(), valueType.String())
+    
+    var entryType *types.StructType
+    if typ, ok := c.GetType(entryName); ok {
+        entryType = typ.(*types.StructType)
+    } else {
+        // Forward declare entry type
+        entryFields := []types.Type{
+            keyType,                          // key
+            valueType,                        // value
+            types.I32,                        // hash
+            types.NewPointer(types.Void),     // next (will fix after creation)
+        }
+        entryType = types.NewStruct(entryName, entryFields, false)
+        c.RegisterType(entryName, entryType)
+        
+        // Fix the next pointer to point to actual entry type
+        entryFields[3] = types.NewPointer(entryType)
+    }
+    
+    fields := []types.Type{
+        types.NewPointer(entryType), // buckets
+        types.I64,                    // length
+        types.I64,                    // capacity
+    }
+    
+    structType := types.NewStruct(name, fields, false)
+    c.RegisterType(name, structType)
+    
+    return structType
+}

@@ -245,13 +245,16 @@ func (v *IRVisitor) resolveType(ctx parser.ITypeContext) types.Type {
 	}
 	
 	if typeCtx.VectorType() != nil {
-		v.ctx.Logger.Warning("Vector types not yet implemented")
-		return types.I64
+		elemType := v.resolveType(typeCtx.VectorType().Type_())
+		// Return dynamic vector type (runtime-sized)
+		return types.NewDynamicVector(elemType)
 	}
 	
 	if typeCtx.MapType() != nil {
-		v.ctx.Logger.Warning("Map types not yet implemented")
-		return types.I64
+		// MapType has two type children: key and value
+		keyType := v.resolveType(typeCtx.MapType().Type_(0))
+		valueType := v.resolveType(typeCtx.MapType().Type_(1))
+		return types.NewMap(keyType, valueType)
 	}
 	
 	if typeCtx.IDENTIFIER() != nil {
@@ -274,10 +277,26 @@ func (v *IRVisitor) getZeroValue(typ types.Type) ir.Value {
 		return v.ctx.Builder.ConstFloat(typ.(*types.FloatType), 0.0)
 	case types.PointerKind:
 		return v.ctx.Builder.ConstNull(typ.(*types.PointerType))
+	case types.VectorKind:
+		// For dynamic vector, create zero-initialized struct
+		if dvt, ok := typ.(*types.DynamicVectorType); ok {
+			structType := v.ctx.GetVectorRuntimeType(dvt.ElementType)
+			return v.ctx.Builder.ConstZero(structType)
+		}
+		// For SIMD vector
+		return v.ctx.Builder.ConstZero(typ)
+	case types.MapKind:
+		// For map, create zero-initialized struct
+		if mt, ok := typ.(*types.MapType); ok {
+			structType := v.ctx.GetMapRuntimeType(mt.KeyType, mt.ValueType)
+			return v.ctx.Builder.ConstZero(structType)
+		}
+		return v.ctx.Builder.ConstZero(typ)
 	default:
 		return v.ctx.Builder.ConstZero(typ)
 	}
 }
+
 
 func (v *IRVisitor) findFieldIndex(structType *types.StructType, fieldName string) int {
 	if fieldIndices, ok := v.ctx.StructFieldIndices[structType.Name]; ok {

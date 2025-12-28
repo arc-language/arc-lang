@@ -177,96 +177,226 @@ func (v *IRVisitor) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 }
 
 func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
-	// Format: for IDENTIFIER in EXPRESSION { BLOCK }
-	varName := ctx.IDENTIFIER(0).GetText()
-	
-	v.logger.Debug("Compiling for-in loop with variable '%s'", varName)
+    // Check if we have two identifiers (for map iteration: for key, value in map)
+    isTwoVar := len(ctx.AllIDENTIFIER()) == 2
+    
+    varName := ctx.IDENTIFIER(0).GetText()
+    var valueName string
+    if isTwoVar {
+        valueName = ctx.IDENTIFIER(1).GetText()
+    }
+    
+    v.logger.Debug("Compiling for-in loop with variable '%s'", varName)
 
-	// 1. Unpack the Range Expression
-	expr := ctx.Expression(0)
-	
-	var rngCtx parser.IRangeExpressionContext
-	
-	// Safe navigation down the AST to find RangeExpression
-	if lor := expr.LogicalOrExpression(); lor != nil {
-		if land := lor.LogicalAndExpression(0); land != nil {
-			if eq := land.EqualityExpression(0); eq != nil {
-				if rel := eq.RelationalExpression(0); rel != nil {
-					rngCtx = rel.RangeExpression(0)
-				}
-			}
-		}
-	}
+    // 1. Evaluate the collection expression
+    expr := ctx.Expression(0)
+    
+    // Check if it's a range expression first
+    var rngCtx parser.IRangeExpressionContext
+    if lor := expr.LogicalOrExpression(); lor != nil {
+        if land := lor.LogicalAndExpression(0); land != nil {
+            if eq := land.EqualityExpression(0); eq != nil {
+                if rel := eq.RelationalExpression(0); rel != nil {
+                    rngCtx = rel.RangeExpression(0)
+                }
+            }
+        }
+    }
 
-	// Check if we actually found a range ".."
-	if rngCtx == nil || rngCtx.RANGE() == nil {
-		v.ctx.Logger.Error("for-in loop expects a range (e.g., 1..10)")
-		return nil
-	}
+    // Handle range expression
+    if rngCtx != nil && rngCtx.RANGE() != nil {
+        return v.visitForInRange(ctx, varName, rngCtx)
+    }
 
-	// 2. Evaluate Start and End
-	startVal := v.Visit(rngCtx.AdditiveExpression(0)).(ir.Value)
-	endVal := v.Visit(rngCtx.AdditiveExpression(1)).(ir.Value)
+    // Not a range - evaluate the collection
+    collection := v.Visit(expr).(ir.Value)
+    
+    // Determine collection type
+    collectionType := collection.Type()
+    
+    // Handle vector iteration
+    if vecType, ok := collectionType.(*types.DynamicVectorType); ok {
+        return v.visitForInVector(ctx, varName, collection, vecType)
+    }
+    
+    // Handle map iteration
+    if mapType, ok := collectionType.(*types.MapType); ok {
+        if !isTwoVar {
+            v.ctx.Logger.Error("Map iteration requires two variables: for key, value in map")
+            return nil
+        }
+        return v.visitForInMap(ctx, varName, valueName, collection, mapType)
+    }
+    
+    // Handle array iteration (pointer to array)
+    if ptrType, ok := collectionType.(*types.PointerType); ok {
+        if arrType, ok := ptrType.ElementType.(*types.ArrayType); ok {
+            return v.visitForInArray(ctx, varName, collection, arrType)
+        }
+    }
+    
+    v.ctx.Logger.Error("for-in loop expects a range, vector, map, or array")
+    return nil
+}
 
-	// Basic type check
-	if !startVal.Type().Equal(endVal.Type()) {
-		v.logger.Warning("Range start and end types differ, may need implicit cast")
-	}
+func (v *IRVisitor) visitForInVector(ctx *parser.ForStmtContext, varName string, collection ir.Value, vecType *types.DynamicVectorType) interface{} {
+    token := ctx.GetStart()
+    uniqueID := fmt.Sprintf("%d_%d", token.GetLine(), token.GetColumn())
+    
+    v.logger.Debug("Compiling for-in loop over vector")
+    
+    // Get the runtime struct type
+    structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
+    
+    // Load vector struct
+    vecAlloca := v.ctx.Builder.CreateAlloca(structType, "vec.addr")
+    v.ctx.Builder.CreateStore(collection, vecAlloca)
+    
+    // Get length field
+    lenGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 1, "")
+    vecLen := v.ctx.Builder.CreateLoad(types.I64, lenGEP, "vec.len")
+    
+    // Get data pointer
+    dataGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 0, "")
+    vecData := v.ctx.Builder.CreateLoad(types.NewPointer(vecType.ElementType), dataGEP, "vec.data")
+    
+    // Create index variable
+    indexType := types.I64
+    indexPtr := v.ctx.Builder.CreateAlloca(indexType, "vec.index.addr")
+    zero := v.ctx.Builder.ConstInt(indexType, 0)
+    v.ctx.Builder.CreateStore(zero, indexPtr)
+    
+    // Create blocks
+    condBlock := v.ctx.Builder.CreateBlock("vec.cond." + uniqueID)
+    bodyBlock := v.ctx.Builder.CreateBlock("vec.body." + uniqueID)
+    stepBlock := v.ctx.Builder.CreateBlock("vec.step." + uniqueID)
+    endBlock := v.ctx.Builder.CreateBlock("vec.end." + uniqueID)
+    
+    v.ctx.Builder.CreateBr(condBlock)
+    
+    // Condition: index < length
+    v.ctx.SetInsertBlock(condBlock)
+    currIndex := v.ctx.Builder.CreateLoad(indexType, indexPtr, "")
+    cmp := v.ctx.Builder.CreateICmpSLT(currIndex, vecLen, "")
+    v.ctx.Builder.CreateCondBr(cmp, bodyBlock, endBlock)
+    
+    // Body: load element and bind to loop variable
+    v.ctx.SetInsertBlock(bodyBlock)
+    
+    // Get element: data[index]
+    index := v.ctx.Builder.CreateLoad(indexType, indexPtr, "")
+    elemPtr := v.ctx.Builder.CreateInBoundsGEP(vecType.ElementType, vecData, []ir.Value{index}, "")
+    
+    // Create loop variable and load element into it
+    loopVarPtr := v.ctx.Builder.CreateAlloca(vecType.ElementType, varName+".addr")
+    elemVal := v.ctx.Builder.CreateLoad(vecType.ElementType, elemPtr, "")
+    v.ctx.Builder.CreateStore(elemVal, loopVarPtr)
+    v.ctx.currentScope.Define(varName, loopVarPtr)
+    
+    // Execute loop body
+    v.ctx.PushLoop(stepBlock, endBlock)
+    v.Visit(ctx.Block())
+    v.ctx.PopLoop()
+    
+    if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
+        v.ctx.Builder.CreateBr(stepBlock)
+    }
+    
+    // Step: index++
+    v.ctx.SetInsertBlock(stepBlock)
+    currIdx := v.ctx.Builder.CreateLoad(indexType, indexPtr, "")
+    one := v.ctx.Builder.ConstInt(indexType, 1)
+    nextIdx := v.ctx.Builder.CreateAdd(currIdx, one, "")
+    v.ctx.Builder.CreateStore(nextIdx, indexPtr)
+    v.ctx.Builder.CreateBr(condBlock)
+    
+    // End block
+    v.ctx.SetInsertBlock(endBlock)
+    return nil
+}
 
-	// 3. Setup Loop Variable
-	loopVarType := startVal.Type()
-	loopVarPtr := v.ctx.Builder.CreateAlloca(loopVarType, varName+".addr")
-	
-	// Initialize loop variable
-	v.ctx.Builder.CreateStore(startVal, loopVarPtr)
-	v.ctx.currentScope.Define(varName, loopVarPtr)
+// New function for map iteration
+func (v *IRVisitor) visitForInMap(ctx *parser.ForStmtContext, keyName, valueName string, collection ir.Value, mapType *types.MapType) interface{} {
+    token := ctx.GetStart()
+    uniqueID := fmt.Sprintf("%d_%d", token.GetLine(), token.GetColumn())
+    
+    v.logger.Debug("Compiling for-in loop over map")
+    
+    // Get the runtime struct type
+    structType := v.ctx.GetMapRuntimeType(mapType.KeyType, mapType.ValueType)
+    
+    // This is complex - requires iterating through hash buckets
+    // For now, emit a warning
+    v.ctx.Logger.Warning("Map iteration not fully implemented - loop will be empty")
+    
+    // Create empty loop that exits immediately
+    endBlock := v.ctx.Builder.CreateBlock("map.end." + uniqueID)
+    v.ctx.Builder.CreateBr(endBlock)
+    v.ctx.SetInsertBlock(endBlock)
+    
+    return nil
+}
 
-	// 4. Create Blocks
-	token := ctx.GetStart()
-	uniqueID := fmt.Sprintf("%d_%d", token.GetLine(), token.GetColumn())
-	
-	condBlock := v.ctx.Builder.CreateBlock("for.cond." + uniqueID)
-	bodyBlock := v.ctx.Builder.CreateBlock("for.body." + uniqueID)
-	stepBlock := v.ctx.Builder.CreateBlock("for.step." + uniqueID)
-	endBlock := v.ctx.Builder.CreateBlock("for.end." + uniqueID)
-
-	v.ctx.Builder.CreateBr(condBlock)
-
-	// 5. Condition Block: if x < end
-	v.ctx.SetInsertBlock(condBlock)
-	currVal := v.ctx.Builder.CreateLoad(loopVarType, loopVarPtr, "")
-	
-	cmp := v.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
-	v.ctx.Builder.CreateCondBr(cmp, bodyBlock, endBlock)
-
-	// 6. Body Block
-	v.ctx.SetInsertBlock(bodyBlock)
-	v.ctx.PushLoop(stepBlock, endBlock) 
-	v.Visit(ctx.Block())
-	v.ctx.PopLoop()
-
-	if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
-		v.ctx.Builder.CreateBr(stepBlock)
-	}
-
-	// 7. Step Block: x = x + 1
-	v.ctx.SetInsertBlock(stepBlock)
-	currValForStep := v.ctx.Builder.CreateLoad(loopVarType, loopVarPtr, "")
-	
-	var one ir.Constant
-	if intType, ok := loopVarType.(*types.IntType); ok {
-		one = v.ctx.Builder.ConstInt(intType, 1)
-	} else {
-		one = v.ctx.Builder.ConstInt(types.I64, 1)
-	}
-
-	nextVal := v.ctx.Builder.CreateAdd(currValForStep, one, "")
-	v.ctx.Builder.CreateStore(nextVal, loopVarPtr)
-	v.ctx.Builder.CreateBr(condBlock)
-
-	// 8. End Block
-	v.ctx.SetInsertBlock(endBlock)
-	return nil
+func (v *IRVisitor) visitForInArray(ctx *parser.ForStmtContext, varName string, collection ir.Value, arrType *types.ArrayType) interface{} {
+    token := ctx.GetStart()
+    uniqueID := fmt.Sprintf("%d_%d", token.GetLine(), token.GetColumn())
+    
+    v.logger.Debug("Compiling for-in loop over array of length %d", arrType.Length)
+    
+    // Create index variable
+    indexType := types.I64
+    indexPtr := v.ctx.Builder.CreateAlloca(indexType, "arr.index.addr")
+    zero := v.ctx.Builder.ConstInt(indexType, 0)
+    v.ctx.Builder.CreateStore(zero, indexPtr)
+    
+    // Create blocks
+    condBlock := v.ctx.Builder.CreateBlock("arr.cond." + uniqueID)
+    bodyBlock := v.ctx.Builder.CreateBlock("arr.body." + uniqueID)
+    stepBlock := v.ctx.Builder.CreateBlock("arr.step." + uniqueID)
+    endBlock := v.ctx.Builder.CreateBlock("arr.end." + uniqueID)
+    
+    v.ctx.Builder.CreateBr(condBlock)
+    
+    // Condition: index < length
+    v.ctx.SetInsertBlock(condBlock)
+    currIndex := v.ctx.Builder.CreateLoad(indexType, indexPtr, "")
+    length := v.ctx.Builder.ConstInt(indexType, arrType.Length)
+    cmp := v.ctx.Builder.CreateICmpSLT(currIndex, length, "")
+    v.ctx.Builder.CreateCondBr(cmp, bodyBlock, endBlock)
+    
+    // Body: load array element and bind to loop variable
+    v.ctx.SetInsertBlock(bodyBlock)
+    
+    // Get pointer to array element: collection[index]
+    index := v.ctx.Builder.CreateLoad(indexType, indexPtr, "")
+    elemPtr := v.ctx.Builder.CreateInBoundsGEP(arrType, collection, []ir.Value{zero, index}, "")
+    
+    // Create loop variable and load element into it
+    loopVarPtr := v.ctx.Builder.CreateAlloca(arrType.ElementType, varName+".addr")
+    elemVal := v.ctx.Builder.CreateLoad(arrType.ElementType, elemPtr, "")
+    v.ctx.Builder.CreateStore(elemVal, loopVarPtr)
+    v.ctx.currentScope.Define(varName, loopVarPtr)
+    
+    // Execute loop body
+    v.ctx.PushLoop(stepBlock, endBlock)
+    v.Visit(ctx.Block())
+    v.ctx.PopLoop()
+    
+    if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
+        v.ctx.Builder.CreateBr(stepBlock)
+    }
+    
+    // Step: index++
+    v.ctx.SetInsertBlock(stepBlock)
+    currIdx := v.ctx.Builder.CreateLoad(indexType, indexPtr, "")
+    one := v.ctx.Builder.ConstInt(indexType, 1)
+    nextIdx := v.ctx.Builder.CreateAdd(currIdx, one, "")
+    v.ctx.Builder.CreateStore(nextIdx, indexPtr)
+    v.ctx.Builder.CreateBr(condBlock)
+    
+    // End block
+    v.ctx.SetInsertBlock(endBlock)
+    return nil
 }
 
 func (v *IRVisitor) VisitBreakStmt(ctx *parser.BreakStmtContext) interface{} {

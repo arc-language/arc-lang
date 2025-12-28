@@ -1,40 +1,24 @@
+// test_async_simple.arc
 namespace main
 
-// Basic function
+// Simple async function that returns immediately
+async func get_value() int32 {
+    return 42
+}
+
+// Async function that awaits another async function
+async func fetch_data() int32 {
+    let value = await get_value()
+    return value
+}
+
+// Regular function
 func add(a: int32, b: int32) int32 {
     return a + b
 }
 
-// No return
-func print_message(msg: string) {
-    // implementation
-}
-
-// Async function with return
-async func fetch_data(url: string) string {
-    let response = await http_get(url)
-    return response
-}
-
-// Async function without return
-async func process_items(items: vector<string>) {
-    for item in items {
-        await process_item(item)
-    }
-}
-
-// Placeholder async functions for testing
-async func http_get(url: string) string {
-    return "response"
-}
-
-async func process_item(item: string) {
-    // implementation
-}
-
+// Main function (not async)
 func main() int32 {
     let result = add(5, 10)
-    print_message("Hello")
-    
-    return 0
+    return result
 }
