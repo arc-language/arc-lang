@@ -92,7 +92,8 @@ func (v *IRVisitor) VisitRelationalExpression(ctx *parser.RelationalExpressionCo
 func (v *IRVisitor) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} {
 	result := v.Visit(ctx.RangeExpression(0)).(ir.Value)
 	
-	for i := 1; i < len(ctx.AllRangeExpression()); i++ {
+	count := len(ctx.AllRangeExpression())
+	for i := 1; i < count; i++ {
 		rhs := v.Visit(ctx.RangeExpression(i)).(ir.Value)
 		
 		opNode := ctx.GetChild(i*2 - 1).(antlr.TerminalNode)
@@ -436,6 +437,23 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 
 	typ, ok := v.ctx.GetType(name)
 	if !ok {
+		// Try fallback if qualified name resolution failed
+		if ctx.QualifiedIdentifier() != nil {
+			qCtx := ctx.QualifiedIdentifier()
+			if len(qCtx.AllIDENTIFIER()) == 2 {
+				nsName := qCtx.IDENTIFIER(0).GetText()
+				typeName := qCtx.IDENTIFIER(1).GetText()
+				if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
+					if t, ok := ns.Types[typeName]; ok {
+						typ = t
+						ok = true
+					}
+				}
+			}
+		}
+	}
+	
+	if !ok {
 		v.ctx.Logger.Error("Unknown struct/class type: %s", name)
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
@@ -446,8 +464,11 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
 
-	if v.ctx.IsClassType(name) {
-		ptrToClass := v.ctx.Builder.CreateAlloca(structType, name+".instance")
+	irName := structType.Name
+	v.logger.Debug("Creating struct literal for type: %s (IR: %s)", name, irName)
+
+	if v.ctx.IsClassType(irName) {
+		ptrToClass := v.ctx.Builder.CreateAlloca(structType, irName+".instance")
 		
 		for i := 0; i < len(structType.Fields); i++ {
 			gep := v.ctx.Builder.CreateStructGEP(structType, ptrToClass, i, "")
@@ -460,12 +481,12 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 			fieldVal := v.Visit(field.Expression()).(ir.Value)
 			
 			var idx int = -1
-			if idxVal, ok := v.ctx.ClassFieldIndices[name][fieldName]; ok {
+			if idxVal, ok := v.ctx.ClassFieldIndices[irName][fieldName]; ok {
 				idx = idxVal
 			}
 			
 			if idx < 0 {
-				v.ctx.Logger.Error("Class %s has no field %s", name, fieldName)
+				v.ctx.Logger.Error("Class %s has no field %s", irName, fieldName)
 				continue
 			}
 			
@@ -686,8 +707,6 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 		targetType := v.resolveType(ctx.Type_())
 		return v.ctx.Builder.CreateVaArg(args[0], targetType, "")
 	}
-	
-	// FIX: Return valid ir.Value (0) for void-like intrinsics to prevent panic in chain
 	if ctx.VA_END() != nil {
 		return v.ctx.Builder.CreateVaEnd(args[0])
 	}
