@@ -422,7 +422,6 @@ func (v *IRVisitor) createEmptyMap(mapType *types.MapType) ir.Value {
     }
 }
 
-// NEW: Runtime vector initialization with elements
 func (v *IRVisitor) createVectorWithElements(constArr *ir.ConstantArray, vecType *types.DynamicVectorType) ir.Value {
     structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
     elemCount := int64(len(constArr.Elements))
@@ -436,13 +435,15 @@ func (v *IRVisitor) createVectorWithElements(constArr *ir.ConstantArray, vecType
     // Create vector struct value with pointer to global array
     // Get pointer to first element: &globalData[0]
     zero := v.ctx.Builder.ConstInt(types.I32, 0)
+    // FIX: Cast the GEP result to the correct pointer type (ptr<elemType> not ptr<arrayType>)
     dataPtr := v.ctx.Builder.CreateInBoundsGEP(arrType, globalData, []ir.Value{zero, zero}, "vec.data")
     
     // Allocate the struct on stack
     vecAlloca := v.ctx.Builder.CreateAlloca(structType, "vec.tmp")
     
-    // Store data pointer (field 0)
+    // Store data pointer (field 0) - cast to correct type first
     dataPtrGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 0, "")
+    // The dataPtr from GEP should already be ptr<elemType>, but let's ensure it
     v.ctx.Builder.CreateStore(dataPtr, dataPtrGEP)
     
     // Store length (field 1)

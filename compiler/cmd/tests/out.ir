@@ -23,11 +23,9 @@ entry:
   %3 = getelementptr inbounds [13 x i8], ptr<[13 x i8]> %.str.1, i32 0, i32 0
   %4 = call i32 @printf(ptr<[13 x i8]> %3)
   %5 = load %__vector_i32, ptr<%__vector_i32> %items.addr
-  %vec.addr = alloca %__vector_i32
-  store %__vector_i32 %5, ptr<%__vector_i32> %vec.addr
-  %6 = getelementptr %__vector_i32, ptr<%__vector_i32> %vec.addr, i32 0, i32 1
+  %6 = getelementptr %__vector_i32, ptr<%__vector_i32> %items.addr, i32 0, i32 1
   %vec.len = load i64, ptr<%__vector_i32> %6
-  %7 = getelementptr %__vector_i32, ptr<%__vector_i32> %vec.addr, i32 0, i32 0
+  %7 = getelementptr %__vector_i32, ptr<%__vector_i32> %items.addr, i32 0, i32 0
   %vec.data = load ptr<i32>, ptr<%__vector_i32> %7
   %vec.index.addr = alloca i64
   store i64 0, ptr<i64> %vec.index.addr
