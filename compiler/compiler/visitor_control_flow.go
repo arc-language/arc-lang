@@ -437,7 +437,6 @@ func (v *IRVisitor) visitForInMap(ctx *parser.ForStmtContext, keyName, valueName
 	return nil
 }
 
-// Array iteration
 func (v *IRVisitor) visitForInArray(ctx *parser.ForStmtContext, varName string, collection ir.Value, arrType *types.ArrayType) interface{} {
 	token := ctx.GetStart()
 	uniqueID := fmt.Sprintf("%d_%d", token.GetLine(), token.GetColumn())
@@ -470,7 +469,6 @@ func (v *IRVisitor) visitForInArray(ctx *parser.ForStmtContext, varName string, 
 	
 	// Get pointer to array element: collection[index]
 	index := v.ctx.Builder.CreateLoad(indexType, indexPtr, "")
-	zero := v.ctx.Builder.ConstInt(types.I64, 0)
 	elemPtr := v.ctx.Builder.CreateInBoundsGEP(arrType, collection, []ir.Value{zero, index}, "")
 	
 	// Create loop variable and load element into it
