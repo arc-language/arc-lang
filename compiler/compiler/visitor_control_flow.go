@@ -176,7 +176,7 @@ func (v *IRVisitor) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	return nil
 }
 
-func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
+func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext, varName string, collection ir.Value, vecType *types.DynamicVectorType) interface{} {
 	// Check if we have two identifiers (for map iteration: for key, value in map)
 	isTwoVar := len(ctx.AllIDENTIFIER()) == 2
 	
@@ -214,9 +214,30 @@ func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 	// Determine collection type
 	collectionType := collection.Type()
 	
-	// Handle vector iteration
+	// IMPORTANT: Handle pointer type - unwrap it to see what it points to
+	if ptrType, ok := collectionType.(*types.PointerType); ok {
+		collectionType = ptrType.ElementType
+	}
+	
+	// Handle vector iteration - check for BOTH abstract type AND struct type
 	if vecType, ok := collectionType.(*types.DynamicVectorType); ok {
 		return v.visitForInVector(ctx, varName, collection, vecType)
+	}
+	
+	// Also check if it's the runtime struct type (e.g., __vector_i32)
+	if structType, ok := collectionType.(*types.StructType); ok {
+		// Check if this struct is a vector runtime type by name pattern
+		if strings.HasPrefix(structType.Name, "__vector_") {
+			// Extract element type from struct
+			// The struct has fields: { ptr<T>, i64, i64 }
+			if len(structType.Fields) >= 3 {
+				if ptrField, ok := structType.Fields[0].(*types.PointerType); ok {
+					elemType := ptrField.ElementType
+					vecType := types.NewDynamicVector(elemType)
+					return v.visitForInVector(ctx, varName, collection, vecType)
+				}
+			}
+		}
 	}
 	
 	// Handle map iteration
@@ -229,10 +250,8 @@ func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 	}
 	
 	// Handle array iteration (pointer to array)
-	if ptrType, ok := collectionType.(*types.PointerType); ok {
-		if arrType, ok := ptrType.ElementType.(*types.ArrayType); ok {
-			return v.visitForInArray(ctx, varName, collection, arrType)
-		}
+	if arrType, ok := collectionType.(*types.ArrayType); ok {
+		return v.visitForInArray(ctx, varName, collection, arrType)
 	}
 	
 	v.ctx.Logger.Error("for-in loop expects a range (e.g., 1..10), vector, map, or array")
