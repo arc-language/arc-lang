@@ -1,7 +1,6 @@
 package compiler
 
 import (
-	"strings"
 
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
