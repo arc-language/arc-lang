@@ -318,7 +318,7 @@ func (v *IRVisitor) visitForInVector(ctx *parser.ForStmtContext, varName string,
 	// Collection is a pointer to the vector struct (from alloca)
 	// Cast it to the correct pointer type
 	var vecPtr ir.Value
-	if ptrType, ok := collection.Type().(*types.PointerType); ok {
+	if _, ok := collection.Type().(*types.PointerType); ok {
 		// It's already a pointer - just cast it to point to the struct type
 		vecPtr = v.ctx.Builder.CreateBitCast(collection, types.NewPointer(structType), "vec.ptr")
 	} else {
