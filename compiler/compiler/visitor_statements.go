@@ -68,7 +68,7 @@ func (v *IRVisitor) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 	lhsCtx := ctx.LeftHandSide()
 	
 	// Simple Variable Assignment: IDENTIFIER = value
-	if lhsCtx.IDENTIFIER() != nil && lhsCtx.DOT() == nil && lhsCtx.STAR() == nil {
+	if lhsCtx.IDENTIFIER() != nil && lhsCtx.DOT() == nil && lhsCtx.STAR() == nil && lhsCtx.LBRACKET() == nil {
 		name := lhsCtx.IDENTIFIER().GetText()
 		rhs := v.Visit(ctx.Expression()).(ir.Value)
 		
@@ -100,6 +100,34 @@ func (v *IRVisitor) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 		ptr := v.Visit(lhsCtx.PostfixExpression()).(ir.Value)
 		rhs := v.Visit(ctx.Expression()).(ir.Value)
 		v.ctx.Builder.CreateStore(rhs, ptr)
+		return nil
+	}
+	
+	// Array/Pointer Index Assignment: buffer[index] = value
+	if lhsCtx.LBRACKET() != nil && lhsCtx.PostfixExpression() != nil {
+		v.logger.Debug("Assigning to array/pointer index")
+		
+		// Get the base (buffer)
+		base := v.Visit(lhsCtx.PostfixExpression()).(ir.Value)
+		
+		// Get the index expression
+		indexExpr := v.Visit(lhsCtx.Expression()).(ir.Value)
+		
+		// Get the value to store
+		rhs := v.Visit(ctx.Expression()).(ir.Value)
+		
+		// Compute the element pointer
+		var elemPtr ir.Value
+		if ptrType, ok := base.Type().(*types.PointerType); ok {
+			// It's a pointer - use GEP to get element address
+			elemPtr = v.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, base, []ir.Value{indexExpr}, "")
+		} else {
+			v.ctx.Logger.Error("Cannot index non-pointer type: %v", base.Type())
+			return nil
+		}
+		
+		// Store the value at that address
+		v.ctx.Builder.CreateStore(rhs, elemPtr)
 		return nil
 	}
 	

@@ -1,170 +1,261 @@
-// std/io.arc
 namespace io
 
-// ============================================================================
-// Syscall Numbers (Linux x86_64)
-// ============================================================================
+// File descriptors
+const STDIN: int32 = 0
+const STDOUT: int32 = 1
+const STDERR: int32 = 2
 
+// Syscall numbers (Linux x86_64)
+const SYS_READ: int32 = 0
 const SYS_WRITE: int32 = 1
 
-// ============================================================================
-// File Descriptors
-// ============================================================================
-
-const STDOUT: int32 = 1
+// Internal buffer size for number conversions
+const NUM_BUFFER_SIZE: usize = 32
 
 // ============================================================================
-// Core Write Function
+// Core Write Functions
 // ============================================================================
 
-// Write bytes to file descriptor
 func write(fd: int32, data: *byte, len: usize) isize {
-    return cast<isize>(syscall(SYS_WRITE, fd, cast<uint64>(data), cast<uint64>(len)))
+    return cast<isize>(syscall(SYS_WRITE, fd, cast<uint64>(data), len))
 }
 
-// ============================================================================
-// Printf Helpers
-// ============================================================================
+func write_string(fd: int32, s: string) isize {
+    return write(fd, cast<*byte>(s), cast<usize>(strlen(cast<*byte>(s))))
+}
 
-// Write single character to fd
-func write_char(fd: int32, ch: char) {
+func write_byte(fd: int32, b: byte) isize {
     let buf = alloca(byte, 1)
-    buf[0] = cast<byte>(ch)
-    write(fd, buf, 1)
+    buf[0] = b
+    return write(fd, buf, 1)
 }
 
-// Helper to get digit character for base conversion
-func get_digit_char(digit: uint64) byte {
-    if digit < 10 {
-        return cast<byte>('0' + cast<char>(digit))
-    }
-    return cast<byte>('a' + cast<char>(digit - 10))
-}
+// ============================================================================
+// Number to String Conversion Helpers
+// ============================================================================
 
-// Convert unsigned integer to string
-func uint_to_str(value: uint64, buffer: *byte, base: uint32) usize {
-    if value == 0 {
-        buffer[0] = '0'
-        return 1
+func int_to_string(value: int64, buffer: *byte, base: uint32) usize {
+    if base < 2 || base > 36 {
+        return 0
     }
     
-    let temp = alloca(byte, 64)
+    let digits = "0123456789abcdefghijklmnopqrstuvwxyz"
+    let is_negative = value < 0
+    let abs_value = if is_negative { -value } else { value }
     let pos: usize = 0
     
-    let v = value
-    for v > 0 {
-        let digit = v % cast<uint64>(base)
-        temp[pos] = get_digit_char(digit)
-        v = v / cast<uint64>(base)
+    // Convert digits in reverse
+    let temp = alloca(byte, NUM_BUFFER_SIZE)
+    let temp_pos: usize = 0
+    
+    if abs_value == 0 {
+        temp[temp_pos] = '0'
+        temp_pos++
+    } else {
+        let n = cast<uint64>(abs_value)
+        for n > 0 {
+            temp[temp_pos] = digits[n % cast<uint64>(base)]
+            temp_pos++
+            n /= cast<uint64>(base)
+        }
+    }
+    
+    // Add negative sign if needed
+    if is_negative {
+        buffer[pos] = '-'
         pos++
     }
     
-    // Reverse into output buffer
-    for let i: usize = 0; i < pos; i++ {
-        buffer[i] = temp[pos - i - 1]
+    // Reverse the digits into output buffer
+    for temp_pos > 0 {
+        temp_pos--
+        buffer[pos] = temp[temp_pos]
+        pos++
     }
     
     return pos
 }
 
-// Convert signed integer to string
-func int_to_str(value: int64, buffer: *byte) usize {
-    let pos: usize = 0
-    
-    if value < 0 {
-        buffer[0] = '-'
-        pos = 1
-        value = -value
+func uint_to_string(value: uint64, buffer: *byte, base: uint32) usize {
+    if base < 2 || base > 36 {
+        return 0
     }
     
-    let uval = cast<uint64>(value)
-    let len = uint_to_str(uval, buffer + pos, 10)
-    return pos + len
+    let digits = "0123456789abcdefghijklmnopqrstuvwxyz"
+    let pos: usize = 0
+    
+    // Convert digits in reverse
+    let temp = alloca(byte, NUM_BUFFER_SIZE)
+    let temp_pos: usize = 0
+    
+    if value == 0 {
+        temp[temp_pos] = '0'
+        temp_pos++
+    } else {
+        let n = value
+        for n > 0 {
+            temp[temp_pos] = digits[n % cast<uint64>(base)]
+            temp_pos++
+            n /= cast<uint64>(base)
+        }
+    }
+    
+    // Reverse the digits into output buffer
+    for temp_pos > 0 {
+        temp_pos--
+        buffer[pos] = temp[temp_pos]
+        pos++
+    }
+    
+    return pos
 }
 
-// Write string to file descriptor
-func write_string(fd: int32, s: string) {
-    let ptr = cast<*byte>(s)
-    let len = *cast<*usize>(cast<uint64>(&s) + 8)
-    write(fd, ptr, len)
+func ptr_to_string(ptr: *void, buffer: *byte) usize {
+    let addr = cast<uint64>(ptr)
+    
+    // Write "0x" prefix
+    buffer[0] = '0'
+    buffer[1] = 'x'
+    let pos: usize = 2
+    
+    // Convert to hex
+    let len = uint_to_string(addr, buffer + pos, 16)
+    return pos + len
 }
 
 // ============================================================================
 // Printf Implementation
 // ============================================================================
 
-// Core formatting function
-func vfprintf(fd: int32, fmt: string, args: *void) {
-    let fmt_ptr = cast<*byte>(fmt)
-    let fmt_len = *cast<*usize>(cast<uint64>(&fmt) + 8)
-    
-    let buffer = alloca(byte, 64)
-    let i: usize = 0
-    
-    for i < fmt_len {
-        let ch = fmt_ptr[i]
-        
-        if ch == '%' {
-            i++
-            if i >= fmt_len {
-                break
-            }
-            
-            let spec = fmt_ptr[i]
-            
-            if spec == 'd' {
-                let val = va_arg<int32>(args)
-                let len = int_to_str(cast<int64>(val), buffer)
-                write(fd, buffer, len)
-                
-            } else if spec == 'u' {
-                let val = va_arg<uint32>(args)
-                let len = uint_to_str(cast<uint64>(val), buffer, 10)
-                write(fd, buffer, len)
-                
-            } else if spec == 'x' {
-                let val = va_arg<uint32>(args)
-                let len = uint_to_str(cast<uint64>(val), buffer, 16)
-                write(fd, buffer, len)
-                
-            } else if spec == 'X' {
-                let val = va_arg<uint32>(args)
-                let len = uint_to_str(cast<uint64>(val), buffer, 16)
-                for let j: usize = 0; j < len; j++ {
-                    if buffer[j] >= 'a' && buffer[j] <= 'f' {
-                        buffer[j] = buffer[j] - 32
-                    }
-                }
-                write(fd, buffer, len)
-                
-            } else if spec == 's' {
-                let str = va_arg<string>(args)
-                write_string(fd, str)
-                
-            } else if spec == 'c' {
-                let c = va_arg<char>(args)
-                write_char(fd, c)
-                
-            } else if spec == '%' {
-                write_char(fd, '%')
-                
-            } else {
-                write_char(fd, '%')
-                write_char(fd, cast<char>(spec))
-            }
-            
-        } else {
-            write_char(fd, cast<char>(ch))
-        }
-        
-        i++
-    }
-}
-
-// Printf - formatted output to stdout
-func printf(fmt: string, ...) {
+func printf(fmt: string, ...) int32 {
     let args = va_start(fmt)
     defer va_end(args)
     
-    vfprintf(STDOUT, fmt, args)
+    let fmt_ptr = cast<*byte>(fmt)
+    let fmt_len = strlen(fmt_ptr)
+    let i: usize = 0
+    let written: isize = 0
+    let num_buffer = alloca(byte, NUM_BUFFER_SIZE)
+    
+    for i < fmt_len {
+        if fmt_ptr[i] == '%' && i + 1 < fmt_len {
+            i++
+            let specifier = fmt_ptr[i]
+            
+            if specifier == 'd' {
+                // Signed decimal integer
+                let val = va_arg<int32>(args)
+                let len = int_to_string(cast<int64>(val), num_buffer, 10)
+                write(STDOUT, num_buffer, len)
+                written += cast<isize>(len)
+            } else if specifier == 'i' {
+                // Signed decimal integer (same as %d)
+                let val = va_arg<int32>(args)
+                let len = int_to_string(cast<int64>(val), num_buffer, 10)
+                write(STDOUT, num_buffer, len)
+                written += cast<isize>(len)
+            } else if specifier == 'u' {
+                // Unsigned decimal integer
+                let val = va_arg<uint32>(args)
+                let len = uint_to_string(cast<uint64>(val), num_buffer, 10)
+                write(STDOUT, num_buffer, len)
+                written += cast<isize>(len)
+            } else if specifier == 'x' {
+                // Unsigned hexadecimal (lowercase)
+                let val = va_arg<uint32>(args)
+                let len = uint_to_string(cast<uint64>(val), num_buffer, 16)
+                write(STDOUT, num_buffer, len)
+                written += cast<isize>(len)
+            } else if specifier == 'X' {
+                // Unsigned hexadecimal (uppercase) - simplified version
+                let val = va_arg<uint32>(args)
+                let len = uint_to_string(cast<uint64>(val), num_buffer, 16)
+                write(STDOUT, num_buffer, len)
+                written += cast<isize>(len)
+            } else if specifier == 'p' {
+                // Pointer address
+                let val = va_arg<*void>(args)
+                let len = ptr_to_string(val, num_buffer)
+                write(STDOUT, num_buffer, len)
+                written += cast<isize>(len)
+            } else if specifier == 's' {
+                // C-string (null-terminated)
+                let val = va_arg<*byte>(args)
+                let len = strlen(val)
+                write(STDOUT, val, len)
+                written += cast<isize>(len)
+            } else if specifier == 'c' {
+                // Character
+                let val = va_arg<int32>(args)
+                write_byte(STDOUT, cast<byte>(val))
+                written += 1
+            } else if specifier == '%' {
+                // Literal %
+                write_byte(STDOUT, '%')
+                written += 1
+            }
+            
+            i++
+        } else {
+            // Regular character
+            write_byte(STDOUT, fmt_ptr[i])
+            written += 1
+            i++
+        }
+    }
+    
+    return cast<int32>(written)
+}
+
+// ============================================================================
+// Convenience Functions
+// ============================================================================
+
+func print(s: string) {
+    write_string(STDOUT, s)
+}
+
+func println(s: string) {
+    write_string(STDOUT, s)
+    write_byte(STDOUT, '\n')
+}
+
+func eprint(s: string) {
+    write_string(STDERR, s)
+}
+
+func eprintln(s: string) {
+    write_string(STDERR, s)
+    write_byte(STDERR, '\n')
+}
+
+// ============================================================================
+// Read Functions
+// ============================================================================
+
+func read(fd: int32, buffer: *byte, count: usize) isize {
+    return cast<isize>(syscall(SYS_READ, fd, cast<uint64>(buffer), count))
+}
+
+func read_line(buffer: *byte, max_len: usize) isize {
+    let total_read: isize = 0
+    
+    for cast<usize>(total_read) < max_len - 1 {
+        let byte_buf = alloca(byte, 1)
+        let n = read(STDIN, byte_buf, 1)
+        
+        if n <= 0 {
+            break
+        }
+        
+        if byte_buf[0] == '\n' {
+            break
+        }
+        
+        buffer[total_read] = byte_buf[0]
+        total_read++
+    }
+    
+    buffer[total_read] = '\0'
+    return total_read
 }
