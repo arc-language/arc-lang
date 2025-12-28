@@ -2,6 +2,7 @@
 package compiler
 
 import (
+	"fmt"
 	"github.com/arc-language/arc-lang/builder/builder"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
