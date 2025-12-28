@@ -337,6 +337,8 @@ func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
     return val
 }
 
+// Add this helper function to visitor.go
+
 func (v *IRVisitor) castConstant(constant ir.Constant, targetType types.Type) ir.Constant {
     srcType := constant.Type()
     

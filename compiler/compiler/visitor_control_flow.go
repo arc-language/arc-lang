@@ -316,19 +316,13 @@ func (v *IRVisitor) visitForInVector(ctx *parser.ForStmtContext, varName string,
 	structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
 	
 	// Collection is a pointer to the vector struct (from alloca)
-	// If it's already a pointer, use it directly
+	// Cast it to the correct pointer type
 	var vecPtr ir.Value
 	if ptrType, ok := collection.Type().(*types.PointerType); ok {
-		if ptrType.ElementType.Equal(structType) {
-			vecPtr = collection
-		} else {
-			// Need to load
-			vecPtr = v.ctx.Builder.CreateAlloca(structType, "vec.addr")
-			loadedVec := v.ctx.Builder.CreateLoad(structType, collection, "")
-			v.ctx.Builder.CreateStore(loadedVec, vecPtr)
-		}
+		// It's already a pointer - just cast it to point to the struct type
+		vecPtr = v.ctx.Builder.CreateBitCast(collection, types.NewPointer(structType), "vec.ptr")
 	} else {
-		// It's a value, need to store it
+		// It's a value - allocate and store
 		vecPtr = v.ctx.Builder.CreateAlloca(structType, "vec.addr")
 		v.ctx.Builder.CreateStore(collection, vecPtr)
 	}

@@ -313,8 +313,8 @@ func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
             if constArr, ok := initValue.(*ir.ConstantArray); ok {
                 v.logger.Info("Creating vector with %d elements", len(constArr.Elements))
                 
-                // IMPORTANT: Cast array elements to match vector element type
-                needsCast := !constArr.Elements[0].Type().Equal(vecType.ElementType)
+                // Cast array elements to match vector element type
+                needsCast := len(constArr.Elements) > 0 && !constArr.Elements[0].Type().Equal(vecType.ElementType)
                 
                 if needsCast {
                     v.logger.Debug("Casting array elements from %v to %v", 
@@ -345,8 +345,15 @@ func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
                 v.logger.Warning("Vector literal not a ConstantArray, got %T", initValue)
                 initValue = v.createEmptyVector(vecType)
             }
+            
+            // IMPORTANT: Change varType to the struct type for allocation
+            varType = v.ctx.GetVectorRuntimeType(vecType.ElementType)
+            
         } else if mapType, ok := varType.(*types.MapType); ok {
             initValue = v.createEmptyMap(mapType)
+            // Change varType to struct type
+            varType = v.ctx.GetMapRuntimeType(mapType.KeyType, mapType.ValueType)
+            
         } else {
             // Regular type - cast if needed
             if !initValue.Type().Equal(varType) {
