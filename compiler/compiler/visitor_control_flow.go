@@ -338,7 +338,7 @@ func (v *IRVisitor) visitForInVector(ctx *parser.ForStmtContext, varName string,
 	// Collection should already be a pointer to the vector struct
 	// (from the variable's alloca in VisitVariableDecl)
 	var vecPtr ir.Value
-	if ptrType, ok := collection.Type().(*types.PointerType); ok {
+	if _, ok := collection.Type().(*types.PointerType); ok {
 		// It's already a pointer - use it directly
 		vecPtr = collection
 	} else {
