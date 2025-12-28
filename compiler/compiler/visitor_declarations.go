@@ -431,19 +431,18 @@ func (v *IRVisitor) createVectorWithElements(constArr *ir.ConstantArray, vecType
     dataArrayName := fmt.Sprintf("__vec_data_%d", len(v.ctx.Module.Globals))
     
     globalData := v.ctx.Builder.CreateGlobalConstant(dataArrayName, constArr)
+    globalData.Linkage = ir.InternalLinkage  // ADD THIS LINE - make it internal so data is emitted
     
     // Create vector struct value with pointer to global array
     // Get pointer to first element: &globalData[0]
     zero := v.ctx.Builder.ConstInt(types.I32, 0)
-    // FIX: Cast the GEP result to the correct pointer type (ptr<elemType> not ptr<arrayType>)
     dataPtr := v.ctx.Builder.CreateInBoundsGEP(arrType, globalData, []ir.Value{zero, zero}, "vec.data")
     
     // Allocate the struct on stack
     vecAlloca := v.ctx.Builder.CreateAlloca(structType, "vec.tmp")
     
-    // Store data pointer (field 0) - cast to correct type first
+    // Store data pointer (field 0)
     dataPtrGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 0, "")
-    // The dataPtr from GEP should already be ptr<elemType>, but let's ensure it
     v.ctx.Builder.CreateStore(dataPtr, dataPtrGEP)
     
     // Store length (field 1)

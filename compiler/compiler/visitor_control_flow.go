@@ -299,69 +299,124 @@ func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 }
 
 // Extract the existing range logic into a separate function
-func (v *IRVisitor) visitForInRange(ctx *parser.ForStmtContext, varName string, rngCtx parser.IRangeExpressionContext) interface{} {
-	// 2. Evaluate Start and End
-	startVal := v.Visit(rngCtx.AdditiveExpression(0)).(ir.Value)
-	endVal := v.Visit(rngCtx.AdditiveExpression(1)).(ir.Value)
+func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
+	// Check if we have two identifiers (for map iteration: for key, value in map)
+	isTwoVar := len(ctx.AllIDENTIFIER()) == 2
+	
+	varName := ctx.IDENTIFIER(0).GetText()
+	var valueName string
+	if isTwoVar {
+		valueName = ctx.IDENTIFIER(1).GetText()
+	}
+	
+	v.logger.Debug("Compiling for-in loop with variable '%s'", varName)
 
-	// Basic type check
-	if !startVal.Type().Equal(endVal.Type()) {
-		v.logger.Warning("Range start and end types differ, may need implicit cast")
+	// 1. Evaluate the collection expression
+	expr := ctx.Expression(0)
+	
+	// Check if it's a range expression first
+	var rngCtx parser.IRangeExpressionContext
+	if lor := expr.LogicalOrExpression(); lor != nil {
+		if land := lor.LogicalAndExpression(0); land != nil {
+			if eq := land.EqualityExpression(0); eq != nil {
+				if rel := eq.RelationalExpression(0); rel != nil {
+					rngCtx = rel.RangeExpression(0)
+				}
+			}
+		}
 	}
 
-	// 3. Setup Loop Variable
-	loopVarType := startVal.Type()
-	loopVarPtr := v.ctx.Builder.CreateAlloca(loopVarType, varName+".addr")
-	
-	// Initialize loop variable
-	v.ctx.Builder.CreateStore(startVal, loopVarPtr)
-	v.ctx.currentScope.Define(varName, loopVarPtr)
-
-	// 4. Create Blocks
-	token := ctx.GetStart()
-	uniqueID := fmt.Sprintf("%d_%d", token.GetLine(), token.GetColumn())
-	
-	condBlock := v.ctx.Builder.CreateBlock("for.cond." + uniqueID)
-	bodyBlock := v.ctx.Builder.CreateBlock("for.body." + uniqueID)
-	stepBlock := v.ctx.Builder.CreateBlock("for.step." + uniqueID)
-	endBlock := v.ctx.Builder.CreateBlock("for.end." + uniqueID)
-
-	v.ctx.Builder.CreateBr(condBlock)
-
-	// 5. Condition Block: if x < end
-	v.ctx.SetInsertBlock(condBlock)
-	currVal := v.ctx.Builder.CreateLoad(loopVarType, loopVarPtr, "")
-	
-	cmp := v.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
-	v.ctx.Builder.CreateCondBr(cmp, bodyBlock, endBlock)
-
-	// 6. Body Block
-	v.ctx.SetInsertBlock(bodyBlock)
-	v.ctx.PushLoop(stepBlock, endBlock) 
-	v.Visit(ctx.Block())
-	v.ctx.PopLoop()
-
-	if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
-		v.ctx.Builder.CreateBr(stepBlock)
+	// Handle range expression
+	if rngCtx != nil && rngCtx.RANGE() != nil {
+		return v.visitForInRange(ctx, varName, rngCtx)
 	}
 
-	// 7. Step Block: x = x + 1
-	v.ctx.SetInsertBlock(stepBlock)
-	currValForStep := v.ctx.Builder.CreateLoad(loopVarType, loopVarPtr, "")
+	// Not a range - evaluate the collection
+	collection := v.Visit(expr).(ir.Value)
 	
-	var one ir.Constant
-	if intType, ok := loopVarType.(*types.IntType); ok {
-		one = v.ctx.Builder.ConstInt(intType, 1)
-	} else {
-		one = v.ctx.Builder.ConstInt(types.I64, 1)
+	// Determine collection type
+	collectionType := collection.Type()
+	
+	// IMPORTANT: If collection is a loaded value (not a pointer), we need the original alloca
+	// Check if this is a simple identifier - if so, get the alloca directly
+	var collectionPtr ir.Value
+	if expr.LogicalOrExpression() != nil {
+		if land := expr.LogicalOrExpression().LogicalAndExpression(0); land != nil {
+			if eq := land.EqualityExpression(0); eq != nil {
+				if rel := eq.RelationalExpression(0); rel != nil {
+					if rng := rel.RangeExpression(0); rng != nil {
+						if add := rng.AdditiveExpression(0); add != nil {
+							if mul := add.MultiplicativeExpression(0); mul != nil {
+								if un := mul.UnaryExpression(0); un != nil {
+									if post := un.PostfixExpression(); post != nil {
+										if prim := post.PrimaryExpression(); prim != nil {
+											if prim.IDENTIFIER() != nil {
+												// It's a simple identifier - get the alloca
+												name := prim.IDENTIFIER().GetText()
+												if sym, ok := v.ctx.currentScope.Lookup(name); ok {
+													if alloca, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
+														collectionPtr = alloca
+														collectionType = alloca.AllocatedType
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
-
-	nextVal := v.ctx.Builder.CreateAdd(currValForStep, one, "")
-	v.ctx.Builder.CreateStore(nextVal, loopVarPtr)
-	v.ctx.Builder.CreateBr(condBlock)
-
-	// 8. End Block
-	v.ctx.SetInsertBlock(endBlock)
+	
+	// If we didn't get a pointer from the symbol table, use the collection as-is
+	if collectionPtr == nil {
+		collectionPtr = collection
+	}
+	
+	// IMPORTANT: Handle pointer type - unwrap it to see what it points to
+	if ptrType, ok := collectionType.(*types.PointerType); ok {
+		collectionType = ptrType.ElementType
+	}
+	
+	// Handle vector iteration - check for BOTH abstract type AND struct type
+	if vecType, ok := collectionType.(*types.DynamicVectorType); ok {
+		return v.visitForInVector(ctx, varName, collectionPtr, vecType)
+	}
+	
+	// Also check if it's the runtime struct type (e.g., __vector_i32)
+	if structType, ok := collectionType.(*types.StructType); ok {
+		// Check if this struct is a vector runtime type by name pattern
+		if strings.HasPrefix(structType.Name, "__vector_") {
+			// Extract element type from struct
+			// The struct has fields: { ptr<T>, i64, i64 }
+			if len(structType.Fields) >= 3 {
+				if ptrField, ok := structType.Fields[0].(*types.PointerType); ok {
+					elemType := ptrField.ElementType
+					vecType := types.NewDynamicVector(elemType)
+					return v.visitForInVector(ctx, varName, collectionPtr, vecType)
+				}
+			}
+		}
+	}
+	
+	// Handle map iteration
+	if mapType, ok := collectionType.(*types.MapType); ok {
+		if !isTwoVar {
+			v.ctx.Logger.Error("Map iteration requires two variables: for key, value in map")
+			return nil
+		}
+		return v.visitForInMap(ctx, varName, valueName, collectionPtr, mapType)
+	}
+	
+	// Handle array iteration (pointer to array)
+	if arrType, ok := collectionType.(*types.ArrayType); ok {
+		return v.visitForInArray(ctx, varName, collectionPtr, arrType)
+	}
+	
+	v.ctx.Logger.Error("for-in loop expects a range (e.g., 1..10), vector, map, or array")
 	return nil
 }
 
