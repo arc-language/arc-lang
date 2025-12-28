@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 	"github.com/arc-language/arc-lang/builder/ir"
