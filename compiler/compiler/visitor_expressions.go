@@ -416,73 +416,72 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 
 func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {
 	var name string
+	var structType *types.StructType
 	
+	// 1. Determine the name and resolve the type
 	if ctx.IDENTIFIER() != nil {
 		name = ctx.IDENTIFIER().GetText()
+		// Try current namespace first
+		if v.ctx.currentNamespace != nil && v.ctx.currentNamespace.Name != "" {
+			nsName := v.ctx.currentNamespace.Name + "_" + name
+			if t, ok := v.ctx.GetType(nsName); ok {
+				name = nsName
+				structType = t.(*types.StructType)
+			}
+		}
+		// Try raw name if namespace failed
+		if structType == nil {
+			if t, ok := v.ctx.GetType(name); ok {
+				structType = t.(*types.StructType)
+			}
+		}
 	} else if ctx.QualifiedIdentifier() != nil {
 		qCtx := ctx.QualifiedIdentifier()
 		if len(qCtx.AllIDENTIFIER()) == 2 {
 			nsName := qCtx.IDENTIFIER(0).GetText()
 			typeName := qCtx.IDENTIFIER(1).GetText()
 			
+			// Resolve via namespace registry
 			if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
 				if typ, ok := ns.Types[typeName]; ok {
 					if st, ok := typ.(*types.StructType); ok {
-						name = st.Name
+						structType = st
+						name = st.Name // Use the internal IR name (e.g., "net_Socket")
 					}
 				}
 			}
 		}
 	}
 
-	typ, ok := v.ctx.GetType(name)
-	if !ok {
-		// Try fallback if qualified name resolution failed
-		if ctx.QualifiedIdentifier() != nil {
-			qCtx := ctx.QualifiedIdentifier()
-			if len(qCtx.AllIDENTIFIER()) == 2 {
-				nsName := qCtx.IDENTIFIER(0).GetText()
-				typeName := qCtx.IDENTIFIER(1).GetText()
-				if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
-					if t, ok := ns.Types[typeName]; ok {
-						typ = t
-						ok = true
-					}
-				}
-			}
-		}
-	}
-	
-	if !ok {
-		v.ctx.Logger.Error("Unknown struct/class type: %s", name)
-		return v.ctx.Builder.ConstInt(types.I64, 0)
-	}
-	
-	structType, ok := typ.(*types.StructType)
-	if !ok {
-		v.ctx.Logger.Error("%s is not a struct/class type", name)
+	if structType == nil {
+		v.ctx.Logger.Error("Unknown struct/class type: %s", ctx.GetText())
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
 
+	// Use the resolved IR name
 	irName := structType.Name
-	v.logger.Debug("Creating struct literal for type: %s (IR: %s)", name, irName)
+	v.logger.Debug("Creating struct literal for type: %s", irName)
 
 	if v.ctx.IsClassType(irName) {
 		ptrToClass := v.ctx.Builder.CreateAlloca(structType, irName+".instance")
 		
+		// Zero-initialize
 		for i := 0; i < len(structType.Fields); i++ {
 			gep := v.ctx.Builder.CreateStructGEP(structType, ptrToClass, i, "")
 			zero := v.getZeroValue(structType.Fields[i])
 			v.ctx.Builder.CreateStore(zero, gep)
 		}
 		
+		// Initialize fields
 		for _, field := range ctx.AllFieldInit() {
 			fieldName := field.IDENTIFIER().GetText()
 			fieldVal := v.Visit(field.Expression()).(ir.Value)
 			
 			var idx int = -1
-			if idxVal, ok := v.ctx.ClassFieldIndices[irName][fieldName]; ok {
-				idx = idxVal
+			if fieldIndices, ok := v.ctx.ClassFieldIndices[irName]; ok {
+				if fieldIdx, ok := fieldIndices[fieldName]; ok {
+					idx = fieldIdx
+				}
 			}
 			
 			if idx < 0 {
@@ -493,21 +492,32 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 			gep := v.ctx.Builder.CreateStructGEP(structType, ptrToClass, idx, "")
 			v.ctx.Builder.CreateStore(fieldVal, gep)
 		}
+		
 		return ptrToClass
 	}
 
+	// Regular struct (Value type)
 	var agg ir.Value = v.ctx.Builder.ConstZero(structType)
+
 	for _, field := range ctx.AllFieldInit() {
 		fieldName := field.IDENTIFIER().GetText()
 		fieldVal := v.Visit(field.Expression()).(ir.Value)
 		
-		idx := v.findFieldIndex(structType, fieldName)
+		var idx int = -1
+		if fieldIndices, ok := v.ctx.StructFieldIndices[irName]; ok {
+			if fieldIdx, ok := fieldIndices[fieldName]; ok {
+				idx = fieldIdx
+			}
+		}
+		
 		if idx < 0 {
-			v.ctx.Logger.Error("Struct %s has no field %s", name, fieldName)
+			v.ctx.Logger.Error("Struct %s has no field %s", irName, fieldName)
 			continue
 		}
+		
 		agg = v.ctx.Builder.CreateInsertValue(agg, fieldVal, []int{idx}, "")
 	}
+	
 	return agg
 }
 
