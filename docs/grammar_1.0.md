@@ -99,6 +99,13 @@ let r: char = 'a'
 let s: string = "hello"
 ```
 
+## Basic Types, Qualified (Namespaced)
+```arc
+// Type from a specific namespace
+let client: net.Socket = ...
+let config: json.Config = ...
+```
+
 ## Literals, boolean
 ```arc
 let flag: bool = true
@@ -252,6 +259,9 @@ struct Point {
 ```arc
 // Named field initialization
 let p1: Point = Point{x: 10, y: 20}
+
+// Qualified struct initialization (Namespace.Type)
+let client = net.Socket{fd: -1, connected: false}
 
 // Type inference
 let p2 = Point{x: 5, y: 15}
@@ -534,6 +544,16 @@ let diff = a - b
 let prod = a * b
 let quot = a / b
 let rem = a % b
+```
+
+## Operators, bitwise
+```arc
+let b_or = a | b    // Bitwise OR
+let b_xor = a ^ b   // Bitwise XOR
+let b_and = a & b   // Bitwise AND
+let shl = a << 2    // Left Shift
+let shr = a >> 1    // Right Shift (Arithmetic for signed, Logical for unsigned)
+let b_not = ~a      // Bitwise NOT
 ```
 
 ## Operators, compound assignment
