@@ -336,3 +336,24 @@ func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
     
     return val
 }
+
+func (v *IRVisitor) castConstant(constant ir.Constant, targetType types.Type) ir.Constant {
+    srcType := constant.Type()
+    
+    // If already the right type, return as-is
+    if srcType.Equal(targetType) {
+        return constant
+    }
+    
+    // Handle integer to integer casts
+    if srcInt, ok := constant.(*ir.ConstantInt); ok {
+        if targetInt, ok := targetType.(*types.IntType); ok {
+            // Truncate or extend the value if needed
+            return v.ctx.Builder.ConstInt(targetInt, srcInt.Value)
+        }
+    }
+    
+    // Add more cast types as needed
+    v.logger.Warning("Cannot cast constant from %v to %v", srcType, targetType)
+    return constant
+}

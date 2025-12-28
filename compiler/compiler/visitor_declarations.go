@@ -310,11 +310,39 @@ func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
         
         // Handle vector initialization specially
         if vecType, ok := varType.(*types.DynamicVectorType); ok {
-            if constArr, ok := initValue.(*ir.ConstantArray); ok && len(constArr.Elements) > 0 {
-                // Runtime initialization for vector with elements
-                initValue = v.createVectorWithElements(constArr, vecType)
+            if constArr, ok := initValue.(*ir.ConstantArray); ok {
+                v.logger.Info("Creating vector with %d elements", len(constArr.Elements))
+                
+                // IMPORTANT: Cast array elements to match vector element type
+                needsCast := !constArr.Elements[0].Type().Equal(vecType.ElementType)
+                
+                if needsCast {
+                    v.logger.Debug("Casting array elements from %v to %v", 
+                        constArr.Elements[0].Type(), vecType.ElementType)
+                    
+                    // Create new array with casted elements
+                    castedElements := make([]ir.Constant, len(constArr.Elements))
+                    for i, elem := range constArr.Elements {
+                        castedElements[i] = v.castConstant(elem, vecType.ElementType)
+                    }
+                    
+                    // Create new ConstantArray with correct type
+                    arrType := types.NewArray(vecType.ElementType, int64(len(castedElements)))
+                    constArr = &ir.ConstantArray{
+                        BaseValue: ir.BaseValue{ValType: arrType},
+                        Elements:  castedElements,
+                    }
+                }
+                
+                if len(constArr.Elements) > 0 {
+                    // Runtime initialization for vector with elements
+                    initValue = v.createVectorWithElements(constArr, vecType)
+                } else {
+                    // Empty vector
+                    initValue = v.createEmptyVector(vecType)
+                }
             } else {
-                // Empty vector or unsupported literal
+                v.logger.Warning("Vector literal not a ConstantArray, got %T", initValue)
                 initValue = v.createEmptyVector(vecType)
             }
         } else if mapType, ok := varType.(*types.MapType); ok {

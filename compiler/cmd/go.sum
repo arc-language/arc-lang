@@ -32,5 +32,7 @@ github.com/arc-language/arc-lang v0.0.0-20251228002524-4dfaaaf87aa8 h1:yxglVhmUx
 github.com/arc-language/arc-lang v0.0.0-20251228002524-4dfaaaf87aa8/go.mod h1:sTFw0uIIwBMXArrj8XXtgIHfvIxgAvb05WS2+qCeuWU=
 github.com/arc-language/arc-lang v0.0.0-20251228003029-a0bbf109b01e h1:auOadUyC8evzpH6WN2ZP7drfou5hHaGN9w2gF/T5hDQ=
 github.com/arc-language/arc-lang v0.0.0-20251228003029-a0bbf109b01e/go.mod h1:sTFw0uIIwBMXArrj8XXtgIHfvIxgAvb05WS2+qCeuWU=
+github.com/arc-language/arc-lang v0.0.0-20251228003633-40006f67ab42 h1:zDuN3l1Yymq/rXXymo/ZznUzxBdOLzvB0959zCqIdRc=
+github.com/arc-language/arc-lang v0.0.0-20251228003633-40006f67ab42/go.mod h1:sTFw0uIIwBMXArrj8XXtgIHfvIxgAvb05WS2+qCeuWU=
 golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 h1:vr/HnozRka3pE4EsMEg1lgkXJkTFJCVUX+S/ZT6wYzM=
 golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842/go.mod h1:XtvwrStGgqGPLc4cjQfWqZHG1YFdYs6swckp8vpsjnc=
