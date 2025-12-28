@@ -215,6 +215,45 @@ func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 	// Determine collection type
 	collectionType := collection.Type()
 	
+	// IMPORTANT: If collection is a loaded value (not a pointer), we need the original alloca
+	// Check if this is a simple identifier - if so, get the alloca directly
+	var collectionPtr ir.Value
+	if expr.LogicalOrExpression() != nil {
+		if land := expr.LogicalOrExpression().LogicalAndExpression(0); land != nil {
+			if eq := land.EqualityExpression(0); eq != nil {
+				if rel := eq.RelationalExpression(0); rel != nil {
+					if rng := rel.RangeExpression(0); rng != nil {
+						if add := rng.AdditiveExpression(0); add != nil {
+							if mul := add.MultiplicativeExpression(0); mul != nil {
+								if un := mul.UnaryExpression(0); un != nil {
+									if post := un.PostfixExpression(); post != nil {
+										if prim := post.PrimaryExpression(); prim != nil {
+											if prim.IDENTIFIER() != nil {
+												// It's a simple identifier - get the alloca
+												name := prim.IDENTIFIER().GetText()
+												if sym, ok := v.ctx.currentScope.Lookup(name); ok {
+													if alloca, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
+														collectionPtr = alloca
+														collectionType = alloca.AllocatedType
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	// If we didn't get a pointer from the symbol table, use the collection as-is
+	if collectionPtr == nil {
+		collectionPtr = collection
+	}
+	
 	// IMPORTANT: Handle pointer type - unwrap it to see what it points to
 	if ptrType, ok := collectionType.(*types.PointerType); ok {
 		collectionType = ptrType.ElementType
@@ -222,7 +261,7 @@ func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 	
 	// Handle vector iteration - check for BOTH abstract type AND struct type
 	if vecType, ok := collectionType.(*types.DynamicVectorType); ok {
-		return v.visitForInVector(ctx, varName, collection, vecType)
+		return v.visitForInVector(ctx, varName, collectionPtr, vecType)
 	}
 	
 	// Also check if it's the runtime struct type (e.g., __vector_i32)
@@ -235,7 +274,7 @@ func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 				if ptrField, ok := structType.Fields[0].(*types.PointerType); ok {
 					elemType := ptrField.ElementType
 					vecType := types.NewDynamicVector(elemType)
-					return v.visitForInVector(ctx, varName, collection, vecType)
+					return v.visitForInVector(ctx, varName, collectionPtr, vecType)
 				}
 			}
 		}
@@ -247,12 +286,12 @@ func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 			v.ctx.Logger.Error("Map iteration requires two variables: for key, value in map")
 			return nil
 		}
-		return v.visitForInMap(ctx, varName, valueName, collection, mapType)
+		return v.visitForInMap(ctx, varName, valueName, collectionPtr, mapType)
 	}
 	
 	// Handle array iteration (pointer to array)
 	if arrType, ok := collectionType.(*types.ArrayType); ok {
-		return v.visitForInArray(ctx, varName, collection, arrType)
+		return v.visitForInArray(ctx, varName, collectionPtr, arrType)
 	}
 	
 	v.ctx.Logger.Error("for-in loop expects a range (e.g., 1..10), vector, map, or array")
