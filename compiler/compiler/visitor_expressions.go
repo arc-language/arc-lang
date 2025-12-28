@@ -1,3 +1,5 @@
+// github.com/arc-language/arc-lang/compiler/compiler/visitor_expressions.go
+
 package compiler
 
 import (
@@ -185,7 +187,7 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 	// Address-of Operator (&)
 	if ctx.AMP() != nil {
 		v.logger.Debug("Processing address-of (&) expression")
-		return v.getExpressionAddress(ctx.UnaryExpression())
+		return v.getExpressionAddress(ctx.UnaryExpression().(*parser.UnaryExpressionContext))
 	}
 	
 	return v.Visit(ctx.PostfixExpression())
