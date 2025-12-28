@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
@@ -176,7 +177,7 @@ func (v *IRVisitor) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	return nil
 }
 
-func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext, varName string, collection ir.Value, vecType *types.DynamicVectorType) interface{} {
+func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 	// Check if we have two identifiers (for map iteration: for key, value in map)
 	isTwoVar := len(ctx.AllIDENTIFIER()) == 2
 	
@@ -469,6 +470,7 @@ func (v *IRVisitor) visitForInArray(ctx *parser.ForStmtContext, varName string, 
 	
 	// Get pointer to array element: collection[index]
 	index := v.ctx.Builder.CreateLoad(indexType, indexPtr, "")
+	zero := v.ctx.Builder.ConstInt(types.I64, 0)
 	elemPtr := v.ctx.Builder.CreateInBoundsGEP(arrType, collection, []ir.Value{zero, index}, "")
 	
 	// Create loop variable and load element into it
