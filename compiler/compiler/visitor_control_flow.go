@@ -10,37 +10,29 @@ import (
 )
 
 func (v *IRVisitor) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
-	// Generate unique suffix based on the source position (Line_Column)
 	token := ctx.GetStart()
 	uniqueID := fmt.Sprintf("%d_%d", token.GetLine(), token.GetColumn())
 
-	v.logger.Debug("Compiling if statement at %s", uniqueID)
-
 	mergeBlock := v.ctx.Builder.CreateBlock("if.end." + uniqueID)
 
-	// First if condition
 	cond := v.Visit(ctx.Expression(0)).(ir.Value)
 	thenBlock := v.ctx.Builder.CreateBlock("if.then." + uniqueID)
 	nextCheckBlock := v.ctx.Builder.CreateBlock("if.next." + uniqueID)
 
 	v.ctx.Builder.CreateCondBr(cond, thenBlock, nextCheckBlock)
 
-	// Then block
 	v.ctx.SetInsertBlock(thenBlock)
 	v.Visit(ctx.Block(0))
 	if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
 		v.ctx.Builder.CreateBr(mergeBlock)
 	}
 
-	// Handle else-if and else
 	v.ctx.SetInsertBlock(nextCheckBlock)
 	count := len(ctx.AllIF())
 
 	for i := 1; i < count; i++ {
-		v.logger.Debug("Compiling else-if branch %d", i)
 		cond := v.Visit(ctx.Expression(i)).(ir.Value)
 		
-		// Use index 'i' to ensure unique block names for else-if chains
 		thenName := fmt.Sprintf("elseif.then.%s.%d", uniqueID, i)
 		nextName := fmt.Sprintf("elseif.next.%s.%d", uniqueID, i)
 		
@@ -58,9 +50,7 @@ func (v *IRVisitor) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 		v.ctx.SetInsertBlock(newNextBlock)
 	}
 
-	// Final else block (if present)
 	if len(ctx.AllBlock()) > count {
-		v.logger.Debug("Compiling else block")
 		v.Visit(ctx.Block(count))
 	}
 
@@ -68,9 +58,7 @@ func (v *IRVisitor) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 		v.ctx.Builder.CreateBr(mergeBlock)
 	}
 
-	// Always set insert point to merge block
 	v.ctx.SetInsertBlock(mergeBlock)
-
 	return nil
 }
 
@@ -78,21 +66,16 @@ func (v *IRVisitor) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	v.ctx.PushScope()
 	defer v.ctx.PopScope()
 
-	// Check for for-in loop (iteration)
 	if ctx.IN() != nil {
 		return v.visitForInLoop(ctx)
 	}
 
-	// Standard for-loop (C-style)
 	token := ctx.GetStart()
 	uniqueID := fmt.Sprintf("%d_%d", token.GetLine(), token.GetColumn())
-
-	v.logger.Debug("Compiling C-style for loop at %s", uniqueID)
 
 	semicolons := ctx.AllSEMICOLON()
 	isClause := len(semicolons) == 2
 
-	// Initialize statement
 	if isClause {
 		if ctx.VariableDecl() != nil {
 			v.Visit(ctx.VariableDecl())
@@ -116,8 +99,6 @@ func (v *IRVisitor) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	}
 
 	v.ctx.Builder.CreateBr(condBlock)
-
-	// Condition block
 	v.ctx.SetInsertBlock(condBlock)
 
 	var cond ir.Value
@@ -143,7 +124,6 @@ func (v *IRVisitor) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 	v.ctx.Builder.CreateCondBr(cond, bodyBlock, endBlock)
 
-	// Body block
 	v.ctx.SetInsertBlock(bodyBlock)
 	v.ctx.PushLoop(continueTarget, endBlock)
 	v.Visit(ctx.Block())
@@ -153,7 +133,6 @@ func (v *IRVisitor) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		v.ctx.Builder.CreateBr(continueTarget)
 	}
 
-	// Post block
 	v.ctx.SetInsertBlock(postBlock)
 	if isClause {
 		semi2 := semicolons[1]
@@ -178,7 +157,6 @@ func (v *IRVisitor) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 }
 
 func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
-	// Check if we have two identifiers (for map iteration: for key, value in map)
 	isTwoVar := len(ctx.AllIDENTIFIER()) == 2
 	
 	varName := ctx.IDENTIFIER(0).GetText()
@@ -187,54 +165,65 @@ func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 		valueName = ctx.IDENTIFIER(1).GetText()
 	}
 	
-	v.logger.Debug("Compiling for-in loop with variable '%s'", varName)
-
-	// 1. Evaluate the collection expression
 	expr := ctx.Expression(0)
 	
-	// Check if it's a range expression first
+	// FIX: Update traversal to match new expression hierarchy
+	// Hierarchy: Lor -> Land -> BOr -> BXor -> BAnd -> Eq -> Rel -> Shift -> Range
+	
 	var rngCtx parser.IRangeExpressionContext
 	if lor := expr.LogicalOrExpression(); lor != nil {
 		if land := lor.LogicalAndExpression(0); land != nil {
-			if eq := land.EqualityExpression(0); eq != nil {
-				if rel := eq.RelationalExpression(0); rel != nil {
-					rngCtx = rel.RangeExpression(0)
+			if bor := land.BitOrExpression(0); bor != nil {
+				if bxor := bor.BitXorExpression(0); bxor != nil {
+					if band := bxor.BitAndExpression(0); band != nil {
+						if eq := band.EqualityExpression(0); eq != nil {
+							if rel := eq.RelationalExpression(0); rel != nil {
+								if shift := rel.ShiftExpression(0); shift != nil {
+									rngCtx = shift.RangeExpression(0)
+								}
+							}
+						}
+					}
 				}
 			}
 		}
 	}
 
-	// Handle range expression
 	if rngCtx != nil && rngCtx.RANGE() != nil {
 		return v.visitForInRange(ctx, varName, rngCtx)
 	}
 
-	// Not a range - evaluate the collection
 	collection := v.Visit(expr).(ir.Value)
-	
-	// Determine collection type
 	collectionType := collection.Type()
 	
-	// IMPORTANT: If collection is a loaded value (not a pointer), we need the original alloca
-	// Check if this is a simple identifier - if so, get the alloca directly
 	var collectionPtr ir.Value
-	if expr.LogicalOrExpression() != nil {
-		if land := expr.LogicalOrExpression().LogicalAndExpression(0); land != nil {
-			if eq := land.EqualityExpression(0); eq != nil {
-				if rel := eq.RelationalExpression(0); rel != nil {
-					if rng := rel.RangeExpression(0); rng != nil {
-						if add := rng.AdditiveExpression(0); add != nil {
-							if mul := add.MultiplicativeExpression(0); mul != nil {
-								if un := mul.UnaryExpression(0); un != nil {
-									if post := un.PostfixExpression(); post != nil {
-										if prim := post.PrimaryExpression(); prim != nil {
-											if prim.IDENTIFIER() != nil {
-												// It's a simple identifier - get the alloca
-												name := prim.IDENTIFIER().GetText()
-												if sym, ok := v.ctx.currentScope.Lookup(name); ok {
-													if alloca, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
-														collectionPtr = alloca
-														collectionType = alloca.AllocatedType
+	
+	// FIX: Traverse down to PrimaryExpression to find the identifier
+	// This is painful manual traversal, but necessary to find the original alloca
+	if lor := expr.LogicalOrExpression(); lor != nil {
+		if land := lor.LogicalAndExpression(0); land != nil {
+			if bor := land.BitOrExpression(0); bor != nil {
+				if bxor := bor.BitXorExpression(0); bxor != nil {
+					if band := bxor.BitAndExpression(0); band != nil {
+						if eq := band.EqualityExpression(0); eq != nil {
+							if rel := eq.RelationalExpression(0); rel != nil {
+								if shift := rel.ShiftExpression(0); shift != nil {
+									if rng := shift.RangeExpression(0); rng != nil {
+										if add := rng.AdditiveExpression(0); add != nil {
+											if mul := add.MultiplicativeExpression(0); mul != nil {
+												if un := mul.UnaryExpression(0); un != nil {
+													if post := un.PostfixExpression(); post != nil {
+														if prim := post.PrimaryExpression(); prim != nil {
+															if prim.IDENTIFIER() != nil {
+																name := prim.IDENTIFIER().GetText()
+																if sym, ok := v.ctx.currentScope.Lookup(name); ok {
+																	if alloca, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
+																		collectionPtr = alloca
+																		collectionType = alloca.AllocatedType
+																	}
+																}
+															}
+														}
 													}
 												}
 											}
@@ -249,27 +238,20 @@ func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 		}
 	}
 	
-	// If we didn't get a pointer from the symbol table, use the collection as-is
 	if collectionPtr == nil {
 		collectionPtr = collection
 	}
 	
-	// IMPORTANT: Handle pointer type - unwrap it to see what it points to
 	if ptrType, ok := collectionType.(*types.PointerType); ok {
 		collectionType = ptrType.ElementType
 	}
 	
-	// Handle vector iteration - check for BOTH abstract type AND struct type
 	if vecType, ok := collectionType.(*types.DynamicVectorType); ok {
 		return v.visitForInVector(ctx, varName, collectionPtr, vecType)
 	}
 	
-	// Also check if it's the runtime struct type (e.g., __vector_i32)
 	if structType, ok := collectionType.(*types.StructType); ok {
-		// Check if this struct is a vector runtime type by name pattern
 		if strings.HasPrefix(structType.Name, "__vector_") {
-			// Extract element type from struct
-			// The struct has fields: { ptr<T>, i64, i64 }
 			if len(structType.Fields) >= 3 {
 				if ptrField, ok := structType.Fields[0].(*types.PointerType); ok {
 					elemType := ptrField.ElementType
@@ -280,25 +262,19 @@ func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 		}
 	}
 	
-	// Handle map iteration
 	if mapType, ok := collectionType.(*types.MapType); ok {
-		if !isTwoVar {
-			v.ctx.Logger.Error("Map iteration requires two variables: for key, value in map")
-			return nil
-		}
 		return v.visitForInMap(ctx, varName, valueName, collectionPtr, mapType)
 	}
 	
-	// Handle array iteration (pointer to array)
 	if arrType, ok := collectionType.(*types.ArrayType); ok {
 		return v.visitForInArray(ctx, varName, collectionPtr, arrType)
 	}
 	
-	v.ctx.Logger.Error("for-in loop expects a range (e.g., 1..10), vector, map, or array")
+	v.ctx.Logger.Error("for-in loop expects a range, vector, map, or array")
 	return nil
 }
 
-// Extract the existing range logic into a separate function
+// ... (Rest of file: visitForInRange, visitForInVector, visitForInMap, visitForInArray, VisitBreakStmt, VisitContinueStmt - unchanged) ...
 func (v *IRVisitor) visitForInRange(ctx *parser.ForStmtContext, varName string, rngCtx parser.IRangeExpressionContext) interface{} {
 	// 2. Evaluate Start and End
 	startVal := v.Visit(rngCtx.AdditiveExpression(0)).(ir.Value)

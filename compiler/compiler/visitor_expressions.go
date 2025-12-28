@@ -1,11 +1,10 @@
-// github.com/arc-language/arc-lang/compiler/compiler/visitor_expressions.go
-
 package compiler
 
 import (
 	"fmt"
 	"strconv"
 
+	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
@@ -24,7 +23,38 @@ func (v *IRVisitor) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionCont
 	return result
 }
 
+// Fixed: LogicalAnd now calls BitOr
 func (v *IRVisitor) VisitLogicalAndExpression(ctx *parser.LogicalAndExpressionContext) interface{} {
+	result := v.Visit(ctx.BitOrExpression(0)).(ir.Value)
+	for i := 1; i < len(ctx.AllBitOrExpression()); i++ {
+		rhs := v.Visit(ctx.BitOrExpression(i)).(ir.Value)
+		result = v.ctx.Builder.CreateAnd(result, rhs, "")
+	}
+	return result
+}
+
+// NEW: Bitwise OR (|)
+func (v *IRVisitor) VisitBitOrExpression(ctx *parser.BitOrExpressionContext) interface{} {
+	result := v.Visit(ctx.BitXorExpression(0)).(ir.Value)
+	for i := 1; i < len(ctx.AllBitXorExpression()); i++ {
+		rhs := v.Visit(ctx.BitXorExpression(i)).(ir.Value)
+		result = v.ctx.Builder.CreateOr(result, rhs, "")
+	}
+	return result
+}
+
+// NEW: Bitwise XOR (^)
+func (v *IRVisitor) VisitBitXorExpression(ctx *parser.BitXorExpressionContext) interface{} {
+	result := v.Visit(ctx.BitAndExpression(0)).(ir.Value)
+	for i := 1; i < len(ctx.AllBitAndExpression()); i++ {
+		rhs := v.Visit(ctx.BitAndExpression(i)).(ir.Value)
+		result = v.ctx.Builder.CreateXor(result, rhs, "")
+	}
+	return result
+}
+
+// NEW: Bitwise AND (&)
+func (v *IRVisitor) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) interface{} {
 	result := v.Visit(ctx.EqualityExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllEqualityExpression()); i++ {
 		rhs := v.Visit(ctx.EqualityExpression(i)).(ir.Value)
@@ -47,9 +77,10 @@ func (v *IRVisitor) VisitEqualityExpression(ctx *parser.EqualityExpressionContex
 }
 
 func (v *IRVisitor) VisitRelationalExpression(ctx *parser.RelationalExpressionContext) interface{} {
-	result := v.Visit(ctx.RangeExpression(0)).(ir.Value)
-	for i := 1; i < len(ctx.AllRangeExpression()); i++ {
-		rhs := v.Visit(ctx.RangeExpression(i)).(ir.Value)
+	// Fixed: Now calls ShiftExpression instead of RangeExpression
+	result := v.Visit(ctx.ShiftExpression(0)).(ir.Value)
+	for i := 1; i < len(ctx.AllShiftExpression()); i++ {
+		rhs := v.Visit(ctx.ShiftExpression(i)).(ir.Value)
 		if i-1 < len(ctx.AllLT()) {
 			result = v.ctx.Builder.CreateICmpSLT(result, rhs, "")
 		} else if i-1-len(ctx.AllLT()) < len(ctx.AllLE()) {
@@ -59,6 +90,39 @@ func (v *IRVisitor) VisitRelationalExpression(ctx *parser.RelationalExpressionCo
 		} else {
 			result = v.ctx.Builder.CreateICmpSGE(result, rhs, "")
 		}
+	}
+	return result
+}
+
+// NEW: Shift Operators (<<, >>)
+func (v *IRVisitor) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} {
+	result := v.Visit(ctx.RangeExpression(0)).(ir.Value)
+	
+	// We need to identify if it's LSHIFT or RSHIFT
+	// The AllRangeExpression array has N+1 elements, operators have N elements
+	// The order corresponds to children
+	
+	opIndex := 0
+	for i := 1; i < len(ctx.AllRangeExpression()); i++ {
+		rhs := v.Visit(ctx.RangeExpression(i)).(ir.Value)
+		
+		// Find which operator is at this position
+		// This is a bit tricky with ANTLR accessor methods, using child index approximation
+		// Child 0 is Expr, Child 1 is Op, Child 2 is Expr...
+		opNode := ctx.GetChild(i*2 - 1).(antlr.TerminalNode)
+		tokenType := opNode.GetSymbol().GetTokenType()
+		
+		if tokenType == parser.ArcParserLSHIFT {
+			result = v.ctx.Builder.CreateShl(result, rhs, "")
+		} else {
+			// RSHIFT: Check signedness
+			if intType, ok := result.Type().(*types.IntType); ok && intType.Signed {
+				result = v.ctx.Builder.CreateAShr(result, rhs, "")
+			} else {
+				result = v.ctx.Builder.CreateLShr(result, rhs, "")
+			}
+		}
+		opIndex++
 	}
 	return result
 }
@@ -96,66 +160,36 @@ func (v *IRVisitor) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 }
 
 func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
-	// Handle await keyword
 	if ctx.AWAIT() != nil {
 		v.logger.Debug("Processing await expression")
-		
-		// The expression being awaited
 		awaitedExpr := v.Visit(ctx.UnaryExpression())
-		
-		// Check for nil
 		if awaitedExpr == nil {
 			v.ctx.Logger.Error("await expression returned nil")
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
-		
 		val, ok := awaitedExpr.(ir.Value)
 		if !ok {
-			v.ctx.Logger.Error("await expression did not return ir.Value, got %T", awaitedExpr)
+			v.ctx.Logger.Error("await expression did not return ir.Value")
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
-		
-		// Create a coroutine suspend point
 		suspend := v.ctx.Builder.CreateCoroSuspend(false, "")
-		v.logger.Debug("Created coroutine suspend point for await")
 		_ = suspend
-		
 		return val
 	}
 	
-	// Handle increment (++x)
 	if ctx.INCREMENT() != nil {
-		v.logger.Debug("Processing pre-increment")
-		exprResult := v.Visit(ctx.UnaryExpression())
-		
-		if exprResult == nil {
-			v.ctx.Logger.Error("Increment expression returned nil")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
 		v.ctx.Logger.Warning("Pre-increment not fully implemented")
-		return exprResult
+		return v.Visit(ctx.UnaryExpression())
 	}
 	
-	// Handle decrement (--x)
 	if ctx.DECREMENT() != nil {
-		v.logger.Debug("Processing pre-decrement")
-		exprResult := v.Visit(ctx.UnaryExpression())
-		
-		if exprResult == nil {
-			v.ctx.Logger.Error("Decrement expression returned nil")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
 		v.ctx.Logger.Warning("Pre-decrement not fully implemented")
-		return exprResult
+		return v.Visit(ctx.UnaryExpression())
 	}
 	
 	if ctx.MINUS() != nil {
 		exprResult := v.Visit(ctx.UnaryExpression())
-		if exprResult == nil {
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
+		if exprResult == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		val, _ := exprResult.(ir.Value)
 		zero := v.getZeroValue(val.Type())
 		return v.ctx.Builder.CreateSub(zero, val, "")
@@ -163,18 +197,29 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 	
 	if ctx.NOT() != nil {
 		exprResult := v.Visit(ctx.UnaryExpression())
-		if exprResult == nil {
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
+		if exprResult == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		val, _ := exprResult.(ir.Value)
 		return v.ctx.Builder.CreateXor(val, v.ctx.Builder.ConstInt(types.I1, 1), "")
+	}
+
+	// NEW: Bitwise NOT (~)
+	if ctx.BIT_NOT() != nil {
+		exprResult := v.Visit(ctx.UnaryExpression())
+		if exprResult == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
+		val, _ := exprResult.(ir.Value)
+		// Bitwise NOT is XOR with -1
+		var allOnes ir.Constant
+		if intType, ok := val.Type().(*types.IntType); ok {
+			allOnes = v.ctx.Builder.ConstInt(intType, -1)
+		} else {
+			allOnes = v.ctx.Builder.ConstInt(types.I64, -1)
+		}
+		return v.ctx.Builder.CreateXor(val, allOnes, "")
 	}
 	
 	if ctx.STAR() != nil {
 		ptrResult := v.Visit(ctx.UnaryExpression())
-		if ptrResult == nil {
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
+		if ptrResult == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		ptr, _ := ptrResult.(ir.Value)
 		ptrType, ok := ptr.Type().(*types.PointerType)
 		if !ok {
@@ -184,40 +229,34 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
 	}
 	
-	// Address-of Operator (&)
 	if ctx.AMP() != nil {
 		v.logger.Debug("Processing address-of (&) expression")
-		return v.getExpressionAddress(ctx.UnaryExpression().(*parser.UnaryExpressionContext))
+		// Safe cast to *UnaryExpressionContext not needed if we are careful
+		// But ctx.UnaryExpression() returns interface
+		if childCtx, ok := ctx.UnaryExpression().(*parser.UnaryExpressionContext); ok {
+			return v.getExpressionAddress(childCtx)
+		}
+		v.ctx.Logger.Error("Invalid operand for address-of")
+		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
 	
 	return v.Visit(ctx.PostfixExpression())
 }
 
-// getExpressionAddress calculates the L-value (address) of an expression
 func (v *IRVisitor) getExpressionAddress(ctx *parser.UnaryExpressionContext) ir.Value {
-	// We need to look inside the UnaryExpression -> PostfixExpression -> PrimaryExpression chain
-	// to find the variable symbol and return its AllocaInst (pointer) instead of loading it.
-	
 	if post := ctx.PostfixExpression(); post != nil {
-		// Case 1: Simple Identifier (&x)
 		if len(post.AllPostfixOp()) == 0 {
 			if prim := post.PrimaryExpression(); prim != nil {
 				if prim.IDENTIFIER() != nil {
 					name := prim.IDENTIFIER().GetText()
 					if sym, ok := v.ctx.currentScope.Lookup(name); ok {
-						// Return the value directly (which is the pointer for local vars/allocas)
 						return sym.Value
 					}
 					v.ctx.Logger.Error("Undefined symbol '%s' for address-of", name)
 				}
 			}
 		} else {
-			// Case 2: Indexing or Field Access (&arr[0], &obj.field)
-			// We need to evaluate the base and the offsets, but NOT load the final result.
-			
-			// For now, let's try to handle basic indexing for the test case if needed
-			// But for &value, the Case 1 above handles it.
-			v.ctx.Logger.Error("Complex address-of expressions (like &arr[0]) not fully implemented yet")
+			v.ctx.Logger.Error("Complex address-of expressions not fully implemented")
 		}
 	}
 	
@@ -228,7 +267,6 @@ func (v *IRVisitor) getExpressionAddress(ctx *parser.UnaryExpressionContext) ir.
 func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
 	result := v.Visit(ctx.PrimaryExpression()).(ir.Value)
 	
-	// Track if we're starting with a namespace identifier
 	var baseIdentifier string
 	if primaryCtx := ctx.PrimaryExpression(); primaryCtx != nil {
 		if primaryCtx.IDENTIFIER() != nil {
@@ -238,13 +276,13 @@ func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	
 	for _, op := range ctx.AllPostfixOp() {
 		result = v.visitPostfixOp(result, op.(*parser.PostfixOpContext), baseIdentifier)
-		baseIdentifier = "" // Clear after first use
+		baseIdentifier = ""
 	}
 	return result
 }
 
 func (v *IRVisitor) visitPostfixOp(base ir.Value, ctx *parser.PostfixOpContext, baseIdentifier string) ir.Value {
-	// Function call (check this FIRST)
+	// Function call
 	if ctx.LPAREN() != nil {
 		var args []ir.Value
 		if ctx.ArgumentList() != nil {
@@ -256,15 +294,12 @@ func (v *IRVisitor) visitPostfixOp(base ir.Value, ctx *parser.PostfixOpContext, 
 			}
 		}
 		
-		// Check if this is a method call
+		// 1. Check if base is already a function (e.g. from QualifiedIdentifier resolution)
 		if fn, ok := base.(*ir.Function); ok {
-			// Prepend self parameter if we have one pending
 			if v.pendingMethodSelf != nil {
 				args = append([]ir.Value{v.pendingMethodSelf}, args...)
 				v.pendingMethodSelf = nil
 			}
-			
-			v.logger.Debug("Calling function: %s", fn.Name())
 			return v.ctx.Builder.CreateCall(fn, args, "")
 		}
 		
@@ -274,18 +309,11 @@ func (v *IRVisitor) visitPostfixOp(base ir.Value, ctx *parser.PostfixOpContext, 
 	
 	// Index access (LBRACKET)
 	if ctx.LBRACKET() != nil {
-		if ctx.Expression() == nil {
-			v.ctx.Logger.Error("Index expression cannot be empty")
-			return base
-		}
-		
+		if ctx.Expression() == nil { return base }
 		indexExpr := v.Visit(ctx.Expression()).(ir.Value)
 		
-		// Base must be a pointer
 		if ptrType, ok := base.Type().(*types.PointerType); ok {
-			// GEP to get address of element
 			elemPtr := v.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, base, []ir.Value{indexExpr}, "")
-			// Load the element
 			return v.ctx.Builder.CreateLoad(ptrType.ElementType, elemPtr, "")
 		}
 		
@@ -296,30 +324,24 @@ func (v *IRVisitor) visitPostfixOp(base ir.Value, ctx *parser.PostfixOpContext, 
 	// Member access (DOT)
 	if ctx.DOT() != nil && ctx.IDENTIFIER() != nil {
 		memberName := ctx.IDENTIFIER().GetText()
-		
-		// Reset pending method state
 		v.pendingMethodSelf = nil
 		
-		// 1. Check if this is namespace.function access
+		// 1. Namespace resolution (only if base was simple identifier)
 		if baseIdentifier != "" {
 			if ns, ok := v.ctx.NamespaceRegistry[baseIdentifier]; ok {
 				if fn, ok := ns.LookupFunction(memberName); ok {
-					v.logger.Debug("Resolved %s.%s to function", baseIdentifier, memberName)
 					return fn
 				}
-				v.ctx.Logger.Error("Function '%s' not found in namespace '%s'", memberName, baseIdentifier)
-				return v.ctx.Builder.ConstInt(types.I64, 0)
 			}
 		}
 		
-		// 2. Check for class method
+		// 2. Class method
 		if ptrType, ok := base.Type().(*types.PointerType); ok {
 			if structType, ok := ptrType.ElementType.(*types.StructType); ok {
 				if v.ctx.IsClassType(structType.Name) {
 					methodName := structType.Name + "_" + memberName
 					if fn := v.ctx.Module.GetFunction(methodName); fn != nil {
 						v.pendingMethodSelf = base
-						v.logger.Debug("Resolved method %s on class %s", memberName, structType.Name)
 						return fn
 					}
 				}
@@ -334,13 +356,11 @@ func (v *IRVisitor) visitPostfixOp(base ir.Value, ctx *parser.PostfixOpContext, 
 }
 
 func (v *IRVisitor) handleFieldAccess(base ir.Value, fieldName string) ir.Value {
-	// Case 1: Pointer to struct/class
 	if ptrType, ok := base.Type().(*types.PointerType); ok {
 		if structType, ok := ptrType.ElementType.(*types.StructType); ok {
-			isClass := v.ctx.IsClassType(structType.Name)
 			var fieldIdx int = -1
 			
-			if isClass {
+			if v.ctx.IsClassType(structType.Name) {
 				if fieldIndices, ok := v.ctx.ClassFieldIndices[structType.Name]; ok {
 					if idx, ok := fieldIndices[fieldName]; ok {
 						fieldIdx = idx
@@ -355,19 +375,16 @@ func (v *IRVisitor) handleFieldAccess(base ir.Value, fieldName string) ir.Value 
 				return base
 			}
 			
-			v.logger.Debug("Accessing field '%s' at index %d on type '%s'", fieldName, fieldIdx, structType.Name)
 			gep := v.ctx.Builder.CreateStructGEP(structType, base, fieldIdx, "")
 			return v.ctx.Builder.CreateLoad(structType.Fields[fieldIdx], gep, "")
 		}
 	}
 	
-	// Case 2: Struct value (direct value)
 	if structType, ok := base.Type().(*types.StructType); ok {
 		if v.ctx.IsClassType(structType.Name) {
 			v.ctx.Logger.Error("Class instances must be accessed via pointer")
 			return base
 		}
-		
 		fieldIdx := v.findFieldIndex(structType, fieldName)
 		if fieldIdx < 0 {
 			v.ctx.Logger.Error("Struct has no field '%s'", fieldName)
@@ -381,64 +398,60 @@ func (v *IRVisitor) handleFieldAccess(base ir.Value, fieldName string) ir.Value 
 }
 
 func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
-	if ctx.StructLiteral() != nil {
-		return v.Visit(ctx.StructLiteral())
-	}
+	if ctx.StructLiteral() != nil { return v.Visit(ctx.StructLiteral()) }
+	if ctx.Literal() != nil { return v.Visit(ctx.Literal()) }
+	if ctx.Expression() != nil { return v.Visit(ctx.Expression()) }
+	if ctx.CastExpression() != nil { return v.Visit(ctx.CastExpression()) }
+	if ctx.AllocaExpression() != nil { return v.Visit(ctx.AllocaExpression()) }
+	if ctx.SyscallExpression() != nil { return v.Visit(ctx.SyscallExpression()) }
+	if ctx.IntrinsicExpression() != nil { return v.Visit(ctx.IntrinsicExpression()) }
 	
-	if ctx.Literal() != nil {
-		return v.Visit(ctx.Literal())
-	}
-	
-	if ctx.Expression() != nil {
-		return v.Visit(ctx.Expression())
-	}
-	
-	if ctx.CastExpression() != nil {
-		return v.Visit(ctx.CastExpression())
-	}
-	
-	if ctx.AllocaExpression() != nil {
-		return v.Visit(ctx.AllocaExpression())
+	// NEW: Qualified Identifiers (namespace.func)
+	if ctx.QualifiedIdentifier() != nil {
+		qCtx := ctx.QualifiedIdentifier()
+		parts := make([]string, len(qCtx.AllIDENTIFIER()))
+		for i, node := range qCtx.AllIDENTIFIER() {
+			parts[i] = node.GetText()
+		}
+		
+		if len(parts) >= 2 {
+			nsName := parts[0]
+			memberName := parts[1] // Support 1 level for now
+			
+			if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
+				if fn, ok := ns.LookupFunction(memberName); ok {
+					return fn
+				}
+				v.ctx.Logger.Error("Function '%s' not found in namespace '%s'", memberName, nsName)
+			} else {
+				v.ctx.Logger.Error("Unknown namespace: %s", nsName)
+			}
+		}
+		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
 
-	if ctx.SyscallExpression() != nil {
-		return v.Visit(ctx.SyscallExpression())
-	}
-	
-	if ctx.IntrinsicExpression() != nil {
-		return v.Visit(ctx.IntrinsicExpression())
-	}
-	
-	// Check identifier
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
 		
-		// First check if this is a type name
 		if _, isType := v.ctx.GetType(name); isType {
-			v.ctx.Logger.Error("Type '%s' used as value (did you mean '%s{}'?)", name, name)
+			v.ctx.Logger.Error("Type '%s' used as value", name)
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
 		
-		// Check if this is a namespace
 		if _, isNamespace := v.ctx.NamespaceRegistry[name]; isNamespace {
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
 		
-		// Normal variable lookup
 		sym, ok := v.ctx.currentScope.Lookup(name)
 		if !ok {
-			// Check if it's a function in the current namespace
 			if v.ctx.currentNamespace != nil {
 				if fn, ok := v.ctx.currentNamespace.Functions[name]; ok {
 					return fn
 				}
 			}
-			
-			// Fallback: Check module directly
 			if fn := v.ctx.Module.GetFunction(name); fn != nil {
 				return fn
 			}
-			
 			v.ctx.Logger.Error("Undefined: %s", name)
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
