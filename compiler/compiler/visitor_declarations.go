@@ -3,7 +3,6 @@ package compiler
 import (
 	"path/filepath"
 	"strings"
-	"fmt"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
@@ -162,10 +161,6 @@ func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		retType = v.resolveType(ctx.Type_())
 	}
 	
-	// If async, wrap return type in a Future/Promise
-	// For now, we'll keep the return type as-is and mark the function
-	// The transformation pass will handle the actual conversion
-	
 	paramTypes := make([]types.Type, 0)
 	paramNames := make([]string, 0)
 	variadic := false
@@ -251,7 +246,6 @@ func (v *IRVisitor) emitAsyncFunctionPrologue(fn *ir.Function) {
 	coroHandle := v.ctx.Builder.CreateCoroBegin(coroId, "")
 	
 	// Store the handle somewhere accessible (in a stack slot for now)
-	// In a full implementation, this would be saved in the function's context
 	handleAlloca := v.ctx.Builder.CreateAlloca(coroHandle.Type(), "coro.handle")
 	v.ctx.Builder.CreateStore(coroHandle, handleAlloca)
 	
@@ -277,9 +271,6 @@ func (v *IRVisitor) emitAsyncFunctionEpilogue(fn *ir.Function) {
 			if idSym, ok := v.ctx.currentScope.Lookup("__coro_id__"); ok {
 				coroId := idSym.Value
 				mem := v.ctx.Builder.CreateCoroFree(coroId, handle, "")
-				
-				// Free the memory (would call free or a custom allocator)
-				// For now, just create the instruction
 				_ = mem
 			}
 		}
@@ -320,13 +311,11 @@ func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
                     v.logger.Debug("Casting array elements from %v to %v", 
                         constArr.Elements[0].Type(), vecType.ElementType)
                     
-                    // Create new array with casted elements
                     castedElements := make([]ir.Constant, len(constArr.Elements))
                     for i, elem := range constArr.Elements {
                         castedElements[i] = v.castConstant(elem, vecType.ElementType)
                     }
                     
-                    // Create new ConstantArray with correct type
                     arrType := types.NewArray(vecType.ElementType, int64(len(castedElements)))
                     constArr = &ir.ConstantArray{
                         BaseValue: ir.BaseValue{ValType: arrType},
@@ -335,10 +324,8 @@ func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
                 }
                 
                 if len(constArr.Elements) > 0 {
-                    // Runtime initialization for vector with elements
                     initValue = v.createVectorWithElements(constArr, vecType)
                 } else {
-                    // Empty vector
                     initValue = v.createEmptyVector(vecType)
                 }
             } else {
@@ -346,16 +333,13 @@ func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
                 initValue = v.createEmptyVector(vecType)
             }
             
-            // IMPORTANT: Change varType to the struct type for allocation
             varType = v.ctx.GetVectorRuntimeType(vecType.ElementType)
             
         } else if mapType, ok := varType.(*types.MapType); ok {
             initValue = v.createEmptyMap(mapType)
-            // Change varType to struct type
             varType = v.ctx.GetMapRuntimeType(mapType.KeyType, mapType.ValueType)
             
         } else {
-            // Regular type - cast if needed
             if !initValue.Type().Equal(varType) {
                 initValue = v.castValue(initValue, varType)
             }
@@ -375,24 +359,44 @@ func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
     return nil
 }
 
-
 func (v *IRVisitor) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
-	
 	v.logger.Debug("Declaring constant: %s", name)
-	
+
 	if ctx.Expression() == nil {
 		v.ctx.Logger.Error("Constant '%s' must have an initializer", name)
 		return nil
 	}
-	
+
 	initValue := v.Visit(ctx.Expression()).(ir.Value)
-	v.ctx.currentScope.DefineConst(name, initValue)
 	
+	// Check if this is a top-level constant (global)
+	isGlobal := v.ctx.currentScope == v.ctx.globalScope
+	
+	if isGlobal {
+        // Create mangled name for global
+        globalName := name
+        if v.ctx.currentNamespace != nil && v.ctx.currentNamespace.Name != "" {
+            globalName = v.ctx.currentNamespace.Name + "_" + name
+        }
+        
+        // Create IR Global for the constant
+        if constant, ok := initValue.(ir.Constant); ok {
+            g := v.ctx.Builder.CreateGlobalConstant(globalName, constant)
+            // Register in scope as the global pointer
+            v.ctx.currentScope.Define(name, g)
+            v.logger.Info("Declared global constant '%s' (IR: %s)", name, globalName)
+        } else {
+            v.ctx.Logger.Error("Top-level constant '%s' must have a constant initializer", name)
+        }
+	} else {
+	    // Local constant
+	    v.ctx.currentScope.DefineConst(name, initValue)
+	}
+
 	return nil
 }
 
-// Simplified - just creates empty vector
 func (v *IRVisitor) createEmptyVector(vecType *types.DynamicVectorType) ir.Value {
     structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
     fields := []ir.Constant{
@@ -407,7 +411,6 @@ func (v *IRVisitor) createEmptyVector(vecType *types.DynamicVectorType) ir.Value
     }
 }
 
-// Simplified - just creates empty map
 func (v *IRVisitor) createEmptyMap(mapType *types.MapType) ir.Value {
     structType := v.ctx.GetMapRuntimeType(mapType.KeyType, mapType.ValueType)
     fields := []ir.Constant{
@@ -426,34 +429,26 @@ func (v *IRVisitor) createVectorWithElements(constArr *ir.ConstantArray, vecType
     structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
     elemCount := int64(len(constArr.Elements))
     
-    // Create global constant array with the data
     arrType := types.NewArray(vecType.ElementType, elemCount)
     dataArrayName := fmt.Sprintf("__vec_data_%d", len(v.ctx.Module.Globals))
     
     globalData := v.ctx.Builder.CreateGlobalConstant(dataArrayName, constArr)
-    globalData.Linkage = ir.InternalLinkage  // ADD THIS LINE - make it internal so data is emitted
+    globalData.Linkage = ir.InternalLinkage
     
-    // Create vector struct value with pointer to global array
-    // Get pointer to first element: &globalData[0]
     zero := v.ctx.Builder.ConstInt(types.I32, 0)
     dataPtr := v.ctx.Builder.CreateInBoundsGEP(arrType, globalData, []ir.Value{zero, zero}, "vec.data")
     
-    // Allocate the struct on stack
     vecAlloca := v.ctx.Builder.CreateAlloca(structType, "vec.tmp")
     
-    // Store data pointer (field 0)
     dataPtrGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 0, "")
     v.ctx.Builder.CreateStore(dataPtr, dataPtrGEP)
     
-    // Store length (field 1)
     lenGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 1, "")
     length := v.ctx.Builder.ConstInt(types.I64, elemCount)
     v.ctx.Builder.CreateStore(length, lenGEP)
     
-    // Store capacity (field 2)
     capGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 2, "")
     v.ctx.Builder.CreateStore(length, capGEP)
     
-    // Load the complete struct
     return v.ctx.Builder.CreateLoad(structType, vecAlloca, "vec.init")
 }

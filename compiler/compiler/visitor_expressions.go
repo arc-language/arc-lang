@@ -92,8 +92,7 @@ func (v *IRVisitor) VisitRelationalExpression(ctx *parser.RelationalExpressionCo
 func (v *IRVisitor) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} {
 	result := v.Visit(ctx.RangeExpression(0)).(ir.Value)
 	
-	count := len(ctx.AllRangeExpression())
-	for i := 1; i < count; i++ {
+	for i := 1; i < len(ctx.AllRangeExpression()); i++ {
 		rhs := v.Visit(ctx.RangeExpression(i)).(ir.Value)
 		
 		opNode := ctx.GetChild(i*2 - 1).(antlr.TerminalNode)
@@ -346,6 +345,7 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		if len(parts) < 2 { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		firstPart := parts[0]
 
+		// 1. Try Variable Lookup (Chain)
 		if sym, ok := v.ctx.currentScope.Lookup(firstPart); ok {
 			var currentVal ir.Value = sym.Value
 			
@@ -363,14 +363,24 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			return currentVal
 		}
 
+		// 2. Try Namespace Lookup
 		nsName := firstPart
 		memberName := parts[1]
 		
 		if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
+			// Check Function
 			if fn, ok := ns.LookupFunction(memberName); ok {
 				return fn
 			}
-			v.ctx.Logger.Error("Function '%s' not found in namespace '%s'", memberName, nsName)
+			
+			// Check Global Constant
+			mangledName := nsName + "_" + memberName
+			if global := v.ctx.Module.GetGlobal(mangledName); global != nil {
+				ptrType := global.Type().(*types.PointerType)
+				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+			}
+			
+			v.ctx.Logger.Error("Member '%s' not found in namespace '%s'", memberName, nsName)
 		} else {
 			v.ctx.Logger.Error("Unknown namespace or variable: %s", nsName)
 		}
@@ -391,6 +401,19 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		
 		sym, ok := v.ctx.currentScope.Lookup(name)
 		if !ok {
+			// Check globals first (namespace_name or simple name)
+			if v.ctx.currentNamespace != nil {
+				mangled := v.ctx.currentNamespace.Name + "_" + name
+				if global := v.ctx.Module.GetGlobal(mangled); global != nil {
+					ptrType := global.Type().(*types.PointerType)
+					return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+				}
+			}
+			if global := v.ctx.Module.GetGlobal(name); global != nil {
+				ptrType := global.Type().(*types.PointerType)
+				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+			}
+			
 			if v.ctx.currentNamespace != nil {
 				if fn, ok := v.ctx.currentNamespace.Functions[name]; ok {
 					return fn
@@ -465,23 +488,19 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 	if v.ctx.IsClassType(irName) {
 		ptrToClass := v.ctx.Builder.CreateAlloca(structType, irName+".instance")
 		
-		// Zero-initialize
 		for i := 0; i < len(structType.Fields); i++ {
 			gep := v.ctx.Builder.CreateStructGEP(structType, ptrToClass, i, "")
 			zero := v.getZeroValue(structType.Fields[i])
 			v.ctx.Builder.CreateStore(zero, gep)
 		}
 		
-		// Initialize fields
 		for _, field := range ctx.AllFieldInit() {
 			fieldName := field.IDENTIFIER().GetText()
 			fieldVal := v.Visit(field.Expression()).(ir.Value)
 			
 			var idx int = -1
-			if fieldIndices, ok := v.ctx.ClassFieldIndices[irName]; ok {
-				if fieldIdx, ok := fieldIndices[fieldName]; ok {
-					idx = fieldIdx
-				}
+			if idxVal, ok := v.ctx.ClassFieldIndices[irName][fieldName]; ok {
+				idx = idxVal
 			}
 			
 			if idx < 0 {
@@ -492,32 +511,25 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 			gep := v.ctx.Builder.CreateStructGEP(structType, ptrToClass, idx, "")
 			v.ctx.Builder.CreateStore(fieldVal, gep)
 		}
-		
 		return ptrToClass
 	}
 
-	// Regular struct (Value type)
 	var agg ir.Value = v.ctx.Builder.ConstZero(structType)
-
 	for _, field := range ctx.AllFieldInit() {
 		fieldName := field.IDENTIFIER().GetText()
 		fieldVal := v.Visit(field.Expression()).(ir.Value)
 		
 		var idx int = -1
-		if fieldIndices, ok := v.ctx.StructFieldIndices[irName]; ok {
-			if fieldIdx, ok := fieldIndices[fieldName]; ok {
-				idx = fieldIdx
-			}
+		if idxVal, ok := v.ctx.StructFieldIndices[irName][fieldName]; ok {
+			idx = idxVal
 		}
 		
 		if idx < 0 {
 			v.ctx.Logger.Error("Struct %s has no field %s", irName, fieldName)
 			continue
 		}
-		
 		agg = v.ctx.Builder.CreateInsertValue(agg, fieldVal, []int{idx}, "")
 	}
-	
 	return agg
 }
 
@@ -718,7 +730,7 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 		return v.ctx.Builder.CreateVaArg(args[0], targetType, "")
 	}
 	if ctx.VA_END() != nil {
-		return v.ctx.Builder.CreateVaEnd(args[0])
+		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
 	if ctx.RAISE() != nil && len(args) == 1 {
 		v.ctx.Builder.CreateRaise(args[0])
@@ -727,4 +739,116 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 	}
 	
 	return v.ctx.Builder.ConstInt(types.I64, 0)
+}
+
+func (v *IRVisitor) calculateSizeOf(typ types.Type) int {
+	switch t := typ.(type) {
+	case *types.IntType: return t.BitWidth / 8
+	case *types.FloatType: return t.BitWidth / 8
+	case *types.PointerType: return 8
+	case *types.ArrayType: return v.calculateSizeOf(t.ElementType) * int(t.Length)
+	case *types.StructType:
+		size := 0
+		for _, field := range t.Fields {
+			align := v.calculateAlignOf(field)
+			if size%align != 0 { size += align - (size % align) }
+			size += v.calculateSizeOf(field)
+		}
+		align := v.calculateAlignOf(typ)
+		if size%align != 0 { size += align - (size % align) }
+		return size
+	default: return 8
+	}
+}
+
+func (v *IRVisitor) calculateAlignOf(typ types.Type) int {
+	switch t := typ.(type) {
+	case *types.IntType:
+		if t.BitWidth <= 8 { return 1 }
+		if t.BitWidth <= 16 { return 2 }
+		if t.BitWidth <= 32 { return 4 }
+		return 8
+	case *types.FloatType:
+		if t.BitWidth == 32 { return 4 }
+		return 8
+	case *types.PointerType: return 8
+	case *types.StructType:
+		max := 1
+		for _, f := range t.Fields {
+			a := v.calculateAlignOf(f)
+			if a > max { max = a }
+		}
+		return max
+	default: return 8
+	}
+}
+
+func (v *IRVisitor) findFieldIndex(structType *types.StructType, fieldName string) int {
+	if indices, ok := v.ctx.StructFieldIndices[structType.Name]; ok {
+		if idx, ok := indices[fieldName]; ok {
+			return idx
+		}
+	}
+	return -1
+}
+
+func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
+    srcType := val.Type()
+    if types.IsInteger(srcType) && types.IsInteger(targetType) {
+        srcBits := srcType.(*types.IntType).BitWidth
+        destBits := targetType.(*types.IntType).BitWidth
+        if srcBits > destBits {
+            return v.ctx.Builder.CreateTrunc(val, targetType, "")
+        } else if srcBits < destBits {
+            return v.ctx.Builder.CreateSExt(val, targetType, "")
+        }
+    }
+    if types.IsFloat(srcType) && types.IsFloat(targetType) {
+        srcBits := srcType.(*types.FloatType).BitWidth
+        destBits := targetType.(*types.FloatType).BitWidth
+        if srcBits > destBits {
+            return v.ctx.Builder.CreateFPTrunc(val, targetType, "")
+        } else if srcBits < destBits {
+            return v.ctx.Builder.CreateFPExt(val, targetType, "")
+        }
+    }
+    if types.IsInteger(srcType) && types.IsFloat(targetType) {
+        if srcType.(*types.IntType).Signed {
+            return v.ctx.Builder.CreateSIToFP(val, targetType, "")
+        }
+        return v.ctx.Builder.CreateUIToFP(val, targetType, "")
+    }
+    if types.IsFloat(srcType) && types.IsInteger(targetType) {
+        if targetType.(*types.IntType).Signed {
+            return v.ctx.Builder.CreateFPToSI(val, targetType, "")
+        }
+        return v.ctx.Builder.CreateFPToUI(val, targetType, "")
+    }
+    if types.IsPointer(srcType) && types.IsInteger(targetType) {
+        return v.ctx.Builder.CreatePtrToInt(val, targetType, "")
+    }
+    if types.IsInteger(srcType) && types.IsPointer(targetType) {
+        return v.ctx.Builder.CreateIntToPtr(val, targetType, "")
+    }
+    return v.ctx.Builder.CreateBitCast(val, targetType, "")
+}
+
+func (v *IRVisitor) castConstant(constant ir.Constant, targetType types.Type) ir.Constant {
+    srcType := constant.Type()
+    if srcType.Equal(targetType) { return constant }
+    if srcInt, ok := constant.(*ir.ConstantInt); ok {
+        if targetInt, ok := targetType.(*types.IntType); ok {
+            return v.ctx.Builder.ConstInt(targetInt, srcInt.Value)
+        }
+    }
+    return constant
+}
+
+func (v *IRVisitor) getZeroValue(typ types.Type) ir.Value {
+	switch typ.Kind() {
+	case types.IntegerKind: return v.ctx.Builder.ConstInt(typ.(*types.IntType), 0)
+	case types.FloatKind: return v.ctx.Builder.ConstFloat(typ.(*types.FloatType), 0.0)
+	case types.PointerKind: return v.ctx.Builder.ConstNull(typ.(*types.PointerType))
+	default: return v.ctx.Builder.ConstZero(typ)
+	}
 }
