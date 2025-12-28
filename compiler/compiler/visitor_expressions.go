@@ -994,3 +994,50 @@ func (v *IRVisitor) VisitVectorLiteral(ctx *parser.VectorLiteralContext) interfa
     
     return constArr
 }
+
+func (v *IRVisitor) VisitOrExpression(ctx *parser.OrExpressionContext) interface{} {
+    result := v.Visit(ctx.XorExpression(0)).(ir.Value)
+    for i := 1; i < len(ctx.AllXorExpression()); i++ {
+        rhs := v.Visit(ctx.XorExpression(i)).(ir.Value)
+        result = v.ctx.Builder.CreateOr(result, rhs, "") // LLVM 'Or' works for both logical and bitwise
+    }
+    return result
+}
+
+func (v *IRVisitor) VisitXorExpression(ctx *parser.XorExpressionContext) interface{} {
+    result := v.Visit(ctx.AndExpression(0)).(ir.Value)
+    for i := 1; i < len(ctx.AllAndExpression()); i++ {
+        rhs := v.Visit(ctx.AndExpression(i)).(ir.Value)
+        result = v.ctx.Builder.CreateXor(result, rhs, "")
+    }
+    return result
+}
+
+func (v *IRVisitor) VisitAndExpression(ctx *parser.AndExpressionContext) interface{} {
+    result := v.Visit(ctx.ShiftExpression(0)).(ir.Value)
+    for i := 1; i < len(ctx.AllShiftExpression()); i++ {
+        rhs := v.Visit(ctx.ShiftExpression(i)).(ir.Value)
+        result = v.ctx.Builder.CreateAnd(result, rhs, "")
+    }
+    return result
+}
+
+func (v *IRVisitor) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} {
+    result := v.Visit(ctx.AdditiveExpression(0)).(ir.Value)
+    for i := 1; i < len(ctx.AllAdditiveExpression()); i++ {
+        rhs := v.Visit(ctx.AdditiveExpression(i)).(ir.Value)
+        if i-1 < len(ctx.AllLSHIFT()) {
+            result = v.ctx.Builder.CreateShl(result, rhs, "")
+        } else {
+            // Check signedness for Arithmetic vs Logical shift
+            // Defaulting to Arithmetic Shift Right (AShr) for signed, LShr for unsigned usually
+            if _, ok := result.Type().(*types.IntType); ok {
+                 // ideally check .Signed property, assuming AShr for now
+                result = v.ctx.Builder.CreateAShr(result, rhs, "")
+            } else {
+                result = v.ctx.Builder.CreateLShr(result, rhs, "")
+            }
+        }
+    }
+    return result
+}
