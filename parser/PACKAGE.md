@@ -3853,9 +3853,10 @@ type IStructLiteralContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	IDENTIFIER() antlr.TerminalNode
 	LBRACE() antlr.TerminalNode
 	RBRACE() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	QualifiedIdentifier() IQualifiedIdentifierContext
 	AllFieldInit() []IFieldInitContext
 	FieldInit(i int) IFieldInitContext
 	AllCOMMA() []antlr.TerminalNode
@@ -5226,6 +5227,8 @@ func (s *StructLiteralContext) IDENTIFIER() antlr.TerminalNode
 func (*StructLiteralContext) IsStructLiteralContext()
 
 func (s *StructLiteralContext) LBRACE() antlr.TerminalNode
+
+func (s *StructLiteralContext) QualifiedIdentifier() IQualifiedIdentifierContext
 
 func (s *StructLiteralContext) RBRACE() antlr.TerminalNode
 

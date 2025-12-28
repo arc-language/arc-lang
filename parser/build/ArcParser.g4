@@ -336,7 +336,7 @@ mapEntry
     ;
 
 structLiteral
-    : IDENTIFIER LBRACE (fieldInit (COMMA fieldInit)*)? RBRACE
+    : (IDENTIFIER | qualifiedIdentifier) LBRACE (fieldInit (COMMA fieldInit)*)? RBRACE
     ;
 
 // Qualified struct literal (net.Socket{...})
