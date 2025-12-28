@@ -24,7 +24,6 @@ func (v *IRVisitor) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionCont
 }
 
 func (v *IRVisitor) VisitLogicalAndExpression(ctx *parser.LogicalAndExpressionContext) interface{} {
-	// Logic Update: Cascades to BitOrExpression instead of EqualityExpression
 	result := v.Visit(ctx.BitOrExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllBitOrExpression()); i++ {
 		rhs := v.Visit(ctx.BitOrExpression(i)).(ir.Value)
@@ -33,7 +32,6 @@ func (v *IRVisitor) VisitLogicalAndExpression(ctx *parser.LogicalAndExpressionCo
 	return result
 }
 
-// NEW: Bitwise OR (|)
 func (v *IRVisitor) VisitBitOrExpression(ctx *parser.BitOrExpressionContext) interface{} {
 	result := v.Visit(ctx.BitXorExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllBitXorExpression()); i++ {
@@ -43,7 +41,6 @@ func (v *IRVisitor) VisitBitOrExpression(ctx *parser.BitOrExpressionContext) int
 	return result
 }
 
-// NEW: Bitwise XOR (^)
 func (v *IRVisitor) VisitBitXorExpression(ctx *parser.BitXorExpressionContext) interface{} {
 	result := v.Visit(ctx.BitAndExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllBitAndExpression()); i++ {
@@ -53,12 +50,10 @@ func (v *IRVisitor) VisitBitXorExpression(ctx *parser.BitXorExpressionContext) i
 	return result
 }
 
-// NEW: Bitwise AND (&)
 func (v *IRVisitor) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) interface{} {
 	result := v.Visit(ctx.EqualityExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllEqualityExpression()); i++ {
 		rhs := v.Visit(ctx.EqualityExpression(i)).(ir.Value)
-		// LLVM 'And' instruction works for both boolean (i1) and bitwise (iN)
 		result = v.ctx.Builder.CreateAnd(result, rhs, "")
 	}
 	return result
@@ -78,7 +73,6 @@ func (v *IRVisitor) VisitEqualityExpression(ctx *parser.EqualityExpressionContex
 }
 
 func (v *IRVisitor) VisitRelationalExpression(ctx *parser.RelationalExpressionContext) interface{} {
-	// Logic Update: Cascades to ShiftExpression instead of RangeExpression
 	result := v.Visit(ctx.ShiftExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllShiftExpression()); i++ {
 		rhs := v.Visit(ctx.ShiftExpression(i)).(ir.Value)
@@ -95,25 +89,23 @@ func (v *IRVisitor) VisitRelationalExpression(ctx *parser.RelationalExpressionCo
 	return result
 }
 
-// NEW: Shift Operators (<<, >>)
 func (v *IRVisitor) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} {
-	// ShiftExpression cascades to RangeExpression
 	result := v.Visit(ctx.RangeExpression(0)).(ir.Value)
 	
-	// Iterate starting from the second operand (index 1)
+	// Determine operator by checking token type of children
+	// Expression children are at indices 0, 2, 4...
+	// Operator children are at indices 1, 3, 5...
+	
 	for i := 1; i < len(ctx.AllRangeExpression()); i++ {
 		rhs := v.Visit(ctx.RangeExpression(i)).(ir.Value)
 		
-		// Determine which operator was used (LSHIFT or RSHIFT)
-		// Children order: Expr (0), Op (1), Expr (2), Op (3), Expr (4)
-		// Operator index for loop iteration 'i' is i*2 - 1
 		opNode := ctx.GetChild(i*2 - 1).(antlr.TerminalNode)
 		tokenType := opNode.GetSymbol().GetTokenType()
 		
 		if tokenType == parser.ArcLexerLSHIFT {
 			result = v.ctx.Builder.CreateShl(result, rhs, "")
 		} else {
-			// RSHIFT: Use Arithmetic Shift (AShr) for signed, Logical (LShr) for unsigned
+			// RSHIFT: Arithmetic if signed, Logical if unsigned
 			if intType, ok := result.Type().(*types.IntType); ok && intType.Signed {
 				result = v.ctx.Builder.CreateAShr(result, rhs, "")
 			} else {
@@ -125,10 +117,8 @@ func (v *IRVisitor) VisitShiftExpression(ctx *parser.ShiftExpressionContext) int
 }
 
 func (v *IRVisitor) VisitRangeExpression(ctx *parser.RangeExpressionContext) interface{} {
-	// Ranges are typically handled in 'for' loops directly.
-	// As a standalone expression, it usually evaluates to the start value 
-	// or requires a struct representation if we implement range objects.
-	// For now, pass through to additive.
+	// Range parsing is usually handled in ForLoop visitor. 
+	// As a value, it returns start.
 	return v.Visit(ctx.AdditiveExpression(0))
 }
 
@@ -161,62 +151,39 @@ func (v *IRVisitor) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 }
 
 func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
-	// Handle await keyword
 	if ctx.AWAIT() != nil {
-		v.logger.Debug("Processing await expression")
-		
-		awaitedExpr := v.Visit(ctx.UnaryExpression())
-		if awaitedExpr == nil {
-			v.ctx.Logger.Error("await expression returned nil")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		val, ok := awaitedExpr.(ir.Value)
-		if !ok {
-			v.ctx.Logger.Error("await expression did not return ir.Value")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
-		// Create a coroutine suspend point
-		suspend := v.ctx.Builder.CreateCoroSuspend(false, "")
-		_ = suspend
-		
+		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		if val == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
+		_ = v.ctx.Builder.CreateCoroSuspend(false, "")
 		return val
 	}
 	
-	// Handle increment (++x)
 	if ctx.INCREMENT() != nil {
 		v.ctx.Logger.Warning("Pre-increment not fully implemented")
 		return v.Visit(ctx.UnaryExpression())
 	}
 	
-	// Handle decrement (--x)
 	if ctx.DECREMENT() != nil {
 		v.ctx.Logger.Warning("Pre-decrement not fully implemented")
 		return v.Visit(ctx.UnaryExpression())
 	}
 	
 	if ctx.MINUS() != nil {
-		exprResult := v.Visit(ctx.UnaryExpression())
-		if exprResult == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
-		val, _ := exprResult.(ir.Value)
+		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		if val == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		zero := v.getZeroValue(val.Type())
 		return v.ctx.Builder.CreateSub(zero, val, "")
 	}
 	
 	if ctx.NOT() != nil {
-		exprResult := v.Visit(ctx.UnaryExpression())
-		if exprResult == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
-		val, _ := exprResult.(ir.Value)
+		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		if val == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		return v.ctx.Builder.CreateXor(val, v.ctx.Builder.ConstInt(types.I1, 1), "")
 	}
 
-	// NEW: Bitwise NOT (~)
 	if ctx.BIT_NOT() != nil {
-		exprResult := v.Visit(ctx.UnaryExpression())
-		if exprResult == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
-		val, _ := exprResult.(ir.Value)
-		
-		// Bitwise NOT is XOR with -1 (all 1s)
+		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		if val == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		var allOnes ir.Constant
 		if intType, ok := val.Type().(*types.IntType); ok {
 			allOnes = v.ctx.Builder.ConstInt(intType, -1)
@@ -227,9 +194,8 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 	}
 	
 	if ctx.STAR() != nil {
-		ptrResult := v.Visit(ctx.UnaryExpression())
-		if ptrResult == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
-		ptr, _ := ptrResult.(ir.Value)
+		ptr := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		if ptr == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		ptrType, ok := ptr.Type().(*types.PointerType)
 		if !ok {
 			v.ctx.Logger.Error("Cannot dereference non-pointer type: %v", ptr.Type())
@@ -238,20 +204,16 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
 	}
 	
-	// Address-of Operator (&)
 	if ctx.AMP() != nil {
-		v.logger.Debug("Processing address-of (&) expression")
 		if childCtx, ok := ctx.UnaryExpression().(*parser.UnaryExpressionContext); ok {
 			return v.getExpressionAddress(childCtx)
 		}
-		v.ctx.Logger.Error("Invalid operand for address-of")
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
 	
 	return v.Visit(ctx.PostfixExpression())
 }
 
-// getExpressionAddress calculates the L-value (address) of an expression
 func (v *IRVisitor) getExpressionAddress(ctx *parser.UnaryExpressionContext) ir.Value {
 	if post := ctx.PostfixExpression(); post != nil {
 		if len(post.AllPostfixOp()) == 0 {
@@ -261,14 +223,10 @@ func (v *IRVisitor) getExpressionAddress(ctx *parser.UnaryExpressionContext) ir.
 					if sym, ok := v.ctx.currentScope.Lookup(name); ok {
 						return sym.Value
 					}
-					v.ctx.Logger.Error("Undefined symbol '%s' for address-of", name)
 				}
 			}
-		} else {
-			v.ctx.Logger.Error("Complex address-of expressions not fully implemented")
 		}
 	}
-	
 	v.ctx.Logger.Error("Invalid operand for address-of operator")
 	return v.ctx.Builder.ConstInt(types.I64, 0)
 }
@@ -285,13 +243,12 @@ func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	
 	for _, op := range ctx.AllPostfixOp() {
 		result = v.visitPostfixOp(result, op.(*parser.PostfixOpContext), baseIdentifier)
-		baseIdentifier = "" 
+		baseIdentifier = ""
 	}
 	return result
 }
 
 func (v *IRVisitor) visitPostfixOp(base ir.Value, ctx *parser.PostfixOpContext, baseIdentifier string) ir.Value {
-	// Function call
 	if ctx.LPAREN() != nil {
 		var args []ir.Value
 		if ctx.ArgumentList() != nil {
@@ -303,100 +260,75 @@ func (v *IRVisitor) visitPostfixOp(base ir.Value, ctx *parser.PostfixOpContext, 
 			}
 		}
 		
-		// Check if base is a function (e.g. from QualifiedIdentifier resolution)
 		if fn, ok := base.(*ir.Function); ok {
 			if v.pendingMethodSelf != nil {
 				args = append([]ir.Value{v.pendingMethodSelf}, args...)
 				v.pendingMethodSelf = nil
 			}
-			v.logger.Debug("Calling function: %s", fn.Name())
 			return v.ctx.Builder.CreateCall(fn, args, "")
 		}
-		
 		v.ctx.Logger.Error("Cannot call non-function")
 		return base
 	}
 	
-	// Index access (LBRACKET)
 	if ctx.LBRACKET() != nil {
-		if ctx.Expression() == nil {
-			v.ctx.Logger.Error("Index expression cannot be empty")
-			return base
-		}
-		
+		if ctx.Expression() == nil { return base }
 		indexExpr := v.Visit(ctx.Expression()).(ir.Value)
 		
 		if ptrType, ok := base.Type().(*types.PointerType); ok {
 			elemPtr := v.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, base, []ir.Value{indexExpr}, "")
 			return v.ctx.Builder.CreateLoad(ptrType.ElementType, elemPtr, "")
 		}
-		
 		v.ctx.Logger.Error("Cannot index non-pointer type: %v", base.Type())
 		return base
 	}
 	
-	// Member access (DOT)
 	if ctx.DOT() != nil && ctx.IDENTIFIER() != nil {
 		memberName := ctx.IDENTIFIER().GetText()
 		v.pendingMethodSelf = nil
 		
-		// 1. Check if this is namespace.function access (only if base was an identifier)
+		// Namespace function check
 		if baseIdentifier != "" {
 			if ns, ok := v.ctx.NamespaceRegistry[baseIdentifier]; ok {
 				if fn, ok := ns.LookupFunction(memberName); ok {
-					v.logger.Debug("Resolved %s.%s to function", baseIdentifier, memberName)
 					return fn
 				}
-				v.ctx.Logger.Error("Function '%s' not found in namespace '%s'", memberName, baseIdentifier)
-				return v.ctx.Builder.ConstInt(types.I64, 0)
 			}
 		}
 		
-		// 2. Check for class method
-		if ptrType, ok := base.Type().(*types.PointerType); ok {
-			if structType, ok := ptrType.ElementType.(*types.StructType); ok {
-				if v.ctx.IsClassType(structType.Name) {
-					methodName := structType.Name + "_" + memberName
-					if fn := v.ctx.Module.GetFunction(methodName); fn != nil {
-						v.pendingMethodSelf = base
-						v.logger.Debug("Resolved method %s on class %s", memberName, structType.Name)
-						return fn
-					}
-				}
-			}
-		}
-		
-		// 3. Field access
-		return v.handleFieldAccess(base, memberName)
+		return v.handleMemberAccess(base, memberName)
 	}
 	
 	return base
 }
 
-func (v *IRVisitor) handleFieldAccess(base ir.Value, fieldName string) ir.Value {
+func (v *IRVisitor) handleMemberAccess(base ir.Value, memberName string) ir.Value {
 	if ptrType, ok := base.Type().(*types.PointerType); ok {
 		if structType, ok := ptrType.ElementType.(*types.StructType); ok {
-			isClass := v.ctx.IsClassType(structType.Name)
-			var fieldIdx int = -1
 			
-			if isClass {
-				if fieldIndices, ok := v.ctx.ClassFieldIndices[structType.Name]; ok {
-					if idx, ok := fieldIndices[fieldName]; ok {
-						fieldIdx = idx
-					}
+			// Method
+			if v.ctx.IsClassType(structType.Name) {
+				methodName := structType.Name + "_" + memberName
+				if fn := v.ctx.Module.GetFunction(methodName); fn != nil {
+					v.pendingMethodSelf = base
+					return fn
+				}
+			}
+			
+			// Field
+			var fieldIdx int = -1
+			if v.ctx.IsClassType(structType.Name) {
+				if idx, ok := v.ctx.ClassFieldIndices[structType.Name][memberName]; ok {
+					fieldIdx = idx
 				}
 			} else {
-				fieldIdx = v.findFieldIndex(structType, fieldName)
+				fieldIdx = v.findFieldIndex(structType, memberName)
 			}
 			
-			if fieldIdx < 0 {
-				v.ctx.Logger.Error("Type '%s' has no field '%s'", structType.Name, fieldName)
-				return base
+			if fieldIdx >= 0 {
+				gep := v.ctx.Builder.CreateStructGEP(structType, base, fieldIdx, "")
+				return v.ctx.Builder.CreateLoad(structType.Fields[fieldIdx], gep, "")
 			}
-			
-			v.logger.Debug("Accessing field '%s' at index %d on type '%s'", fieldName, fieldIdx, structType.Name)
-			gep := v.ctx.Builder.CreateStructGEP(structType, base, fieldIdx, "")
-			return v.ctx.Builder.CreateLoad(structType.Fields[fieldIdx], gep, "")
 		}
 	}
 	
@@ -405,16 +337,13 @@ func (v *IRVisitor) handleFieldAccess(base ir.Value, fieldName string) ir.Value 
 			v.ctx.Logger.Error("Class instances must be accessed via pointer")
 			return base
 		}
-		
-		fieldIdx := v.findFieldIndex(structType, fieldName)
-		if fieldIdx < 0 {
-			v.ctx.Logger.Error("Struct has no field '%s'", fieldName)
-			return base
+		fieldIdx := v.findFieldIndex(structType, memberName)
+		if fieldIdx >= 0 {
+			return v.ctx.Builder.CreateExtractValue(base, []int{fieldIdx}, "")
 		}
-		return v.ctx.Builder.CreateExtractValue(base, []int{fieldIdx}, "")
 	}
 	
-	v.ctx.Logger.Error("Field access requires struct or class instance")
+	v.ctx.Logger.Error("Type '%v' has no member '%s'", base.Type(), memberName)
 	return base
 }
 
@@ -427,7 +356,7 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	if ctx.SyscallExpression() != nil { return v.Visit(ctx.SyscallExpression()) }
 	if ctx.IntrinsicExpression() != nil { return v.Visit(ctx.IntrinsicExpression()) }
 	
-	// NEW: Qualified Identifiers (namespace.func)
+	// Handle Qualified Identifiers (e.g., namespace.Func or variable.field.field)
 	if ctx.QualifiedIdentifier() != nil {
 		qCtx := ctx.QualifiedIdentifier()
 		parts := make([]string, len(qCtx.AllIDENTIFIER()))
@@ -435,27 +364,49 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			parts[i] = node.GetText()
 		}
 		
-		if len(parts) >= 2 {
-			nsName := parts[0]
-			memberName := parts[1] // Support 1 level for now
+		if len(parts) < 2 { return v.ctx.Builder.ConstInt(types.I64, 0) }
+		firstPart := parts[0]
+
+		// 1. Try Variable Lookup (Chain)
+		if sym, ok := v.ctx.currentScope.Lookup(firstPart); ok {
+			var currentVal ir.Value = sym.Value
 			
-			if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
-				if fn, ok := ns.LookupFunction(memberName); ok {
-					return fn
+			if ptr, isAlloca := currentVal.(*ir.AllocaInst); isAlloca {
+				// If struct on stack, use ptr. If class ptr on stack, load it.
+				if _, isPtr := ptr.AllocatedType.(*types.PointerType); isPtr {
+					currentVal = v.ctx.Builder.CreateLoad(ptr.AllocatedType, ptr, "")
+				} else {
+					currentVal = ptr
 				}
-				v.ctx.Logger.Error("Function '%s' not found in namespace '%s'", memberName, nsName)
-			} else {
-				v.ctx.Logger.Error("Unknown namespace: %s", nsName)
 			}
+			
+			// Chain access
+			for i := 1; i < len(parts); i++ {
+				currentVal = v.handleMemberAccess(currentVal, parts[i])
+			}
+			return currentVal
+		}
+
+		// 2. Try Namespace Lookup
+		nsName := firstPart
+		memberName := parts[1]
+		
+		if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
+			if fn, ok := ns.LookupFunction(memberName); ok {
+				return fn
+			}
+			v.ctx.Logger.Error("Function '%s' not found in namespace '%s'", memberName, nsName)
+		} else {
+			v.ctx.Logger.Error("Unknown namespace or variable: %s", nsName)
 		}
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
-	
+
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
 		
 		if _, isType := v.ctx.GetType(name); isType {
-			v.ctx.Logger.Error("Type '%s' used as value (did you mean '%s{}'?)", name, name)
+			v.ctx.Logger.Error("Type '%s' used as value", name)
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
 		
@@ -479,8 +430,7 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 
 		if ptr, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
 			ptrType := ptr.Type().(*types.PointerType)
-			loaded := v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
-			return loaded
+			return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
 		}
 
 		return sym.Value
@@ -489,219 +439,27 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	return v.ctx.Builder.ConstInt(types.I64, 0)
 }
 
-func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionContext) interface{} {
-	// Handle sizeof and alignof (compile-time constants)
-	if ctx.SIZEOF() != nil {
-		typ := v.resolveType(ctx.Type_())
-		v.logger.Debug("Creating sizeof intrinsic for type: %v", typ)
-		return v.ctx.Builder.CreateSizeOf(typ, "")
-	}
-	
-	if ctx.ALIGNOF() != nil {
-		typ := v.resolveType(ctx.Type_())
-		v.logger.Debug("Creating alignof intrinsic for type: %v", typ)
-		return v.ctx.Builder.CreateAlignOf(typ, "")
-	}
-	
-	// Special handling for va_start - it needs to allocate a va_list first
-	if ctx.VA_START() != nil {
-		v.logger.Debug("Creating va_start intrinsic")
-		
-		vaListType := v.ctx.namedTypes["va_list"]
-		if vaListType == nil {
-			vaListType = types.NewPointer(types.I8)
-			v.ctx.namedTypes["va_list"] = vaListType
-		}
-		
-		vaListPtr := v.ctx.Builder.CreateAlloca(vaListType, "va_list")
-		v.ctx.Builder.CreateVaStart(vaListPtr)
-		
-		return vaListPtr
-	}
-	
-	// Get arguments
-	var args []ir.Value
-	for _, expr := range ctx.AllExpression() {
-		argVal := v.Visit(expr)
-		if argVal == nil {
-			v.ctx.Logger.Error("Failed to evaluate intrinsic argument expression")
-			continue
-		}
-		val, ok := argVal.(ir.Value)
-		if !ok {
-			v.ctx.Logger.Error("Intrinsic argument is not a value")
-			continue
-		}
-		args = append(args, val)
-	}
-	
-	if ctx.MEMSET() != nil {
-		if len(args) != 3 {
-			v.ctx.Logger.Error("memset requires 3 arguments (dest, val, count)")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		v.logger.Debug("Creating memset intrinsic")
-		return v.ctx.Builder.CreateMemSet(args[0], args[1], args[2])
-	}
-	
-	if ctx.MEMCPY() != nil {
-		if len(args) != 3 {
-			v.ctx.Logger.Error("memcpy requires 3 arguments (dest, src, count)")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		v.logger.Debug("Creating memcpy intrinsic")
-		return v.ctx.Builder.CreateMemCpy(args[0], args[1], args[2])
-	}
-	
-	if ctx.MEMMOVE() != nil {
-		if len(args) != 3 {
-			v.ctx.Logger.Error("memmove requires 3 arguments (dest, src, count)")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		v.logger.Debug("Creating memmove intrinsic")
-		return v.ctx.Builder.CreateMemMove(args[0], args[1], args[2])
-	}
-	
-	if ctx.STRLEN() != nil {
-		if len(args) != 1 {
-			v.ctx.Logger.Error("strlen requires 1 argument")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		v.logger.Debug("Creating strlen intrinsic")
-		return v.ctx.Builder.CreateStrLen(args[0], "")
-	}
-	
-	if ctx.MEMCHR() != nil {
-		if len(args) != 3 {
-			v.ctx.Logger.Error("memchr requires 3 arguments (ptr, val, count)")
-			return v.ctx.Builder.ConstNull(types.NewPointer(types.Void))
-		}
-		v.logger.Debug("Creating memchr intrinsic")
-		return v.ctx.Builder.CreateMemChr(args[0], args[1], args[2], "")
-	}
-	
-	if ctx.MEMCMP() != nil {
-		if len(args) != 3 {
-			v.ctx.Logger.Error("memcmp requires 3 arguments (ptr1, ptr2, count)")
-			return v.ctx.Builder.ConstInt(types.I32, 0)
-		}
-		v.logger.Debug("Creating memcmp intrinsic")
-		return v.ctx.Builder.CreateMemCmp(args[0], args[1], args[2], "")
-	}
-	
-	if ctx.VA_ARG() != nil {
-		if len(args) != 1 {
-			v.ctx.Logger.Error("va_arg requires 1 argument (va_list)")
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		targetType := v.resolveType(ctx.Type_())
-		v.logger.Debug("Creating va_arg intrinsic with type: %v", targetType)
-		return v.ctx.Builder.CreateVaArg(args[0], targetType, "")
-	}
-	
-	if ctx.VA_END() != nil {
-		if len(args) != 1 {
-			v.ctx.Logger.Error("va_end requires 1 argument (va_list)")
-			return nil
-		}
-		v.logger.Debug("Creating va_end intrinsic")
-		return v.ctx.Builder.CreateVaEnd(args[0])
-	}
-	
-	if ctx.RAISE() != nil {
-		if len(args) != 1 {
-			v.ctx.Logger.Error("raise requires 1 argument (message)")
-			defaultMsg := v.ctx.Builder.ConstInt(types.I64, 0)
-			v.ctx.Builder.CreateRaise(defaultMsg)
-			v.ctx.Builder.CreateUnreachable()
-			return nil
-		}
-		v.logger.Debug("Creating raise intrinsic")
-		v.ctx.Builder.CreateRaise(args[0])
-		v.ctx.Builder.CreateUnreachable()
-		return nil
-	}
+func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {
+	var name string
 	
 	if ctx.IDENTIFIER() != nil {
-		intrinsicName := ctx.IDENTIFIER().GetText()
-		v.ctx.Logger.Error("Unknown intrinsic function: %s", intrinsicName)
-	}
-	
-	return v.ctx.Builder.ConstInt(types.I64, 0)
-}
-
-func (v *IRVisitor) calculateSizeOf(typ types.Type) int {
-	switch t := typ.(type) {
-	case *types.IntType:
-		return t.BitWidth / 8
-	case *types.FloatType:
-		return t.BitWidth / 8
-	case *types.PointerType:
-		return 8
-	case *types.StructType:
-		size := 0
-		for _, field := range t.Fields {
-			fieldSize := v.calculateSizeOf(field)
-			fieldAlign := v.calculateAlignOf(field)
-			if size%fieldAlign != 0 {
-				size += fieldAlign - (size % fieldAlign)
-			}
-			size += fieldSize
-		}
-		structAlign := v.calculateAlignOf(typ)
-		if size%structAlign != 0 {
-			size += structAlign - (size % structAlign)
-		}
-		return size
-	case *types.ArrayType:
-		return v.calculateSizeOf(t.ElementType) * int(t.Length)
-	default:
-		return 8
-	}
-}
-
-func (v *IRVisitor) calculateAlignOf(typ types.Type) int {
-	switch t := typ.(type) {
-	case *types.IntType:
-		bits := t.BitWidth
-		if bits <= 8 {
-			return 1
-		} else if bits <= 16 {
-			return 2
-		} else if bits <= 32 {
-			return 4
-		}
-		return 8
-	case *types.FloatType:
-		bits := t.BitWidth
-		if bits == 16 {
-			return 2
-		} else if bits == 32 {
-			return 4
-		} else if bits == 64 {
-			return 8
-		}
-		return 16
-	case *types.PointerType:
-		return 8
-	case *types.StructType:
-		maxAlign := 1
-		for _, field := range t.Fields {
-			align := v.calculateAlignOf(field)
-			if align > maxAlign {
-				maxAlign = align
+		name = ctx.IDENTIFIER().GetText()
+	} else if ctx.QualifiedIdentifier() != nil {
+		qCtx := ctx.QualifiedIdentifier()
+		if len(qCtx.AllIDENTIFIER()) == 2 {
+			nsName := qCtx.IDENTIFIER(0).GetText()
+			typeName := qCtx.IDENTIFIER(1).GetText()
+			
+			if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
+				if typ, ok := ns.Types[typeName]; ok {
+					if st, ok := typ.(*types.StructType); ok {
+						name = st.Name
+					}
+				}
 			}
 		}
-		return maxAlign
-	case *types.ArrayType:
-		return v.calculateAlignOf(t.ElementType)
-	default:
-		return 8
 	}
-}
 
-func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {
-	name := ctx.IDENTIFIER().GetText()
 	typ, ok := v.ctx.GetType(name)
 	if !ok {
 		v.ctx.Logger.Error("Unknown struct/class type: %s", name)
@@ -719,23 +477,19 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 	if v.ctx.IsClassType(name) {
 		ptrToClass := v.ctx.Builder.CreateAlloca(structType, name+".instance")
 		
-		// Zero-initialize
 		for i := 0; i < len(structType.Fields); i++ {
 			gep := v.ctx.Builder.CreateStructGEP(structType, ptrToClass, i, "")
 			zero := v.getZeroValue(structType.Fields[i])
 			v.ctx.Builder.CreateStore(zero, gep)
 		}
 		
-		// Initialize fields
 		for _, field := range ctx.AllFieldInit() {
 			fieldName := field.IDENTIFIER().GetText()
 			fieldVal := v.Visit(field.Expression()).(ir.Value)
 			
 			var idx int = -1
-			if fieldIndices, ok := v.ctx.ClassFieldIndices[name]; ok {
-				if fieldIdx, ok := fieldIndices[fieldName]; ok {
-					idx = fieldIdx
-				}
+			if idxVal, ok := v.ctx.ClassFieldIndices[name][fieldName]; ok {
+				idx = idxVal
 			}
 			
 			if idx < 0 {
@@ -746,12 +500,10 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 			gep := v.ctx.Builder.CreateStructGEP(structType, ptrToClass, idx, "")
 			v.ctx.Builder.CreateStore(fieldVal, gep)
 		}
-		
 		return ptrToClass
 	}
 
 	var agg ir.Value = v.ctx.Builder.ConstZero(structType)
-
 	for _, field := range ctx.AllFieldInit() {
 		fieldName := field.IDENTIFIER().GetText()
 		fieldVal := v.Visit(field.Expression()).(ir.Value)
@@ -761,10 +513,8 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 			v.ctx.Logger.Error("Struct %s has no field %s", name, fieldName)
 			continue
 		}
-		
 		agg = v.ctx.Builder.CreateInsertValue(agg, fieldVal, []int{idx}, "")
 	}
-	
 	return agg
 }
 
@@ -774,20 +524,17 @@ func (v *IRVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
         val, _ := strconv.ParseInt(text, 0, 64)
         return v.ctx.Builder.ConstInt(types.I64, val)
     }
-    
     if ctx.FLOAT_LITERAL() != nil {
         text := ctx.FLOAT_LITERAL().GetText()
         val, _ := strconv.ParseFloat(text, 64)
         return v.ctx.Builder.ConstFloat(types.F64, val)
     }
-    
     if ctx.BOOLEAN_LITERAL() != nil {
         if ctx.BOOLEAN_LITERAL().GetText() == "true" {
             return v.ctx.Builder.True()
         }
         return v.ctx.Builder.False()
     }
-    
     if ctx.STRING_LITERAL() != nil {
         rawText := ctx.STRING_LITERAL().GetText()
         content, err := strconv.Unquote(rawText)
@@ -817,97 +564,36 @@ func (v *IRVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
         
         return v.ctx.Builder.CreateInBoundsGEP(arrType, global, []ir.Value{zero, zero}, "")
     }
-    
     if ctx.VectorLiteral() != nil {
         return v.Visit(ctx.VectorLiteral())
     }
-    
     if ctx.MapLiteral() != nil {
         v.ctx.Logger.Warning("Map literals not yet implemented")
         return v.ctx.Builder.ConstInt(types.I64, 0)
     }
-    
     return v.ctx.Builder.ConstInt(types.I64, 0)
 }
 
 func (v *IRVisitor) VisitCastExpression(ctx *parser.CastExpressionContext) interface{} {
 	val := v.Visit(ctx.Expression()).(ir.Value)
 	destType := v.resolveType(ctx.Type_())
-	srcType := val.Type()
-	
-	v.logger.Debug("Casting from %v to %v", srcType, destType)
-	
-	if types.IsPointer(srcType) && types.IsInteger(destType) {
-		return v.ctx.Builder.CreatePtrToInt(val, destType, "")
-	}
-	if types.IsInteger(srcType) && types.IsPointer(destType) {
-		return v.ctx.Builder.CreateIntToPtr(val, destType, "")
-	}
-	if types.IsInteger(srcType) && types.IsInteger(destType) {
-		srcInt := srcType.(*types.IntType)
-		destInt := destType.(*types.IntType)
-		if destInt.BitWidth > srcInt.BitWidth {
-			if srcInt.Signed {
-				return v.ctx.Builder.CreateSExt(val, destType, "")
-			}
-			return v.ctx.Builder.CreateZExt(val, destType, "")
-		} else if destInt.BitWidth < srcInt.BitWidth {
-			return v.ctx.Builder.CreateTrunc(val, destType, "")
-		}
-		if srcInt.Signed != destInt.Signed {
-			return v.ctx.Builder.CreateBitCast(val, destType, "")
-		}
-		return val
-	}
-	if types.IsInteger(srcType) && types.IsFloat(destType) {
-		if srcType.(*types.IntType).Signed {
-			return v.ctx.Builder.CreateSIToFP(val, destType, "")
-		}
-		return v.ctx.Builder.CreateUIToFP(val, destType, "")
-	}
-	if types.IsFloat(srcType) && types.IsInteger(destType) {
-		if destType.(*types.IntType).Signed {
-			return v.ctx.Builder.CreateFPToSI(val, destType, "")
-		}
-		return v.ctx.Builder.CreateFPToUI(val, destType, "")
-	}
-	if types.IsFloat(srcType) && types.IsFloat(destType) {
-		srcFloat := srcType.(*types.FloatType)
-		destFloat := destType.(*types.FloatType)
-		if destFloat.BitWidth > srcFloat.BitWidth {
-			return v.ctx.Builder.CreateFPExt(val, destType, "")
-		}
-		if destFloat.BitWidth < srcFloat.BitWidth {
-			return v.ctx.Builder.CreateFPTrunc(val, destType, "")
-		}
-		return val
-	}
-	
-	return v.ctx.Builder.CreateBitCast(val, destType, "")
+	return v.castValue(val, destType)
 }
 
 func (v *IRVisitor) VisitAllocaExpression(ctx *parser.AllocaExpressionContext) interface{} {
 	allocType := v.resolveType(ctx.Type_())
-	
-	v.logger.Debug("Creating alloca for type: %v", allocType)
-	
 	if ctx.Expression() != nil {
 		count := v.Visit(ctx.Expression()).(ir.Value)
 		return v.ctx.Builder.CreateAllocaWithCount(allocType, count, "")
 	}
-	
 	return v.ctx.Builder.CreateAlloca(allocType, "")
 }
 
 func (v *IRVisitor) VisitSyscallExpression(ctx *parser.SyscallExpressionContext) interface{} {
 	exprs := ctx.AllExpression()
 	if len(exprs) == 0 {
-		v.ctx.Logger.Error("syscall requires at least a syscall number")
 		return v.ctx.Builder.ConstInt(types.I64, -1)
 	}
-
-	v.logger.Debug("Creating syscall with %d arguments", len(exprs))
-
 	args := make([]ir.Value, len(exprs))
 	for i, expr := range exprs {
 		val := v.Visit(expr).(ir.Value)
@@ -918,35 +604,23 @@ func (v *IRVisitor) VisitSyscallExpression(ctx *parser.SyscallExpressionContext)
 		}
 		args[i] = val
 	}
-
 	return v.ctx.Builder.CreateSyscall(args)
 }
 
 func (v *IRVisitor) VisitArgumentList(ctx *parser.ArgumentListContext) interface{} {
-	args := make([]ir.Value, 0)
-	
+	var args []ir.Value
 	for _, expr := range ctx.AllExpression() {
-		arg := v.Visit(expr)
-		if arg == nil {
-			v.ctx.Logger.Error("Failed to evaluate argument expression")
-			continue
+		if val, ok := v.Visit(expr).(ir.Value); ok {
+			args = append(args, val)
 		}
-		argVal, ok := arg.(ir.Value)
-		if !ok {
-			v.ctx.Logger.Error("Argument expression did not produce a value")
-			continue
-		}
-		args = append(args, argVal)
 	}
-	
 	return args
 }
 
 func (v *IRVisitor) VisitLeftHandSide(ctx *parser.LeftHandSideContext) interface{} {
 	if ctx.IDENTIFIER() != nil && ctx.DOT() == nil && ctx.STAR() == nil {
 		name := ctx.IDENTIFIER().GetText()
-		sym, ok := v.ctx.currentScope.Lookup(name)
-		if ok {
+		if sym, ok := v.ctx.currentScope.Lookup(name); ok {
 			return sym.Value
 		}
 	}
@@ -960,12 +634,8 @@ func (v *IRVisitor) VisitLeftHandSide(ctx *parser.LeftHandSideContext) interface
 }
 
 func (v *IRVisitor) VisitVectorLiteral(ctx *parser.VectorLiteralContext) interface{} {
-    v.logger.Debug("Visiting vector literal")
-    
     exprs := ctx.AllExpression()
-    
     if len(exprs) == 0 {
-        v.logger.Debug("Empty vector literal")
         return &ir.ConstantArray{
             BaseValue: ir.BaseValue{ValType: types.NewArray(types.I32, 0)},
             Elements:  []ir.Constant{},
@@ -977,29 +647,199 @@ func (v *IRVisitor) VisitVectorLiteral(ctx *parser.VectorLiteralContext) interfa
     
     for i, expr := range exprs {
         val := v.Visit(expr).(ir.Value)
-        
-        if i == 0 {
-            elemType = val.Type()
-        }
+        if i == 0 { elemType = val.Type() }
         
         if constVal, ok := val.(ir.Constant); ok {
             elements[i] = constVal
         } else {
-            v.ctx.Logger.Error("Vector literal elements must be constant values, got %T", val)
             elements[i] = v.ctx.Builder.ConstInt(types.I32, 0)
-            if elemType == nil {
-                elemType = types.I32
-            }
+            if elemType == nil { elemType = types.I32 }
         }
     }
     
     arrType := types.NewArray(elemType, int64(len(elements)))
-    constArr := &ir.ConstantArray{
+    return &ir.ConstantArray{
         BaseValue: ir.BaseValue{ValType: arrType},
         Elements:  elements,
     }
+}
+
+func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionContext) interface{} {
+	if ctx.SIZEOF() != nil {
+		typ := v.resolveType(ctx.Type_())
+		return v.ctx.Builder.CreateSizeOf(typ, "")
+	}
+	if ctx.ALIGNOF() != nil {
+		typ := v.resolveType(ctx.Type_())
+		return v.ctx.Builder.CreateAlignOf(typ, "")
+	}
+	
+	if ctx.VA_START() != nil {
+		vaListType := v.ctx.namedTypes["va_list"]
+		if vaListType == nil {
+			vaListType = types.NewPointer(types.I8)
+			v.ctx.namedTypes["va_list"] = vaListType
+		}
+		vaListPtr := v.ctx.Builder.CreateAlloca(vaListType, "va_list")
+		v.ctx.Builder.CreateVaStart(vaListPtr)
+		return vaListPtr
+	}
+	
+	var args []ir.Value
+	for _, expr := range ctx.AllExpression() {
+		if val, ok := v.Visit(expr).(ir.Value); ok {
+			args = append(args, val)
+		}
+	}
+	
+	if ctx.MEMSET() != nil && len(args) == 3 {
+		return v.ctx.Builder.CreateMemSet(args[0], args[1], args[2])
+	}
+	if ctx.MEMCPY() != nil && len(args) == 3 {
+		return v.ctx.Builder.CreateMemCpy(args[0], args[1], args[2])
+	}
+	if ctx.MEMMOVE() != nil && len(args) == 3 {
+		return v.ctx.Builder.CreateMemMove(args[0], args[1], args[2])
+	}
+	if ctx.STRLEN() != nil && len(args) == 1 {
+		return v.ctx.Builder.CreateStrLen(args[0], "")
+	}
+	if ctx.MEMCHR() != nil && len(args) == 3 {
+		return v.ctx.Builder.CreateMemChr(args[0], args[1], args[2], "")
+	}
+	if ctx.MEMCMP() != nil && len(args) == 3 {
+		return v.ctx.Builder.CreateMemCmp(args[0], args[1], args[2], "")
+	}
+	if ctx.VA_ARG() != nil && len(args) == 1 {
+		targetType := v.resolveType(ctx.Type_())
+		return v.ctx.Builder.CreateVaArg(args[0], targetType, "")
+	}
+	if ctx.VA_END() != nil && len(args) == 1 {
+		return v.ctx.Builder.CreateVaEnd(args[0])
+	}
+	if ctx.RAISE() != nil && len(args) == 1 {
+		v.ctx.Builder.CreateRaise(args[0])
+		v.ctx.Builder.CreateUnreachable()
+		return nil
+	}
+	
+	return v.ctx.Builder.ConstInt(types.I64, 0)
+}
+
+// --- Helpers duplicated here to ensure file completeness if missing in visitor.go ---
+
+func (v *IRVisitor) calculateSizeOf(typ types.Type) int {
+	switch t := typ.(type) {
+	case *types.IntType: return t.BitWidth / 8
+	case *types.FloatType: return t.BitWidth / 8
+	case *types.PointerType: return 8
+	case *types.ArrayType: return v.calculateSizeOf(t.ElementType) * int(t.Length)
+	case *types.StructType:
+		size := 0
+		for _, field := range t.Fields {
+			align := v.calculateAlignOf(field)
+			if size%align != 0 { size += align - (size % align) }
+			size += v.calculateSizeOf(field)
+		}
+		align := v.calculateAlignOf(typ)
+		if size%align != 0 { size += align - (size % align) }
+		return size
+	default: return 8
+	}
+}
+
+func (v *IRVisitor) calculateAlignOf(typ types.Type) int {
+	switch t := typ.(type) {
+	case *types.IntType:
+		if t.BitWidth <= 8 { return 1 }
+		if t.BitWidth <= 16 { return 2 }
+		if t.BitWidth <= 32 { return 4 }
+		return 8
+	case *types.FloatType:
+		if t.BitWidth == 32 { return 4 }
+		return 8
+	case *types.PointerType: return 8
+	case *types.StructType:
+		max := 1
+		for _, f := range t.Fields {
+			a := v.calculateAlignOf(f)
+			if a > max { max = a }
+		}
+		return max
+	default: return 8
+	}
+}
+
+func (v *IRVisitor) findFieldIndex(structType *types.StructType, fieldName string) int {
+	if indices, ok := v.ctx.StructFieldIndices[structType.Name]; ok {
+		if idx, ok := indices[fieldName]; ok {
+			return idx
+		}
+	}
+	return -1
+}
+
+func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
+    srcType := val.Type()
+    if types.IsInteger(srcType) && types.IsInteger(targetType) {
+        srcBits := srcType.(*types.IntType).BitWidth
+        destBits := targetType.(*types.IntType).BitWidth
+        if srcBits > destBits {
+            return v.ctx.Builder.CreateTrunc(val, targetType, "")
+        } else if srcBits < destBits {
+            return v.ctx.Builder.CreateSExt(val, targetType, "")
+        }
+    }
+    if types.IsFloat(srcType) && types.IsFloat(targetType) {
+        srcBits := srcType.(*types.FloatType).BitWidth
+        destBits := targetType.(*types.FloatType).BitWidth
+        if srcBits > destBits {
+            return v.ctx.Builder.CreateFPTrunc(val, targetType, "")
+        } else if srcBits < destBits {
+            return v.ctx.Builder.CreateFPExt(val, targetType, "")
+        }
+    }
+    if types.IsInteger(srcType) && types.IsFloat(targetType) {
+        if srcType.(*types.IntType).Signed {
+            return v.ctx.Builder.CreateSIToFP(val, targetType, "")
+        }
+        return v.ctx.Builder.CreateUIToFP(val, targetType, "")
+    }
+    if types.IsFloat(srcType) && types.IsInteger(targetType) {
+        if targetType.(*types.IntType).Signed {
+            return v.ctx.Builder.CreateFPToSI(val, targetType, "")
+        }
+        return v.ctx.Builder.CreateFPToUI(val, targetType, "")
+    }
+    // Pointer to Int
+    if types.IsPointer(srcType) && types.IsInteger(targetType) {
+        return v.ctx.Builder.CreatePtrToInt(val, targetType, "")
+    }
+    // Int to Pointer
+    if types.IsInteger(srcType) && types.IsPointer(targetType) {
+        return v.ctx.Builder.CreateIntToPtr(val, targetType, "")
+    }
     
-    v.logger.Info("Created vector literal with %d elements of type %v", len(elements), elemType)
-    
-    return constArr
+    // Bitcast fallthrough
+    return v.ctx.Builder.CreateBitCast(val, targetType, "")
+}
+
+func (v *IRVisitor) castConstant(constant ir.Constant, targetType types.Type) ir.Constant {
+    srcType := constant.Type()
+    if srcType.Equal(targetType) { return constant }
+    if srcInt, ok := constant.(*ir.ConstantInt); ok {
+        if targetInt, ok := targetType.(*types.IntType); ok {
+            return v.ctx.Builder.ConstInt(targetInt, srcInt.Value)
+        }
+    }
+    return constant
+}
+
+func (v *IRVisitor) getZeroValue(typ types.Type) ir.Value {
+	switch typ.Kind() {
+	case types.IntegerKind: return v.ctx.Builder.ConstInt(typ.(*types.IntType), 0)
+	case types.FloatKind: return v.ctx.Builder.ConstFloat(typ.(*types.FloatType), 0.0)
+	case types.PointerKind: return v.ctx.Builder.ConstNull(typ.(*types.PointerType))
+	default: return v.ctx.Builder.ConstZero(typ)
+	}
 }
