@@ -731,56 +731,66 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 }
 
 func (v *IRVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
-	if ctx.INTEGER_LITERAL() != nil {
-		text := ctx.INTEGER_LITERAL().GetText()
-		val, _ := strconv.ParseInt(text, 0, 64)
-		return v.ctx.Builder.ConstInt(types.I64, val)
-	}
-	
-	if ctx.FLOAT_LITERAL() != nil {
-		text := ctx.FLOAT_LITERAL().GetText()
-		val, _ := strconv.ParseFloat(text, 64)
-		return v.ctx.Builder.ConstFloat(types.F64, val)
-	}
-	
-	if ctx.BOOLEAN_LITERAL() != nil {
-		if ctx.BOOLEAN_LITERAL().GetText() == "true" {
-			return v.ctx.Builder.True()
-		}
-		return v.ctx.Builder.False()
-	}
-	
-	if ctx.STRING_LITERAL() != nil {
-		rawText := ctx.STRING_LITERAL().GetText()
-		content, err := strconv.Unquote(rawText)
-		if err != nil {
-			if len(rawText) >= 2 {
-				content = rawText[1 : len(rawText)-1]
-			} else {
-				content = rawText
-			}
-		}
-		
-		bytes := append([]byte(content), 0)
-		elements := make([]ir.Constant, len(bytes))
-		for i, b := range bytes {
-			elements[i] = v.ctx.Builder.ConstInt(types.I8, int64(b))
-		}
-		
-		arrType := types.NewArray(types.I8, int64(len(bytes)))
-		constArr := &ir.ConstantArray{
-			BaseValue: ir.BaseValue{ValType: arrType},
-			Elements:  elements,
-		}
-		
-		strName := fmt.Sprintf(".str.%d", len(v.ctx.Module.Globals))
-		global := v.ctx.Builder.CreateGlobalConstant(strName, constArr)
-		zero := v.ctx.Builder.ConstInt(types.I32, 0)
-		
-		return v.ctx.Builder.CreateInBoundsGEP(arrType, global, []ir.Value{zero, zero}, "")
-	}
-	
-	return v.ctx.Builder.ConstInt(types.I64, 0)
+    if ctx.INTEGER_LITERAL() != nil {
+        text := ctx.INTEGER_LITERAL().GetText()
+        val, _ := strconv.ParseInt(text, 0, 64)
+        return v.ctx.Builder.ConstInt(types.I64, val)
+    }
+    
+    if ctx.FLOAT_LITERAL() != nil {
+        text := ctx.FLOAT_LITERAL().GetText()
+        val, _ := strconv.ParseFloat(text, 64)
+        return v.ctx.Builder.ConstFloat(types.F64, val)
+    }
+    
+    if ctx.BOOLEAN_LITERAL() != nil {
+        if ctx.BOOLEAN_LITERAL().GetText() == "true" {
+            return v.ctx.Builder.True()
+        }
+        return v.ctx.Builder.False()
+    }
+    
+    if ctx.STRING_LITERAL() != nil {
+        rawText := ctx.STRING_LITERAL().GetText()
+        content, err := strconv.Unquote(rawText)
+        if err != nil {
+            if len(rawText) >= 2 {
+                content = rawText[1 : len(rawText)-1]
+            } else {
+                content = rawText
+            }
+        }
+        
+        bytes := append([]byte(content), 0)
+        elements := make([]ir.Constant, len(bytes))
+        for i, b := range bytes {
+            elements[i] = v.ctx.Builder.ConstInt(types.I8, int64(b))
+        }
+        
+        arrType := types.NewArray(types.I8, int64(len(bytes)))
+        constArr := &ir.ConstantArray{
+            BaseValue: ir.BaseValue{ValType: arrType},
+            Elements:  elements,
+        }
+        
+        strName := fmt.Sprintf(".str.%d", len(v.ctx.Module.Globals))
+        global := v.ctx.Builder.CreateGlobalConstant(strName, constArr)
+        zero := v.ctx.Builder.ConstInt(types.I32, 0)
+        
+        return v.ctx.Builder.CreateInBoundsGEP(arrType, global, []ir.Value{zero, zero}, "")
+    }
+    
+    // ADD THIS:
+    if ctx.VectorLiteral() != nil {
+        return v.Visit(ctx.VectorLiteral())
+    }
+    
+    if ctx.MapLiteral() != nil {
+        v.ctx.Logger.Warning("Map literals not yet implemented")
+        return v.ctx.Builder.ConstInt(types.I64, 0)
+    }
+    
+    return v.ctx.Builder.ConstInt(types.I64, 0)
 }
 
 func (v *IRVisitor) VisitCastExpression(ctx *parser.CastExpressionContext) interface{} {
@@ -913,4 +923,56 @@ func (v *IRVisitor) VisitLeftHandSide(ctx *parser.LeftHandSideContext) interface
 		return v.Visit(ctx.PostfixExpression())
 	}
 	return v.ctx.Builder.ConstInt(types.I64, 0)
+}
+
+func (v *IRVisitor) VisitVectorLiteral(ctx *parser.VectorLiteralContext) interface{} {
+    v.logger.Debug("Visiting vector literal")
+    
+    // Get all expressions inside { ... }
+    exprs := ctx.AllExpression()
+    
+    if len(exprs) == 0 {
+        v.logger.Debug("Empty vector literal")
+        // Return empty array
+        return &ir.ConstantArray{
+            BaseValue: ir.BaseValue{ValType: types.NewArray(types.I32, 0)},
+            Elements:  []ir.Constant{},
+        }
+    }
+    
+    // Evaluate all expressions
+    elements := make([]ir.Constant, len(exprs))
+    var elemType types.Type
+    
+    for i, expr := range exprs {
+        val := v.Visit(expr).(ir.Value)
+        
+        // First element determines the type
+        if i == 0 {
+            elemType = val.Type()
+        }
+        
+        // Convert to constant
+        if constVal, ok := val.(ir.Constant); ok {
+            elements[i] = constVal
+        } else {
+            v.ctx.Logger.Error("Vector literal elements must be constant values, got %T", val)
+            // Use zero as fallback
+            elements[i] = v.ctx.Builder.ConstInt(types.I32, 0)
+            if elemType == nil {
+                elemType = types.I32
+            }
+        }
+    }
+    
+    // Create ConstantArray
+    arrType := types.NewArray(elemType, int64(len(elements)))
+    constArr := &ir.ConstantArray{
+        BaseValue: ir.BaseValue{ValType: arrType},
+        Elements:  elements,
+    }
+    
+    v.logger.Info("Created vector literal with %d elements of type %v", len(elements), elemType)
+    
+    return constArr
 }

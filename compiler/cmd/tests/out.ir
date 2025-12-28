@@ -1,0 +1,43 @@
+%__vector_i32 = type { ptr<i32>, i64, i64 }
+
+@.str.0 = external constant [4 x i8] [i8 37, i8 100, i8 10, i8 0]
+
+declare external i32 @printf(ptr<u8>, ...)
+
+define external i32 @main() {
+entry:
+  %items.addr = alloca vector<i32>
+  store %__vector_i32 %<unnamed>, ptr<vector<i32>> %items.addr
+  %0 = load vector<i32>, ptr<vector<i32>> %items.addr
+  %vec.addr = alloca %__vector_i32
+  store vector<i32> %0, ptr<%__vector_i32> %vec.addr
+  %1 = getelementptr %__vector_i32, ptr<%__vector_i32> %vec.addr, i32 0, i32 1
+  %vec.len = load i64, ptr<%__vector_i32> %1
+  %2 = getelementptr %__vector_i32, ptr<%__vector_i32> %vec.addr, i32 0, i32 0
+  %vec.data = load ptr<i32>, ptr<%__vector_i32> %2
+  %vec.index.addr = alloca i64
+  store i64 0, ptr<i64> %vec.index.addr
+  br label %vec.cond.11_4
+vec.cond.11_4:
+  %3 = load i64, ptr<i64> %vec.index.addr
+  %4 = icmp slt i64 %3, %vec.len
+  br i1 %4, label %vec.body.11_4, label %vec.end.11_4
+vec.body.11_4:
+  %5 = load i64, ptr<i64> %vec.index.addr
+  %6 = getelementptr inbounds i32, ptr<i32> %vec.data, i64 %5
+  %item.addr = alloca i32
+  %7 = load i32, ptr<i32> %6
+  store i32 %7, ptr<i32> %item.addr
+  %8 = getelementptr inbounds [4 x i8], ptr<[4 x i8]> %.str.0, i32 0, i32 0
+  %9 = load i32, ptr<i32> %item.addr
+  %10 = call i32 @printf(ptr<[4 x i8]> %8, i32 %9)
+  br label %vec.step.11_4
+vec.step.11_4:
+  %11 = load i64, ptr<i64> %vec.index.addr
+  %12 = add i64 %11, 1
+  store i64 %12, ptr<i64> %vec.index.addr
+  br label %vec.cond.11_4
+vec.end.11_4:
+  %13 = trunc i64 0 to i32
+  ret i32 %13
+}

@@ -115,6 +115,8 @@ func (v *IRVisitor) Visit(tree antlr.ParseTree) interface{} {
 		return v.VisitPrimaryExpression(ctx)
 	case *parser.LiteralContext:
 		return v.VisitLiteral(ctx)
+    case *parser.VectorLiteralContext:
+        return v.VisitVectorLiteral(ctx)
 	case *parser.StructLiteralContext:
 		return v.VisitStructLiteral(ctx)
 	case *parser.CastExpressionContext:
