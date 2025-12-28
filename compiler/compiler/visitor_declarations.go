@@ -326,6 +326,8 @@ func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
         initValue = v.getZeroValue(varType)
     }
 
+    // For vectors and maps, allocate the struct directly (not a pointer to it)
+    // The struct itself will be on the stack
     alloca := v.ctx.Builder.CreateAlloca(varType, name+".addr")
     v.ctx.Builder.CreateStore(initValue, alloca)
     v.ctx.currentScope.Define(name, alloca)
@@ -354,53 +356,41 @@ func (v *IRVisitor) createVectorFromLiteral(literal ir.Value, vecType *types.Dyn
     // Get runtime struct type
     structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
     
-    // Allocate the vector struct on stack
-    vecPtr := v.ctx.Builder.CreateAlloca(structType, "vec.tmp")
-    
-    // Extract elements from the literal (assuming it's a ConstantArray wrapped in something)
-    // For now, we'll need to handle this in expression visiting
-    // This is a placeholder - proper implementation needs array literal handling
-    
     v.ctx.Logger.Warning("Vector literal initialization not fully implemented - using empty vector")
     
-    // Initialize to empty vector
-    // data = null
-    zero := v.ctx.Builder.ConstNull(types.NewPointer(vecType.ElementType))
-    dataPtr := v.ctx.Builder.CreateStructGEP(structType, vecPtr, 0, "")
-    v.ctx.Builder.CreateStore(zero, dataPtr)
+    // Create a zero-initialized struct value
+    // The struct has 3 fields: data ptr (null), length (0), capacity (0)
+    fields := []ir.Constant{
+        v.ctx.Builder.ConstNull(types.NewPointer(vecType.ElementType)), // data = null
+        v.ctx.Builder.ConstInt(types.I64, 0),                            // length = 0
+        v.ctx.Builder.ConstInt(types.I64, 0),                            // capacity = 0
+    }
     
-    // length = 0
-    lenPtr := v.ctx.Builder.CreateStructGEP(structType, vecPtr, 1, "")
-    v.ctx.Builder.CreateStore(v.ctx.Builder.ConstInt(types.I64, 0), lenPtr)
+    structVal := &ir.ConstantStruct{
+        BaseValue: ir.BaseValue{ValType: structType},
+        Fields:    fields,
+    }
     
-    // capacity = 0
-    capPtr := v.ctx.Builder.CreateStructGEP(structType, vecPtr, 2, "")
-    v.ctx.Builder.CreateStore(v.ctx.Builder.ConstInt(types.I64, 0), capPtr)
-    
-    return v.ctx.Builder.CreateLoad(structType, vecPtr, "")
+    return structVal
 }
 
 // Helper to create map from literal {"key": value}
 func (v *IRVisitor) createMapFromLiteral(literal ir.Value, mapType *types.MapType) ir.Value {
     structType := v.ctx.GetMapRuntimeType(mapType.KeyType, mapType.ValueType)
     
-    mapPtr := v.ctx.Builder.CreateAlloca(structType, "map.tmp")
-    
     v.ctx.Logger.Warning("Map literal initialization not fully implemented - using empty map")
     
-    // Initialize to empty map
-    // buckets = null
-    zero := v.ctx.Builder.ConstNull(types.NewPointer(types.Void))
-    bucketsPtr := v.ctx.Builder.CreateStructGEP(structType, mapPtr, 0, "")
-    v.ctx.Builder.CreateStore(zero, bucketsPtr)
+    // Create a zero-initialized struct value
+    fields := []ir.Constant{
+        v.ctx.Builder.ConstNull(types.NewPointer(types.Void)), // buckets = null
+        v.ctx.Builder.ConstInt(types.I64, 0),                   // length = 0
+        v.ctx.Builder.ConstInt(types.I64, 0),                   // capacity = 0
+    }
     
-    // length = 0
-    lenPtr := v.ctx.Builder.CreateStructGEP(structType, mapPtr, 1, "")
-    v.ctx.Builder.CreateStore(v.ctx.Builder.ConstInt(types.I64, 0), lenPtr)
+    structVal := &ir.ConstantStruct{
+        BaseValue: ir.BaseValue{ValType: structType},
+        Fields:    fields,
+    }
     
-    // capacity = 0
-    capPtr := v.ctx.Builder.CreateStructGEP(structType, mapPtr, 2, "")
-    v.ctx.Builder.CreateStore(v.ctx.Builder.ConstInt(types.I64, 0), capPtr)
-    
-    return v.ctx.Builder.CreateLoad(structType, mapPtr, "")
+    return structVal
 }

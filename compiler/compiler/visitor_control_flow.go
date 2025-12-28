@@ -306,7 +306,6 @@ func (v *IRVisitor) visitForInRange(ctx *parser.ForStmtContext, varName string, 
 	return nil
 }
 
-// New function for vector iteration
 func (v *IRVisitor) visitForInVector(ctx *parser.ForStmtContext, varName string, collection ir.Value, vecType *types.DynamicVectorType) interface{} {
 	token := ctx.GetStart()
 	uniqueID := fmt.Sprintf("%d_%d", token.GetLine(), token.GetColumn())
@@ -316,16 +315,30 @@ func (v *IRVisitor) visitForInVector(ctx *parser.ForStmtContext, varName string,
 	// Get the runtime struct type
 	structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
 	
-	// Load vector struct
-	vecAlloca := v.ctx.Builder.CreateAlloca(structType, "vec.addr")
-	v.ctx.Builder.CreateStore(collection, vecAlloca)
+	// Collection is a pointer to the vector struct (from alloca)
+	// If it's already a pointer, use it directly
+	var vecPtr ir.Value
+	if ptrType, ok := collection.Type().(*types.PointerType); ok {
+		if ptrType.ElementType.Equal(structType) {
+			vecPtr = collection
+		} else {
+			// Need to load
+			vecPtr = v.ctx.Builder.CreateAlloca(structType, "vec.addr")
+			loadedVec := v.ctx.Builder.CreateLoad(structType, collection, "")
+			v.ctx.Builder.CreateStore(loadedVec, vecPtr)
+		}
+	} else {
+		// It's a value, need to store it
+		vecPtr = v.ctx.Builder.CreateAlloca(structType, "vec.addr")
+		v.ctx.Builder.CreateStore(collection, vecPtr)
+	}
 	
-	// Get length field
-	lenGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 1, "")
+	// Get length field (field index 1)
+	lenGEP := v.ctx.Builder.CreateStructGEP(structType, vecPtr, 1, "")
 	vecLen := v.ctx.Builder.CreateLoad(types.I64, lenGEP, "vec.len")
 	
-	// Get data pointer
-	dataGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 0, "")
+	// Get data pointer (field index 0)
+	dataGEP := v.ctx.Builder.CreateStructGEP(structType, vecPtr, 0, "")
 	vecData := v.ctx.Builder.CreateLoad(types.NewPointer(vecType.ElementType), dataGEP, "vec.data")
 	
 	// Create index variable
