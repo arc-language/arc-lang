@@ -80,6 +80,9 @@ type ArcParserListener interface {
 	// EnterType is called when entering the type production.
 	EnterType(c *TypeContext)
 
+	// EnterQualifiedType is called when entering the qualifiedType production.
+	EnterQualifiedType(c *QualifiedTypeContext)
+
 	// EnterPrimitiveType is called when entering the primitiveType production.
 	EnterPrimitiveType(c *PrimitiveTypeContext)
 
@@ -137,11 +140,23 @@ type ArcParserListener interface {
 	// EnterLogicalAndExpression is called when entering the logicalAndExpression production.
 	EnterLogicalAndExpression(c *LogicalAndExpressionContext)
 
+	// EnterBitOrExpression is called when entering the bitOrExpression production.
+	EnterBitOrExpression(c *BitOrExpressionContext)
+
+	// EnterBitXorExpression is called when entering the bitXorExpression production.
+	EnterBitXorExpression(c *BitXorExpressionContext)
+
+	// EnterBitAndExpression is called when entering the bitAndExpression production.
+	EnterBitAndExpression(c *BitAndExpressionContext)
+
 	// EnterEqualityExpression is called when entering the equalityExpression production.
 	EnterEqualityExpression(c *EqualityExpressionContext)
 
 	// EnterRelationalExpression is called when entering the relationalExpression production.
 	EnterRelationalExpression(c *RelationalExpressionContext)
+
+	// EnterShiftExpression is called when entering the shiftExpression production.
+	EnterShiftExpression(c *ShiftExpressionContext)
 
 	// EnterRangeExpression is called when entering the rangeExpression production.
 	EnterRangeExpression(c *RangeExpressionContext)
@@ -163,6 +178,9 @@ type ArcParserListener interface {
 
 	// EnterPrimaryExpression is called when entering the primaryExpression production.
 	EnterPrimaryExpression(c *PrimaryExpressionContext)
+
+	// EnterQualifiedIdentifier is called when entering the qualifiedIdentifier production.
+	EnterQualifiedIdentifier(c *QualifiedIdentifierContext)
 
 	// EnterLiteral is called when entering the literal production.
 	EnterLiteral(c *LiteralContext)
@@ -269,6 +287,9 @@ type ArcParserListener interface {
 	// ExitType is called when exiting the type production.
 	ExitType(c *TypeContext)
 
+	// ExitQualifiedType is called when exiting the qualifiedType production.
+	ExitQualifiedType(c *QualifiedTypeContext)
+
 	// ExitPrimitiveType is called when exiting the primitiveType production.
 	ExitPrimitiveType(c *PrimitiveTypeContext)
 
@@ -326,11 +347,23 @@ type ArcParserListener interface {
 	// ExitLogicalAndExpression is called when exiting the logicalAndExpression production.
 	ExitLogicalAndExpression(c *LogicalAndExpressionContext)
 
+	// ExitBitOrExpression is called when exiting the bitOrExpression production.
+	ExitBitOrExpression(c *BitOrExpressionContext)
+
+	// ExitBitXorExpression is called when exiting the bitXorExpression production.
+	ExitBitXorExpression(c *BitXorExpressionContext)
+
+	// ExitBitAndExpression is called when exiting the bitAndExpression production.
+	ExitBitAndExpression(c *BitAndExpressionContext)
+
 	// ExitEqualityExpression is called when exiting the equalityExpression production.
 	ExitEqualityExpression(c *EqualityExpressionContext)
 
 	// ExitRelationalExpression is called when exiting the relationalExpression production.
 	ExitRelationalExpression(c *RelationalExpressionContext)
+
+	// ExitShiftExpression is called when exiting the shiftExpression production.
+	ExitShiftExpression(c *ShiftExpressionContext)
 
 	// ExitRangeExpression is called when exiting the rangeExpression production.
 	ExitRangeExpression(c *RangeExpressionContext)
@@ -352,6 +385,9 @@ type ArcParserListener interface {
 
 	// ExitPrimaryExpression is called when exiting the primaryExpression production.
 	ExitPrimaryExpression(c *PrimaryExpressionContext)
+
+	// ExitQualifiedIdentifier is called when exiting the qualifiedIdentifier production.
+	ExitQualifiedIdentifier(c *QualifiedIdentifierContext)
 
 	// ExitLiteral is called when exiting the literal production.
 	ExitLiteral(c *LiteralContext)

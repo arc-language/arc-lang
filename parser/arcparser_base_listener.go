@@ -165,6 +165,12 @@ func (s *BaseArcParserListener) EnterType(ctx *TypeContext) {}
 // ExitType is called when production type is exited.
 func (s *BaseArcParserListener) ExitType(ctx *TypeContext) {}
 
+// EnterQualifiedType is called when production qualifiedType is entered.
+func (s *BaseArcParserListener) EnterQualifiedType(ctx *QualifiedTypeContext) {}
+
+// ExitQualifiedType is called when production qualifiedType is exited.
+func (s *BaseArcParserListener) ExitQualifiedType(ctx *QualifiedTypeContext) {}
+
 // EnterPrimitiveType is called when production primitiveType is entered.
 func (s *BaseArcParserListener) EnterPrimitiveType(ctx *PrimitiveTypeContext) {}
 
@@ -279,6 +285,24 @@ func (s *BaseArcParserListener) EnterLogicalAndExpression(ctx *LogicalAndExpress
 // ExitLogicalAndExpression is called when production logicalAndExpression is exited.
 func (s *BaseArcParserListener) ExitLogicalAndExpression(ctx *LogicalAndExpressionContext) {}
 
+// EnterBitOrExpression is called when production bitOrExpression is entered.
+func (s *BaseArcParserListener) EnterBitOrExpression(ctx *BitOrExpressionContext) {}
+
+// ExitBitOrExpression is called when production bitOrExpression is exited.
+func (s *BaseArcParserListener) ExitBitOrExpression(ctx *BitOrExpressionContext) {}
+
+// EnterBitXorExpression is called when production bitXorExpression is entered.
+func (s *BaseArcParserListener) EnterBitXorExpression(ctx *BitXorExpressionContext) {}
+
+// ExitBitXorExpression is called when production bitXorExpression is exited.
+func (s *BaseArcParserListener) ExitBitXorExpression(ctx *BitXorExpressionContext) {}
+
+// EnterBitAndExpression is called when production bitAndExpression is entered.
+func (s *BaseArcParserListener) EnterBitAndExpression(ctx *BitAndExpressionContext) {}
+
+// ExitBitAndExpression is called when production bitAndExpression is exited.
+func (s *BaseArcParserListener) ExitBitAndExpression(ctx *BitAndExpressionContext) {}
+
 // EnterEqualityExpression is called when production equalityExpression is entered.
 func (s *BaseArcParserListener) EnterEqualityExpression(ctx *EqualityExpressionContext) {}
 
@@ -290,6 +314,12 @@ func (s *BaseArcParserListener) EnterRelationalExpression(ctx *RelationalExpress
 
 // ExitRelationalExpression is called when production relationalExpression is exited.
 func (s *BaseArcParserListener) ExitRelationalExpression(ctx *RelationalExpressionContext) {}
+
+// EnterShiftExpression is called when production shiftExpression is entered.
+func (s *BaseArcParserListener) EnterShiftExpression(ctx *ShiftExpressionContext) {}
+
+// ExitShiftExpression is called when production shiftExpression is exited.
+func (s *BaseArcParserListener) ExitShiftExpression(ctx *ShiftExpressionContext) {}
 
 // EnterRangeExpression is called when production rangeExpression is entered.
 func (s *BaseArcParserListener) EnterRangeExpression(ctx *RangeExpressionContext) {}
@@ -332,6 +362,12 @@ func (s *BaseArcParserListener) EnterPrimaryExpression(ctx *PrimaryExpressionCon
 
 // ExitPrimaryExpression is called when production primaryExpression is exited.
 func (s *BaseArcParserListener) ExitPrimaryExpression(ctx *PrimaryExpressionContext) {}
+
+// EnterQualifiedIdentifier is called when production qualifiedIdentifier is entered.
+func (s *BaseArcParserListener) EnterQualifiedIdentifier(ctx *QualifiedIdentifierContext) {}
+
+// ExitQualifiedIdentifier is called when production qualifiedIdentifier is exited.
+func (s *BaseArcParserListener) ExitQualifiedIdentifier(ctx *QualifiedIdentifierContext) {}
 
 // EnterLiteral is called when production literal is entered.
 func (s *BaseArcParserListener) EnterLiteral(ctx *LiteralContext) {}

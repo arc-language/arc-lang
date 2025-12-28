@@ -65,8 +65,10 @@ BIT_CAST: 'bit_cast';
 
 // Operators (multi-character first!)
 ARROW: '->';
-RANGE: '..';      // Must come before DOT and ELLIPSIS
-ELLIPSIS: '...';  // Must come after RANGE
+RANGE: '..';      
+ELLIPSIS: '...';  
+LSHIFT: '<<';     // New
+RSHIFT: '>>';     // New
 EQ: '==';
 NE: '!=';
 LE: '<=';
@@ -91,6 +93,9 @@ LT: '<';
 GT: '>';
 NOT: '!';
 AMP: '&';
+BIT_OR: '|';      // New
+BIT_XOR: '^';     // New
+BIT_NOT: '~';     // New
 AT: '@';
 ASSIGN: '=';
 
@@ -104,7 +109,7 @@ RBRACKET: ']';
 COMMA: ',';
 COLON: ':';
 SEMICOLON: ';';
-DOT: '.';         // Single dot comes after RANGE and ELLIPSIS
+DOT: '.';
 
 // Literals
 BOOLEAN_LITERAL: 'true' | 'false';
@@ -138,7 +143,7 @@ CHAR_LITERAL
     ;
 
 fragment ESCAPE_SEQUENCE
-    : '\\' ['"\\nrt0]  // Added \0 for null character
+    : '\\' ['"\\nrt0] 
     | '\\' 'x' HEX_DIGIT HEX_DIGIT
     | '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     | '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT

@@ -50,7 +50,6 @@ externFunctionDecl
     : FUNC IDENTIFIER (STRING_LITERAL)? LPAREN externParameterList? RPAREN type?
     ;
 
-// Extern parameters are type-only (no names required)
 externParameterList
     : type (COMMA type)* (COMMA ELLIPSIS)?
     | ELLIPSIS
@@ -70,7 +69,7 @@ parameter
     : SELF? IDENTIFIER COLON type
     ;
 
-// Struct Declaration (can contain inline methods)
+// Struct Declaration
 structDecl
     : STRUCT IDENTIFIER LBRACE structMember* RBRACE
     ;
@@ -85,7 +84,7 @@ structField
     : IDENTIFIER COLON type
     ;
 
-// Class Declaration (can contain inline methods and deinit)
+// Class Declaration
 classDecl
     : CLASS IDENTIFIER LBRACE classMember* RBRACE
     ;
@@ -100,27 +99,24 @@ classField
     : IDENTIFIER COLON type
     ;
 
-// Flat Method Declaration (outside struct/class body)
+// Method Declarations
 methodDecl
     : ASYNC? FUNC IDENTIFIER LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN type? block
     ;
 
-// Mutating Method Declaration (like deinit, just the keyword)
 mutatingDecl
     : MUTATING IDENTIFIER LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN type? block
     ;
 
-// Deinit Declaration (can be inline or flat)
 deinitDecl
     : DEINIT LPAREN SELF IDENTIFIER COLON type RPAREN block
     ;
 
-// Variable Declaration
+// Variable/Constant Declarations
 variableDecl
     : LET IDENTIFIER (COLON type)? ASSIGN expression
     ;
 
-// Constant Declaration
 constDecl
     : CONST IDENTIFIER (COLON type)? ASSIGN expression
     ;
@@ -132,7 +128,12 @@ type
     | referenceType
     | vectorType
     | mapType
+    | qualifiedType  // New: Supports namespace.Type
     | IDENTIFIER
+    ;
+
+qualifiedType
+    : IDENTIFIER (DOT IDENTIFIER)+
     ;
 
 primitiveType
@@ -184,12 +185,11 @@ assignmentStmt
     : leftHandSide (ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | STAR_ASSIGN | SLASH_ASSIGN | PERCENT_ASSIGN) expression
     ;
 
-// Left-hand side patterns for assignment
 leftHandSide
-    : STAR postfixExpression              // Pointer dereference: *ptr = value
-    | postfixExpression DOT IDENTIFIER    // Field access: obj.field = value
-    | postfixExpression LBRACKET expression RBRACKET  // Index access: arr[i] = value
-    | IDENTIFIER                          // Simple variable: x = value
+    : STAR postfixExpression
+    | postfixExpression DOT IDENTIFIER
+    | postfixExpression LBRACKET expression RBRACKET
+    | IDENTIFIER
     ;
 
 expressionStmt
@@ -205,7 +205,6 @@ ifStmt
     : IF expression block (ELSE IF expression block)* (ELSE block)?
     ;
 
-// Modern For Loop
 forStmt
     : FOR block
     | FOR expression block
@@ -226,7 +225,7 @@ deferStmt
     : DEFER (assignmentStmt | expression)
     ;
 
-// Expressions (with proper precedence, lowest to highest)
+// Expressions (Precedence: Lowest to Highest)
 expression
     : logicalOrExpression
     ;
@@ -236,7 +235,20 @@ logicalOrExpression
     ;
 
 logicalAndExpression
-    : equalityExpression (AND equalityExpression)*
+    : bitOrExpression (AND bitOrExpression)*
+    ;
+
+// New Bitwise Levels
+bitOrExpression
+    : bitXorExpression (BIT_OR bitXorExpression)*
+    ;
+
+bitXorExpression
+    : bitAndExpression (BIT_XOR bitAndExpression)*
+    ;
+
+bitAndExpression
+    : equalityExpression (AMP equalityExpression)*
     ;
 
 equalityExpression
@@ -244,7 +256,11 @@ equalityExpression
     ;
 
 relationalExpression
-    : rangeExpression ((LT | LE | GT | GE) rangeExpression)*
+    : shiftExpression ((LT | LE | GT | GE) shiftExpression)*
+    ;
+
+shiftExpression
+    : rangeExpression ((LSHIFT | RSHIFT) rangeExpression)*
     ;
 
 rangeExpression
@@ -260,9 +276,9 @@ multiplicativeExpression
     ;
 
 unaryExpression
-    : (MINUS | NOT | STAR | AMP | AWAIT) unaryExpression
-    | INCREMENT unaryExpression   // Pre-increment
-    | DECREMENT unaryExpression   // Pre-decrement
+    : (MINUS | NOT | BIT_NOT | STAR | AMP | AWAIT) unaryExpression
+    | INCREMENT unaryExpression
+    | DECREMENT unaryExpression
     | postfixExpression
     ;
 
@@ -274,9 +290,9 @@ postfixOp
     : DOT IDENTIFIER
     | DOT IDENTIFIER LPAREN argumentList? RPAREN
     | LPAREN argumentList? RPAREN
-    | LBRACKET expression RBRACKET  // Index access: arr[i]
-    | INCREMENT                      // Post-increment
-    | DECREMENT                      // Post-decrement
+    | LBRACKET expression RBRACKET
+    | INCREMENT
+    | DECREMENT
     ;
 
 // Primary expressions
@@ -288,7 +304,12 @@ primaryExpression
     | syscallExpression
     | intrinsicExpression
     | LPAREN expression RPAREN
+    | qualifiedIdentifier // New: Supports namespace.func()
     | IDENTIFIER
+    ;
+
+qualifiedIdentifier
+    : IDENTIFIER (DOT IDENTIFIER)+
     ;
 
 literal
@@ -318,6 +339,13 @@ structLiteral
     : IDENTIFIER LBRACE (fieldInit (COMMA fieldInit)*)? RBRACE
     ;
 
+// Qualified struct literal (net.Socket{...})
+// Note: This logic is usually handled in primaryExpression or a dedicated rule,
+// but for simplicity in ANTLR without left-recursion issues, we can rely on
+// IDENTIFIER lookups or specific qualified rules if needed. 
+// For now, structLiteral only supports simple names. 
+// You might need `qualifiedType LBRACE ...` if you want `net.Socket{}`.
+
 fieldInit
     : IDENTIFIER COLON expression
     ;
@@ -338,7 +366,6 @@ syscallExpression
     : SYSCALL LPAREN expression (COMMA expression)* RPAREN
     ;
 
-// Intrinsic functions
 intrinsicExpression
     : SIZEOF LT type GT
     | ALIGNOF LT type GT

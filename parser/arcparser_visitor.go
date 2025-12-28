@@ -80,6 +80,9 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#type.
 	VisitType(ctx *TypeContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#qualifiedType.
+	VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#primitiveType.
 	VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
 
@@ -137,11 +140,23 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#logicalAndExpression.
 	VisitLogicalAndExpression(ctx *LogicalAndExpressionContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#bitOrExpression.
+	VisitBitOrExpression(ctx *BitOrExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#bitXorExpression.
+	VisitBitXorExpression(ctx *BitXorExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#bitAndExpression.
+	VisitBitAndExpression(ctx *BitAndExpressionContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#equalityExpression.
 	VisitEqualityExpression(ctx *EqualityExpressionContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#relationalExpression.
 	VisitRelationalExpression(ctx *RelationalExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#shiftExpression.
+	VisitShiftExpression(ctx *ShiftExpressionContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#rangeExpression.
 	VisitRangeExpression(ctx *RangeExpressionContext) interface{}
@@ -163,6 +178,9 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#primaryExpression.
 	VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
+	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#literal.
 	VisitLiteral(ctx *LiteralContext) interface{}

@@ -63,49 +63,54 @@ const (
 	ArcLexerARROW           = 58
 	ArcLexerRANGE           = 59
 	ArcLexerELLIPSIS        = 60
-	ArcLexerEQ              = 61
-	ArcLexerNE              = 62
-	ArcLexerLE              = 63
-	ArcLexerGE              = 64
-	ArcLexerAND             = 65
-	ArcLexerOR              = 66
-	ArcLexerPLUS_ASSIGN     = 67
-	ArcLexerMINUS_ASSIGN    = 68
-	ArcLexerSTAR_ASSIGN     = 69
-	ArcLexerSLASH_ASSIGN    = 70
-	ArcLexerPERCENT_ASSIGN  = 71
-	ArcLexerINCREMENT       = 72
-	ArcLexerDECREMENT       = 73
-	ArcLexerPLUS            = 74
-	ArcLexerMINUS           = 75
-	ArcLexerSTAR            = 76
-	ArcLexerSLASH           = 77
-	ArcLexerPERCENT         = 78
-	ArcLexerLT              = 79
-	ArcLexerGT              = 80
-	ArcLexerNOT             = 81
-	ArcLexerAMP             = 82
-	ArcLexerAT              = 83
-	ArcLexerASSIGN          = 84
-	ArcLexerLPAREN          = 85
-	ArcLexerRPAREN          = 86
-	ArcLexerLBRACE          = 87
-	ArcLexerRBRACE          = 88
-	ArcLexerLBRACKET        = 89
-	ArcLexerRBRACKET        = 90
-	ArcLexerCOMMA           = 91
-	ArcLexerCOLON           = 92
-	ArcLexerSEMICOLON       = 93
-	ArcLexerDOT             = 94
-	ArcLexerBOOLEAN_LITERAL = 95
-	ArcLexerINTEGER_LITERAL = 96
-	ArcLexerFLOAT_LITERAL   = 97
-	ArcLexerSTRING_LITERAL  = 98
-	ArcLexerCHAR_LITERAL    = 99
-	ArcLexerIDENTIFIER      = 100
-	ArcLexerWS              = 101
-	ArcLexerLINE_COMMENT    = 102
-	ArcLexerBLOCK_COMMENT   = 103
+	ArcLexerLSHIFT          = 61
+	ArcLexerRSHIFT          = 62
+	ArcLexerEQ              = 63
+	ArcLexerNE              = 64
+	ArcLexerLE              = 65
+	ArcLexerGE              = 66
+	ArcLexerAND             = 67
+	ArcLexerOR              = 68
+	ArcLexerPLUS_ASSIGN     = 69
+	ArcLexerMINUS_ASSIGN    = 70
+	ArcLexerSTAR_ASSIGN     = 71
+	ArcLexerSLASH_ASSIGN    = 72
+	ArcLexerPERCENT_ASSIGN  = 73
+	ArcLexerINCREMENT       = 74
+	ArcLexerDECREMENT       = 75
+	ArcLexerPLUS            = 76
+	ArcLexerMINUS           = 77
+	ArcLexerSTAR            = 78
+	ArcLexerSLASH           = 79
+	ArcLexerPERCENT         = 80
+	ArcLexerLT              = 81
+	ArcLexerGT              = 82
+	ArcLexerNOT             = 83
+	ArcLexerAMP             = 84
+	ArcLexerBIT_OR          = 85
+	ArcLexerBIT_XOR         = 86
+	ArcLexerBIT_NOT         = 87
+	ArcLexerAT              = 88
+	ArcLexerASSIGN          = 89
+	ArcLexerLPAREN          = 90
+	ArcLexerRPAREN          = 91
+	ArcLexerLBRACE          = 92
+	ArcLexerRBRACE          = 93
+	ArcLexerLBRACKET        = 94
+	ArcLexerRBRACKET        = 95
+	ArcLexerCOMMA           = 96
+	ArcLexerCOLON           = 97
+	ArcLexerSEMICOLON       = 98
+	ArcLexerDOT             = 99
+	ArcLexerBOOLEAN_LITERAL = 100
+	ArcLexerINTEGER_LITERAL = 101
+	ArcLexerFLOAT_LITERAL   = 102
+	ArcLexerSTRING_LITERAL  = 103
+	ArcLexerCHAR_LITERAL    = 104
+	ArcLexerIDENTIFIER      = 105
+	ArcLexerWS              = 106
+	ArcLexerLINE_COMMENT    = 107
+	ArcLexerBLOCK_COMMENT   = 108
 )
     ArcLexer tokens.
 
@@ -171,49 +176,54 @@ const (
 	ArcParserARROW           = 58
 	ArcParserRANGE           = 59
 	ArcParserELLIPSIS        = 60
-	ArcParserEQ              = 61
-	ArcParserNE              = 62
-	ArcParserLE              = 63
-	ArcParserGE              = 64
-	ArcParserAND             = 65
-	ArcParserOR              = 66
-	ArcParserPLUS_ASSIGN     = 67
-	ArcParserMINUS_ASSIGN    = 68
-	ArcParserSTAR_ASSIGN     = 69
-	ArcParserSLASH_ASSIGN    = 70
-	ArcParserPERCENT_ASSIGN  = 71
-	ArcParserINCREMENT       = 72
-	ArcParserDECREMENT       = 73
-	ArcParserPLUS            = 74
-	ArcParserMINUS           = 75
-	ArcParserSTAR            = 76
-	ArcParserSLASH           = 77
-	ArcParserPERCENT         = 78
-	ArcParserLT              = 79
-	ArcParserGT              = 80
-	ArcParserNOT             = 81
-	ArcParserAMP             = 82
-	ArcParserAT              = 83
-	ArcParserASSIGN          = 84
-	ArcParserLPAREN          = 85
-	ArcParserRPAREN          = 86
-	ArcParserLBRACE          = 87
-	ArcParserRBRACE          = 88
-	ArcParserLBRACKET        = 89
-	ArcParserRBRACKET        = 90
-	ArcParserCOMMA           = 91
-	ArcParserCOLON           = 92
-	ArcParserSEMICOLON       = 93
-	ArcParserDOT             = 94
-	ArcParserBOOLEAN_LITERAL = 95
-	ArcParserINTEGER_LITERAL = 96
-	ArcParserFLOAT_LITERAL   = 97
-	ArcParserSTRING_LITERAL  = 98
-	ArcParserCHAR_LITERAL    = 99
-	ArcParserIDENTIFIER      = 100
-	ArcParserWS              = 101
-	ArcParserLINE_COMMENT    = 102
-	ArcParserBLOCK_COMMENT   = 103
+	ArcParserLSHIFT          = 61
+	ArcParserRSHIFT          = 62
+	ArcParserEQ              = 63
+	ArcParserNE              = 64
+	ArcParserLE              = 65
+	ArcParserGE              = 66
+	ArcParserAND             = 67
+	ArcParserOR              = 68
+	ArcParserPLUS_ASSIGN     = 69
+	ArcParserMINUS_ASSIGN    = 70
+	ArcParserSTAR_ASSIGN     = 71
+	ArcParserSLASH_ASSIGN    = 72
+	ArcParserPERCENT_ASSIGN  = 73
+	ArcParserINCREMENT       = 74
+	ArcParserDECREMENT       = 75
+	ArcParserPLUS            = 76
+	ArcParserMINUS           = 77
+	ArcParserSTAR            = 78
+	ArcParserSLASH           = 79
+	ArcParserPERCENT         = 80
+	ArcParserLT              = 81
+	ArcParserGT              = 82
+	ArcParserNOT             = 83
+	ArcParserAMP             = 84
+	ArcParserBIT_OR          = 85
+	ArcParserBIT_XOR         = 86
+	ArcParserBIT_NOT         = 87
+	ArcParserAT              = 88
+	ArcParserASSIGN          = 89
+	ArcParserLPAREN          = 90
+	ArcParserRPAREN          = 91
+	ArcParserLBRACE          = 92
+	ArcParserRBRACE          = 93
+	ArcParserLBRACKET        = 94
+	ArcParserRBRACKET        = 95
+	ArcParserCOMMA           = 96
+	ArcParserCOLON           = 97
+	ArcParserSEMICOLON       = 98
+	ArcParserDOT             = 99
+	ArcParserBOOLEAN_LITERAL = 100
+	ArcParserINTEGER_LITERAL = 101
+	ArcParserFLOAT_LITERAL   = 102
+	ArcParserSTRING_LITERAL  = 103
+	ArcParserCHAR_LITERAL    = 104
+	ArcParserIDENTIFIER      = 105
+	ArcParserWS              = 106
+	ArcParserLINE_COMMENT    = 107
+	ArcParserBLOCK_COMMENT   = 108
 )
     ArcParser tokens.
 
@@ -242,45 +252,51 @@ const (
 	ArcParserRULE_variableDecl             = 21
 	ArcParserRULE_constDecl                = 22
 	ArcParserRULE_type                     = 23
-	ArcParserRULE_primitiveType            = 24
-	ArcParserRULE_pointerType              = 25
-	ArcParserRULE_referenceType            = 26
-	ArcParserRULE_vectorType               = 27
-	ArcParserRULE_mapType                  = 28
-	ArcParserRULE_block                    = 29
-	ArcParserRULE_statement                = 30
-	ArcParserRULE_assignmentStmt           = 31
-	ArcParserRULE_leftHandSide             = 32
-	ArcParserRULE_expressionStmt           = 33
-	ArcParserRULE_returnStmt               = 34
-	ArcParserRULE_ifStmt                   = 35
-	ArcParserRULE_forStmt                  = 36
-	ArcParserRULE_breakStmt                = 37
-	ArcParserRULE_continueStmt             = 38
-	ArcParserRULE_deferStmt                = 39
-	ArcParserRULE_expression               = 40
-	ArcParserRULE_logicalOrExpression      = 41
-	ArcParserRULE_logicalAndExpression     = 42
-	ArcParserRULE_equalityExpression       = 43
-	ArcParserRULE_relationalExpression     = 44
-	ArcParserRULE_rangeExpression          = 45
-	ArcParserRULE_additiveExpression       = 46
-	ArcParserRULE_multiplicativeExpression = 47
-	ArcParserRULE_unaryExpression          = 48
-	ArcParserRULE_postfixExpression        = 49
-	ArcParserRULE_postfixOp                = 50
-	ArcParserRULE_primaryExpression        = 51
-	ArcParserRULE_literal                  = 52
-	ArcParserRULE_vectorLiteral            = 53
-	ArcParserRULE_mapLiteral               = 54
-	ArcParserRULE_mapEntry                 = 55
-	ArcParserRULE_structLiteral            = 56
-	ArcParserRULE_fieldInit                = 57
-	ArcParserRULE_argumentList             = 58
-	ArcParserRULE_castExpression           = 59
-	ArcParserRULE_allocaExpression         = 60
-	ArcParserRULE_syscallExpression        = 61
-	ArcParserRULE_intrinsicExpression      = 62
+	ArcParserRULE_qualifiedType            = 24
+	ArcParserRULE_primitiveType            = 25
+	ArcParserRULE_pointerType              = 26
+	ArcParserRULE_referenceType            = 27
+	ArcParserRULE_vectorType               = 28
+	ArcParserRULE_mapType                  = 29
+	ArcParserRULE_block                    = 30
+	ArcParserRULE_statement                = 31
+	ArcParserRULE_assignmentStmt           = 32
+	ArcParserRULE_leftHandSide             = 33
+	ArcParserRULE_expressionStmt           = 34
+	ArcParserRULE_returnStmt               = 35
+	ArcParserRULE_ifStmt                   = 36
+	ArcParserRULE_forStmt                  = 37
+	ArcParserRULE_breakStmt                = 38
+	ArcParserRULE_continueStmt             = 39
+	ArcParserRULE_deferStmt                = 40
+	ArcParserRULE_expression               = 41
+	ArcParserRULE_logicalOrExpression      = 42
+	ArcParserRULE_logicalAndExpression     = 43
+	ArcParserRULE_bitOrExpression          = 44
+	ArcParserRULE_bitXorExpression         = 45
+	ArcParserRULE_bitAndExpression         = 46
+	ArcParserRULE_equalityExpression       = 47
+	ArcParserRULE_relationalExpression     = 48
+	ArcParserRULE_shiftExpression          = 49
+	ArcParserRULE_rangeExpression          = 50
+	ArcParserRULE_additiveExpression       = 51
+	ArcParserRULE_multiplicativeExpression = 52
+	ArcParserRULE_unaryExpression          = 53
+	ArcParserRULE_postfixExpression        = 54
+	ArcParserRULE_postfixOp                = 55
+	ArcParserRULE_primaryExpression        = 56
+	ArcParserRULE_qualifiedIdentifier      = 57
+	ArcParserRULE_literal                  = 58
+	ArcParserRULE_vectorLiteral            = 59
+	ArcParserRULE_mapLiteral               = 60
+	ArcParserRULE_mapEntry                 = 61
+	ArcParserRULE_structLiteral            = 62
+	ArcParserRULE_fieldInit                = 63
+	ArcParserRULE_argumentList             = 64
+	ArcParserRULE_castExpression           = 65
+	ArcParserRULE_allocaExpression         = 66
+	ArcParserRULE_syscallExpression        = 67
+	ArcParserRULE_intrinsicExpression      = 68
 )
     ArcParser rules.
 
@@ -328,6 +344,9 @@ func InitEmptyAdditiveExpressionContext(p *AdditiveExpressionContext)
 func InitEmptyAllocaExpressionContext(p *AllocaExpressionContext)
 func InitEmptyArgumentListContext(p *ArgumentListContext)
 func InitEmptyAssignmentStmtContext(p *AssignmentStmtContext)
+func InitEmptyBitAndExpressionContext(p *BitAndExpressionContext)
+func InitEmptyBitOrExpressionContext(p *BitOrExpressionContext)
+func InitEmptyBitXorExpressionContext(p *BitXorExpressionContext)
 func InitEmptyBlockContext(p *BlockContext)
 func InitEmptyBreakStmtContext(p *BreakStmtContext)
 func InitEmptyCastExpressionContext(p *CastExpressionContext)
@@ -371,10 +390,13 @@ func InitEmptyPostfixExpressionContext(p *PostfixExpressionContext)
 func InitEmptyPostfixOpContext(p *PostfixOpContext)
 func InitEmptyPrimaryExpressionContext(p *PrimaryExpressionContext)
 func InitEmptyPrimitiveTypeContext(p *PrimitiveTypeContext)
+func InitEmptyQualifiedIdentifierContext(p *QualifiedIdentifierContext)
+func InitEmptyQualifiedTypeContext(p *QualifiedTypeContext)
 func InitEmptyRangeExpressionContext(p *RangeExpressionContext)
 func InitEmptyReferenceTypeContext(p *ReferenceTypeContext)
 func InitEmptyRelationalExpressionContext(p *RelationalExpressionContext)
 func InitEmptyReturnStmtContext(p *ReturnStmtContext)
+func InitEmptyShiftExpressionContext(p *ShiftExpressionContext)
 func InitEmptyStatementContext(p *StatementContext)
 func InitEmptyStructDeclContext(p *StructDeclContext)
 func InitEmptyStructFieldContext(p *StructFieldContext)
@@ -486,6 +508,12 @@ func (p *ArcParser) ArgumentList() (localctx IArgumentListContext)
 
 func (p *ArcParser) AssignmentStmt() (localctx IAssignmentStmtContext)
 
+func (p *ArcParser) BitAndExpression() (localctx IBitAndExpressionContext)
+
+func (p *ArcParser) BitOrExpression() (localctx IBitOrExpressionContext)
+
+func (p *ArcParser) BitXorExpression() (localctx IBitXorExpressionContext)
+
 func (p *ArcParser) Block() (localctx IBlockContext)
 
 func (p *ArcParser) BreakStmt() (localctx IBreakStmtContext)
@@ -572,6 +600,10 @@ func (p *ArcParser) PrimaryExpression() (localctx IPrimaryExpressionContext)
 
 func (p *ArcParser) PrimitiveType() (localctx IPrimitiveTypeContext)
 
+func (p *ArcParser) QualifiedIdentifier() (localctx IQualifiedIdentifierContext)
+
+func (p *ArcParser) QualifiedType() (localctx IQualifiedTypeContext)
+
 func (p *ArcParser) RangeExpression() (localctx IRangeExpressionContext)
 
 func (p *ArcParser) ReferenceType() (localctx IReferenceTypeContext)
@@ -579,6 +611,8 @@ func (p *ArcParser) ReferenceType() (localctx IReferenceTypeContext)
 func (p *ArcParser) RelationalExpression() (localctx IRelationalExpressionContext)
 
 func (p *ArcParser) ReturnStmt() (localctx IReturnStmtContext)
+
+func (p *ArcParser) ShiftExpression() (localctx IShiftExpressionContext)
 
 func (p *ArcParser) Statement() (localctx IStatementContext)
 
@@ -679,6 +713,9 @@ type ArcParserListener interface {
 	// EnterType is called when entering the type production.
 	EnterType(c *TypeContext)
 
+	// EnterQualifiedType is called when entering the qualifiedType production.
+	EnterQualifiedType(c *QualifiedTypeContext)
+
 	// EnterPrimitiveType is called when entering the primitiveType production.
 	EnterPrimitiveType(c *PrimitiveTypeContext)
 
@@ -736,11 +773,23 @@ type ArcParserListener interface {
 	// EnterLogicalAndExpression is called when entering the logicalAndExpression production.
 	EnterLogicalAndExpression(c *LogicalAndExpressionContext)
 
+	// EnterBitOrExpression is called when entering the bitOrExpression production.
+	EnterBitOrExpression(c *BitOrExpressionContext)
+
+	// EnterBitXorExpression is called when entering the bitXorExpression production.
+	EnterBitXorExpression(c *BitXorExpressionContext)
+
+	// EnterBitAndExpression is called when entering the bitAndExpression production.
+	EnterBitAndExpression(c *BitAndExpressionContext)
+
 	// EnterEqualityExpression is called when entering the equalityExpression production.
 	EnterEqualityExpression(c *EqualityExpressionContext)
 
 	// EnterRelationalExpression is called when entering the relationalExpression production.
 	EnterRelationalExpression(c *RelationalExpressionContext)
+
+	// EnterShiftExpression is called when entering the shiftExpression production.
+	EnterShiftExpression(c *ShiftExpressionContext)
 
 	// EnterRangeExpression is called when entering the rangeExpression production.
 	EnterRangeExpression(c *RangeExpressionContext)
@@ -762,6 +811,9 @@ type ArcParserListener interface {
 
 	// EnterPrimaryExpression is called when entering the primaryExpression production.
 	EnterPrimaryExpression(c *PrimaryExpressionContext)
+
+	// EnterQualifiedIdentifier is called when entering the qualifiedIdentifier production.
+	EnterQualifiedIdentifier(c *QualifiedIdentifierContext)
 
 	// EnterLiteral is called when entering the literal production.
 	EnterLiteral(c *LiteralContext)
@@ -868,6 +920,9 @@ type ArcParserListener interface {
 	// ExitType is called when exiting the type production.
 	ExitType(c *TypeContext)
 
+	// ExitQualifiedType is called when exiting the qualifiedType production.
+	ExitQualifiedType(c *QualifiedTypeContext)
+
 	// ExitPrimitiveType is called when exiting the primitiveType production.
 	ExitPrimitiveType(c *PrimitiveTypeContext)
 
@@ -925,11 +980,23 @@ type ArcParserListener interface {
 	// ExitLogicalAndExpression is called when exiting the logicalAndExpression production.
 	ExitLogicalAndExpression(c *LogicalAndExpressionContext)
 
+	// ExitBitOrExpression is called when exiting the bitOrExpression production.
+	ExitBitOrExpression(c *BitOrExpressionContext)
+
+	// ExitBitXorExpression is called when exiting the bitXorExpression production.
+	ExitBitXorExpression(c *BitXorExpressionContext)
+
+	// ExitBitAndExpression is called when exiting the bitAndExpression production.
+	ExitBitAndExpression(c *BitAndExpressionContext)
+
 	// ExitEqualityExpression is called when exiting the equalityExpression production.
 	ExitEqualityExpression(c *EqualityExpressionContext)
 
 	// ExitRelationalExpression is called when exiting the relationalExpression production.
 	ExitRelationalExpression(c *RelationalExpressionContext)
+
+	// ExitShiftExpression is called when exiting the shiftExpression production.
+	ExitShiftExpression(c *ShiftExpressionContext)
 
 	// ExitRangeExpression is called when exiting the rangeExpression production.
 	ExitRangeExpression(c *RangeExpressionContext)
@@ -951,6 +1018,9 @@ type ArcParserListener interface {
 
 	// ExitPrimaryExpression is called when exiting the primaryExpression production.
 	ExitPrimaryExpression(c *PrimaryExpressionContext)
+
+	// ExitQualifiedIdentifier is called when exiting the qualifiedIdentifier production.
+	ExitQualifiedIdentifier(c *QualifiedIdentifierContext)
 
 	// ExitLiteral is called when exiting the literal production.
 	ExitLiteral(c *LiteralContext)
@@ -1063,6 +1133,9 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#type.
 	VisitType(ctx *TypeContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#qualifiedType.
+	VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#primitiveType.
 	VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
 
@@ -1120,11 +1193,23 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#logicalAndExpression.
 	VisitLogicalAndExpression(ctx *LogicalAndExpressionContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#bitOrExpression.
+	VisitBitOrExpression(ctx *BitOrExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#bitXorExpression.
+	VisitBitXorExpression(ctx *BitXorExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#bitAndExpression.
+	VisitBitAndExpression(ctx *BitAndExpressionContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#equalityExpression.
 	VisitEqualityExpression(ctx *EqualityExpressionContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#relationalExpression.
 	VisitRelationalExpression(ctx *RelationalExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#shiftExpression.
+	VisitShiftExpression(ctx *ShiftExpressionContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#rangeExpression.
 	VisitRangeExpression(ctx *RangeExpressionContext) interface{}
@@ -1146,6 +1231,9 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#primaryExpression.
 	VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
+	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#literal.
 	VisitLiteral(ctx *LiteralContext) interface{}
@@ -1268,6 +1356,15 @@ func (s *BaseArcParserListener) EnterArgumentList(ctx *ArgumentListContext)
 
 func (s *BaseArcParserListener) EnterAssignmentStmt(ctx *AssignmentStmtContext)
     EnterAssignmentStmt is called when production assignmentStmt is entered.
+
+func (s *BaseArcParserListener) EnterBitAndExpression(ctx *BitAndExpressionContext)
+    EnterBitAndExpression is called when production bitAndExpression is entered.
+
+func (s *BaseArcParserListener) EnterBitOrExpression(ctx *BitOrExpressionContext)
+    EnterBitOrExpression is called when production bitOrExpression is entered.
+
+func (s *BaseArcParserListener) EnterBitXorExpression(ctx *BitXorExpressionContext)
+    EnterBitXorExpression is called when production bitXorExpression is entered.
 
 func (s *BaseArcParserListener) EnterBlock(ctx *BlockContext)
     EnterBlock is called when production block is entered.
@@ -1410,6 +1507,13 @@ func (s *BaseArcParserListener) EnterPrimaryExpression(ctx *PrimaryExpressionCon
 func (s *BaseArcParserListener) EnterPrimitiveType(ctx *PrimitiveTypeContext)
     EnterPrimitiveType is called when production primitiveType is entered.
 
+func (s *BaseArcParserListener) EnterQualifiedIdentifier(ctx *QualifiedIdentifierContext)
+    EnterQualifiedIdentifier is called when production qualifiedIdentifier is
+    entered.
+
+func (s *BaseArcParserListener) EnterQualifiedType(ctx *QualifiedTypeContext)
+    EnterQualifiedType is called when production qualifiedType is entered.
+
 func (s *BaseArcParserListener) EnterRangeExpression(ctx *RangeExpressionContext)
     EnterRangeExpression is called when production rangeExpression is entered.
 
@@ -1422,6 +1526,9 @@ func (s *BaseArcParserListener) EnterRelationalExpression(ctx *RelationalExpress
 
 func (s *BaseArcParserListener) EnterReturnStmt(ctx *ReturnStmtContext)
     EnterReturnStmt is called when production returnStmt is entered.
+
+func (s *BaseArcParserListener) EnterShiftExpression(ctx *ShiftExpressionContext)
+    EnterShiftExpression is called when production shiftExpression is entered.
 
 func (s *BaseArcParserListener) EnterStatement(ctx *StatementContext)
     EnterStatement is called when production statement is entered.
@@ -1472,6 +1579,15 @@ func (s *BaseArcParserListener) ExitArgumentList(ctx *ArgumentListContext)
 
 func (s *BaseArcParserListener) ExitAssignmentStmt(ctx *AssignmentStmtContext)
     ExitAssignmentStmt is called when production assignmentStmt is exited.
+
+func (s *BaseArcParserListener) ExitBitAndExpression(ctx *BitAndExpressionContext)
+    ExitBitAndExpression is called when production bitAndExpression is exited.
+
+func (s *BaseArcParserListener) ExitBitOrExpression(ctx *BitOrExpressionContext)
+    ExitBitOrExpression is called when production bitOrExpression is exited.
+
+func (s *BaseArcParserListener) ExitBitXorExpression(ctx *BitXorExpressionContext)
+    ExitBitXorExpression is called when production bitXorExpression is exited.
 
 func (s *BaseArcParserListener) ExitBlock(ctx *BlockContext)
     ExitBlock is called when production block is exited.
@@ -1612,6 +1728,13 @@ func (s *BaseArcParserListener) ExitPrimaryExpression(ctx *PrimaryExpressionCont
 func (s *BaseArcParserListener) ExitPrimitiveType(ctx *PrimitiveTypeContext)
     ExitPrimitiveType is called when production primitiveType is exited.
 
+func (s *BaseArcParserListener) ExitQualifiedIdentifier(ctx *QualifiedIdentifierContext)
+    ExitQualifiedIdentifier is called when production qualifiedIdentifier is
+    exited.
+
+func (s *BaseArcParserListener) ExitQualifiedType(ctx *QualifiedTypeContext)
+    ExitQualifiedType is called when production qualifiedType is exited.
+
 func (s *BaseArcParserListener) ExitRangeExpression(ctx *RangeExpressionContext)
     ExitRangeExpression is called when production rangeExpression is exited.
 
@@ -1624,6 +1747,9 @@ func (s *BaseArcParserListener) ExitRelationalExpression(ctx *RelationalExpressi
 
 func (s *BaseArcParserListener) ExitReturnStmt(ctx *ReturnStmtContext)
     ExitReturnStmt is called when production returnStmt is exited.
+
+func (s *BaseArcParserListener) ExitShiftExpression(ctx *ShiftExpressionContext)
+    ExitShiftExpression is called when production shiftExpression is exited.
 
 func (s *BaseArcParserListener) ExitStatement(ctx *StatementContext)
     ExitStatement is called when production statement is exited.
@@ -1678,6 +1804,12 @@ func (v *BaseArcParserVisitor) VisitAllocaExpression(ctx *AllocaExpressionContex
 func (v *BaseArcParserVisitor) VisitArgumentList(ctx *ArgumentListContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitAssignmentStmt(ctx *AssignmentStmtContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitBitAndExpression(ctx *BitAndExpressionContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitBitOrExpression(ctx *BitOrExpressionContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitBitXorExpression(ctx *BitXorExpressionContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitBlock(ctx *BlockContext) interface{}
 
@@ -1765,6 +1897,10 @@ func (v *BaseArcParserVisitor) VisitPrimaryExpression(ctx *PrimaryExpressionCont
 
 func (v *BaseArcParserVisitor) VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
 
+func (v *BaseArcParserVisitor) VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
+
 func (v *BaseArcParserVisitor) VisitRangeExpression(ctx *RangeExpressionContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitReferenceType(ctx *ReferenceTypeContext) interface{}
@@ -1772,6 +1908,8 @@ func (v *BaseArcParserVisitor) VisitReferenceType(ctx *ReferenceTypeContext) int
 func (v *BaseArcParserVisitor) VisitRelationalExpression(ctx *RelationalExpressionContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitReturnStmt(ctx *ReturnStmtContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitShiftExpression(ctx *ShiftExpressionContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitStatement(ctx *StatementContext) interface{}
 
@@ -1796,6 +1934,99 @@ func (v *BaseArcParserVisitor) VisitVariableDecl(ctx *VariableDeclContext) inter
 func (v *BaseArcParserVisitor) VisitVectorLiteral(ctx *VectorLiteralContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitVectorType(ctx *VectorTypeContext) interface{}
+
+type BitAndExpressionContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewBitAndExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *BitAndExpressionContext
+
+func NewEmptyBitAndExpressionContext() *BitAndExpressionContext
+
+func (s *BitAndExpressionContext) AMP(i int) antlr.TerminalNode
+
+func (s *BitAndExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *BitAndExpressionContext) AllAMP() []antlr.TerminalNode
+
+func (s *BitAndExpressionContext) AllEqualityExpression() []IEqualityExpressionContext
+
+func (s *BitAndExpressionContext) EnterRule(listener antlr.ParseTreeListener)
+
+func (s *BitAndExpressionContext) EqualityExpression(i int) IEqualityExpressionContext
+
+func (s *BitAndExpressionContext) ExitRule(listener antlr.ParseTreeListener)
+
+func (s *BitAndExpressionContext) GetParser() antlr.Parser
+
+func (s *BitAndExpressionContext) GetRuleContext() antlr.RuleContext
+
+func (*BitAndExpressionContext) IsBitAndExpressionContext()
+
+func (s *BitAndExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type BitOrExpressionContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewBitOrExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *BitOrExpressionContext
+
+func NewEmptyBitOrExpressionContext() *BitOrExpressionContext
+
+func (s *BitOrExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *BitOrExpressionContext) AllBIT_OR() []antlr.TerminalNode
+
+func (s *BitOrExpressionContext) AllBitXorExpression() []IBitXorExpressionContext
+
+func (s *BitOrExpressionContext) BIT_OR(i int) antlr.TerminalNode
+
+func (s *BitOrExpressionContext) BitXorExpression(i int) IBitXorExpressionContext
+
+func (s *BitOrExpressionContext) EnterRule(listener antlr.ParseTreeListener)
+
+func (s *BitOrExpressionContext) ExitRule(listener antlr.ParseTreeListener)
+
+func (s *BitOrExpressionContext) GetParser() antlr.Parser
+
+func (s *BitOrExpressionContext) GetRuleContext() antlr.RuleContext
+
+func (*BitOrExpressionContext) IsBitOrExpressionContext()
+
+func (s *BitOrExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type BitXorExpressionContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewBitXorExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *BitXorExpressionContext
+
+func NewEmptyBitXorExpressionContext() *BitXorExpressionContext
+
+func (s *BitXorExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *BitXorExpressionContext) AllBIT_XOR() []antlr.TerminalNode
+
+func (s *BitXorExpressionContext) AllBitAndExpression() []IBitAndExpressionContext
+
+func (s *BitXorExpressionContext) BIT_XOR(i int) antlr.TerminalNode
+
+func (s *BitXorExpressionContext) BitAndExpression(i int) IBitAndExpressionContext
+
+func (s *BitXorExpressionContext) EnterRule(listener antlr.ParseTreeListener)
+
+func (s *BitXorExpressionContext) ExitRule(listener antlr.ParseTreeListener)
+
+func (s *BitXorExpressionContext) GetParser() antlr.Parser
+
+func (s *BitXorExpressionContext) GetRuleContext() antlr.RuleContext
+
+func (*BitXorExpressionContext) IsBitXorExpressionContext()
+
+func (s *BitXorExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type BlockContext struct {
 	antlr.BaseParserRuleContext
@@ -2556,6 +2787,57 @@ type IAssignmentStmtContext interface {
 }
     IAssignmentStmtContext is an interface to support dynamic dispatch.
 
+type IBitAndExpressionContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllEqualityExpression() []IEqualityExpressionContext
+	EqualityExpression(i int) IEqualityExpressionContext
+	AllAMP() []antlr.TerminalNode
+	AMP(i int) antlr.TerminalNode
+
+	// IsBitAndExpressionContext differentiates from other interfaces.
+	IsBitAndExpressionContext()
+}
+    IBitAndExpressionContext is an interface to support dynamic dispatch.
+
+type IBitOrExpressionContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllBitXorExpression() []IBitXorExpressionContext
+	BitXorExpression(i int) IBitXorExpressionContext
+	AllBIT_OR() []antlr.TerminalNode
+	BIT_OR(i int) antlr.TerminalNode
+
+	// IsBitOrExpressionContext differentiates from other interfaces.
+	IsBitOrExpressionContext()
+}
+    IBitOrExpressionContext is an interface to support dynamic dispatch.
+
+type IBitXorExpressionContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllBitAndExpression() []IBitAndExpressionContext
+	BitAndExpression(i int) IBitAndExpressionContext
+	AllBIT_XOR() []antlr.TerminalNode
+	BIT_XOR(i int) antlr.TerminalNode
+
+	// IsBitXorExpressionContext differentiates from other interfaces.
+	IsBitXorExpressionContext()
+}
+    IBitXorExpressionContext is an interface to support dynamic dispatch.
+
 type IBlockContext interface {
 	antlr.ParserRuleContext
 
@@ -3067,8 +3349,8 @@ type ILogicalAndExpressionContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	AllEqualityExpression() []IEqualityExpressionContext
-	EqualityExpression(i int) IEqualityExpressionContext
+	AllBitOrExpression() []IBitOrExpressionContext
+	BitOrExpression(i int) IBitOrExpressionContext
 	AllAND() []antlr.TerminalNode
 	AND(i int) antlr.TerminalNode
 
@@ -3345,6 +3627,7 @@ type IPrimaryExpressionContext interface {
 	LPAREN() antlr.TerminalNode
 	Expression() IExpressionContext
 	RPAREN() antlr.TerminalNode
+	QualifiedIdentifier() IQualifiedIdentifierContext
 	IDENTIFIER() antlr.TerminalNode
 
 	// IsPrimaryExpressionContext differentiates from other interfaces.
@@ -3381,6 +3664,40 @@ type IPrimitiveTypeContext interface {
 	IsPrimitiveTypeContext()
 }
     IPrimitiveTypeContext is an interface to support dynamic dispatch.
+
+type IQualifiedIdentifierContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllIDENTIFIER() []antlr.TerminalNode
+	IDENTIFIER(i int) antlr.TerminalNode
+	AllDOT() []antlr.TerminalNode
+	DOT(i int) antlr.TerminalNode
+
+	// IsQualifiedIdentifierContext differentiates from other interfaces.
+	IsQualifiedIdentifierContext()
+}
+    IQualifiedIdentifierContext is an interface to support dynamic dispatch.
+
+type IQualifiedTypeContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllIDENTIFIER() []antlr.TerminalNode
+	IDENTIFIER(i int) antlr.TerminalNode
+	AllDOT() []antlr.TerminalNode
+	DOT(i int) antlr.TerminalNode
+
+	// IsQualifiedTypeContext differentiates from other interfaces.
+	IsQualifiedTypeContext()
+}
+    IQualifiedTypeContext is an interface to support dynamic dispatch.
 
 type IRangeExpressionContext interface {
 	antlr.ParserRuleContext
@@ -3420,8 +3737,8 @@ type IRelationalExpressionContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	AllRangeExpression() []IRangeExpressionContext
-	RangeExpression(i int) IRangeExpressionContext
+	AllShiftExpression() []IShiftExpressionContext
+	ShiftExpression(i int) IShiftExpressionContext
 	AllLT() []antlr.TerminalNode
 	LT(i int) antlr.TerminalNode
 	AllLE() []antlr.TerminalNode
@@ -3450,6 +3767,25 @@ type IReturnStmtContext interface {
 	IsReturnStmtContext()
 }
     IReturnStmtContext is an interface to support dynamic dispatch.
+
+type IShiftExpressionContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllRangeExpression() []IRangeExpressionContext
+	RangeExpression(i int) IRangeExpressionContext
+	AllLSHIFT() []antlr.TerminalNode
+	LSHIFT(i int) antlr.TerminalNode
+	AllRSHIFT() []antlr.TerminalNode
+	RSHIFT(i int) antlr.TerminalNode
+
+	// IsShiftExpressionContext differentiates from other interfaces.
+	IsShiftExpressionContext()
+}
+    IShiftExpressionContext is an interface to support dynamic dispatch.
 
 type IStatementContext interface {
 	antlr.ParserRuleContext
@@ -3600,6 +3936,7 @@ type ITypeContext interface {
 	ReferenceType() IReferenceTypeContext
 	VectorType() IVectorTypeContext
 	MapType() IMapTypeContext
+	QualifiedType() IQualifiedTypeContext
 	IDENTIFIER() antlr.TerminalNode
 
 	// IsTypeContext differentiates from other interfaces.
@@ -3617,6 +3954,7 @@ type IUnaryExpressionContext interface {
 	UnaryExpression() IUnaryExpressionContext
 	MINUS() antlr.TerminalNode
 	NOT() antlr.TerminalNode
+	BIT_NOT() antlr.TerminalNode
 	STAR() antlr.TerminalNode
 	AMP() antlr.TerminalNode
 	AWAIT() antlr.TerminalNode
@@ -3943,11 +4281,11 @@ func (s *LogicalAndExpressionContext) Accept(visitor antlr.ParseTreeVisitor) int
 
 func (s *LogicalAndExpressionContext) AllAND() []antlr.TerminalNode
 
-func (s *LogicalAndExpressionContext) AllEqualityExpression() []IEqualityExpressionContext
+func (s *LogicalAndExpressionContext) AllBitOrExpression() []IBitOrExpressionContext
+
+func (s *LogicalAndExpressionContext) BitOrExpression(i int) IBitOrExpressionContext
 
 func (s *LogicalAndExpressionContext) EnterRule(listener antlr.ParseTreeListener)
-
-func (s *LogicalAndExpressionContext) EqualityExpression(i int) IEqualityExpressionContext
 
 func (s *LogicalAndExpressionContext) ExitRule(listener antlr.ParseTreeListener)
 
@@ -4457,6 +4795,8 @@ func (s *PrimaryExpressionContext) LPAREN() antlr.TerminalNode
 
 func (s *PrimaryExpressionContext) Literal() ILiteralContext
 
+func (s *PrimaryExpressionContext) QualifiedIdentifier() IQualifiedIdentifierContext
+
 func (s *PrimaryExpressionContext) RPAREN() antlr.TerminalNode
 
 func (s *PrimaryExpressionContext) StructLiteral() IStructLiteralContext
@@ -4521,6 +4861,68 @@ func (s *PrimitiveTypeContext) UINT8() antlr.TerminalNode
 func (s *PrimitiveTypeContext) USIZE() antlr.TerminalNode
 
 func (s *PrimitiveTypeContext) VOID() antlr.TerminalNode
+
+type QualifiedIdentifierContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyQualifiedIdentifierContext() *QualifiedIdentifierContext
+
+func NewQualifiedIdentifierContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *QualifiedIdentifierContext
+
+func (s *QualifiedIdentifierContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *QualifiedIdentifierContext) AllDOT() []antlr.TerminalNode
+
+func (s *QualifiedIdentifierContext) AllIDENTIFIER() []antlr.TerminalNode
+
+func (s *QualifiedIdentifierContext) DOT(i int) antlr.TerminalNode
+
+func (s *QualifiedIdentifierContext) EnterRule(listener antlr.ParseTreeListener)
+
+func (s *QualifiedIdentifierContext) ExitRule(listener antlr.ParseTreeListener)
+
+func (s *QualifiedIdentifierContext) GetParser() antlr.Parser
+
+func (s *QualifiedIdentifierContext) GetRuleContext() antlr.RuleContext
+
+func (s *QualifiedIdentifierContext) IDENTIFIER(i int) antlr.TerminalNode
+
+func (*QualifiedIdentifierContext) IsQualifiedIdentifierContext()
+
+func (s *QualifiedIdentifierContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type QualifiedTypeContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyQualifiedTypeContext() *QualifiedTypeContext
+
+func NewQualifiedTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *QualifiedTypeContext
+
+func (s *QualifiedTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *QualifiedTypeContext) AllDOT() []antlr.TerminalNode
+
+func (s *QualifiedTypeContext) AllIDENTIFIER() []antlr.TerminalNode
+
+func (s *QualifiedTypeContext) DOT(i int) antlr.TerminalNode
+
+func (s *QualifiedTypeContext) EnterRule(listener antlr.ParseTreeListener)
+
+func (s *QualifiedTypeContext) ExitRule(listener antlr.ParseTreeListener)
+
+func (s *QualifiedTypeContext) GetParser() antlr.Parser
+
+func (s *QualifiedTypeContext) GetRuleContext() antlr.RuleContext
+
+func (s *QualifiedTypeContext) IDENTIFIER(i int) antlr.TerminalNode
+
+func (*QualifiedTypeContext) IsQualifiedTypeContext()
+
+func (s *QualifiedTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type RangeExpressionContext struct {
 	antlr.BaseParserRuleContext
@@ -4597,7 +4999,7 @@ func (s *RelationalExpressionContext) AllLE() []antlr.TerminalNode
 
 func (s *RelationalExpressionContext) AllLT() []antlr.TerminalNode
 
-func (s *RelationalExpressionContext) AllRangeExpression() []IRangeExpressionContext
+func (s *RelationalExpressionContext) AllShiftExpression() []IShiftExpressionContext
 
 func (s *RelationalExpressionContext) EnterRule(listener antlr.ParseTreeListener)
 
@@ -4617,7 +5019,7 @@ func (s *RelationalExpressionContext) LE(i int) antlr.TerminalNode
 
 func (s *RelationalExpressionContext) LT(i int) antlr.TerminalNode
 
-func (s *RelationalExpressionContext) RangeExpression(i int) IRangeExpressionContext
+func (s *RelationalExpressionContext) ShiftExpression(i int) IShiftExpressionContext
 
 func (s *RelationalExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
@@ -4647,6 +5049,41 @@ func (*ReturnStmtContext) IsReturnStmtContext()
 func (s *ReturnStmtContext) RETURN() antlr.TerminalNode
 
 func (s *ReturnStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ShiftExpressionContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyShiftExpressionContext() *ShiftExpressionContext
+
+func NewShiftExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ShiftExpressionContext
+
+func (s *ShiftExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ShiftExpressionContext) AllLSHIFT() []antlr.TerminalNode
+
+func (s *ShiftExpressionContext) AllRSHIFT() []antlr.TerminalNode
+
+func (s *ShiftExpressionContext) AllRangeExpression() []IRangeExpressionContext
+
+func (s *ShiftExpressionContext) EnterRule(listener antlr.ParseTreeListener)
+
+func (s *ShiftExpressionContext) ExitRule(listener antlr.ParseTreeListener)
+
+func (s *ShiftExpressionContext) GetParser() antlr.Parser
+
+func (s *ShiftExpressionContext) GetRuleContext() antlr.RuleContext
+
+func (*ShiftExpressionContext) IsShiftExpressionContext()
+
+func (s *ShiftExpressionContext) LSHIFT(i int) antlr.TerminalNode
+
+func (s *ShiftExpressionContext) RSHIFT(i int) antlr.TerminalNode
+
+func (s *ShiftExpressionContext) RangeExpression(i int) IRangeExpressionContext
+
+func (s *ShiftExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type StatementContext struct {
 	antlr.BaseParserRuleContext
@@ -4930,6 +5367,8 @@ func (s *TypeContext) PointerType() IPointerTypeContext
 
 func (s *TypeContext) PrimitiveType() IPrimitiveTypeContext
 
+func (s *TypeContext) QualifiedType() IQualifiedTypeContext
+
 func (s *TypeContext) ReferenceType() IReferenceTypeContext
 
 func (s *TypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
@@ -4950,6 +5389,8 @@ func (s *UnaryExpressionContext) AMP() antlr.TerminalNode
 func (s *UnaryExpressionContext) AWAIT() antlr.TerminalNode
 
 func (s *UnaryExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *UnaryExpressionContext) BIT_NOT() antlr.TerminalNode
 
 func (s *UnaryExpressionContext) DECREMENT() antlr.TerminalNode
 

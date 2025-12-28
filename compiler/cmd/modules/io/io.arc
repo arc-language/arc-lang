@@ -41,7 +41,15 @@ func int_to_string(value: int64, buffer: *byte, base: uint32) usize {
     
     let digits = "0123456789abcdefghijklmnopqrstuvwxyz"
     let is_negative = value < 0
-    let abs_value = if is_negative { -value } else { value }
+    
+    // FIX: Replaced invalid 'if' expression with statement
+    let abs_value: int64 = 0
+    if is_negative {
+        abs_value = -value
+    } else {
+        abs_value = value
+    }
+    
     let pos: usize = 0
     
     // Convert digits in reverse
@@ -53,10 +61,11 @@ func int_to_string(value: int64, buffer: *byte, base: uint32) usize {
         temp_pos++
     } else {
         let n = cast<uint64>(abs_value)
+        let base_u64 = cast<uint64>(base)
         for n > 0 {
-            temp[temp_pos] = digits[n % cast<uint64>(base)]
+            temp[temp_pos] = digits[n % base_u64]
             temp_pos++
-            n /= cast<uint64>(base)
+            n /= base_u64
         }
     }
     
@@ -93,10 +102,11 @@ func uint_to_string(value: uint64, buffer: *byte, base: uint32) usize {
         temp_pos++
     } else {
         let n = value
+        let base_u64 = cast<uint64>(base)
         for n > 0 {
-            temp[temp_pos] = digits[n % cast<uint64>(base)]
+            temp[temp_pos] = digits[n % base_u64]
             temp_pos++
-            n /= cast<uint64>(base)
+            n /= base_u64
         }
     }
     
@@ -129,7 +139,7 @@ func ptr_to_string(ptr: *void, buffer: *byte) usize {
 
 func printf(fmt: string, ...) int32 {
     let args = va_start(fmt)
-    defer va_end(args)
+    // FIX: Manual cleanup since defer is not fully implemented
     
     let fmt_ptr = cast<*byte>(fmt)
     let fmt_len = strlen(fmt_ptr)
@@ -167,7 +177,7 @@ func printf(fmt: string, ...) int32 {
                 write(STDOUT, num_buffer, len)
                 written += cast<isize>(len)
             } else if specifier == 'X' {
-                // Unsigned hexadecimal (uppercase) - simplified version
+                // Unsigned hexadecimal (uppercase)
                 let val = va_arg<uint32>(args)
                 let len = uint_to_string(cast<uint64>(val), num_buffer, 16)
                 write(STDOUT, num_buffer, len)
@@ -204,6 +214,7 @@ func printf(fmt: string, ...) int32 {
         }
     }
     
+    va_end(args)
     return cast<int32>(written)
 }
 
