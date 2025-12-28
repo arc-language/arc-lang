@@ -150,17 +150,66 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		_ = v.ctx.Builder.CreateCoroSuspend(false, "")
 		return val
 	}
+	
+	// Pre-Increment (++i)
+	if ctx.INCREMENT() != nil {
+		if childCtx, ok := ctx.UnaryExpression().(*parser.UnaryExpressionContext); ok {
+			ptr := v.getExpressionAddress(childCtx)
+			if ptr != nil && types.IsPointer(ptr.Type()) {
+				valType := ptr.Type().(*types.PointerType).ElementType
+				val := v.ctx.Builder.CreateLoad(valType, ptr, "")
+				
+				var one ir.Constant
+				if intType, ok := valType.(*types.IntType); ok {
+					one = v.ctx.Builder.ConstInt(intType, 1)
+				} else {
+					one = v.ctx.Builder.ConstInt(types.I64, 1)
+				}
+				newVal := v.ctx.Builder.CreateAdd(val, one, "")
+				v.ctx.Builder.CreateStore(newVal, ptr)
+				return newVal
+			}
+		}
+		v.ctx.Logger.Error("Invalid operand for pre-increment")
+		return v.ctx.Builder.ConstInt(types.I64, 0)
+	}
+	
+	// Pre-Decrement (--i)
+	if ctx.DECREMENT() != nil {
+		if childCtx, ok := ctx.UnaryExpression().(*parser.UnaryExpressionContext); ok {
+			ptr := v.getExpressionAddress(childCtx)
+			if ptr != nil && types.IsPointer(ptr.Type()) {
+				valType := ptr.Type().(*types.PointerType).ElementType
+				val := v.ctx.Builder.CreateLoad(valType, ptr, "")
+				
+				var one ir.Constant
+				if intType, ok := valType.(*types.IntType); ok {
+					one = v.ctx.Builder.ConstInt(intType, 1)
+				} else {
+					one = v.ctx.Builder.ConstInt(types.I64, 1)
+				}
+				newVal := v.ctx.Builder.CreateSub(val, one, "")
+				v.ctx.Builder.CreateStore(newVal, ptr)
+				return newVal
+			}
+		}
+		v.ctx.Logger.Error("Invalid operand for pre-decrement")
+		return v.ctx.Builder.ConstInt(types.I64, 0)
+	}
+	
 	if ctx.MINUS() != nil {
 		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
 		if val == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		zero := v.getZeroValue(val.Type())
 		return v.ctx.Builder.CreateSub(zero, val, "")
 	}
+	
 	if ctx.NOT() != nil {
 		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
 		if val == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		return v.ctx.Builder.CreateXor(val, v.ctx.Builder.ConstInt(types.I1, 1), "")
 	}
+
 	if ctx.BIT_NOT() != nil {
 		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
 		if val == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
@@ -172,6 +221,7 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		}
 		return v.ctx.Builder.CreateXor(val, allOnes, "")
 	}
+	
 	if ctx.STAR() != nil {
 		ptr := v.Visit(ctx.UnaryExpression()).(ir.Value)
 		if ptr == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
@@ -182,6 +232,7 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		}
 		return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
 	}
+	
 	if ctx.AMP() != nil {
 		if childCtx, ok := ctx.UnaryExpression().(*parser.UnaryExpressionContext); ok {
 			return v.getExpressionAddress(childCtx)
@@ -189,11 +240,7 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
 	
-	if ctx.PostfixExpression() != nil {
-		return v.Visit(ctx.PostfixExpression())
-	}
-	
-	return v.ctx.Builder.ConstInt(types.I64, 0)
+	return v.Visit(ctx.PostfixExpression())
 }
 
 func (v *IRVisitor) getExpressionAddress(ctx *parser.UnaryExpressionContext) ir.Value {
@@ -278,6 +325,58 @@ func (v *IRVisitor) visitPostfixOp(base ir.Value, ctx *parser.PostfixOpContext, 
 		}
 		
 		return v.handleMemberAccess(base, memberName)
+	}
+
+	// Post-Increment (i++)
+	if ctx.INCREMENT() != nil {
+		if baseIdentifier != "" {
+			if sym, ok := v.ctx.currentScope.Lookup(baseIdentifier); ok {
+				ptr := sym.Value
+				if !types.IsPointer(ptr.Type()) {
+					v.ctx.Logger.Error("Cannot increment non-lvalue")
+					return base
+				}
+				
+				var one ir.Constant
+				if intType, ok := base.Type().(*types.IntType); ok {
+					one = v.ctx.Builder.ConstInt(intType, 1)
+				} else {
+					one = v.ctx.Builder.ConstInt(types.I64, 1)
+				}
+				newVal := v.ctx.Builder.CreateAdd(base, one, "")
+				v.ctx.Builder.CreateStore(newVal, ptr)
+				
+				// Post-inc returns OLD value (which is 'base')
+				return base
+			}
+		}
+		v.ctx.Logger.Error("Post-increment only supported on simple variables for now")
+		return base
+	}
+
+	// Post-Decrement (i--)
+	if ctx.DECREMENT() != nil {
+		if baseIdentifier != "" {
+			if sym, ok := v.ctx.currentScope.Lookup(baseIdentifier); ok {
+				ptr := sym.Value
+				if !types.IsPointer(ptr.Type()) {
+					v.ctx.Logger.Error("Cannot decrement non-lvalue")
+					return base
+				}
+				
+				var one ir.Constant
+				if intType, ok := base.Type().(*types.IntType); ok {
+					one = v.ctx.Builder.ConstInt(intType, 1)
+				} else {
+					one = v.ctx.Builder.ConstInt(types.I64, 1)
+				}
+				newVal := v.ctx.Builder.CreateSub(base, one, "")
+				v.ctx.Builder.CreateStore(newVal, ptr)
+				return base
+			}
+		}
+		v.ctx.Logger.Error("Post-decrement only supported on simple variables for now")
+		return base
 	}
 	
 	return base
@@ -370,13 +469,12 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				return fn
 			}
 			
-            // Check Global Constant (mangled: namespace_member)
-            mangledName := nsName + "_" + memberName
-            if global := v.ctx.Module.GetGlobal(mangledName); global != nil {
-                ptrType := global.Type().(*types.PointerType)
-                return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
-            }
-
+			mangledName := nsName + "_" + memberName
+			if global := v.ctx.Module.GetGlobal(mangledName); global != nil {
+				ptrType := global.Type().(*types.PointerType)
+				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+			}
+			
 			v.ctx.Logger.Error("Member '%s' not found in namespace '%s'", memberName, nsName)
 		} else {
 			v.ctx.Logger.Error("Unknown namespace or variable: %s", nsName)
@@ -398,7 +496,6 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		
 		sym, ok := v.ctx.currentScope.Lookup(name)
 		if !ok {
-            // Check globals first
 			if v.ctx.currentNamespace != nil {
 				mangled := v.ctx.currentNamespace.Name + "_" + name
 				if global := v.ctx.Module.GetGlobal(mangled); global != nil {
@@ -410,7 +507,7 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				ptrType := global.Type().(*types.PointerType)
 				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
 			}
-            
+			
 			if v.ctx.currentNamespace != nil {
 				if fn, ok := v.ctx.currentNamespace.Functions[name]; ok {
 					return fn
@@ -721,7 +818,6 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 		targetType := v.resolveType(ctx.Type_())
 		return v.ctx.Builder.CreateVaArg(args[0], targetType, "")
 	}
-	
 	if ctx.VA_END() != nil {
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
@@ -732,46 +828,4 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 	}
 	
 	return v.ctx.Builder.ConstInt(types.I64, 0)
-}
-
-func (v *IRVisitor) calculateSizeOf(typ types.Type) int {
-	switch t := typ.(type) {
-	case *types.IntType: return t.BitWidth / 8
-	case *types.FloatType: return t.BitWidth / 8
-	case *types.PointerType: return 8
-	case *types.ArrayType: return v.calculateSizeOf(t.ElementType) * int(t.Length)
-	case *types.StructType:
-		size := 0
-		for _, field := range t.Fields {
-			align := v.calculateAlignOf(field)
-			if size%align != 0 { size += align - (size % align) }
-			size += v.calculateSizeOf(field)
-		}
-		align := v.calculateAlignOf(typ)
-		if size%align != 0 { size += align - (size % align) }
-		return size
-	default: return 8
-	}
-}
-
-func (v *IRVisitor) calculateAlignOf(typ types.Type) int {
-	switch t := typ.(type) {
-	case *types.IntType:
-		if t.BitWidth <= 8 { return 1 }
-		if t.BitWidth <= 16 { return 2 }
-		if t.BitWidth <= 32 { return 4 }
-		return 8
-	case *types.FloatType:
-		if t.BitWidth == 32 { return 4 }
-		return 8
-	case *types.PointerType: return 8
-	case *types.StructType:
-		max := 1
-		for _, f := range t.Fields {
-			a := v.calculateAlignOf(f)
-			if a > max { max = a }
-		}
-		return max
-	default: return 8
-	}
 }
