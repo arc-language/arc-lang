@@ -351,19 +351,46 @@ func (v *IRVisitor) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 	return nil
 }
 
-// Helper to create vector from literal {1, 2, 3, 4, 5}
 func (v *IRVisitor) createVectorFromLiteral(literal ir.Value, vecType *types.DynamicVectorType) ir.Value {
-    // Get runtime struct type
     structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
     
-    v.ctx.Logger.Warning("Vector literal initialization not fully implemented - using empty vector")
+    // Check if literal is a ConstantArray or similar aggregate
+    var elements []ir.Constant
     
-    // Create a zero-initialized struct value
-    // The struct has 3 fields: data ptr (null), length (0), capacity (0)
+    if constArr, ok := literal.(*ir.ConstantArray); ok {
+        elements = constArr.Elements
+    } else if constStruct, ok := literal.(*ir.ConstantStruct); ok {
+        elements = constStruct.Fields
+    } else {
+        v.ctx.Logger.Warning("Vector literal not from array/struct constant - using empty vector")
+        return v.createEmptyVector(structType, vecType)
+    }
+    
+    if len(elements) == 0 {
+        return v.createEmptyVector(structType, vecType)
+    }
+    
+    // Create a global constant array for the data
+    elemCount := int64(len(elements))
+    arrType := types.NewArray(vecType.ElementType, elemCount)
+    
+    dataArrayName := fmt.Sprintf("__vec_data_%d", len(v.ctx.Module.Globals))
+    dataArray := &ir.ConstantArray{
+        BaseValue: ir.BaseValue{ValType: arrType},
+        Elements:  elements,
+    }
+    
+    globalData := v.ctx.Builder.CreateGlobalConstant(dataArrayName, dataArray)
+    
+    // Get pointer to first element
+    zero := v.ctx.Builder.ConstInt(types.I32, 0)
+    dataPtr := v.ctx.Builder.CreateInBoundsGEP(arrType, globalData, []ir.Value{zero, zero}, "")
+    
+    // Create struct: {data, length, capacity}
     fields := []ir.Constant{
-        v.ctx.Builder.ConstNull(types.NewPointer(vecType.ElementType)), // data = null
-        v.ctx.Builder.ConstInt(types.I64, 0),                            // length = 0
-        v.ctx.Builder.ConstInt(types.I64, 0),                            // capacity = 0
+        dataPtr.(*ir.GetElementPtrInst),  // data pointer
+        v.ctx.Builder.ConstInt(types.I64, elemCount),  // length
+        v.ctx.Builder.ConstInt(types.I64, elemCount),  // capacity
     }
     
     structVal := &ir.ConstantStruct{
@@ -372,6 +399,19 @@ func (v *IRVisitor) createVectorFromLiteral(literal ir.Value, vecType *types.Dyn
     }
     
     return structVal
+}
+
+func (v *IRVisitor) createEmptyVector(structType *types.StructType, vecType *types.DynamicVectorType) ir.Value {
+    fields := []ir.Constant{
+        v.ctx.Builder.ConstNull(types.NewPointer(vecType.ElementType)),
+        v.ctx.Builder.ConstInt(types.I64, 0),
+        v.ctx.Builder.ConstInt(types.I64, 0),
+    }
+    
+    return &ir.ConstantStruct{
+        BaseValue: ir.BaseValue{ValType: structType},
+        Fields:    fields,
+    }
 }
 
 // Helper to create map from literal {"key": value}

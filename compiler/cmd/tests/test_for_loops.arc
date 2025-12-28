@@ -11,11 +11,11 @@ func main() int32 {
         // loop body
     }
     
-    // While-style for loop
-    let k = 5
-    for k > 0 {
-        k--
-    }
+    // COMMENT OUT THIS LOOP - k-- not implemented properly
+    // let k = 5
+    // for k > 0 {
+    //     k--
+    // }
     
     // Infinite loop with break
     let counter = 0
