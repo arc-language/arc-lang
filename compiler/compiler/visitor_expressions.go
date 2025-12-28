@@ -114,19 +114,8 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		}
 		
 		// Create a coroutine suspend point
-		// This marks where the async function should suspend execution
 		suspend := v.ctx.Builder.CreateCoroSuspend(false, "")
-		
 		v.logger.Debug("Created coroutine suspend point for await")
-		
-		// For now, we return the awaited value directly
-		// The transformation pass will later convert this into proper state machine code
-		// In a full implementation:
-		// 1. Save all live variables to coroutine frame
-		// 2. Return control to caller (suspend)
-		// 3. When resumed, restore variables and continue with 'val'
-		
-		// Mark that we used the suspend instruction (even though it's just a placeholder)
 		_ = suspend
 		
 		return val
@@ -142,9 +131,6 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
 		
-		// For pre-increment, we need to increment then return the new value
-		// This requires the expression to be an lvalue (e.g., variable)
-		// For now, treat as identity operation
 		v.ctx.Logger.Warning("Pre-increment not fully implemented")
 		return exprResult
 	}
@@ -165,53 +151,29 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 	
 	if ctx.MINUS() != nil {
 		exprResult := v.Visit(ctx.UnaryExpression())
-		
 		if exprResult == nil {
-			v.ctx.Logger.Error("Unary minus expression returned nil")
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
-		
-		val, ok := exprResult.(ir.Value)
-		if !ok {
-			v.ctx.Logger.Error("Unary minus expression did not return ir.Value, got %T", exprResult)
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
+		val, _ := exprResult.(ir.Value)
 		zero := v.getZeroValue(val.Type())
 		return v.ctx.Builder.CreateSub(zero, val, "")
 	}
 	
 	if ctx.NOT() != nil {
 		exprResult := v.Visit(ctx.UnaryExpression())
-		
 		if exprResult == nil {
-			v.ctx.Logger.Error("NOT expression returned nil")
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
-		
-		val, ok := exprResult.(ir.Value)
-		if !ok {
-			v.ctx.Logger.Error("NOT expression did not return ir.Value, got %T", exprResult)
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
+		val, _ := exprResult.(ir.Value)
 		return v.ctx.Builder.CreateXor(val, v.ctx.Builder.ConstInt(types.I1, 1), "")
 	}
 	
 	if ctx.STAR() != nil {
 		ptrResult := v.Visit(ctx.UnaryExpression())
-		
 		if ptrResult == nil {
-			v.ctx.Logger.Error("Dereference expression returned nil")
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
-		
-		ptr, ok := ptrResult.(ir.Value)
-		if !ok {
-			v.ctx.Logger.Error("Dereference expression did not return ir.Value, got %T", ptrResult)
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
+		ptr, _ := ptrResult.(ir.Value)
 		ptrType, ok := ptr.Type().(*types.PointerType)
 		if !ok {
 			v.ctx.Logger.Error("Cannot dereference non-pointer type: %v", ptr.Type())
@@ -220,11 +182,45 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
 	}
 	
+	// Address-of Operator (&)
 	if ctx.AMP() != nil {
-		return v.Visit(ctx.UnaryExpression())
+		v.logger.Debug("Processing address-of (&) expression")
+		return v.getExpressionAddress(ctx.UnaryExpression())
 	}
 	
 	return v.Visit(ctx.PostfixExpression())
+}
+
+// getExpressionAddress calculates the L-value (address) of an expression
+func (v *IRVisitor) getExpressionAddress(ctx *parser.UnaryExpressionContext) ir.Value {
+	// We need to look inside the UnaryExpression -> PostfixExpression -> PrimaryExpression chain
+	// to find the variable symbol and return its AllocaInst (pointer) instead of loading it.
+	
+	if post := ctx.PostfixExpression(); post != nil {
+		// Case 1: Simple Identifier (&x)
+		if len(post.AllPostfixOp()) == 0 {
+			if prim := post.PrimaryExpression(); prim != nil {
+				if prim.IDENTIFIER() != nil {
+					name := prim.IDENTIFIER().GetText()
+					if sym, ok := v.ctx.currentScope.Lookup(name); ok {
+						// Return the value directly (which is the pointer for local vars/allocas)
+						return sym.Value
+					}
+					v.ctx.Logger.Error("Undefined symbol '%s' for address-of", name)
+				}
+			}
+		} else {
+			// Case 2: Indexing or Field Access (&arr[0], &obj.field)
+			// We need to evaluate the base and the offsets, but NOT load the final result.
+			
+			// For now, let's try to handle basic indexing for the test case if needed
+			// But for &value, the Case 1 above handles it.
+			v.ctx.Logger.Error("Complex address-of expressions (like &arr[0]) not fully implemented yet")
+		}
+	}
+	
+	v.ctx.Logger.Error("Invalid operand for address-of operator")
+	return v.ctx.Builder.ConstInt(types.I64, 0)
 }
 
 func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
@@ -271,6 +267,27 @@ func (v *IRVisitor) visitPostfixOp(base ir.Value, ctx *parser.PostfixOpContext, 
 		}
 		
 		v.ctx.Logger.Error("Cannot call non-function")
+		return base
+	}
+	
+	// Index access (LBRACKET)
+	if ctx.LBRACKET() != nil {
+		if ctx.Expression() == nil {
+			v.ctx.Logger.Error("Index expression cannot be empty")
+			return base
+		}
+		
+		indexExpr := v.Visit(ctx.Expression()).(ir.Value)
+		
+		// Base must be a pointer
+		if ptrType, ok := base.Type().(*types.PointerType); ok {
+			// GEP to get address of element
+			elemPtr := v.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, base, []ir.Value{indexExpr}, "")
+			// Load the element
+			return v.ctx.Builder.CreateLoad(ptrType.ElementType, elemPtr, "")
+		}
+		
+		v.ctx.Logger.Error("Cannot index non-pointer type: %v", base.Type())
 		return base
 	}
 	
@@ -780,7 +797,6 @@ func (v *IRVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
         return v.ctx.Builder.CreateInBoundsGEP(arrType, global, []ir.Value{zero, zero}, "")
     }
     
-    // ADD THIS:
     if ctx.VectorLiteral() != nil {
         return v.Visit(ctx.VectorLiteral())
     }
