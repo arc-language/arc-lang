@@ -3,7 +3,7 @@ package compiler
 import (
 	"path/filepath"
 	"strings"
-
+	"fmt"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
@@ -304,16 +304,23 @@ func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
     if ctx.Expression() != nil {
         initValue = v.Visit(ctx.Expression()).(ir.Value)
         
-        // Handle vector/map initialization
-        if vecType, ok := varType.(*types.DynamicVectorType); ok {
-            initValue = v.createVectorFromLiteral(initValue, vecType)
-        } else if mapType, ok := varType.(*types.MapType); ok {
-            initValue = v.createMapFromLiteral(initValue, mapType)
-        }
-        
         if varType == nil {
             varType = initValue.Type()
+        }
+        
+        // Handle vector initialization specially
+        if vecType, ok := varType.(*types.DynamicVectorType); ok {
+            if constArr, ok := initValue.(*ir.ConstantArray); ok && len(constArr.Elements) > 0 {
+                // Runtime initialization for vector with elements
+                initValue = v.createVectorWithElements(constArr, vecType)
+            } else {
+                // Empty vector or unsupported literal
+                initValue = v.createEmptyVector(vecType)
+            }
+        } else if mapType, ok := varType.(*types.MapType); ok {
+            initValue = v.createEmptyMap(mapType)
         } else {
+            // Regular type - cast if needed
             if !initValue.Type().Equal(varType) {
                 initValue = v.castValue(initValue, varType)
             }
@@ -326,14 +333,13 @@ func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
         initValue = v.getZeroValue(varType)
     }
 
-    // For vectors and maps, allocate the struct directly (not a pointer to it)
-    // The struct itself will be on the stack
     alloca := v.ctx.Builder.CreateAlloca(varType, name+".addr")
     v.ctx.Builder.CreateStore(initValue, alloca)
     v.ctx.currentScope.Define(name, alloca)
     
     return nil
 }
+
 
 func (v *IRVisitor) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
@@ -351,57 +357,9 @@ func (v *IRVisitor) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 	return nil
 }
 
-func (v *IRVisitor) createVectorFromLiteral(literal ir.Value, vecType *types.DynamicVectorType) ir.Value {
+// Simplified - just creates empty vector
+func (v *IRVisitor) createEmptyVector(vecType *types.DynamicVectorType) ir.Value {
     structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
-    
-    // Check if literal is a ConstantArray or similar aggregate
-    var elements []ir.Constant
-    
-    if constArr, ok := literal.(*ir.ConstantArray); ok {
-        elements = constArr.Elements
-    } else if constStruct, ok := literal.(*ir.ConstantStruct); ok {
-        elements = constStruct.Fields
-    } else {
-        v.ctx.Logger.Warning("Vector literal not from array/struct constant - using empty vector")
-        return v.createEmptyVector(structType, vecType)
-    }
-    
-    if len(elements) == 0 {
-        return v.createEmptyVector(structType, vecType)
-    }
-    
-    // Create a global constant array for the data
-    elemCount := int64(len(elements))
-    arrType := types.NewArray(vecType.ElementType, elemCount)
-    
-    dataArrayName := fmt.Sprintf("__vec_data_%d", len(v.ctx.Module.Globals))
-    dataArray := &ir.ConstantArray{
-        BaseValue: ir.BaseValue{ValType: arrType},
-        Elements:  elements,
-    }
-    
-    globalData := v.ctx.Builder.CreateGlobalConstant(dataArrayName, dataArray)
-    
-    // Get pointer to first element
-    zero := v.ctx.Builder.ConstInt(types.I32, 0)
-    dataPtr := v.ctx.Builder.CreateInBoundsGEP(arrType, globalData, []ir.Value{zero, zero}, "")
-    
-    // Create struct: {data, length, capacity}
-    fields := []ir.Constant{
-        dataPtr.(*ir.GetElementPtrInst),  // data pointer
-        v.ctx.Builder.ConstInt(types.I64, elemCount),  // length
-        v.ctx.Builder.ConstInt(types.I64, elemCount),  // capacity
-    }
-    
-    structVal := &ir.ConstantStruct{
-        BaseValue: ir.BaseValue{ValType: structType},
-        Fields:    fields,
-    }
-    
-    return structVal
-}
-
-func (v *IRVisitor) createEmptyVector(structType *types.StructType, vecType *types.DynamicVectorType) ir.Value {
     fields := []ir.Constant{
         v.ctx.Builder.ConstNull(types.NewPointer(vecType.ElementType)),
         v.ctx.Builder.ConstInt(types.I64, 0),
@@ -414,23 +372,53 @@ func (v *IRVisitor) createEmptyVector(structType *types.StructType, vecType *typ
     }
 }
 
-// Helper to create map from literal {"key": value}
-func (v *IRVisitor) createMapFromLiteral(literal ir.Value, mapType *types.MapType) ir.Value {
+// Simplified - just creates empty map
+func (v *IRVisitor) createEmptyMap(mapType *types.MapType) ir.Value {
     structType := v.ctx.GetMapRuntimeType(mapType.KeyType, mapType.ValueType)
-    
-    v.ctx.Logger.Warning("Map literal initialization not fully implemented - using empty map")
-    
-    // Create a zero-initialized struct value
     fields := []ir.Constant{
-        v.ctx.Builder.ConstNull(types.NewPointer(types.Void)), // buckets = null
-        v.ctx.Builder.ConstInt(types.I64, 0),                   // length = 0
-        v.ctx.Builder.ConstInt(types.I64, 0),                   // capacity = 0
+        v.ctx.Builder.ConstNull(types.NewPointer(types.Void)),
+        v.ctx.Builder.ConstInt(types.I64, 0),
+        v.ctx.Builder.ConstInt(types.I64, 0),
     }
     
-    structVal := &ir.ConstantStruct{
+    return &ir.ConstantStruct{
         BaseValue: ir.BaseValue{ValType: structType},
         Fields:    fields,
     }
+}
+
+// NEW: Runtime vector initialization with elements
+func (v *IRVisitor) createVectorWithElements(constArr *ir.ConstantArray, vecType *types.DynamicVectorType) ir.Value {
+    structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
+    elemCount := int64(len(constArr.Elements))
     
-    return structVal
+    // Create global constant array with the data
+    arrType := types.NewArray(vecType.ElementType, elemCount)
+    dataArrayName := fmt.Sprintf("__vec_data_%d", len(v.ctx.Module.Globals))
+    
+    globalData := v.ctx.Builder.CreateGlobalConstant(dataArrayName, constArr)
+    
+    // Create vector struct value with pointer to global array
+    // Get pointer to first element: &globalData[0]
+    zero := v.ctx.Builder.ConstInt(types.I32, 0)
+    dataPtr := v.ctx.Builder.CreateInBoundsGEP(arrType, globalData, []ir.Value{zero, zero}, "vec.data")
+    
+    // Allocate the struct on stack
+    vecAlloca := v.ctx.Builder.CreateAlloca(structType, "vec.tmp")
+    
+    // Store data pointer (field 0)
+    dataPtrGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 0, "")
+    v.ctx.Builder.CreateStore(dataPtr, dataPtrGEP)
+    
+    // Store length (field 1)
+    lenGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 1, "")
+    length := v.ctx.Builder.ConstInt(types.I64, elemCount)
+    v.ctx.Builder.CreateStore(length, lenGEP)
+    
+    // Store capacity (field 2)
+    capGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 2, "")
+    v.ctx.Builder.CreateStore(length, capGEP)
+    
+    // Load the complete struct
+    return v.ctx.Builder.CreateLoad(structType, vecAlloca, "vec.init")
 }
