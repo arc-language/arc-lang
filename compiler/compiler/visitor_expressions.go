@@ -1,7 +1,6 @@
 package compiler
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -40,12 +39,34 @@ func (v *IRVisitor) VisitLogicalAndExpression(ctx *parser.LogicalAndExpressionCo
 	return result
 }
 
+func (v *IRVisitor) VisitBitOrExpression(ctx *parser.BitOrExpressionContext) interface{} {
+	result := v.Visit(ctx.BitXorExpression(0)).(ir.Value)
+
+	for i := 1; i < len(ctx.AllBitXorExpression()); i++ {
+		right := v.Visit(ctx.BitXorExpression(i)).(ir.Value)
+		result = v.ctx.Builder.CreateOr(result, right, "")
+	}
+
+	return result
+}
+
 func (v *IRVisitor) VisitBitXorExpression(ctx *parser.BitXorExpressionContext) interface{} {
 	result := v.Visit(ctx.BitAndExpression(0)).(ir.Value)
 
 	for i := 1; i < len(ctx.AllBitAndExpression()); i++ {
 		right := v.Visit(ctx.BitAndExpression(i)).(ir.Value)
-		result = v.ctx.Builder.CreateBitXor(result, right, "")
+		result = v.ctx.Builder.CreateXor(result, right, "")
+	}
+
+	return result
+}
+
+func (v *IRVisitor) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) interface{} {
+	result := v.Visit(ctx.EqualityExpression(0)).(ir.Value)
+
+	for i := 1; i < len(ctx.AllEqualityExpression()); i++ {
+		right := v.Visit(ctx.EqualityExpression(i)).(ir.Value)
+		result = v.ctx.Builder.CreateAnd(result, right, "")
 	}
 
 	return result
@@ -106,7 +127,7 @@ func (v *IRVisitor) VisitShiftExpression(ctx *parser.ShiftExpressionContext) int
 	allLT := ctx.AllLT()
 	allGT := ctx.AllGT()
 
-	// Left shift: <<
+	// Left shift: 
 	for i := 0; i < len(allLT)/2; i++ {
 		right := v.Visit(ctx.RangeExpression(i + 1)).(ir.Value)
 		result = v.ctx.Builder.CreateShl(result, right, "")
@@ -181,6 +202,73 @@ func (v *IRVisitor) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 	}
 
 	return result
+}
+
+func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
+	if ctx.PostfixExpression() != nil {
+		return v.Visit(ctx.PostfixExpression())
+	}
+
+	if ctx.MINUS() != nil {
+		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		if types.IsFloat(operand.Type()) {
+			zero := v.ctx.Builder.ConstFloat(operand.Type().(*types.FloatType), 0.0)
+			return v.ctx.Builder.CreateFSub(zero, operand, "")
+		} else {
+			zero := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 0)
+			return v.ctx.Builder.CreateSub(zero, operand, "")
+		}
+	}
+
+	if ctx.NOT() != nil {
+		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		zero := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 0)
+		return v.ctx.Builder.CreateICmp(ir.ICmpEQ, operand, zero, "")
+	}
+
+	if ctx.BIT_NOT() != nil {
+		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		allOnes := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), -1)
+		return v.ctx.Builder.CreateXor(operand, allOnes, "")
+	}
+
+	if ctx.STAR() != nil {
+		// Dereference
+		ptr := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		ptrType, ok := ptr.Type().(*types.PointerType)
+		if !ok {
+			v.ctx.Logger.Error("Cannot dereference non-pointer type")
+			return ptr
+		}
+		return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
+	}
+
+	if ctx.AMP() != nil {
+		// Address-of
+		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		// The operand should already be an lvalue (address)
+		return operand
+	}
+
+	if ctx.INCREMENT() != nil {
+		// Pre-increment
+		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		one := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 1)
+		newVal := v.ctx.Builder.CreateAdd(operand, one, "")
+		v.ctx.Builder.CreateStore(newVal, operand)
+		return newVal
+	}
+
+	if ctx.DECREMENT() != nil {
+		// Pre-decrement
+		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
+		one := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 1)
+		newVal := v.ctx.Builder.CreateSub(operand, one, "")
+		v.ctx.Builder.CreateStore(newVal, operand)
+		return newVal
+	}
+
+	return nil
 }
 
 func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
@@ -332,11 +420,15 @@ func (v *IRVisitor) handleMethodCall(base ir.Value, methodName string, op *parse
 		return base
 	}
 
-	// Find the method - look it up by name
-	methodFunc := v.ctx.module.LookupFunction(structType.Name + "." + methodName)
+	// Find the method - look it up by name from the module
+	methodFunc := v.ctx.Module.LookupFunction(structType.Name + "." + methodName)
 	if methodFunc == nil {
-		v.ctx.Logger.Error("Method %s not found on type %s", methodName, structType.Name)
-		return base
+		// Try without struct name prefix
+		methodFunc = v.ctx.Module.LookupFunction(methodName)
+		if methodFunc == nil {
+			v.ctx.Logger.Error("Method %s not found on type %s", methodName, structType.Name)
+			return base
+		}
 	}
 
 	// Build arguments: self is the first argument
@@ -501,7 +593,7 @@ func (v *IRVisitor) handlePostIncrement(base ir.Value) ir.Value {
 	newVal := v.ctx.Builder.CreateAdd(currentVal, one, "")
 
 	// Store back
-	if ptrType, ok := base.Type().(*types.PointerType); ok {
+	if _, ok := base.Type().(*types.PointerType); ok {
 		v.ctx.Builder.CreateStore(newVal, base)
 	}
 
@@ -528,7 +620,7 @@ func (v *IRVisitor) handlePostDecrement(base ir.Value) ir.Value {
 	newVal := v.ctx.Builder.CreateSub(currentVal, one, "")
 
 	// Store back
-	if ptrType, ok := base.Type().(*types.PointerType); ok {
+	if _, ok := base.Type().(*types.PointerType); ok {
 		v.ctx.Builder.CreateStore(newVal, base)
 	}
 
@@ -684,14 +776,14 @@ func (v *IRVisitor) parseStringLiteral(text string) ir.Value {
 		text = text[1 : len(text)-1]
 	}
 
-	// TODO: Handle escape sequences properly
+	// Handle escape sequences
 	text = strings.ReplaceAll(text, "\\n", "\n")
 	text = strings.ReplaceAll(text, "\\t", "\t")
 	text = strings.ReplaceAll(text, "\\r", "\r")
 	text = strings.ReplaceAll(text, "\\\"", "\"")
 	text = strings.ReplaceAll(text, "\\\\", "\\")
 
-	return v.ctx.Builder.ConstString(text)
+	return v.ctx.Builder.CreateGlobalString(text, "")
 }
 
 func (v *IRVisitor) parseCharLiteral(text string) ir.Value {
@@ -756,265 +848,4 @@ func (v *IRVisitor) lookupVariable(name string) ir.Value {
 		return v.ctx.Builder.ConstInt(types.NewInt(32, true), 0)
 	}
 	return val
-}
-
-func (v *IRVisitor) VisitBitOrExpression(ctx *parser.BitOrExpressionContext) interface{} {
-	result := v.Visit(ctx.BitXorExpression(0)).(ir.Value)
-
-	for i := 1; i < len(ctx.AllBitXorExpression()); i++ {
-		right := v.Visit(ctx.BitXorExpression(i)).(ir.Value)
-		result = v.ctx.Builder.CreateOr(result, right, "") // Use CreateOr instead
-	}
-
-	return result
-}
-
-func (v *IRVisitor) VisitBitXorExpression(ctx *parser.BitXorExpressionContext) interface{} {
-	result := v.Visit(ctx.BitAndExpression(0)).(ir.Value)
-
-	for i := 1; i < len(ctx.AllBitAndExpression()); i++ {
-		right := v.Visit(ctx.BitAndExpression(i)).(ir.Value)
-		result = v.ctx.Builder.CreateXor(result, right, "") // Use CreateXor instead
-	}
-
-	return result
-}
-
-func (v *IRVisitor) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) interface{} {
-	result := v.Visit(ctx.EqualityExpression(0)).(ir.Value)
-
-	for i := 1; i < len(ctx.AllEqualityExpression()); i++ {
-		right := v.Visit(ctx.EqualityExpression(i)).(ir.Value)
-		result = v.ctx.Builder.CreateAnd(result, right, "") // Use CreateAnd instead
-	}
-
-	return result
-}
-
-func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
-	if ctx.PostfixExpression() != nil {
-		return v.Visit(ctx.PostfixExpression())
-	}
-
-	if ctx.MINUS() != nil {
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		if types.IsFloat(operand.Type()) {
-			zero := v.ctx.Builder.ConstFloat(operand.Type().(*types.FloatType), 0.0)
-			return v.ctx.Builder.CreateFSub(zero, operand, "")
-		} else {
-			zero := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 0)
-			return v.ctx.Builder.CreateSub(zero, operand, "")
-		}
-	}
-
-	if ctx.NOT() != nil {
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		zero := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 0)
-		return v.ctx.Builder.CreateICmp(ir.ICmpEQ, operand, zero, "")
-	}
-
-	if ctx.BIT_NOT() != nil {
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		allOnes := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), -1)
-		return v.ctx.Builder.CreateXor(operand, allOnes, "")
-	}
-
-	if ctx.STAR() != nil {
-		ptr := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		ptrType, ok := ptr.Type().(*types.PointerType)
-		if !ok {
-			v.ctx.Logger.Error("Cannot dereference non-pointer type")
-			return ptr
-		}
-		return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
-	}
-
-	if ctx.AMP() != nil {
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		return operand
-	}
-
-	if ctx.INCREMENT() != nil {
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		one := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 1)
-		newVal := v.ctx.Builder.CreateAdd(operand, one, "")
-		v.ctx.Builder.CreateStore(newVal, operand)
-		return newVal
-	}
-
-	if ctx.DECREMENT() != nil {
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		one := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 1)
-		newVal := v.ctx.Builder.CreateSub(operand, one, "")
-		v.ctx.Builder.CreateStore(newVal, operand)
-		return newVal
-	}
-
-	return nil
-}
-
-func (v *IRVisitor) handleMethodCall(base ir.Value, methodName string, op *parser.PostfixOpContext) ir.Value {
-	v.logger.Debug("Handling method call: %s", methodName)
-
-	// Get the base type
-	baseType := base.Type()
-	
-	// If base is a pointer, get the element type
-	if ptrType, ok := baseType.(*types.PointerType); ok {
-		baseType = ptrType.ElementType
-	}
-
-	// Look up the method
-	structType, ok := baseType.(*types.StructType)
-	if !ok {
-		v.ctx.Logger.Error("Cannot call method on non-struct type: %v", baseType)
-		return base
-	}
-
-	// Find the method - look it up by name from the module
-	methodFunc := v.ctx.module.LookupFunction(structType.Name + "." + methodName)
-	if methodFunc == nil {
-		// Try without struct name prefix
-		methodFunc = v.ctx.module.LookupFunction(methodName)
-		if methodFunc == nil {
-			v.ctx.Logger.Error("Method %s not found on type %s", methodName, structType.Name)
-			return base
-		}
-	}
-
-	// Build arguments: self is the first argument
-	args := []ir.Value{base}
-	
-	argList := op.ArgumentList()
-	if argList != nil {
-		allArgs := argList.(*parser.ArgumentListContext).AllArgument()
-		
-		// Get function type for parameter type checking
-		funcType := methodFunc.FuncType
-		
-		for i, argCtx := range allArgs {
-			// Visit the argument expression
-			var argVal ir.Value
-			
-			argContext := argCtx.(*parser.ArgumentContext)
-			if argContext.Expression() != nil {
-				argVal = v.Visit(argContext.Expression()).(ir.Value)
-			} else if argContext.LambdaExpression() != nil {
-				argVal = v.Visit(argContext.LambdaExpression()).(ir.Value)
-			} else {
-				v.ctx.Logger.Error("Invalid argument type")
-				continue
-			}
-			
-			// Cast to expected parameter type (i+1 because self is param 0)
-			paramIndex := i + 1
-			if paramIndex < len(funcType.ParamTypes) {
-				expectedType := funcType.ParamTypes[paramIndex]
-				if !argVal.Type().Equal(expectedType) {
-					v.logger.Debug("Casting method argument %d from %v to %v", i, argVal.Type(), expectedType)
-					argVal = v.castValue(argVal, expectedType)
-				}
-			}
-			
-			args = append(args, argVal)
-		}
-	}
-
-	// Create the call instruction
-	result := v.ctx.Builder.CreateCall(methodFunc, args, "")
-	
-	return result
-}
-
-func (v *IRVisitor) handlePostIncrement(base ir.Value) ir.Value {
-	v.logger.Debug("Handling post-increment")
-
-	// Load the current value
-	currentVal := base
-	if _, ok := base.Type().(*types.PointerType); ok {
-		ptrType := base.Type().(*types.PointerType)
-		currentVal = v.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
-	}
-
-	// Create the increment
-	intType, ok := currentVal.Type().(*types.IntType)
-	if !ok {
-		v.ctx.Logger.Error("Cannot increment non-integer type")
-		return currentVal
-	}
-	one := v.ctx.Builder.ConstInt(intType, 1)
-	newVal := v.ctx.Builder.CreateAdd(currentVal, one, "")
-
-	// Store back
-	if _, ok := base.Type().(*types.PointerType); ok {
-		v.ctx.Builder.CreateStore(newVal, base)
-	}
-
-	// Return the original value (post-increment returns old value)
-	return currentVal
-}
-
-func (v *IRVisitor) handlePostDecrement(base ir.Value) ir.Value {
-	v.logger.Debug("Handling post-decrement")
-
-	// Load the current value
-	currentVal := base
-	if _, ok := base.Type().(*types.PointerType); ok {
-		ptrType := base.Type().(*types.PointerType)
-		currentVal = v.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
-	}
-
-	// Create the decrement
-	intType, ok := currentVal.Type().(*types.IntType)
-	if !ok {
-		v.ctx.Logger.Error("Cannot decrement non-integer type")
-		return currentVal
-	}
-	one := v.ctx.Builder.ConstInt(intType, 1)
-	newVal := v.ctx.Builder.CreateSub(currentVal, one, "")
-
-	// Store back
-	if _, ok := base.Type().(*types.PointerType); ok {
-		v.ctx.Builder.CreateStore(newVal, base)
-	}
-
-	// Return the original value (post-decrement returns old value)
-	return currentVal
-}
-
-func (v *IRVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
-	if ctx.INTEGER_LITERAL() != nil {
-		return v.parseIntegerLiteral(ctx.INTEGER_LITERAL().GetText())
-	}
-
-	if ctx.FLOAT_LITERAL() != nil {
-		return v.parseFloatLiteral(ctx.FLOAT_LITERAL().GetText())
-	}
-
-	if ctx.STRING_LITERAL() != nil {
-		return v.parseStringLiteral(ctx.STRING_LITERAL().GetText())
-	}
-
-	if ctx.CHAR_LITERAL() != nil {
-		return v.parseCharLiteral(ctx.CHAR_LITERAL().GetText())
-	}
-
-	if ctx.BOOLEAN_LITERAL() != nil {
-		value := ctx.BOOLEAN_LITERAL().GetText() == "true"
-		boolVal := int64(0)
-		if value {
-			boolVal = 1
-		}
-		return v.ctx.Builder.ConstInt(types.NewInt(1, false), boolVal)
-	}
-
-	if ctx.NULL() != nil {
-		return v.ctx.Builder.ConstNull(types.NewPointer(types.NewInt(8, false)))
-	}
-
-	if ctx.InitializerList() != nil {
-		return v.Visit(ctx.InitializerList())
-	}
-
-	return nil
 }
