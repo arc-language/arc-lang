@@ -1011,13 +1011,7 @@ struct map<K, V> {
     buckets: *vector<Entry<K, V>>
     count: usize
     
-    // The self parameter type is just the struct name - 
-    // type parameters are already in scope from the struct definition
-    func insert(self m: *map, key: K, val: V) {
-        // ...
-    }
-    
-    func get(self m: *map, key: K) *V {
+    func insert(self m: *map<K, V>, key: K, val: V) {
         // ...
     }
 }
