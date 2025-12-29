@@ -68,7 +68,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.07s)
+✅ PASS (0.05s)
 [2/36] test_arithmetic                               
 --- Testing: test_arithmetic ---
 Source file: tests/test_arithmetic.arc
@@ -302,7 +302,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.07s)
+✅ PASS (0.05s)
 [5/36] test_cast                                     
 --- Testing: test_cast ---
 Source file: tests/test_cast.arc
@@ -368,7 +368,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.04s)
 [6/36] test_char_literal                             
 --- Testing: test_char_literal ---
 Source file: tests/test_char_literal.arc
@@ -930,7 +930,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.07s)
 [14/36] test_for_in_range                             
 --- Testing: test_for_in_range ---
 Source file: tests/test_for_in_range.arc
@@ -1003,7 +1003,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.08s)
+✅ PASS (0.05s)
 [15/36] test_function_basic                           
 --- Testing: test_function_basic ---
 Source file: tests/test_function_basic.arc
@@ -1084,7 +1084,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.05s)
 [16/36] test_generics                                 
 --- Testing: test_generics ---
 Source file: tests/test_generics.arc
@@ -1333,7 +1333,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.05s)
 [19/36] test_import_multiple                          
 --- Testing: test_import_multiple ---
 Source file: tests/test_import_multiple.arc
@@ -1357,27 +1357,27 @@ Compiling tests/test_import_multiple.arc...
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
 panic: runtime error: invalid memory address or nil pointer dereference
-[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59c98b]
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59d66b]
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc000488600, 0x6383e0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/visitor_declarations.go:18 +0x2b
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8324b0?, {0x69af80?, 0xc00010ac00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/visitor.go:51 +0x757
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc000488600, 0xc00010aa80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/visitor.go:165 +0x1fa
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x832430?, {0x69ae48?, 0xc00010aa80?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/visitor.go:45 +0x266
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a4060, {0xc0000c6080, 0x40}, 0x1)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/compiler.go:147 +0x432
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a4060, {0x7ffcc94ff693, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/compiler.go:41 +0x18b
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0001d1140, 0x6394e0?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/visitor_declarations.go:18 +0x2b
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8344b0?, {0x69c320?, 0xc00010ac00?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/visitor.go:51 +0x757
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0001d1140, 0xc00010aa80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/visitor.go:165 +0x1fa
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x834430?, {0x69c1e8?, 0xc00010aa80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/visitor.go:45 +0x266
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a6060, {0xc0000c6080, 0x40}, 0x1)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/compiler.go:147 +0x432
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a6060, {0x7ffdaa16c693, 0x1e})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/compiler.go:41 +0x18b
 main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
 main.main()
 	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Compilation failed
     Compile output:
       Compiling tests/test_import_multiple.arc...
@@ -1394,21 +1394,21 @@ main.main()
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
       panic: runtime error: invalid memory address or nil pointer dereference
-      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59c98b]
+      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59d66b]
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc000488600, 0x6383e0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/visitor_declarations.go:18 +0x2b
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8324b0?, {0x69af80?, 0xc00010ac00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/visitor.go:51 +0x757
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc000488600, 0xc00010aa80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/visitor.go:165 +0x1fa
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x832430?, {0x69ae48?, 0xc00010aa80?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/visitor.go:45 +0x266
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a4060, {0xc0000c6080, 0x40}, 0x1)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/compiler.go:147 +0x432
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a4060, {0x7ffcc94ff693, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229233616-d158f5d4e98d/compiler/compiler/compiler.go:41 +0x18b
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0001d1140, 0x6394e0?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/visitor_declarations.go:18 +0x2b
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8344b0?, {0x69c320?, 0xc00010ac00?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/visitor.go:51 +0x757
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0001d1140, 0xc00010aa80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/visitor.go:165 +0x1fa
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x834430?, {0x69c1e8?, 0xc00010aa80?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/visitor.go:45 +0x266
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a6060, {0xc0000c6080, 0x40}, 0x1)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/compiler.go:147 +0x432
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a6060, {0x7ffdaa16c693, 0x1e})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235019-5cc3e7e6ea8e/compiler/compiler/compiler.go:41 +0x18b
       main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
       main.main()
@@ -1574,7 +1574,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.06s)
 [22/36] test_namespace                                
 --- Testing: test_namespace ---
 Source file: tests/test_namespace.arc
@@ -1630,7 +1630,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.04s)
 [23/36] test_null_check                               
 --- Testing: test_null_check ---
 Source file: tests/test_null_check.arc
@@ -1963,7 +1963,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.11s)
+✅ PASS (0.06s)
 [28/36] test_struct_method                            
 --- Testing: test_struct_method ---
 Source file: tests/test_struct_method.arc
@@ -2125,7 +2125,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.07s)
 [30/36] test_try_except_raise                         
 --- Testing: test_try_except_raise ---
 Source file: tests/test_try_except_raise.arc
@@ -2193,19 +2193,15 @@ Compiling tests/test_try_except_raise.arc...
 [Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
-[Context] [WARN] Try-except-finally uses simplified exception model - full exception handling not yet implemented
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-
-[Context] Compilation Summary:
-  Warnings: 1
 [Compiler:test_try_except_raise] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
 Module has 2 functions, 1 globals
 [Compiler:test_try_except_raise] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise.o
 [Compiler:test_try_except_raise] [DEBUG] Calling code generator for module 'test_try_except_raise'
-[Compiler:test_try_except_raise] [DEBUG] Generated 1328 bytes of object code
+[Compiler:test_try_except_raise] [DEBUG] Generated 1392 bytes of object code
 [Compiler:test_try_except_raise] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_try_except_raise.o
 ✓ Object file written to /tmp/arc_tests/test_try_except_raise.o
 
@@ -2214,12 +2210,21 @@ To create executable:
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: in function `divide':
+test_try_except_raise:(.text+0xe0): undefined reference to `__exception_state'
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.06s)
+❌ FAIL (0.07s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: in function `divide':
+      test_try_except_raise:(.text+0xe0): undefined reference to `__exception_state'
+      collect2: error: ld returned 1 exit status
+    /usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: in function `divide':
+test_try_except_raise:(.text+0xe0): undefined reference to `__exception_state'
+collect2: error: ld returned 1 exit status
 [31/36] test_try_except_raise_err                     
 --- Testing: test_try_except_raise_err ---
 Source file: tests/test_try_except_raise_err.arc
@@ -2287,7 +2292,6 @@ Compiling tests/test_try_except_raise_err.arc...
 [Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
-[Context] [WARN] Try-except-finally uses simplified exception model - full exception handling not yet implemented
 [Visitor] [DEBUG] Compiling return statement
 [Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
@@ -2295,14 +2299,11 @@ Compiling tests/test_try_except_raise_err.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-
-[Context] Compilation Summary:
-  Warnings: 1
 [Compiler:test_try_except_raise_err] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
 Module has 2 functions, 1 globals
 [Compiler:test_try_except_raise_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise_err.o
 [Compiler:test_try_except_raise_err] [DEBUG] Calling code generator for module 'test_try_except_raise_err'
-[Compiler:test_try_except_raise_err] [DEBUG] Generated 1376 bytes of object code
+[Compiler:test_try_except_raise_err] [DEBUG] Generated 1440 bytes of object code
 [Compiler:test_try_except_raise_err] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_try_except_raise_err.o
 ✓ Object file written to /tmp/arc_tests/test_try_except_raise_err.o
 
@@ -2311,13 +2312,18 @@ To create executable:
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_try_except_raise_err.o: in function `divide':
+test_try_except_raise_err:(.text+0xe0): undefined reference to `__exception_state'
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 1
-❌ Test FAILED: expected exit=0, got exit=1
 ❌ FAIL (0.06s)
-    Expected exit=0, got exit=1
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_try_except_raise_err.o: in function `divide':
+      test_try_except_raise_err:(.text+0xe0): undefined reference to `__exception_state'
+      collect2: error: ld returned 1 exit status
 [32/36] test_try_except_throw                         
 --- Testing: test_try_except_throw ---
 Source file: tests/test_try_except_throw.arc
@@ -2325,8 +2331,8 @@ Object file: /tmp/arc_tests/test_try_except_throw.o
 Executable: /tmp/arc_tests/test_try_except_throw
 
 Step 1: Compiling to object file...
-Compilation successful
-Compile output:
+Compilation failed: exit status 1
+Output:
 Compiling tests/test_try_except_throw.arc...
 [Compiler:test_try_except_throw] [INFO] Creating compiler for module 'test_try_except_throw' with entry file 'tests/test_try_except_throw.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -2351,7 +2357,7 @@ Compiling tests/test_try_except_throw.arc...
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing throw statement
 [Visitor] [DEBUG] Visiting postfix expression
-[Context] [WARN] throw statement maps to raise() - proper exception handling not yet implemented
+[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
 [Visitor] [DEBUG] Visiting postfix expression
@@ -2386,33 +2392,89 @@ Compiling tests/test_try_except_throw.arc...
 [Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
-[Context] [WARN] Try-except-finally uses simplified exception model - full exception handling not yet implemented
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-
-[Context] Compilation Summary:
-  Warnings: 2
 [Compiler:test_try_except_throw] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-Module has 2 functions, 1 globals
+Module has 2 functions, 2 globals
 [Compiler:test_try_except_throw] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw.o
 [Compiler:test_try_except_throw] [DEBUG] Calling code generator for module 'test_try_except_throw'
-[Compiler:test_try_except_throw] [DEBUG] Generated 1328 bytes of object code
-[Compiler:test_try_except_throw] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_try_except_throw.o
-✓ Object file written to /tmp/arc_tests/test_try_except_throw.o
+[Compiler:test_try_except_throw] [ERROR] Code generation failed: compilation failed: in global __exception_state: unsupported constant type: *ir.ConstantNull
+Object generation failed: code generation failed: compilation failed: in global __exception_state: unsupported constant type: *ir.ConstantNull
 
-To create executable:
-  gcc /tmp/arc_tests/test_try_except_throw.o -o test_try_except_throw && ./test_try_except_throw
-
-
-Step 2: Linking with gcc...
-Linking successful
-
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.06s)
+❌ FAIL (0.04s)
+    Compilation failed
+    Compile output:
+      Compiling tests/test_try_except_throw.arc...
+      [Compiler:test_try_except_throw] [INFO] Creating compiler for module 'test_try_except_throw' with entry file 'tests/test_try_except_throw.arc'
+      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
+      [Context] [DEBUG] Registered 35 builtin types
+      [Context] [DEBUG] Context initialized for module 'test_try_except_throw'
+      [Compiler:test_try_except_throw] [INFO] Compiling file: tests/test_try_except_throw.arc
+      [Compiler:test_try_except_throw] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc (isEntry=true)
+      [Compiler:test_try_except_throw] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
+      [Compiler:test_try_except_throw] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
+      [Compiler:test_try_except_throw] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
+      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
+      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
+      [Visitor] [DEBUG] Pass 0 - Processing imports
+      [Visitor] [DEBUG] Pass 1 - Registering types
+      [Visitor] [DEBUG] Pass 2 - Processing declarations
+      [Visitor] [DEBUG] Declaring function: divide (IR: divide)
+      [Context] [DEBUG] Pushed new scope
+      [Context] [DEBUG] Entered function 'divide'
+      [Context] [DEBUG] Pushed new scope
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Context] [DEBUG] Pushed new scope
+      [Visitor] [DEBUG] Processing throw statement
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
+      [Context] [DEBUG] Popped scope
+      [Visitor] [DEBUG] Compiling return statement
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
+      [Context] [DEBUG] Popped scope
+      [Context] [DEBUG] Exited function 'divide'
+      [Context] [DEBUG] Popped scope
+      [Visitor] [DEBUG] Declaring function: main (IR: main)
+      [Context] [DEBUG] Pushed new scope
+      [Context] [DEBUG] Entered function 'main'
+      [Context] [DEBUG] Pushed new scope
+      [Visitor] [DEBUG] Processing try-except-finally block
+      [Context] [DEBUG] Pushed new scope
+      [Visitor] [DEBUG] Declaring variable: result
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Function call
+      [Visitor] [DEBUG] Handling function call
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Casting argument 0 from i64 to i32
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Casting argument 1 from i64 to i32
+      [Visitor] [DEBUG] Function call created, return type: i32
+      [Visitor] [DEBUG] Compiling return statement
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
+      [Context] [DEBUG] Popped scope
+      [Visitor] [DEBUG] Processing except clause 1
+      [Visitor] [DEBUG] Binding exception to variable: err
+      [Context] [DEBUG] Pushed new scope
+      [Visitor] [DEBUG] Compiling return statement
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
+      [Context] [DEBUG] Popped scope
+      [Context] [DEBUG] Popped scope
+      [Context] [DEBUG] Exited function 'main'
+      [Context] [DEBUG] Popped scope
+      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
+      [Compiler:test_try_except_throw] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
+      Module has 2 functions, 2 globals
+      [Compiler:test_try_except_throw] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw.o
+      [Compiler:test_try_except_throw] [DEBUG] Calling code generator for module 'test_try_except_throw'
+      [Compiler:test_try_except_throw] [ERROR] Code generation failed: compilation failed: in global __exception_state: unsupported constant type: *ir.ConstantNull
+      Object generation failed: code generation failed: compilation failed: in global __exception_state: unsupported constant type: *ir.ConstantNull
 [33/36] test_try_except_throw_err                     
 --- Testing: test_try_except_throw_err ---
 Source file: tests/test_try_except_throw_err.arc
@@ -2420,8 +2482,8 @@ Object file: /tmp/arc_tests/test_try_except_throw_err.o
 Executable: /tmp/arc_tests/test_try_except_throw_err
 
 Step 1: Compiling to object file...
-Compilation successful
-Compile output:
+Compilation failed: exit status 1
+Output:
 Compiling tests/test_try_except_throw_err.arc...
 [Compiler:test_try_except_throw_err] [INFO] Creating compiler for module 'test_try_except_throw_err' with entry file 'tests/test_try_except_throw_err.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -2446,7 +2508,7 @@ Compiling tests/test_try_except_throw_err.arc...
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing throw statement
 [Visitor] [DEBUG] Visiting postfix expression
-[Context] [WARN] throw statement maps to raise() - proper exception handling not yet implemented
+[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
 [Visitor] [DEBUG] Visiting postfix expression
@@ -2481,34 +2543,89 @@ Compiling tests/test_try_except_throw_err.arc...
 [Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
-[Context] [WARN] Try-except-finally uses simplified exception model - full exception handling not yet implemented
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-
-[Context] Compilation Summary:
-  Warnings: 2
 [Compiler:test_try_except_throw_err] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-Module has 2 functions, 1 globals
+Module has 2 functions, 2 globals
 [Compiler:test_try_except_throw_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw_err.o
 [Compiler:test_try_except_throw_err] [DEBUG] Calling code generator for module 'test_try_except_throw_err'
-[Compiler:test_try_except_throw_err] [DEBUG] Generated 1328 bytes of object code
-[Compiler:test_try_except_throw_err] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_try_except_throw_err.o
-✓ Object file written to /tmp/arc_tests/test_try_except_throw_err.o
+[Compiler:test_try_except_throw_err] [ERROR] Code generation failed: compilation failed: in global __exception_state: unsupported constant type: *ir.ConstantNull
+Object generation failed: code generation failed: compilation failed: in global __exception_state: unsupported constant type: *ir.ConstantNull
 
-To create executable:
-  gcc /tmp/arc_tests/test_try_except_throw_err.o -o test_try_except_throw_err && ./test_try_except_throw_err
-
-
-Step 2: Linking with gcc...
-Linking successful
-
-Step 3: Running executable...
-Process exited with code: 1
-❌ Test FAILED: expected exit=0, got exit=1
-❌ FAIL (0.06s)
-    Expected exit=0, got exit=1
+❌ FAIL (0.04s)
+    Compilation failed
+    Compile output:
+      Compiling tests/test_try_except_throw_err.arc...
+      [Compiler:test_try_except_throw_err] [INFO] Creating compiler for module 'test_try_except_throw_err' with entry file 'tests/test_try_except_throw_err.arc'
+      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
+      [Context] [DEBUG] Registered 35 builtin types
+      [Context] [DEBUG] Context initialized for module 'test_try_except_throw_err'
+      [Compiler:test_try_except_throw_err] [INFO] Compiling file: tests/test_try_except_throw_err.arc
+      [Compiler:test_try_except_throw_err] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc (isEntry=true)
+      [Compiler:test_try_except_throw_err] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
+      [Compiler:test_try_except_throw_err] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
+      [Compiler:test_try_except_throw_err] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
+      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
+      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
+      [Visitor] [DEBUG] Pass 0 - Processing imports
+      [Visitor] [DEBUG] Pass 1 - Registering types
+      [Visitor] [DEBUG] Pass 2 - Processing declarations
+      [Visitor] [DEBUG] Declaring function: divide (IR: divide)
+      [Context] [DEBUG] Pushed new scope
+      [Context] [DEBUG] Entered function 'divide'
+      [Context] [DEBUG] Pushed new scope
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Context] [DEBUG] Pushed new scope
+      [Visitor] [DEBUG] Processing throw statement
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
+      [Context] [DEBUG] Popped scope
+      [Visitor] [DEBUG] Compiling return statement
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
+      [Context] [DEBUG] Popped scope
+      [Context] [DEBUG] Exited function 'divide'
+      [Context] [DEBUG] Popped scope
+      [Visitor] [DEBUG] Declaring function: main (IR: main)
+      [Context] [DEBUG] Pushed new scope
+      [Context] [DEBUG] Entered function 'main'
+      [Context] [DEBUG] Pushed new scope
+      [Visitor] [DEBUG] Processing try-except-finally block
+      [Context] [DEBUG] Pushed new scope
+      [Visitor] [DEBUG] Declaring variable: result
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Function call
+      [Visitor] [DEBUG] Handling function call
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Casting argument 0 from i64 to i32
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Casting argument 1 from i64 to i32
+      [Visitor] [DEBUG] Function call created, return type: i32
+      [Visitor] [DEBUG] Compiling return statement
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
+      [Context] [DEBUG] Popped scope
+      [Visitor] [DEBUG] Processing except clause 1
+      [Visitor] [DEBUG] Binding exception to variable: err
+      [Context] [DEBUG] Pushed new scope
+      [Visitor] [DEBUG] Compiling return statement
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
+      [Context] [DEBUG] Popped scope
+      [Context] [DEBUG] Popped scope
+      [Context] [DEBUG] Exited function 'main'
+      [Context] [DEBUG] Popped scope
+      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
+      [Compiler:test_try_except_throw_err] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
+      Module has 2 functions, 2 globals
+      [Compiler:test_try_except_throw_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw_err.o
+      [Compiler:test_try_except_throw_err] [DEBUG] Calling code generator for module 'test_try_except_throw_err'
+      [Compiler:test_try_except_throw_err] [ERROR] Code generation failed: compilation failed: in global __exception_state: unsupported constant type: *ir.ConstantNull
+      Object generation failed: code generation failed: compilation failed: in global __exception_state: unsupported constant type: *ir.ConstantNull
 [34/36] test_tuple_return                             
 --- Testing: test_tuple_return ---
 Source file: tests/test_tuple_return.arc
@@ -2670,7 +2787,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.04s)
 [36/36] test_variable_typed                           
 --- Testing: test_variable_typed ---
 Source file: tests/test_variable_typed.arc
@@ -2737,17 +2854,19 @@ Process exited with code: 0
 
 ======================================================================
 Total Tests:      36
-Passed:           31 (86.1%)
-Failed:           5
-  Compile errors: 3
-  Link errors:    0
-  Runtime errors: 2
-Total Duration:   1.97s
+Passed:           29 (80.6%)
+Failed:           7
+  Compile errors: 5
+  Link errors:    2
+  Runtime errors: 0
+Total Duration:   1.81s
 
 Failed Tests:
   ❌ test_generics                            (compile)
   ❌ test_import_multiple                     (compile)
   ❌ test_import_single                       (compile)
-  ❌ test_try_except_raise_err                (runtime)
-  ❌ test_try_except_throw_err                (runtime)
+  ❌ test_try_except_raise                    (link)
+  ❌ test_try_except_raise_err                (link)
+  ❌ test_try_except_throw                    (compile)
+  ❌ test_try_except_throw_err                (compile)
 

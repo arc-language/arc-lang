@@ -602,19 +602,18 @@ func (v *IRVisitor) VisitThrowStmt(ctx *parser.ThrowStmtContext) interface{} {
 	exceptionStateGlobal := v.ctx.Module.GetGlobal("__exception_state")
 	if exceptionStateGlobal == nil {
 		// Create the exception state global
+		// Structure: { i1 hasException, ptr<i8> exceptionMessage }
 		stateType := types.NewStruct("", []types.Type{types.I1, types.NewPointer(types.I8)}, false)
-		zeroState := &ir.ConstantStruct{
+		
+		// Use ConstantZero instead of ConstantStruct with ConstantNull
+		zeroState := &ir.ConstantZero{
 			BaseValue: ir.BaseValue{ValType: stateType},
-			Fields: []ir.Constant{
-				v.ctx.Builder.ConstInt(types.I1, 0),
-				v.ctx.Builder.ConstNull(types.NewPointer(types.I8)),
-			},
 		}
+		
 		exceptionStateGlobal = v.ctx.Builder.CreateGlobalVariable("__exception_state", stateType, zeroState)
 	}
 	
 	// Set hasException = true
-	// REMOVE: zero := v.ctx.Builder.ConstInt(types.I32, 0)  <- DELETE THIS LINE
 	hasExceptionPtr := v.ctx.Builder.CreateStructGEP(
 		exceptionStateGlobal.Type().(*types.PointerType).ElementType, 
 		exceptionStateGlobal, 
