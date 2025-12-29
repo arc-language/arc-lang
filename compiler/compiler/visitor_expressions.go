@@ -547,10 +547,10 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 
 		// Handle global constants stored in scope
 		if sym.IsConst {
-			// If it's a global variable pointer, load it
-			if globalVar, ok := sym.Value.(*ir.GlobalVariable); ok {
-				ptrType := globalVar.Type().(*types.PointerType)
-				return v.ctx.Builder.CreateLoad(ptrType.ElementType, globalVar, "")
+			// If it's a global pointer, load it
+			if global, ok := sym.Value.(*ir.Global); ok {
+				ptrType := global.Type().(*types.PointerType)
+				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
 			}
 			// Otherwise return the constant value directly
 			return sym.Value
