@@ -22,5 +22,17 @@ entry:
   store %Point %8, ptr<%Point> %p.addr
   %9 = load %Point, ptr<%Point> %p.addr
   %10 = call i32 @Point_sum(%Point %9)
-  ret i32 %10
+  %s.addr = alloca i32
+  store i32 %10, ptr<i32> %s.addr
+  %11 = load i32, ptr<i32> %s.addr
+  %12 = icmp eq i32 %11, 30
+  br i1 %12, label %if.then.14_4, label %if.next.14_4
+if.end.14_4:
+  %14 = trunc i64 1 to i32
+  ret i32 %14
+if.then.14_4:
+  %13 = trunc i64 0 to i32
+  ret i32 %13
+if.next.14_4:
+  br label %if.end.14_4
 }
