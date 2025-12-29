@@ -7,7 +7,7 @@ import (
 
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
-	"github.com/arc-language/arc-lang/compiler/parser"
+	"github.com/arc-language/arc-lang/parser"
 )
 
 // ============================================================================
