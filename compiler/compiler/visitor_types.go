@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
 )
@@ -162,7 +163,7 @@ func (v *IRVisitor) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 	v.logger.Info("Processing enum declaration: %s", name)
 	
 	// Determine underlying type (default int32)
-	underlyingType := types.I32
+	var underlyingType types.Type = types.I32
 	if ctx.PrimitiveType() != nil {
 		typeName := ctx.PrimitiveType().GetText()
 		if typ, ok := v.ctx.GetType(typeName); ok {
@@ -174,7 +175,7 @@ func (v *IRVisitor) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 	intType, ok := underlyingType.(*types.IntType)
 	if !ok {
 		v.ctx.Logger.Error("Enum underlying type must be an integer type")
-		intType, _ = types.I32.(*types.IntType)
+		intType = types.I32.(*types.IntType)
 	}
 	
 	// Register enum as an alias to underlying type
