@@ -892,7 +892,7 @@ try {
 
 ## Function Return Tuples
 ```arc
-func divide(a: int32, b: int32) -> (int32, bool) {
+func divide(a: int32, b: int32) (int32, bool) {
     if b == 0 {
         return (0, false)
     }
