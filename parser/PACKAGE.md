@@ -4830,8 +4830,8 @@ type IReturnStmtContext interface {
 
 	// Getter signatures
 	RETURN() antlr.TerminalNode
-	Expression() IExpressionContext
 	TupleExpression() ITupleExpressionContext
+	Expression() IExpressionContext
 
 	// IsReturnStmtContext differentiates from other interfaces.
 	IsReturnStmtContext()

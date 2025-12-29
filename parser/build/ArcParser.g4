@@ -298,8 +298,8 @@ expressionStmt
     ;
 
 returnStmt
-    : RETURN expression?
-    | RETURN tupleExpression
+    : RETURN tupleExpression
+    | RETURN expression?
     ;
 
 // =============================================================================

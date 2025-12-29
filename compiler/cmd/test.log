@@ -60,7 +60,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.09s)
+✅ PASS (0.05s)
 [2/37] test_arithmetic                               
 --- Testing: test_arithmetic ---
 Source file: tests/test_arithmetic.arc
@@ -168,7 +168,7 @@ Compiling tests/test_array.arc...
   Errors: 1
 Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Compilation failed
     Compile output:
       Compiling tests/test_array.arc...
@@ -653,7 +653,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.04s)
 [11/37] test_constant                                 
 --- Testing: test_constant ---
 Source file: tests/test_constant.arc
@@ -829,7 +829,7 @@ Compiling tests/test_enum.arc...
   Errors: 1
 Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Compilation failed
     Compile output:
       Compiling tests/test_enum.arc...
@@ -1058,7 +1058,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.07s)
 [17/37] test_function_basic                           
 --- Testing: test_function_basic ---
 Source file: tests/test_function_basic.arc
@@ -1178,7 +1178,7 @@ Compiling tests/test_generics.arc...
   Errors: 3
 Compilation failed: compilation failed with 3 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
 
-❌ FAIL (0.04s)
+❌ FAIL (0.05s)
     Compilation failed
     Compile output:
       Compiling tests/test_generics.arc...
@@ -1282,7 +1282,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.08s)
+✅ PASS (0.05s)
 [20/37] test_if_statement                             
 --- Testing: test_if_statement ---
 Source file: tests/test_if_statement.arc
@@ -1340,7 +1340,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.04s)
+✅ PASS (0.05s)
 [21/37] test_import_multiple                          
 --- Testing: test_import_multiple ---
 Source file: tests/test_import_multiple.arc
@@ -1367,24 +1367,24 @@ panic: runtime error: invalid memory address or nil pointer dereference
 [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59af2b]
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc000498a00, 0x631de0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/visitor_declarations.go:17 +0x2b
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc000488900, 0x631de0?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/visitor_declarations.go:17 +0x2b
 github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8284b0?, {0x693c60?, 0xc00010ac00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/visitor.go:51 +0x731
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc000498a00, 0xc00010aa80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/visitor.go:163 +0x1fa
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/visitor.go:51 +0x731
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc000488900, 0xc00010aa80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/visitor.go:163 +0x1fa
 github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x828430?, {0x693b28?, 0xc00010aa80?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/visitor.go:45 +0x266
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a4060, {0xc0000c6080, 0x40}, 0x1)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/compiler.go:147 +0x432
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a4060, {0x7fff6d3714cc, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/compiler.go:41 +0x18b
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/visitor.go:45 +0x266
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a6060, {0xc0000c6080, 0x40}, 0x1)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/compiler.go:147 +0x432
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a6060, {0x7ffd1b7954cc, 0x1e})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/compiler.go:41 +0x18b
 main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
 main.main()
 	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
 
-❌ FAIL (0.03s)
+❌ FAIL (0.02s)
     Compilation failed
     Compile output:
       Compiling tests/test_import_multiple.arc...
@@ -1404,18 +1404,18 @@ main.main()
       [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59af2b]
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc000498a00, 0x631de0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/visitor_declarations.go:17 +0x2b
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc000488900, 0x631de0?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/visitor_declarations.go:17 +0x2b
       github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8284b0?, {0x693c60?, 0xc00010ac00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/visitor.go:51 +0x731
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc000498a00, 0xc00010aa80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/visitor.go:163 +0x1fa
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/visitor.go:51 +0x731
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc000488900, 0xc00010aa80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/visitor.go:163 +0x1fa
       github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x828430?, {0x693b28?, 0xc00010aa80?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/visitor.go:45 +0x266
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a4060, {0xc0000c6080, 0x40}, 0x1)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/compiler.go:147 +0x432
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a4060, {0x7fff6d3714cc, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081207-fd3c2feff0db/compiler/compiler/compiler.go:41 +0x18b
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/visitor.go:45 +0x266
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a6060, {0xc0000c6080, 0x40}, 0x1)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/compiler.go:147 +0x432
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a6060, {0x7ffd1b7954cc, 0x1e})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229081421-ab07900e1428/compiler/compiler/compiler.go:41 +0x18b
       main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
       main.main()
@@ -1756,7 +1756,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.04s)
 [27/37] test_pointer                                  
 --- Testing: test_pointer ---
 Source file: tests/test_pointer.arc
@@ -1816,7 +1816,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.04s)
 [28/37] test_sizeof                                   
 --- Testing: test_sizeof ---
 Source file: tests/test_sizeof.arc
@@ -1875,7 +1875,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.04s)
 [29/37] test_string_interpolation                     
 --- Testing: test_string_interpolation ---
 Source file: tests/test_string_interpolation.arc
@@ -2054,7 +2054,7 @@ Compiling tests/test_struct_method.arc...
   Errors: 2
 Compilation failed: compilation failed with 2 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
 
-❌ FAIL (0.05s)
+❌ FAIL (0.07s)
     Compilation failed
     Compile output:
       Compiling tests/test_struct_method.arc...
@@ -2353,7 +2353,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: -1
 ❌ Test FAILED: expected exit=0, got exit=-1
-❌ FAIL (0.15s)
+❌ FAIL (0.16s)
     Expected exit=0, got exit=-1
 [35/37] test_variable_inferred                        
 --- Testing: test_variable_inferred ---
@@ -2470,7 +2470,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.07s)
 [37/37] test_vector                                   
 --- Testing: test_vector ---
 Source file: tests/test_vector.arc
@@ -2512,7 +2512,7 @@ Compiling tests/test_vector.arc...
   Errors: 1
 Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_vector.arc
 
-❌ FAIL (0.03s)
+❌ FAIL (0.06s)
     Compilation failed
     Compile output:
       Compiling tests/test_vector.arc...
@@ -2554,7 +2554,7 @@ Failed:           11
   Compile errors: 9
   Link errors:    0
   Runtime errors: 2
-Total Duration:   1.82s
+Total Duration:   1.88s
 
 Failed Tests:
   ❌ test_array                               (compile)
