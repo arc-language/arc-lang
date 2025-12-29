@@ -289,7 +289,6 @@ func (v *IRVisitor) getExpressionAddress(ctx *parser.UnaryExpressionContext) ir.
 func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
 	v.logger.Debug("Visiting postfix expression")
 
-	// Don't clear pendingMethodSelf here - let it propagate through the postfix chain
 	// Start with the primary expression
 	result := v.Visit(ctx.PrimaryExpression()).(ir.Value)
 
