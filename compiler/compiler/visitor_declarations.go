@@ -1,3 +1,4 @@
+// --- START OF FILE compiler/visitor_declarations.go ---
 package compiler
 
 import (
@@ -383,18 +384,28 @@ func (v *IRVisitor) visitTupleVariableDecl(ctx *parser.VariableDeclContext) inte
 		return nil
 	}
 	
+	// Spill the tuple value to a temporary stack slot to allow safe field extraction
+	// This avoids potential backend issues with extractvalue on registers (or treating them as pointers)
+	tempAlloca := v.ctx.Builder.CreateAlloca(tupleType, "tuple.destruct.temp")
+	v.ctx.Builder.CreateStore(tupleVal, tempAlloca)
+	
 	// Extract each field and create variables
 	for i, name := range names {
-		// Extract the field value - this returns the field type, not the tuple type
-		fieldVal := v.ctx.Builder.CreateExtractValue(tupleVal, []int{i}, "")
-		
 		// Get the actual field type from the struct
 		fieldType := tupleType.Fields[i]
 		
-		// Create alloca with the FIELD type (not the tuple type!)
+		// Create GEP to access the field from memory
+		zero := v.ctx.Builder.ConstInt(types.I32, 0)
+		idx := v.ctx.Builder.ConstInt(types.I32, int64(i))
+		gep := v.ctx.Builder.CreateInBoundsGEP(tupleType, tempAlloca, []ir.Value{zero, idx}, "")
+		
+		// Load the field value
+		fieldVal := v.ctx.Builder.CreateLoad(fieldType, gep, "")
+		
+		// Create alloca with the FIELD type
 		alloca := v.ctx.Builder.CreateAlloca(fieldType, name+".addr")
 		
-		// Store the extracted field value (fieldVal type should match fieldType)
+		// Store the extracted field value
 		v.ctx.Builder.CreateStore(fieldVal, alloca)
 		
 		// Define the variable in the current scope

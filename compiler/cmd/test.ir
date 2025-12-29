@@ -25,22 +25,24 @@ if.next.2_4:
 
 define external i32 @main() {
 entry:
-  %10 = call { i32, i1 } @divide(i64 10, i64 2)
-  %11 = extractvalue { i32, i1 } %10, 0
+  %10 = trunc i64 10 to i32
+  %11 = trunc i64 2 to i32
+  %12 = call { i32, i1 } @divide(i32 %10, i32 %11)
+  %13 = extractvalue { i32, i1 } %12, 0
   %result.addr = alloca i32
-  store { i32, i1 } %11, ptr<i32> %result.addr
-  %12 = extractvalue { i32, i1 } %10, 1
+  store { i32, i1 } %13, ptr<i32> %result.addr
+  %14 = extractvalue { i32, i1 } %12, 1
   %ok.addr = alloca i1
-  store { i32, i1 } %12, ptr<i1> %ok.addr
-  %13 = load i1, ptr<i1> %ok.addr
-  br i1 %13, label %if.then.10_4, label %if.next.10_4
+  store { i32, i1 } %14, ptr<i1> %ok.addr
+  %15 = load i1, ptr<i1> %ok.addr
+  br i1 %15, label %if.then.10_4, label %if.next.10_4
 if.end.10_4:
-  %15 = sub i64 0, 1
-  %16 = trunc i64 %15 to i32
-  ret i32 %16
+  %17 = sub i64 0, 1
+  %18 = trunc i64 %17 to i32
+  ret i32 %18
 if.then.10_4:
-  %14 = load i32, ptr<i32> %result.addr
-  ret i32 %14
+  %16 = load i32, ptr<i32> %result.addr
+  ret i32 %16
 if.next.10_4:
   br label %if.end.10_4
 }
