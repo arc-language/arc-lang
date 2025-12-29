@@ -486,7 +486,6 @@ func (v *IRVisitor) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 		exceptionStateGlobal := v.ctx.Module.GetGlobal("__exception_state")
 		if exceptionStateGlobal != nil {
 			// Check if exception occurred
-			zero := v.ctx.Builder.ConstInt(types.I32, 0)
 			hasExceptionPtr := v.ctx.Builder.CreateStructGEP(
 				exceptionStateGlobal.Type().(*types.PointerType).ElementType,
 				exceptionStateGlobal,
@@ -532,7 +531,6 @@ func (v *IRVisitor) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 			// Clear the exception state
 			exceptionStateGlobal := v.ctx.Module.GetGlobal("__exception_state")
 			if exceptionStateGlobal != nil {
-				zero := v.ctx.Builder.ConstInt(types.I32, 0)
 				hasExceptionPtr := v.ctx.Builder.CreateStructGEP(
 					exceptionStateGlobal.Type().(*types.PointerType).ElementType,
 					exceptionStateGlobal,
@@ -600,15 +598,10 @@ func (v *IRVisitor) VisitThrowStmt(ctx *parser.ThrowStmtContext) interface{} {
 	// Evaluate the exception expression
 	exceptionValue := v.Visit(ctx.Expression()).(ir.Value)
 	
-	// Instead of calling raise (which exits), we need to:
-	// 1. Store the exception in a global exception state
-	// 2. Return from the current function with an error indicator
-	
 	// Get or create the global exception state variable
 	exceptionStateGlobal := v.ctx.Module.GetGlobal("__exception_state")
 	if exceptionStateGlobal == nil {
 		// Create the exception state global
-		// Structure: { i1 hasException, ptr<i8> exceptionMessage }
 		stateType := types.NewStruct("", []types.Type{types.I1, types.NewPointer(types.I8)}, false)
 		zeroState := &ir.ConstantStruct{
 			BaseValue: ir.BaseValue{ValType: stateType},
@@ -621,7 +614,7 @@ func (v *IRVisitor) VisitThrowStmt(ctx *parser.ThrowStmtContext) interface{} {
 	}
 	
 	// Set hasException = true
-	zero := v.ctx.Builder.ConstInt(types.I32, 0)
+	// REMOVE: zero := v.ctx.Builder.ConstInt(types.I32, 0)  <- DELETE THIS LINE
 	hasExceptionPtr := v.ctx.Builder.CreateStructGEP(
 		exceptionStateGlobal.Type().(*types.PointerType).ElementType, 
 		exceptionStateGlobal, 
@@ -640,7 +633,6 @@ func (v *IRVisitor) VisitThrowStmt(ctx *parser.ThrowStmtContext) interface{} {
 	v.ctx.Builder.CreateStore(exceptionValue, messagePtrFieldPtr)
 	
 	// Return an error code (-1) instead of exiting
-	// This allows the caller to check if an exception occurred
 	errorCode := v.ctx.Builder.ConstInt(types.I32, -1)
 	v.ctx.Builder.CreateRet(errorCode)
 	
