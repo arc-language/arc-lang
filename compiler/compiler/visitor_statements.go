@@ -16,6 +16,7 @@ func (v *IRVisitor) VisitStatement(ctx *parser.StatementContext) interface{} {
 	if ctx.ForStmt() != nil { return v.Visit(ctx.ForStmt()) }
 	if ctx.SwitchStmt() != nil { return v.Visit(ctx.SwitchStmt()) }
 	if ctx.TryStmt() != nil { return v.Visit(ctx.TryStmt()) }
+	if ctx.ThrowStmt() != nil { return v.Visit(ctx.ThrowStmt()) }  // ADD THIS LINE
 	if ctx.BreakStmt() != nil { return v.Visit(ctx.BreakStmt()) }
 	if ctx.ContinueStmt() != nil { return v.Visit(ctx.ContinueStmt()) }
 	if ctx.DeferStmt() != nil { return v.Visit(ctx.DeferStmt()) }

@@ -91,6 +91,8 @@ func (v *IRVisitor) Visit(tree antlr.ParseTree) interface{} {
 		return v.VisitSwitchStmt(ctx)
 	case *parser.TryStmtContext:
 		return v.VisitTryStmt(ctx)
+	case *parser.ThrowStmtContext:
+		return v.VisitThrowStmt(ctx)
 	case *parser.BreakStmtContext:
 		return v.VisitBreakStmt(ctx)
 	case *parser.ContinueStmtContext:

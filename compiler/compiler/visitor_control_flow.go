@@ -459,6 +459,8 @@ func (v *IRVisitor) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 	token := ctx.GetStart()
 	uniqueID := fmt.Sprintf("%d_%d", token.GetLine(), token.GetColumn())
 	
+	v.logger.Debug("Processing try-except-finally block")
+	
 	tryBlock := v.ctx.Builder.CreateBlock("try." + uniqueID)
 	endBlock := v.ctx.Builder.CreateBlock("try.end." + uniqueID)
 	
@@ -487,20 +489,43 @@ func (v *IRVisitor) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 		}
 	}
 	
-	// Except blocks
+	// Except blocks (catch handlers)
 	if catchBlock != nil {
 		v.ctx.SetInsertBlock(catchBlock)
-		for _, except := range ctx.AllExceptClause() {
-			// Generate catch block body
+		
+		// In a full implementation, this would:
+		// 1. Check the type of the thrown exception
+		// 2. Match it against each except clause
+		// 3. Execute the matching handler
+		// 4. Clear the exception state
+		
+		for i, except := range ctx.AllExceptClause() {
+			v.logger.Debug("Processing except clause %d", i+1)
+			
+			// Create a block for this specific handler
+			handlerBlock := v.ctx.Builder.CreateBlock(fmt.Sprintf("except.%s.%d", uniqueID, i))
+			v.ctx.SetInsertBlock(handlerBlock)
+			
+			// If the except clause has an identifier, bind the exception to it
+			if except.IDENTIFIER() != nil {
+				errName := except.IDENTIFIER().GetText()
+				// TODO: Create alloca for exception binding
+				// errPtr := v.ctx.Builder.CreateAlloca(exceptionType, errName+".addr")
+				// v.ctx.currentScope.Define(errName, errPtr)
+				v.logger.Debug("Binding exception to variable: %s", errName)
+			}
+			
+			// Generate handler body
 			if except.Block() != nil {
 				v.Visit(except.Block())
 			}
-		}
-		if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
-			if finallyBlock != nil {
-				v.ctx.Builder.CreateBr(finallyBlock)
-			} else {
-				v.ctx.Builder.CreateBr(endBlock)
+			
+			if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
+				if finallyBlock != nil {
+					v.ctx.Builder.CreateBr(finallyBlock)
+				} else {
+					v.ctx.Builder.CreateBr(endBlock)
+				}
 			}
 		}
 	}
@@ -508,7 +533,10 @@ func (v *IRVisitor) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 	// Finally block (always executes)
 	if finallyBlock != nil {
 		v.ctx.SetInsertBlock(finallyBlock)
+		v.logger.Debug("Processing finally block")
+		
 		v.Visit(ctx.FinallyClause().Block())
+		
 		if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			v.ctx.Builder.CreateBr(endBlock)
 		}
@@ -516,6 +544,28 @@ func (v *IRVisitor) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 	
 	v.ctx.SetInsertBlock(endBlock)
 	
-	v.ctx.Logger.Warning("Try-except-finally is not fully implemented - basic structure only")
+	v.ctx.Logger.Warning("Try-except-finally uses simplified exception model - full exception handling not yet implemented")
+	return nil
+}
+
+func (v *IRVisitor) VisitThrowStmt(ctx *parser.ThrowStmtContext) interface{} {
+	v.logger.Debug("Processing throw statement")
+	
+	// Evaluate the exception expression
+	exceptionValue := v.Visit(ctx.Expression()).(ir.Value)
+	
+	// For now, we'll use the raise intrinsic to throw
+	// In a full implementation, this would:
+	// 1. Store the exception in a thread-local exception register
+	// 2. Unwind the stack to the nearest try block
+	// 3. Jump to the appropriate except handler
+	
+	// Create a builder call to raise with the exception value
+	v.ctx.Builder.CreateRaise(exceptionValue)
+	
+	// Note: In a real implementation, throw would be catchable unlike raise()
+	// This is a simplified version that maps throw to raise for now
+	v.ctx.Logger.Warning("throw statement maps to raise() - proper exception handling not yet implemented")
+	
 	return nil
 }
