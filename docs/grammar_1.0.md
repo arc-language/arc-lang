@@ -798,4 +798,30 @@ extern libc {
     // Direct mapping (no alias needed if names match)
     func usleep(int32) int32
 }
+
+libc.printf()
+```
+
+## Enums
+```arc
+// Basic enumeration
+enum Status {
+    OK
+    ERROR
+    PENDING
+}
+
+// With explicit values
+enum HttpCode {
+    OK = 200
+    NOT_FOUND = 404
+    SERVER_ERROR = 500
+}
+
+// Underlying type (default is int32)
+enum Color: uint8 {
+    RED = 0xFF0000
+    GREEN = 0x00FF00
+    BLUE = 0x0000FF
+}
 ```
