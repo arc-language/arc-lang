@@ -385,16 +385,21 @@ func (v *IRVisitor) visitTupleVariableDecl(ctx *parser.VariableDeclContext) inte
 	
 	// Extract each field and create variables
 	for i, name := range names {
-		// Extract the field value
+		// Extract the field value - this returns the field type, not the tuple type
 		fieldVal := v.ctx.Builder.CreateExtractValue(tupleVal, []int{i}, "")
 		
-		// Create alloca with the FIELD type (not the tuple type!)
+		// Get the actual field type from the struct
 		fieldType := tupleType.Fields[i]
+		
+		// Create alloca with the FIELD type (not the tuple type!)
 		alloca := v.ctx.Builder.CreateAlloca(fieldType, name+".addr")
 		
-		// Store the field value (which matches the alloca type)
+		// Store the extracted field value
 		v.ctx.Builder.CreateStore(fieldVal, alloca)
+		
+		// Define the variable in the current scope
 		v.ctx.currentScope.Define(name, alloca)
+		
 		v.logger.Debug("Tuple destructure: %s = field %d (type: %v)", name, i, fieldType)
 	}
 	

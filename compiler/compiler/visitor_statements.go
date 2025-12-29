@@ -206,10 +206,18 @@ func (v *IRVisitor) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 	deferred := v.ctx.GetDeferredStmts()
 	for i := len(deferred) - 1; i >= 0; i-- {
 		_ = deferred[i]
+		// TODO: Actually emit deferred instruction execution
 	}
 	
-	// Check for tuple return
+	// Get expected return type
+	var expectedRetType types.Type
+	if v.ctx.currentFunction != nil {
+		expectedRetType = v.ctx.currentFunction.FuncType.ReturnType
+	}
+	
+	// Check for explicit tuple expression in return statement
 	if ctx.TupleExpression() != nil {
+		v.logger.Debug("Processing tuple expression return")
 		tupleCtx := ctx.TupleExpression()
 		exprs := tupleCtx.AllExpression()
 		
@@ -218,35 +226,33 @@ func (v *IRVisitor) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 			return nil
 		}
 		
-		// Get expected return type
-		var expectedRetType types.Type
-		if v.ctx.currentFunction != nil {
-			expectedRetType = v.ctx.currentFunction.FuncType.ReturnType
-		}
-		
-		// Build tuple struct from expressions
+		// Evaluate all tuple element expressions
 		values := make([]ir.Value, len(exprs))
-		
 		for i, expr := range exprs {
 			values[i] = v.Visit(expr).(ir.Value)
 		}
 		
-		// If function expects a struct/tuple return, build it
+		// Check if function expects a struct/tuple return
 		if structType, ok := expectedRetType.(*types.StructType); ok {
-			if len(structType.Fields) != len(values) {
-				v.ctx.Logger.Error("Tuple return size mismatch: expected %d, got %d", 
-					len(structType.Fields), len(values))
-			}
+			v.logger.Debug("Building tuple return value with %d fields", len(structType.Fields))
 			
-			// Build the tuple
+			// Build the tuple struct
 			var tuple ir.Value = v.ctx.Builder.ConstZero(structType)
 			
 			for i, val := range values {
-				// Cast value to match expected field type
+				if i >= len(structType.Fields) {
+					v.ctx.Logger.Error("Too many values in tuple return: expected %d, got %d", 
+						len(structType.Fields), len(values))
+					break
+				}
+				
+				// Cast value to match expected field type if needed
 				expectedFieldType := structType.Fields[i]
 				if !val.Type().Equal(expectedFieldType) {
+					v.logger.Debug("Casting tuple element %d from %v to %v", i, val.Type(), expectedFieldType)
 					val = v.castValue(val, expectedFieldType)
 				}
+				
 				tuple = v.ctx.Builder.CreateInsertValue(tuple, val, []int{i}, "")
 			}
 			
@@ -254,34 +260,35 @@ func (v *IRVisitor) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 			return nil
 		}
 		
-		// Otherwise, if single value in tuple and function expects scalar, extract it
-		if len(values) == 1 {
+		// If single value and function expects scalar, just return the value
+		if len(values) == 1 && expectedRetType != nil && expectedRetType.Kind() != types.VoidKind {
 			retVal := values[0]
-			if expectedRetType != nil && !retVal.Type().Equal(expectedRetType) {
+			if !retVal.Type().Equal(expectedRetType) {
 				retVal = v.castValue(retVal, expectedRetType)
 			}
 			v.ctx.Builder.CreateRet(retVal)
 			return nil
 		}
 		
-		// Shouldn't reach here for valid code
-		v.ctx.Logger.Error("Cannot return tuple when function doesn't expect tuple")
+		v.ctx.Logger.Error("Cannot return tuple when function doesn't expect tuple type")
 		v.ctx.Builder.CreateRetVoid()
 		return nil
 	}
 	
+	// Handle regular expression return
 	if ctx.Expression() != nil {
 		retVal := v.Visit(ctx.Expression()).(ir.Value)
-		if v.ctx.currentFunction != nil {
-			expectedType := v.ctx.currentFunction.FuncType.ReturnType
-			if !retVal.Type().Equal(expectedType) {
-				retVal = v.castValue(retVal, expectedType)
-			}
+		
+		// Cast to expected type if needed
+		if expectedRetType != nil && !retVal.Type().Equal(expectedRetType) {
+			retVal = v.castValue(retVal, expectedRetType)
 		}
+		
 		v.ctx.Builder.CreateRet(retVal)
 	} else {
 		v.ctx.Builder.CreateRetVoid()
 	}
+	
 	return nil
 }
 
