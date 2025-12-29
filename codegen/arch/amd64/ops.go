@@ -62,7 +62,7 @@ func (c *compiler) compileInstruction(inst ir.Instruction) error {
 	case ir.OpFCmp:
 		return c.fcmpOp(inst.(*ir.FCmpInst))
 
-	// Control flow
+	// Control flow (implemented in controlflow.go)
 	case ir.OpRet:
 		return c.retOp(inst.(*ir.RetInst))
 	case ir.OpBr:
@@ -84,7 +84,7 @@ func (c *compiler) compileInstruction(inst ir.Instruction) error {
 	case ir.OpPtrToInt, ir.OpIntToPtr, ir.OpBitcast:
 		return c.bitcastOp(inst.(*ir.CastInst))
 
-	// Other
+	// Other (mostly in controlflow.go or here)
 	case ir.OpPhi:
 		return c.phiOp(inst.(*ir.PhiInst))
 	case ir.OpSelect:
@@ -126,7 +126,7 @@ func (c *compiler) compileInstruction(inst ir.Instruction) error {
 	case ir.OpRaise:
 		return c.raiseOp(inst.(*ir.RaiseInst))
 
-	// Coroutine operations
+	// Coroutine operations (implemented in coroutines.go)
 	case ir.OpCoroId:
 		return c.coroIdOp(inst.(*ir.CoroIdInst))
 	case ir.OpCoroBegin:
@@ -399,17 +399,19 @@ func (c *compiler) loadOp(inst *ir.LoadInst) error {
 	// Determine size
 	size := SizeOf(inst.Type())
 
-	// For aggregate types, we typically return a pointer to the data on stack
-	// EXCEPT if it's small enough to fit in a register (≤ 8 bytes), 
-	// in which case we load the value directly to match ABI register passing.
-	if (types.IsAggregate(inst.Type()) && size > 8) {
-		// For large aggregates:
-		// Just store the pointer (address of the struct)
+	// For struct types (like vector/map), we need to copy the entire struct
+	// This is more complex - for now, just store the pointer itself
+	if types.IsAggregate(inst.Type()) || size > 8 {
+		// For aggregates larger than 8 bytes, we should:
+		// 1. Allocate space on stack
+		// 2. Copy the data
+		// 3. Return pointer to the copy
+		// For now, just return the pointer (address of the struct)
 		c.storeFromReg(RAX, inst)
 		return nil
 	}
 
-	// Load value (scalar or small aggregate)
+	// mov rax, [rax]
 	switch size {
 	case 1:
 		// movzx rax, byte ptr [rax]
@@ -424,8 +426,6 @@ func (c *compiler) loadOp(inst *ir.LoadInst) error {
 		// mov rax, [rax]
 		c.emitBytes(0x48, 0x8B, 0x00)
 	default:
-		// Fallback for non-standard sizes (e.g. 3 bytes, 5-7 bytes)
-		// For now error out, but we could implement byte-wise copy
 		return fmt.Errorf("unsupported load size: %d", size)
 	}
 
@@ -444,7 +444,13 @@ func (c *compiler) storeOp(inst *ir.StoreInst) error {
 	// For large structs, we need memcpy
 	if size > 8 {
 		// This is a struct copy - use memcpy
-		// For now, assume the value is already in place or we need to handle it better
+		// For now, skip it (the value is already in the right place)
+		// A proper implementation would:
+		// 1. Load source address
+		// 2. Load dest address  
+		// 3. Call memcpy or use rep movsb
+		
+		// Simple implementation: assume the struct is already where it needs to be
 		return nil
 	}
 
@@ -1222,46 +1228,5 @@ func (c *compiler) raiseOp(inst *ir.RaiseInst) error {
 	c.emitBytes(0x0F, 0x05)
 	
 	// This never returns
-	return nil
-}
-
-// Coroutine operations
-func (c *compiler) coroIdOp(inst *ir.CoroIdInst) error {
-	c.loadConstInt(RAX, int64(c.text.Len()))
-	c.storeFromReg(RAX, inst)
-	return nil
-}
-
-func (c *compiler) coroBeginOp(inst *ir.CoroBeginInst) error {
-	frameSize := 256
-	c.emitXorReg(RDI, RDI)
-	c.loadConstInt(RSI, int64(frameSize))
-	c.loadConstInt(RDX, 3)
-	c.loadConstInt(R10, 0x22)
-	c.loadConstInt(R8, -1)
-	c.emitXorReg(R9, R9)
-	c.loadConstInt(RAX, 9)
-	c.emitBytes(0x0F, 0x05)
-	c.storeFromReg(RAX, inst)
-	return nil
-}
-
-func (c *compiler) coroSuspendOp(inst *ir.CoroSuspendInst) error {
-	c.loadConstInt(RAX, 0)
-	c.storeFromReg(RAX, inst)
-	return nil
-}
-
-func (c *compiler) coroEndOp(inst *ir.CoroEndInst) error {
-	handle := inst.Operands()[0]
-	c.loadToReg(RAX, handle)
-	c.loadConstInt(RAX, 1)
-	return nil
-}
-
-func (c *compiler) coroFreeOp(inst *ir.CoroFreeInst) error {
-	handle := inst.Operands()[1]
-	c.loadToReg(RAX, handle)
-	c.storeFromReg(RAX, inst)
 	return nil
 }
