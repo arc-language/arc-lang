@@ -44,6 +44,9 @@ type ArcParserListener interface {
 	// EnterGenericArgs is called when entering the genericArgs production.
 	EnterGenericArgs(c *GenericArgsContext)
 
+	// EnterGtClose is called when entering the gtClose production.
+	EnterGtClose(c *GtCloseContext)
+
 	// EnterTypeList is called when entering the typeList production.
 	EnterTypeList(c *TypeListContext)
 
@@ -310,6 +313,9 @@ type ArcParserListener interface {
 
 	// ExitGenericArgs is called when exiting the genericArgs production.
 	ExitGenericArgs(c *GenericArgsContext)
+
+	// ExitGtClose is called when exiting the gtClose production.
+	ExitGtClose(c *GtCloseContext)
 
 	// ExitTypeList is called when exiting the typeList production.
 	ExitTypeList(c *TypeListContext)

@@ -56,6 +56,10 @@ func (v *BaseArcParserVisitor) VisitGenericArgs(ctx *GenericArgsContext) interfa
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseArcParserVisitor) VisitGtClose(ctx *GtCloseContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseArcParserVisitor) VisitTypeList(ctx *TypeListContext) interface{} {
 	return v.VisitChildren(ctx)
 }

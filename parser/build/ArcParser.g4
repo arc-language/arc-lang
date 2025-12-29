@@ -84,7 +84,12 @@ genericParamList
     ;
 
 genericArgs
-    : LT typeList GT
+    : LT typeList gtClose
+    ;
+
+gtClose
+    : GT
+    | RSHIFT {this.getCurrentToken().setText(">"); this.getInputStream().seek(this.getInputStream().index() - 1);}
     ;
 
 typeList
@@ -209,6 +214,7 @@ type
     | arrayType
     | qualifiedType
     | IDENTIFIER genericArgs?
+    | UNDERSCORE
     ;
 
 qualifiedType
@@ -234,7 +240,7 @@ referenceType
     ;
 
 arrayType
-    : ARRAY LT type COMMA arraySize GT
+    : ARRAY LT type COMMA arraySize gtClose
     ;
 
 arraySize
@@ -547,7 +553,7 @@ tupleExpression
 // =============================================================================
 
 castExpression
-    : CAST LT type GT LPAREN expression RPAREN
+    : CAST LT type gtClose LPAREN expression RPAREN
     ;
 
 // =============================================================================
@@ -571,18 +577,18 @@ syscallExpression
 // =============================================================================
 
 intrinsicExpression
-    : SIZEOF LT type GT
-    | ALIGNOF LT type GT
+    : SIZEOF LT type gtClose
+    | ALIGNOF LT type gtClose
     | MEMSET LPAREN expression COMMA expression COMMA expression RPAREN
     | MEMCPY LPAREN expression COMMA expression COMMA expression RPAREN
     | MEMMOVE LPAREN expression COMMA expression COMMA expression RPAREN
     | STRLEN LPAREN expression RPAREN
     | MEMCHR LPAREN expression COMMA expression COMMA expression RPAREN
     | VA_START LPAREN IDENTIFIER RPAREN
-    | VA_ARG LT type GT LPAREN expression RPAREN
+    | VA_ARG LT type gtClose LPAREN expression RPAREN
     | VA_END LPAREN expression RPAREN
     | RAISE LPAREN expression RPAREN
     | MEMCMP LPAREN expression COMMA expression COMMA expression RPAREN
-    | BIT_CAST LT type GT LPAREN expression RPAREN
+    | BIT_CAST LT type gtClose LPAREN expression RPAREN
     | SLICE LPAREN expression COMMA expression RPAREN
     ;

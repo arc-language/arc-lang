@@ -44,6 +44,9 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#genericArgs.
 	VisitGenericArgs(ctx *GenericArgsContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#gtClose.
+	VisitGtClose(ctx *GtCloseContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#typeList.
 	VisitTypeList(ctx *TypeListContext) interface{}
 
