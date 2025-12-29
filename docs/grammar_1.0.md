@@ -945,3 +945,39 @@ let vec: vector<byte> = {1, 2, 3, 4, 5}
 let (data_ptr, data_len) = slice(vec, 0..3)
 
 ```
+
+
+## String Interpolation
+```arc
+let name = "Alice"
+let age = 30
+
+// Basic variable interpolation
+let msg = "Hello, \(name)!"
+
+// Expression interpolation
+let info = "You are \(age) years old, born in \(2025 - age)"
+
+// Complex expressions
+let result = "Sum: \(a + b), Product: \(a * b)"
+
+// Nested function calls
+let upper = "Name: \(name.to_upper())"
+```
+
+
+## Control Flow, switch
+```arc
+let status = 2
+
+switch status {
+    case 0:
+        io.print("OK")
+    case 1:
+        io.print("Pending")
+    case 2:
+        io.print("Error")
+    default:
+        io.print("Unknown")
+}
+```
