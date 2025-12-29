@@ -175,7 +175,8 @@ func (v *IRVisitor) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 	intType, ok := underlyingType.(*types.IntType)
 	if !ok {
 		v.ctx.Logger.Error("Enum underlying type must be an integer type")
-		intType = types.I32.(*types.IntType)
+		// Default to I32
+		intType = &types.IntType{BitWidth: 32, Signed: true}
 	}
 	
 	// Register enum as an alias to underlying type
