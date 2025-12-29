@@ -18,8 +18,6 @@ const (
     ArrayKind
     StructKind
     FunctionKind
-    VectorKind
-    MapKind
     LabelKind
 )
 
@@ -225,33 +223,6 @@ func (t *FunctionType) Equal(o Type) bool {
 	return false
 }
 
-// VectorType represents SIMD vectors
-type VectorType struct {
-	ElementType Type
-	Length      int
-	Scalable    bool // For scalable vectors (SVE-like)
-}
-
-func (t *VectorType) Kind() TypeKind { return VectorKind }
-func (t *VectorType) String() string {
-	if t.Scalable {
-		return fmt.Sprintf("<vscale x %d x %s>", t.Length, t.ElementType)
-	}
-	return fmt.Sprintf("<%d x %s>", t.Length, t.ElementType)
-}
-func (t *VectorType) BitSize() int {
-	if t.Scalable {
-		return 0 // Unknown at compile time
-	}
-	return t.ElementType.BitSize() * t.Length
-}
-func (t *VectorType) Equal(o Type) bool {
-	if ot, ok := o.(*VectorType); ok {
-		return t.Length == ot.Length && t.Scalable == ot.Scalable && t.ElementType.Equal(ot.ElementType)
-	}
-	return false
-}
-
 // LabelType represents a basic block label
 type LabelType struct{}
 
@@ -318,16 +289,6 @@ func NewFunction(ret Type, params []Type, variadic bool) *FunctionType {
 	return &FunctionType{ReturnType: ret, ParamTypes: params, Variadic: variadic}
 }
 
-// NewVector creates a vector type
-func NewVector(elem Type, length int) *VectorType {
-	return &VectorType{ElementType: elem, Length: length}
-}
-
-// NewScalableVector creates a scalable vector type
-func NewScalableVector(elem Type, minLength int) *VectorType {
-	return &VectorType{ElementType: elem, Length: minLength, Scalable: true}
-}
-
 // IsInteger returns true if the type is an integer
 func IsInteger(t Type) bool { return t.Kind() == IntegerKind }
 
@@ -340,72 +301,4 @@ func IsPointer(t Type) bool { return t.Kind() == PointerKind }
 // IsAggregate returns true if the type is an aggregate (struct or array)
 func IsAggregate(t Type) bool {
 	return t.Kind() == StructKind || t.Kind() == ArrayKind
-}
-
-// IsDynamicVector returns true if the type is a runtime-sized vector
-func IsDynamicVector(t Type) bool {
-	_, ok := t.(*DynamicVectorType)
-	return ok
-}
-
-// IsMap returns true if the type is a map
-func IsMap(t Type) bool {
-	_, ok := t.(*MapType)
-	return ok
-}
-
-
-// DynamicVectorType - runtime-sized vector (like std::vector)
-// Represented at runtime as a struct { *T data, i64 len, i64 cap }
-type DynamicVectorType struct {
-    ElementType Type
-}
-
-func NewDynamicVector(elem Type) *DynamicVectorType {
-    return &DynamicVectorType{ElementType: elem}
-}
-
-func (t *DynamicVectorType) Kind() TypeKind { return VectorKind }
-
-func (t *DynamicVectorType) String() string {
-    return fmt.Sprintf("vector<%s>", t.ElementType)
-}
-
-func (t *DynamicVectorType) BitSize() int { 
-    return 24 * 8 // 3 pointers worth (data ptr + len + cap) = 24 bytes on 64-bit
-}
-
-func (t *DynamicVectorType) Equal(o Type) bool {
-    if ot, ok := o.(*DynamicVectorType); ok {
-        return t.ElementType.Equal(ot.ElementType)
-    }
-    return false
-}
-
-// MapType - runtime hash map
-// Represented at runtime as a struct { *Entry buckets, i64 len, i64 cap }
-type MapType struct {
-    KeyType   Type
-    ValueType Type
-}
-
-func NewMap(key, value Type) *MapType {
-    return &MapType{KeyType: key, ValueType: value}
-}
-
-func (t *MapType) Kind() TypeKind { return MapKind }
-
-func (t *MapType) String() string {
-    return fmt.Sprintf("map<%s, %s>", t.KeyType, t.ValueType)
-}
-
-func (t *MapType) BitSize() int {
-    return 24 * 8 // Similar to vector: buckets ptr + len + cap
-}
-
-func (t *MapType) Equal(o Type) bool {
-    if ot, ok := o.(*MapType); ok {
-        return t.KeyType.Equal(ot.KeyType) && t.ValueType.Equal(ot.ValueType)
-    }
-    return false
 }
