@@ -250,6 +250,25 @@ async func main() {
 }
 ```
 
+## Functions, async callback
+```arc
+// Async callback with single param
+some.func2(args, async (item: string) => {
+    await process(item)
+})
+
+// Async callback with multiple params
+some.fetch(args, async (url: string, timeout: int32) => {
+    let resp = await http.get(url, timeout)
+    return resp.body
+})
+
+// Async callback with no params
+button.on_click(async () => {
+    await save_state()
+})
+```
+
 ## Structs, basic (value type - stack allocated, copied)
 ```arc
 struct Point {
@@ -840,20 +859,6 @@ try {
     io.printf("Error: %s\n", err)
 }
 
-// Try-except with typed errors
-enum FileError {
-    NotFound
-    PermissionDenied
-    IOError
-}
-
-func read_file(path: string) string throws FileError {
-    if !exists(path) {
-        throw FileError.NotFound
-    }
-    return contents
-}
-
 try {
     let data = read_file("/tmp/config.txt")
     process(data)
@@ -876,19 +881,7 @@ try {
     // Cleanup code always runs
     cleanup()
 }
-
-// Try-except with ref-counted classes (automatic cleanup)
-try {
-    let client = HttpClient{}  // Ref count = 1
-    let data = client.fetch("https://api.example.com")
-    process(data)
-} except err {
-    // If exception thrown, client is automatically released
-    io.printf("Failed to fetch: %s\n", err)
-}
-// client ref count decremented here (or during exception unwinding)
 ```
-
 
 ## Function Return Tuples
 ```arc
@@ -946,7 +939,6 @@ let (data_ptr, data_len) = slice(vec, 0..3)
 
 ```
 
-
 ## String Interpolation
 ```arc
 let name = "Alice"
@@ -964,7 +956,6 @@ let result = "Sum: \(a + b), Product: \(a * b)"
 // Nested function calls
 let upper = "Name: \(name.to_upper())"
 ```
-
 
 ## Control Flow, switch
 ```arc
