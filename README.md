@@ -27,7 +27,7 @@ We appreciate your feedback! Feel free to open GitHub issues or submit changes t
 
 ### About Arc AI Language
 
-Arc AI Language is a modern systems programming language purpose-built for artificial intelligence and machine learning workloads. Combining Python-like simplicity with C-level performance, Arc provides direct hardware access, GPU acceleration, and zero-overhead abstractions for AI inference, training pipelines, and performance-critical applications.
+Arc AI Language is a modern systems programming language purpose-built for artificial intelligence and machine learning workloads. Combining modern types simplicity with C-level performance, Arc provides direct hardware access, GPU acceleration, and zero-overhead abstractions for AI inference, training pipelines, and performance-critical applications.
 
 ## Getting Started
 
