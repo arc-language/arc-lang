@@ -372,7 +372,24 @@ func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpC
 	
 	// Inject pending self argument if this is a method call found via handleMemberAccess
 	if v.pendingMethodSelf != nil {
-		args = append(args, v.pendingMethodSelf)
+		selfArg := v.pendingMethodSelf
+		
+		// Auto-dereference: If method expects value but we have pointer (and not class type)
+		// Class types are passed by pointer, but Structs are passed by value in methods defined with 'self p: Point'
+		if funcType != nil && len(funcType.ParamTypes) > 0 {
+			expectedType := funcType.ParamTypes[0]
+			currentType := selfArg.Type()
+			
+			// If we have ptr<T> but need T, load it
+			if ptrType, ok := currentType.(*types.PointerType); ok {
+				if ptrType.ElementType.Equal(expectedType) {
+					v.logger.Debug("Auto-dereferencing self argument for method call")
+					selfArg = v.ctx.Builder.CreateLoad(expectedType, selfArg, "")
+				}
+			}
+		}
+		
+		args = append(args, selfArg)
 		v.pendingMethodSelf = nil // Consumed
 	}
 	
@@ -381,7 +398,6 @@ func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpC
 	if argList != nil {
 		allArgs := argList.(*parser.ArgumentListContext).AllArgument()
 		
-		// Fixed: Replaced unused index 'i' with '_'
 		for _, argCtx := range allArgs {
 			// Visit the argument expression
 			var argVal ir.Value
