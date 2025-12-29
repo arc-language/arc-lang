@@ -40,34 +40,12 @@ func (v *IRVisitor) VisitLogicalAndExpression(ctx *parser.LogicalAndExpressionCo
 	return result
 }
 
-func (v *IRVisitor) VisitBitOrExpression(ctx *parser.BitOrExpressionContext) interface{} {
-	result := v.Visit(ctx.BitXorExpression(0)).(ir.Value)
-
-	for i := 1; i < len(ctx.AllBitXorExpression()); i++ {
-		right := v.Visit(ctx.BitXorExpression(i)).(ir.Value)
-		result = v.ctx.Builder.CreateBitOr(result, right, "")
-	}
-
-	return result
-}
-
 func (v *IRVisitor) VisitBitXorExpression(ctx *parser.BitXorExpressionContext) interface{} {
 	result := v.Visit(ctx.BitAndExpression(0)).(ir.Value)
 
 	for i := 1; i < len(ctx.AllBitAndExpression()); i++ {
 		right := v.Visit(ctx.BitAndExpression(i)).(ir.Value)
 		result = v.ctx.Builder.CreateBitXor(result, right, "")
-	}
-
-	return result
-}
-
-func (v *IRVisitor) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) interface{} {
-	result := v.Visit(ctx.EqualityExpression(0)).(ir.Value)
-
-	for i := 1; i < len(ctx.AllEqualityExpression()); i++ {
-		right := v.Visit(ctx.EqualityExpression(i)).(ir.Value)
-		result = v.ctx.Builder.CreateBitAnd(result, right, "")
 	}
 
 	return result
@@ -203,71 +181,6 @@ func (v *IRVisitor) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 	}
 
 	return result
-}
-
-func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
-	if ctx.PostfixExpression() != nil {
-		return v.Visit(ctx.PostfixExpression())
-	}
-
-	if ctx.MINUS() != nil {
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		if types.IsFloat(operand.Type()) {
-			zero := v.ctx.Builder.ConstFloat(operand.Type().(*types.FloatType), 0.0)
-			return v.ctx.Builder.CreateFSub(zero, operand, "")
-		} else {
-			zero := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 0)
-			return v.ctx.Builder.CreateSub(zero, operand, "")
-		}
-	}
-
-	if ctx.NOT() != nil {
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		return v.ctx.Builder.CreateNot(operand, "")
-	}
-
-	if ctx.BIT_NOT() != nil {
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		return v.ctx.Builder.CreateBitNot(operand, "")
-	}
-
-	if ctx.STAR() != nil {
-		// Dereference
-		ptr := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		ptrType, ok := ptr.Type().(*types.PointerType)
-		if !ok {
-			v.ctx.Logger.Error("Cannot dereference non-pointer type")
-			return ptr
-		}
-		return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
-	}
-
-	if ctx.AMP() != nil {
-		// Address-of
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		// The operand should already be an lvalue (address)
-		return operand
-	}
-
-	if ctx.INCREMENT() != nil {
-		// Pre-increment
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		one := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 1)
-		newVal := v.ctx.Builder.CreateAdd(operand, one, "")
-		v.ctx.Builder.CreateStore(newVal, operand)
-		return newVal
-	}
-
-	if ctx.DECREMENT() != nil {
-		// Pre-decrement
-		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		one := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 1)
-		newVal := v.ctx.Builder.CreateSub(operand, one, "")
-		v.ctx.Builder.CreateStore(newVal, operand)
-		return newVal
-	}
-
-	return nil
 }
 
 func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
@@ -420,7 +333,7 @@ func (v *IRVisitor) handleMethodCall(base ir.Value, methodName string, op *parse
 	}
 
 	// Find the method - look it up by name
-	methodFunc := v.ctx.currentScope.LookupFunction(structType.Name + "." + methodName)
+	methodFunc := v.ctx.module.LookupFunction(structType.Name + "." + methodName)
 	if methodFunc == nil {
 		v.ctx.Logger.Error("Method %s not found on type %s", methodName, structType.Name)
 		return base
@@ -688,7 +601,11 @@ func (v *IRVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 
 	if ctx.BOOLEAN_LITERAL() != nil {
 		value := ctx.BOOLEAN_LITERAL().GetText() == "true"
-		return v.ctx.Builder.ConstBool(value)
+		boolVal := int64(0)
+		if value {
+			boolVal = 1
+		}
+		return v.ctx.Builder.ConstInt(types.NewInt(1, false), boolVal)
 	}
 
 	if ctx.NULL() != nil {
@@ -892,20 +809,17 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 
 	if ctx.NOT() != nil {
 		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		// Logical NOT - compare with zero
 		zero := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 0)
 		return v.ctx.Builder.CreateICmp(ir.ICmpEQ, operand, zero, "")
 	}
 
 	if ctx.BIT_NOT() != nil {
 		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		// Bitwise NOT - XOR with all 1s
 		allOnes := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), -1)
 		return v.ctx.Builder.CreateXor(operand, allOnes, "")
 	}
 
 	if ctx.STAR() != nil {
-		// Dereference
 		ptr := v.Visit(ctx.UnaryExpression()).(ir.Value)
 		ptrType, ok := ptr.Type().(*types.PointerType)
 		if !ok {
@@ -916,14 +830,11 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 	}
 
 	if ctx.AMP() != nil {
-		// Address-of
 		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
-		// The operand should already be an lvalue (address)
 		return operand
 	}
 
 	if ctx.INCREMENT() != nil {
-		// Pre-increment
 		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
 		one := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 1)
 		newVal := v.ctx.Builder.CreateAdd(operand, one, "")
@@ -932,7 +843,6 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 	}
 
 	if ctx.DECREMENT() != nil {
-		// Pre-decrement
 		operand := v.Visit(ctx.UnaryExpression()).(ir.Value)
 		one := v.ctx.Builder.ConstInt(operand.Type().(*types.IntType), 1)
 		newVal := v.ctx.Builder.CreateSub(operand, one, "")
