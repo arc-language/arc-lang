@@ -240,6 +240,7 @@ arrayType
 arraySize
     : INTEGER_LITERAL
     | IDENTIFIER
+    | UNDERSCORE
     ;
 
 // =============================================================================
@@ -267,7 +268,21 @@ statement
     ;
 
 assignmentStmt
-    : leftHandSide (ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | STAR_ASSIGN | SLASH_ASSIGN | PERCENT_ASSIGN) expression
+    : leftHandSide assignmentOp expression
+    ;
+
+assignmentOp
+    : ASSIGN
+    | PLUS_ASSIGN
+    | MINUS_ASSIGN
+    | STAR_ASSIGN
+    | SLASH_ASSIGN
+    | PERCENT_ASSIGN
+    | BIT_OR_ASSIGN
+    | BIT_AND_ASSIGN
+    | BIT_XOR_ASSIGN
+    | LSHIFT_ASSIGN
+    | RSHIFT_ASSIGN
     ;
 
 leftHandSide

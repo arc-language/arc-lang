@@ -134,6 +134,9 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#assignmentStmt.
 	VisitAssignmentStmt(ctx *AssignmentStmtContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#assignmentOp.
+	VisitAssignmentOp(ctx *AssignmentOpContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#leftHandSide.
 	VisitLeftHandSide(ctx *LeftHandSideContext) interface{}
 

@@ -134,6 +134,9 @@ type ArcParserListener interface {
 	// EnterAssignmentStmt is called when entering the assignmentStmt production.
 	EnterAssignmentStmt(c *AssignmentStmtContext)
 
+	// EnterAssignmentOp is called when entering the assignmentOp production.
+	EnterAssignmentOp(c *AssignmentOpContext)
+
 	// EnterLeftHandSide is called when entering the leftHandSide production.
 	EnterLeftHandSide(c *LeftHandSideContext)
 
@@ -397,6 +400,9 @@ type ArcParserListener interface {
 
 	// ExitAssignmentStmt is called when exiting the assignmentStmt production.
 	ExitAssignmentStmt(c *AssignmentStmtContext)
+
+	// ExitAssignmentOp is called when exiting the assignmentOp production.
+	ExitAssignmentOp(c *AssignmentOpContext)
 
 	// ExitLeftHandSide is called when exiting the leftHandSide production.
 	ExitLeftHandSide(c *LeftHandSideContext)

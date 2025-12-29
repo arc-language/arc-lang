@@ -176,6 +176,10 @@ func (v *BaseArcParserVisitor) VisitAssignmentStmt(ctx *AssignmentStmtContext) i
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseArcParserVisitor) VisitAssignmentOp(ctx *AssignmentOpContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseArcParserVisitor) VisitLeftHandSide(ctx *LeftHandSideContext) interface{} {
 	return v.VisitChildren(ctx)
 }

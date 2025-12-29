@@ -74,10 +74,12 @@ MEMCMP: 'memcmp';
 BIT_CAST: 'bit_cast';
 SLICE: 'slice';
 
-// Operators (multi-character first!)
+// Operators (multi-character first - ORDER MATTERS!)
 ARROW: '->';
 RANGE: '..';
 ELLIPSIS: '...';
+LSHIFT_ASSIGN: '<<=';
+RSHIFT_ASSIGN: '>>=';
 LSHIFT: '<<';
 RSHIFT: '>>';
 EQ: '==';
@@ -91,6 +93,9 @@ MINUS_ASSIGN: '-=';
 STAR_ASSIGN: '*=';
 SLASH_ASSIGN: '/=';
 PERCENT_ASSIGN: '%=';
+BIT_OR_ASSIGN: '|=';
+BIT_AND_ASSIGN: '&=';
+BIT_XOR_ASSIGN: '^=';
 INCREMENT: '++';
 DECREMENT: '--';
 FAT_ARROW: '=>';

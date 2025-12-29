@@ -273,6 +273,12 @@ func (s *BaseArcParserListener) EnterAssignmentStmt(ctx *AssignmentStmtContext) 
 // ExitAssignmentStmt is called when production assignmentStmt is exited.
 func (s *BaseArcParserListener) ExitAssignmentStmt(ctx *AssignmentStmtContext) {}
 
+// EnterAssignmentOp is called when production assignmentOp is entered.
+func (s *BaseArcParserListener) EnterAssignmentOp(ctx *AssignmentOpContext) {}
+
+// ExitAssignmentOp is called when production assignmentOp is exited.
+func (s *BaseArcParserListener) ExitAssignmentOp(ctx *AssignmentOpContext) {}
+
 // EnterLeftHandSide is called when production leftHandSide is entered.
 func (s *BaseArcParserListener) EnterLeftHandSide(ctx *LeftHandSideContext) {}
 
