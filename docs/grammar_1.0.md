@@ -899,3 +899,34 @@ func divide(a: int32, b: int32) -> (int32, bool) {
 let (result, ok) = divide(10, 2)
 ```
 
+## Collections, array (fixed-size)
+```arc
+let arr: array<int32, 5> = {1, 2, 3, 4, 5}
+let coords: array<float64, 3> = {1.0, 2.0, 3.0}
+```
+
+## Collections, array initialization
+```arc
+// Initialized with values
+let nums: array<int32, 5> = {1, 2, 3, 4, 5}
+
+// Zero/default initialization
+let zeros: array<int32, 100> = {}
+
+// Type inference (size still required)
+let items: array<_, 3> = {10, 20, 30}
+```
+
+## Collections, array access
+```arc
+let arr: array<int32, 5> = {1, 2, 3, 4, 5}
+
+// Read element
+let val = arr[2]
+
+// Write element
+arr[3] = 42
+
+// Get pointer to element
+let ptr: *int32 = &arr[0]
+```
