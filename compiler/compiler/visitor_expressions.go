@@ -289,6 +289,11 @@ func (v *IRVisitor) getExpressionAddress(ctx *parser.UnaryExpressionContext) ir.
 func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
 	v.logger.Debug("Visiting postfix expression")
 
+	// Save and clear pending method self to handle nested calls correctly
+	prevPending := v.pendingMethodSelf
+	v.pendingMethodSelf = nil
+	defer func() { v.pendingMethodSelf = prevPending }()
+
 	// Start with the primary expression
 	result := v.Visit(ctx.PrimaryExpression()).(ir.Value)
 
@@ -364,6 +369,13 @@ func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpC
 
 	// Build arguments with proper type casting
 	args := []ir.Value{}
+	
+	// Inject pending self argument if this is a method call found via handleMemberAccess
+	if v.pendingMethodSelf != nil {
+		args = append(args, v.pendingMethodSelf)
+		v.pendingMethodSelf = nil // Consumed
+	}
+	
 	argList := op.ArgumentList()
 	
 	if argList != nil {
@@ -384,10 +396,16 @@ func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpC
 			}
 			
 			// Cast to expected parameter type if function type is known
-			if funcType != nil && i < len(funcType.ParamTypes) {
-				expectedType := funcType.ParamTypes[i]
+			// Adjust index if we added self
+			paramIdx := i + len(args) - len(allArgs) // This logic is flawed if we split args loop
+			// Correct approach: check against funcType.ParamTypes directly
+			
+			targetParamIdx := len(args) // Current position in args being built (includes self)
+			
+			if funcType != nil && targetParamIdx < len(funcType.ParamTypes) {
+				expectedType := funcType.ParamTypes[targetParamIdx]
 				if !argVal.Type().Equal(expectedType) {
-					v.logger.Debug("Casting argument %d from %v to %v", i, argVal.Type(), expectedType)
+					v.logger.Debug("Casting argument %d from %v to %v", targetParamIdx, argVal.Type(), expectedType)
 					argVal = v.castValue(argVal, expectedType)
 				}
 			}
@@ -511,6 +529,13 @@ func (v *IRVisitor) handleMemberAccess(base ir.Value, memberName string) ir.Valu
 				return v.ctx.Builder.CreateLoad(structType.Fields[fieldIdx], gep, "")
 			}
 			
+			// Method on pointer to struct (generic case, e.g. for methods taking pointer receiver)
+			methodName := structType.Name + "_" + memberName
+			if fn := v.ctx.Module.GetFunction(methodName); fn != nil {
+				v.pendingMethodSelf = base
+				return fn
+			}
+			
 			v.ctx.Logger.Error("Struct/Class '%s' has no member '%s'", structType.Name, memberName)
 			return base
 		}
@@ -526,6 +551,13 @@ func (v *IRVisitor) handleMemberAccess(base ir.Value, memberName string) ir.Valu
 		fieldIdx := v.findFieldIndex(structType, memberName)
 		if fieldIdx >= 0 {
 			return v.ctx.Builder.CreateExtractValue(base, []int{fieldIdx}, "")
+		}
+		
+		// Method on struct value
+		methodName := structType.Name + "_" + memberName
+		if fn := v.ctx.Module.GetFunction(methodName); fn != nil {
+			v.pendingMethodSelf = base
+			return fn
 		}
 		
 		v.ctx.Logger.Error("Struct '%s' has no member '%s'", structType.Name, memberName)

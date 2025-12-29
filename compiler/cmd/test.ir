@@ -11,12 +11,12 @@ if.end.3_4:
   %5 = load i32, ptr<i32> %a.addr
   %6 = load i32, ptr<i32> %b.addr
   %7 = sdiv i32 %5, %6
-  %8 = insertvalue { i32, i1 } %<unnamed>, i32 %7, 0
+  %8 = insertvalue { i32, i1 } zeroinitializer, i32 %7, 0
   %9 = insertvalue { i32, i1 } %8, i1 1, 1
   ret { i32, i1 } %9
 if.then.3_4:
   %2 = trunc i64 0 to i32
-  %3 = insertvalue { i32, i1 } %<unnamed>, i32 %2, 0
+  %3 = insertvalue { i32, i1 } zeroinitializer, i32 %2, 0
   %4 = insertvalue { i32, i1 } %3, i1 0, 1
   ret { i32, i1 } %4
 if.next.3_4:
