@@ -792,23 +792,10 @@ func (v *IRVisitor) parseStringLiteral(text string) ir.Value {
 	text = strings.ReplaceAll(text, "\\\"", "\"")
 	text = strings.ReplaceAll(text, "\\\\", "\\")
 
-	// Create array type for the string (length + 1 for null terminator)
-	strLen := int64(len(text) + 1)
-	arrayType := types.NewArray(types.NewInt(8, false), strLen)
-	
-	// Create a new global variable
-	globalName := fmt.Sprintf(".str.%d", len(v.ctx.Module.Globals))
-	global := &ir.Global{
-		Name: globalName,
-		Type: arrayType,
-	}
-	
-	// Add to module globals
-	v.ctx.Module.Globals = append(v.ctx.Module.Globals, global)
-	
-	// Return pointer to the first element
-	zero := v.ctx.Builder.ConstInt(types.NewInt(64, false), 0)
-	return v.ctx.Builder.CreateGEP(arrayType, global, []ir.Value{zero, zero}, "")
+	// For now, just return a null pointer as a placeholder
+	// TODO: Implement proper global string constants
+	ptrType := types.NewPointer(types.NewInt(8, false))
+	return v.ctx.Builder.ConstNull(ptrType)
 }
 
 func (v *IRVisitor) parseCharLiteral(text string) ir.Value {
