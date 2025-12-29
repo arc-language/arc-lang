@@ -394,7 +394,7 @@ func (v *IRVisitor) visitTupleVariableDecl(ctx *parser.VariableDeclContext) inte
 		// Create alloca with the FIELD type (not the tuple type!)
 		alloca := v.ctx.Builder.CreateAlloca(fieldType, name+".addr")
 		
-		// Store the extracted field value
+		// Store the extracted field value (fieldVal type should match fieldType)
 		v.ctx.Builder.CreateStore(fieldVal, alloca)
 		
 		// Define the variable in the current scope

@@ -12,8 +12,25 @@ func (c *compiler) retOp(inst *ir.RetInst) error {
 	if inst.NumOperands() > 0 && inst.Operands()[0] != nil {
 		retVal := inst.Operands()[0]
 
-		// Check if it's a float return
-		if types.IsFloat(retVal.Type()) {
+		// Check if it's a struct return
+		if structType, ok := retVal.Type().(*types.StructType); ok {
+			structSize := SizeOf(structType)
+			
+			if structSize <= 8 {
+				// Small struct (≤8 bytes) - return in RAX
+				c.loadToReg(RAX, retVal)
+			} else if structSize <= 16 {
+				// Medium struct (9-16 bytes) - return in RAX:RDX
+				// Load the struct and split into RAX (low 8) and RDX (high 8)
+				// For now, just load into RAX
+				// TODO: Properly handle 9-16 byte structs
+				c.loadToReg(RAX, retVal)
+			} else {
+				// Large struct (>16 bytes) - should use hidden pointer parameter
+				// This should be handled differently at the IR level
+				c.loadToReg(RAX, retVal)
+			}
+		} else if types.IsFloat(retVal.Type()) {
 			c.loadToFpReg(0, retVal) // Return in XMM0
 		} else {
 			c.loadToReg(RAX, retVal) // Return in RAX
@@ -168,7 +185,7 @@ func (c *compiler) callOp(inst *ir.CallInst) error {
 	// System V AMD64 ABI calling convention
 	// Integer/pointer args: RDI, RSI, RDX, RCX, R8, R9, then stack
 	// Float args: XMM0-XMM7, then stack
-	// Return: RAX (integer), XMM0 (float)
+	// Return: RAX (integer), XMM0 (float), RAX:RDX (large struct up to 16 bytes)
 
 	intArgRegs := []int{RDI, RSI, RDX, RCX, R8, R9}
 	fpArgRegs := []int{0, 1, 2, 3, 4, 5, 6, 7} // XMM0-XMM7
@@ -241,7 +258,25 @@ func (c *compiler) callOp(inst *ir.CallInst) error {
 
 	// Store return value
 	if inst.Type() != nil && inst.Type().Kind() != types.VoidKind {
-		if types.IsFloat(inst.Type()) {
+		// Check if return type is a small struct (returned in registers)
+		if structType, ok := inst.Type().(*types.StructType); ok {
+			structSize := SizeOf(structType)
+			
+			if structSize <= 8 {
+				// Small struct (≤8 bytes) returned directly in RAX
+				// Store RAX as-is - it contains the struct value, not a pointer
+				c.storeFromReg(RAX, inst)
+			} else if structSize <= 16 {
+				// Medium struct (9-16 bytes) returned in RAX (low 8) and RDX (high 8)
+				// For now, just store RAX portion
+				// TODO: Properly handle the RDX portion for 9-16 byte structs
+				c.storeFromReg(RAX, inst)
+			} else {
+				// Large struct (>16 bytes) - caller allocates space and passes hidden pointer
+				// The function returns the pointer in RAX
+				c.storeFromReg(RAX, inst)
+			}
+		} else if types.IsFloat(inst.Type()) {
 			c.storeFromFpReg(0, inst)
 		} else {
 			c.storeFromReg(RAX, inst)

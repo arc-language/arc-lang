@@ -8,31 +8,39 @@ entry:
   %1 = icmp eq i32 %0, 0
   br i1 %1, label %if.then.2_4, label %if.next.2_4
 if.end.2_4:
-  ret i64 0
+  %5 = load i32, ptr<i32> %a.addr
+  %6 = load i32, ptr<i32> %b.addr
+  %7 = sdiv i32 %5, %6
+  %8 = insertvalue { i32, i1 } %<unnamed>, i32 %7, 0
+  %9 = insertvalue { i32, i1 } %8, i1 1, 1
+  ret { i32, i1 } %9
 if.then.2_4:
-  ret i64 0
+  %2 = trunc i64 0 to i32
+  %3 = insertvalue { i32, i1 } %<unnamed>, i32 %2, 0
+  %4 = insertvalue { i32, i1 } %3, i1 0, 1
+  ret { i32, i1 } %4
 if.next.2_4:
   br label %if.end.2_4
 }
 
 define external i32 @main() {
 entry:
-  %2 = call { i32, i1 } @divide(i64 10, i64 2)
-  %3 = extractvalue { i32, i1 } %2, 0
+  %10 = call { i32, i1 } @divide(i64 10, i64 2)
+  %11 = extractvalue { i32, i1 } %10, 0
   %result.addr = alloca i32
-  store { i32, i1 } %3, ptr<i32> %result.addr
-  %4 = extractvalue { i32, i1 } %2, 1
+  store { i32, i1 } %11, ptr<i32> %result.addr
+  %12 = extractvalue { i32, i1 } %10, 1
   %ok.addr = alloca i1
-  store { i32, i1 } %4, ptr<i1> %ok.addr
-  %5 = load i1, ptr<i1> %ok.addr
-  br i1 %5, label %if.then.10_4, label %if.next.10_4
+  store { i32, i1 } %12, ptr<i1> %ok.addr
+  %13 = load i1, ptr<i1> %ok.addr
+  br i1 %13, label %if.then.10_4, label %if.next.10_4
 if.end.10_4:
-  %7 = sub i64 0, 1
-  %8 = trunc i64 %7 to i32
-  ret i32 %8
+  %15 = sub i64 0, 1
+  %16 = trunc i64 %15 to i32
+  ret i32 %16
 if.then.10_4:
-  %6 = load i32, ptr<i32> %result.addr
-  ret i32 %6
+  %14 = load i32, ptr<i32> %result.addr
+  ret i32 %14
 if.next.10_4:
   br label %if.end.10_4
 }

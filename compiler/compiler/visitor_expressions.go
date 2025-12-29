@@ -286,20 +286,333 @@ func (v *IRVisitor) getExpressionAddress(ctx *parser.UnaryExpressionContext) ir.
 }
 
 func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
+	v.logger.Debug("Visiting postfix expression")
+
+	// Start with the primary expression
 	result := v.Visit(ctx.PrimaryExpression()).(ir.Value)
+
+	// Apply each postfix operation
+	for _, opCtx := range ctx.AllPostfixOp() {
+		result = v.applyPostfixOp(result, opCtx)
+	}
+
+	return result
+}
+
+func (v *IRVisitor) applyPostfixOp(base ir.Value, opCtx parser.IPostfixOpContext) ir.Value {
+	op := opCtx.(*parser.PostfixOpContext)
+
+	// Member access: base.member
+	if op.DOT() != nil && op.IDENTIFIER() != nil {
+		memberName := op.IDENTIFIER().GetText()
+		v.logger.Debug("Member access: .%s", memberName)
+
+		// Check if this is a method call (has LPAREN)
+		if op.LPAREN() != nil {
+			// This is a method call: base.method(args)
+			return v.handleMethodCall(base, memberName, op)
+		}
+
+		// Regular member access
+		return v.handleMemberAccess(base, memberName)
+	}
+
+	// Function call: base(args)
+	if op.LPAREN() != nil && op.DOT() == nil {
+		v.logger.Debug("Function call")
+		return v.handleFunctionCall(base, op)
+	}
+
+	// Array/pointer indexing: base[index]
+	if op.LBRACKET() != nil {
+		v.logger.Debug("Array indexing")
+		indexVal := v.Visit(op.Expression()).(ir.Value)
+		return v.handleIndexing(base, indexVal)
+	}
+
+	// Post-increment: base++
+	if op.INCREMENT() != nil {
+		v.logger.Debug("Post-increment")
+		return v.handlePostIncrement(base)
+	}
+
+	// Post-decrement: base--
+	if op.DECREMENT() != nil {
+		v.logger.Debug("Post-decrement")
+		return v.handlePostDecrement(base)
+	}
+
+	v.ctx.Logger.Error("Unknown postfix operation")
+	return base
+}
+
+func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpContext) ir.Value {
+	v.logger.Debug("Handling function call")
+
+	// Get the function type
+	var funcType *types.FunctionType
 	
-	var baseIdentifier string
-	if primaryCtx := ctx.PrimaryExpression(); primaryCtx != nil {
-		if primaryCtx.IDENTIFIER() != nil {
-			baseIdentifier = primaryCtx.IDENTIFIER().GetText()
+	// If funcValue is a pointer to a function, dereference it
+	if ptrType, ok := funcValue.Type().(*types.PointerType); ok {
+		if ft, ok := ptrType.ElementType.(*types.FunctionType); ok {
+			funcType = ft
+		}
+	} else if ft, ok := funcValue.Type().(*types.FunctionType); ok {
+		funcType = ft
+	}
+
+	// Build arguments with proper type casting
+	args := []ir.Value{}
+	argList := op.ArgumentList()
+	
+	if argList != nil {
+		allArgs := argList.(*parser.ArgumentListContext).AllArgument()
+		
+		for i, argCtx := range allArgs {
+			// Visit the argument expression
+			var argVal ir.Value
+			
+			argContext := argCtx.(*parser.ArgumentContext)
+			if argContext.Expression() != nil {
+				argVal = v.Visit(argContext.Expression()).(ir.Value)
+			} else if argContext.LambdaExpression() != nil {
+				argVal = v.Visit(argContext.LambdaExpression()).(ir.Value)
+			} else {
+				v.ctx.Logger.Error("Invalid argument type")
+				continue
+			}
+			
+			// Cast to expected parameter type if function type is known
+			if funcType != nil && i < len(funcType.ParamTypes) {
+				expectedType := funcType.ParamTypes[i]
+				if !argVal.Type().Equal(expectedType) {
+					v.logger.Debug("Casting argument %d from %v to %v", i, argVal.Type(), expectedType)
+					argVal = v.castValue(argVal, expectedType)
+				}
+			}
+			
+			args = append(args, argVal)
 		}
 	}
+
+	// Create the call instruction
+	result := v.ctx.Builder.CreateCall(funcValue, args, "")
 	
-	for _, op := range ctx.AllPostfixOp() {
-		result = v.visitPostfixOp(result, op.(*parser.PostfixOpContext), baseIdentifier)
-		baseIdentifier = ""
-	}
+	v.logger.Debug("Function call created, return type: %v", result.Type())
+	
 	return result
+}
+
+func (v *IRVisitor) handleMethodCall(base ir.Value, methodName string, op *parser.PostfixOpContext) ir.Value {
+	v.logger.Debug("Handling method call: %s", methodName)
+
+	// Get the base type
+	baseType := base.Type()
+	
+	// If base is a pointer, get the element type
+	if ptrType, ok := baseType.(*types.PointerType); ok {
+		baseType = ptrType.ElementType
+	}
+
+	// Look up the method
+	structType, ok := baseType.(*types.StructType)
+	if !ok {
+		v.ctx.Logger.Error("Cannot call method on non-struct type: %v", baseType)
+		return base
+	}
+
+	// Find the method in the struct's associated methods
+	methodFunc := v.ctx.LookupMethod(structType.Name, methodName)
+	if methodFunc == nil {
+		v.ctx.Logger.Error("Method %s not found on type %s", methodName, structType.Name)
+		return base
+	}
+
+	// Build arguments: self is the first argument
+	args := []ir.Value{base}
+	
+	argList := op.ArgumentList()
+	if argList != nil {
+		allArgs := argList.(*parser.ArgumentListContext).AllArgument()
+		
+		// Get function type for parameter type checking
+		funcType := methodFunc.FuncType
+		
+		for i, argCtx := range allArgs {
+			// Visit the argument expression
+			var argVal ir.Value
+			
+			argContext := argCtx.(*parser.ArgumentContext)
+			if argContext.Expression() != nil {
+				argVal = v.Visit(argContext.Expression()).(ir.Value)
+			} else if argContext.LambdaExpression() != nil {
+				argVal = v.Visit(argContext.LambdaExpression()).(ir.Value)
+			} else {
+				v.ctx.Logger.Error("Invalid argument type")
+				continue
+			}
+			
+			// Cast to expected parameter type (i+1 because self is param 0)
+			paramIndex := i + 1
+			if paramIndex < len(funcType.ParamTypes) {
+				expectedType := funcType.ParamTypes[paramIndex]
+				if !argVal.Type().Equal(expectedType) {
+					v.logger.Debug("Casting method argument %d from %v to %v", i, argVal.Type(), expectedType)
+					argVal = v.castValue(argVal, expectedType)
+				}
+			}
+			
+			args = append(args, argVal)
+		}
+	}
+
+	// Create the call instruction
+	result := v.ctx.Builder.CreateCall(methodFunc, args, "")
+	
+	return result
+}
+
+func (v *IRVisitor) handleMemberAccess(base ir.Value, memberName string) ir.Value {
+	v.logger.Debug("Handling member access: .%s", memberName)
+
+	baseType := base.Type()
+
+	// If base is a pointer, we need to load it first or use GEP
+	var structVal ir.Value
+	var structType *types.StructType
+
+	if ptrType, ok := baseType.(*types.PointerType); ok {
+		// Base is a pointer to a struct
+		if st, ok := ptrType.ElementType.(*types.StructType); ok {
+			structType = st
+			structVal = base // Keep as pointer for GEP
+		} else {
+			v.ctx.Logger.Error("Cannot access member of non-struct pointer type: %v", ptrType.ElementType)
+			return base
+		}
+	} else if st, ok := baseType.(*types.StructType); ok {
+		// Base is a struct value - need to get its address
+		structType = st
+		// For struct values, we need an address to do GEP
+		// This might require storing to a temporary and getting its address
+		temp := v.ctx.Builder.CreateAlloca(structType, "temp.struct")
+		v.ctx.Builder.CreateStore(base, temp)
+		structVal = temp
+	} else {
+		v.ctx.Logger.Error("Cannot access member of non-struct type: %v", baseType)
+		return base
+	}
+
+	// Find the field index
+	fieldIndex := -1
+	for i, field := range structType.Fields {
+		if structType.FieldNames != nil && i < len(structType.FieldNames) {
+			if structType.FieldNames[i] == memberName {
+				fieldIndex = i
+				break
+			}
+		}
+	}
+
+	if fieldIndex == -1 {
+		v.ctx.Logger.Error("Field %s not found in struct %s", memberName, structType.Name)
+		return base
+	}
+
+	// Create GEP to get pointer to the field
+	indices := []ir.Value{
+		v.ctx.Builder.ConstInt(types.NewInt(32), 0),
+		v.ctx.Builder.ConstInt(types.NewInt(32), int64(fieldIndex)),
+	}
+
+	fieldPtr := v.ctx.Builder.CreateGEP(structType, structVal, indices, "")
+
+	// Load the field value
+	fieldValue := v.ctx.Builder.CreateLoad(structType.Fields[fieldIndex], fieldPtr, "")
+
+	return fieldValue
+}
+
+func (v *IRVisitor) handleIndexing(base ir.Value, index ir.Value) ir.Value {
+	v.logger.Debug("Handling array indexing")
+
+	baseType := base.Type()
+
+	// Handle pointer types
+	if ptrType, ok := baseType.(*types.PointerType); ok {
+		elemType := ptrType.ElementType
+
+		// Create GEP
+		indices := []ir.Value{index}
+		elemPtr := v.ctx.Builder.CreateGEP(elemType, base, indices, "")
+
+		// Load the element
+		return v.ctx.Builder.CreateLoad(elemType, elemPtr, "")
+	}
+
+	// Handle array types
+	if arrayType, ok := baseType.(*types.ArrayType); ok {
+		// Need to get pointer to array first
+		arrayPtr := v.ctx.Builder.CreateAlloca(arrayType, "temp.array")
+		v.ctx.Builder.CreateStore(base, arrayPtr)
+
+		// Create GEP with two indices: [0][index]
+		indices := []ir.Value{
+			v.ctx.Builder.ConstInt(types.NewInt(32), 0),
+			index,
+		}
+		elemPtr := v.ctx.Builder.CreateGEP(arrayType, arrayPtr, indices, "")
+
+		// Load the element
+		return v.ctx.Builder.CreateLoad(arrayType.ElementType, elemPtr, "")
+	}
+
+	v.ctx.Logger.Error("Cannot index non-pointer/non-array type: %v", baseType)
+	return base
+}
+
+func (v *IRVisitor) handlePostIncrement(base ir.Value) ir.Value {
+	v.logger.Debug("Handling post-increment")
+
+	// Load the current value
+	currentVal := base
+	if ptrType, ok := base.Type().(*types.PointerType); ok {
+		currentVal = v.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
+	}
+
+	// Create the increment
+	one := v.ctx.Builder.ConstInt(currentVal.Type(), 1)
+	newVal := v.ctx.Builder.CreateAdd(currentVal, one, "")
+
+	// Store back
+	if ptrType, ok := base.Type().(*types.PointerType); ok {
+		v.ctx.Builder.CreateStore(newVal, base)
+	}
+
+	// Return the original value (post-increment returns old value)
+	return currentVal
+}
+
+func (v *IRVisitor) handlePostDecrement(base ir.Value) ir.Value {
+	v.logger.Debug("Handling post-decrement")
+
+	// Load the current value
+	currentVal := base
+	if ptrType, ok := base.Type().(*types.PointerType); ok {
+		currentVal = v.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
+	}
+
+	// Create the decrement
+	one := v.ctx.Builder.ConstInt(currentVal.Type(), 1)
+	newVal := v.ctx.Builder.CreateSub(currentVal, one, "")
+
+	// Store back
+	if ptrType, ok := base.Type().(*types.PointerType); ok {
+		v.ctx.Builder.CreateStore(newVal, base)
+	}
+
+	// Return the original value (post-decrement returns old value)
+	return currentVal
 }
 
 func (v *IRVisitor) visitPostfixOp(base ir.Value, ctx *parser.PostfixOpContext, baseIdentifier string) ir.Value {
