@@ -1,6 +1,3 @@
-Here's the complete updated `visitor_expressions.go` file:
-
-```go
 package compiler
 
 import (
@@ -673,7 +670,6 @@ func (v *IRVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	if ctx.CHAR_LITERAL() != nil {
 		text := ctx.CHAR_LITERAL().GetText()
 		// Remove single quotes
-
 		if len(text) >= 2 {
 			text = text[1 : len(text)-1]
 		}
