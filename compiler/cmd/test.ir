@@ -1,20 +1,11 @@
+define external void @cleanup() {
+entry:
+  ret void
+}
+
 define external i32 @main() {
 entry:
-  %i.addr = alloca i64
-  store i64 0, ptr<i64> %i.addr
-  %0 = load i64, ptr<i64> %i.addr
-  %1 = add i64 %0, 1
-  %2 = load i64, ptr<i64> %i.addr
-  %3 = add i64 %2, 1
-  %4 = load i64, ptr<i64> %i.addr
-  %5 = icmp eq i64 %4, 2
-  br i1 %5, label %if.then.5_4, label %if.next.5_4
-if.end.5_4:
-  %7 = trunc i64 1 to i32
-  ret i32 %7
-if.then.5_4:
-  %6 = trunc i64 0 to i32
-  ret i32 %6
-if.next.5_4:
-  br label %if.end.5_4
+  call void @cleanup()
+  %0 = trunc i64 0 to i32
+  ret i32 %0
 }

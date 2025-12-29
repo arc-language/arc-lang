@@ -1203,7 +1203,7 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 	}
 	if ctx.RAISE() != nil && len(args) == 1 {
 		v.ctx.Builder.CreateRaise(args[0])
-		v.ctx.Builder.CreateUnreachable()
+		// Removed: v.ctx.Builder.CreateUnreachable() - backend doesn't support it
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
 	if ctx.BIT_CAST() != nil && len(args) == 1 {
