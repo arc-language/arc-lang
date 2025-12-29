@@ -159,9 +159,7 @@ func (v *IRVisitor) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 	isTwoVar := len(ctx.AllIDENTIFIER()) == 2
 	
 	varName := ctx.IDENTIFIER(0).GetText()
-	var valueName string
 	if isTwoVar {
-		valueName = ctx.IDENTIFIER(1).GetText()
 		// Two-variable for-in is only for maps, which are now library types
 		v.ctx.Logger.Error("Two-variable for-in loops are only supported for map types (library feature)")
 		return nil
