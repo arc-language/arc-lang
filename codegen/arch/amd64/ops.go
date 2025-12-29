@@ -62,7 +62,7 @@ func (c *compiler) compileInstruction(inst ir.Instruction) error {
 	case ir.OpFCmp:
 		return c.fcmpOp(inst.(*ir.FCmpInst))
 
-	// Control flow
+	// Control flow (implemented in controlflow.go)
 	case ir.OpRet:
 		return c.retOp(inst.(*ir.RetInst))
 	case ir.OpBr:
@@ -84,7 +84,7 @@ func (c *compiler) compileInstruction(inst ir.Instruction) error {
 	case ir.OpPtrToInt, ir.OpIntToPtr, ir.OpBitcast:
 		return c.bitcastOp(inst.(*ir.CastInst))
 
-	// Other
+	// Other (mostly in controlflow.go or here)
 	case ir.OpPhi:
 		return c.phiOp(inst.(*ir.PhiInst))
 	case ir.OpSelect:
@@ -126,7 +126,7 @@ func (c *compiler) compileInstruction(inst ir.Instruction) error {
 	case ir.OpRaise:
 		return c.raiseOp(inst.(*ir.RaiseInst))
 
-	// Coroutine operations
+	// Coroutine operations (implemented in coroutines.go)
 	case ir.OpCoroId:
 		return c.coroIdOp(inst.(*ir.CoroIdInst))
 	case ir.OpCoroBegin:
@@ -826,6 +826,118 @@ func (c *compiler) insertValueOp(inst *ir.InsertValueInst) error {
 
 	// The result is already in place at destOffset
 	// No need to call storeFromReg since the value is already where it should be
+	return nil
+}
+
+// ============================================================================
+// Cast Operations (Integer/Float Conversions)
+// ============================================================================
+
+// Integer cast operations
+func (c *compiler) intCastOp(inst *ir.CastInst) error {
+	src := inst.Operands()[0]
+	c.loadToReg(RAX, src)
+
+	srcSize := SizeOf(src.Type())
+
+	switch inst.Opcode() {
+	case ir.OpTrunc:
+		// Truncation - just take lower bits (already in RAX)
+		// No operation needed, storing will handle it by taking correct size
+
+	case ir.OpZExt:
+		// Zero extension
+		switch srcSize {
+		case 1:
+			c.emitBytes(0x48, 0x0F, 0xB6, 0xC0) // movzx rax, al
+		case 2:
+			c.emitBytes(0x48, 0x0F, 0xB7, 0xC0) // movzx rax, ax
+		case 4:
+			c.emitBytes(0x89, 0xC0) // mov eax, eax (zero-extends to 64-bit)
+		}
+
+	case ir.OpSExt:
+		// Sign extension
+		switch srcSize {
+		case 1:
+			c.emitBytes(0x48, 0x0F, 0xBE, 0xC0) // movsx rax, al
+		case 2:
+			c.emitBytes(0x48, 0x0F, 0xBF, 0xC0) // movsx rax, ax
+		case 4:
+			c.emitBytes(0x48, 0x63, 0xC0) // movsxd rax, eax
+		}
+	}
+
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+// Floating point cast operations (float <-> double)
+func (c *compiler) fpCastOp(inst *ir.CastInst) error {
+	src := inst.Operands()[0]
+	srcType := src.Type().(*types.FloatType)
+	dstType := inst.Type().(*types.FloatType)
+
+	c.loadToFpReg(0, src)
+
+	if srcType.BitWidth == 32 && dstType.BitWidth == 64 {
+		// cvtss2sd xmm0, xmm0
+		c.emitBytes(0xF3, 0x0F, 0x5A, 0xC0)
+	} else if srcType.BitWidth == 64 && dstType.BitWidth == 32 {
+		// cvtsd2ss xmm0, xmm0
+		c.emitBytes(0xF2, 0x0F, 0x5A, 0xC0)
+	}
+
+	c.storeFromFpReg(0, inst)
+	return nil
+}
+
+// Float to integer conversion
+func (c *compiler) fpToIntOp(inst *ir.CastInst) error {
+	src := inst.Operands()[0]
+	srcType := src.Type().(*types.FloatType)
+
+	c.loadToFpReg(0, src)
+
+	if srcType.BitWidth == 32 {
+		// cvttss2si rax, xmm0
+		c.emitBytes(0xF3, 0x48, 0x0F, 0x2C, 0xC0)
+	} else {
+		// cvttsd2si rax, xmm0
+		c.emitBytes(0xF2, 0x48, 0x0F, 0x2C, 0xC0)
+	}
+
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+// Integer to float conversion
+func (c *compiler) intToFpOp(inst *ir.CastInst) error {
+	src := inst.Operands()[0]
+	dstType := inst.Type().(*types.FloatType)
+
+	c.loadToReg(RAX, src)
+
+	if dstType.BitWidth == 32 {
+		// cvtsi2ss xmm0, rax
+		c.emitBytes(0xF3, 0x48, 0x0F, 0x2A, 0xC0)
+	} else {
+		// cvtsi2sd xmm0, rax
+		c.emitBytes(0xF2, 0x48, 0x0F, 0x2A, 0xC0)
+	}
+
+	c.storeFromFpReg(0, inst)
+	return nil
+}
+
+// Bitcast and pointer casts
+func (c *compiler) bitcastOp(inst *ir.CastInst) error {
+	src := inst.Operands()[0]
+
+	// For bitcast, pointer cast, etc., just copy the bits
+	c.loadToReg(RAX, src)
+	c.storeFromReg(RAX, inst)
+
 	return nil
 }
 
