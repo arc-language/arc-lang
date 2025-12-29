@@ -48,6 +48,9 @@ x = 100
 ## Constants, immutable with type
 ```arc
 const x: int32 = 42
+
+const BUFFER_SIZE: usize = 1024
+let buffer: array<byte, BUFFER_SIZE> = {}
 ```
 
 ## Constants, immutable with inference
