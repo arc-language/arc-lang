@@ -70,61 +70,57 @@ const (
 	ArcLexerARROW           = 65
 	ArcLexerRANGE           = 66
 	ArcLexerELLIPSIS        = 67
-	ArcLexerLSHIFT_ASSIGN   = 68
-	ArcLexerRSHIFT_ASSIGN   = 69
-	ArcLexerLSHIFT          = 70
-	ArcLexerRSHIFT          = 71
-	ArcLexerEQ              = 72
-	ArcLexerNE              = 73
-	ArcLexerLE              = 74
-	ArcLexerGE              = 75
-	ArcLexerAND             = 76
-	ArcLexerOR              = 77
-	ArcLexerPLUS_ASSIGN     = 78
-	ArcLexerMINUS_ASSIGN    = 79
-	ArcLexerSTAR_ASSIGN     = 80
-	ArcLexerSLASH_ASSIGN    = 81
-	ArcLexerPERCENT_ASSIGN  = 82
-	ArcLexerBIT_OR_ASSIGN   = 83
-	ArcLexerBIT_AND_ASSIGN  = 84
-	ArcLexerBIT_XOR_ASSIGN  = 85
-	ArcLexerINCREMENT       = 86
-	ArcLexerDECREMENT       = 87
-	ArcLexerFAT_ARROW       = 88
-	ArcLexerPLUS            = 89
-	ArcLexerMINUS           = 90
-	ArcLexerSTAR            = 91
-	ArcLexerSLASH           = 92
-	ArcLexerPERCENT         = 93
-	ArcLexerLT              = 94
-	ArcLexerGT              = 95
-	ArcLexerNOT             = 96
-	ArcLexerAMP             = 97
-	ArcLexerBIT_OR          = 98
-	ArcLexerBIT_XOR         = 99
-	ArcLexerBIT_NOT         = 100
-	ArcLexerAT              = 101
-	ArcLexerASSIGN          = 102
-	ArcLexerLPAREN          = 103
-	ArcLexerRPAREN          = 104
-	ArcLexerLBRACE          = 105
-	ArcLexerRBRACE          = 106
-	ArcLexerLBRACKET        = 107
-	ArcLexerRBRACKET        = 108
-	ArcLexerCOMMA           = 109
-	ArcLexerCOLON           = 110
-	ArcLexerSEMICOLON       = 111
-	ArcLexerDOT             = 112
-	ArcLexerUNDERSCORE      = 113
-	ArcLexerBOOLEAN_LITERAL = 114
-	ArcLexerINTEGER_LITERAL = 115
-	ArcLexerFLOAT_LITERAL   = 116
-	ArcLexerSTRING_LITERAL  = 117
-	ArcLexerCHAR_LITERAL    = 118
-	ArcLexerIDENTIFIER      = 119
-	ArcLexerWS              = 120
-	ArcLexerLINE_COMMENT    = 121
-	ArcLexerBLOCK_COMMENT   = 122
+	ArcLexerEQ              = 68
+	ArcLexerNE              = 69
+	ArcLexerLE              = 70
+	ArcLexerGE              = 71
+	ArcLexerAND             = 72
+	ArcLexerOR              = 73
+	ArcLexerPLUS_ASSIGN     = 74
+	ArcLexerMINUS_ASSIGN    = 75
+	ArcLexerSTAR_ASSIGN     = 76
+	ArcLexerSLASH_ASSIGN    = 77
+	ArcLexerPERCENT_ASSIGN  = 78
+	ArcLexerBIT_OR_ASSIGN   = 79
+	ArcLexerBIT_AND_ASSIGN  = 80
+	ArcLexerBIT_XOR_ASSIGN  = 81
+	ArcLexerINCREMENT       = 82
+	ArcLexerDECREMENT       = 83
+	ArcLexerFAT_ARROW       = 84
+	ArcLexerPLUS            = 85
+	ArcLexerMINUS           = 86
+	ArcLexerSTAR            = 87
+	ArcLexerSLASH           = 88
+	ArcLexerPERCENT         = 89
+	ArcLexerLT              = 90
+	ArcLexerGT              = 91
+	ArcLexerNOT             = 92
+	ArcLexerAMP             = 93
+	ArcLexerBIT_OR          = 94
+	ArcLexerBIT_XOR         = 95
+	ArcLexerBIT_NOT         = 96
+	ArcLexerAT              = 97
+	ArcLexerASSIGN          = 98
+	ArcLexerLPAREN          = 99
+	ArcLexerRPAREN          = 100
+	ArcLexerLBRACE          = 101
+	ArcLexerRBRACE          = 102
+	ArcLexerLBRACKET        = 103
+	ArcLexerRBRACKET        = 104
+	ArcLexerCOMMA           = 105
+	ArcLexerCOLON           = 106
+	ArcLexerSEMICOLON       = 107
+	ArcLexerDOT             = 108
+	ArcLexerUNDERSCORE      = 109
+	ArcLexerBOOLEAN_LITERAL = 110
+	ArcLexerINTEGER_LITERAL = 111
+	ArcLexerFLOAT_LITERAL   = 112
+	ArcLexerSTRING_LITERAL  = 113
+	ArcLexerCHAR_LITERAL    = 114
+	ArcLexerIDENTIFIER      = 115
+	ArcLexerWS              = 116
+	ArcLexerLINE_COMMENT    = 117
+	ArcLexerBLOCK_COMMENT   = 118
 )
     ArcLexer tokens.
 
@@ -197,61 +193,57 @@ const (
 	ArcParserARROW           = 65
 	ArcParserRANGE           = 66
 	ArcParserELLIPSIS        = 67
-	ArcParserLSHIFT_ASSIGN   = 68
-	ArcParserRSHIFT_ASSIGN   = 69
-	ArcParserLSHIFT          = 70
-	ArcParserRSHIFT          = 71
-	ArcParserEQ              = 72
-	ArcParserNE              = 73
-	ArcParserLE              = 74
-	ArcParserGE              = 75
-	ArcParserAND             = 76
-	ArcParserOR              = 77
-	ArcParserPLUS_ASSIGN     = 78
-	ArcParserMINUS_ASSIGN    = 79
-	ArcParserSTAR_ASSIGN     = 80
-	ArcParserSLASH_ASSIGN    = 81
-	ArcParserPERCENT_ASSIGN  = 82
-	ArcParserBIT_OR_ASSIGN   = 83
-	ArcParserBIT_AND_ASSIGN  = 84
-	ArcParserBIT_XOR_ASSIGN  = 85
-	ArcParserINCREMENT       = 86
-	ArcParserDECREMENT       = 87
-	ArcParserFAT_ARROW       = 88
-	ArcParserPLUS            = 89
-	ArcParserMINUS           = 90
-	ArcParserSTAR            = 91
-	ArcParserSLASH           = 92
-	ArcParserPERCENT         = 93
-	ArcParserLT              = 94
-	ArcParserGT              = 95
-	ArcParserNOT             = 96
-	ArcParserAMP             = 97
-	ArcParserBIT_OR          = 98
-	ArcParserBIT_XOR         = 99
-	ArcParserBIT_NOT         = 100
-	ArcParserAT              = 101
-	ArcParserASSIGN          = 102
-	ArcParserLPAREN          = 103
-	ArcParserRPAREN          = 104
-	ArcParserLBRACE          = 105
-	ArcParserRBRACE          = 106
-	ArcParserLBRACKET        = 107
-	ArcParserRBRACKET        = 108
-	ArcParserCOMMA           = 109
-	ArcParserCOLON           = 110
-	ArcParserSEMICOLON       = 111
-	ArcParserDOT             = 112
-	ArcParserUNDERSCORE      = 113
-	ArcParserBOOLEAN_LITERAL = 114
-	ArcParserINTEGER_LITERAL = 115
-	ArcParserFLOAT_LITERAL   = 116
-	ArcParserSTRING_LITERAL  = 117
-	ArcParserCHAR_LITERAL    = 118
-	ArcParserIDENTIFIER      = 119
-	ArcParserWS              = 120
-	ArcParserLINE_COMMENT    = 121
-	ArcParserBLOCK_COMMENT   = 122
+	ArcParserEQ              = 68
+	ArcParserNE              = 69
+	ArcParserLE              = 70
+	ArcParserGE              = 71
+	ArcParserAND             = 72
+	ArcParserOR              = 73
+	ArcParserPLUS_ASSIGN     = 74
+	ArcParserMINUS_ASSIGN    = 75
+	ArcParserSTAR_ASSIGN     = 76
+	ArcParserSLASH_ASSIGN    = 77
+	ArcParserPERCENT_ASSIGN  = 78
+	ArcParserBIT_OR_ASSIGN   = 79
+	ArcParserBIT_AND_ASSIGN  = 80
+	ArcParserBIT_XOR_ASSIGN  = 81
+	ArcParserINCREMENT       = 82
+	ArcParserDECREMENT       = 83
+	ArcParserFAT_ARROW       = 84
+	ArcParserPLUS            = 85
+	ArcParserMINUS           = 86
+	ArcParserSTAR            = 87
+	ArcParserSLASH           = 88
+	ArcParserPERCENT         = 89
+	ArcParserLT              = 90
+	ArcParserGT              = 91
+	ArcParserNOT             = 92
+	ArcParserAMP             = 93
+	ArcParserBIT_OR          = 94
+	ArcParserBIT_XOR         = 95
+	ArcParserBIT_NOT         = 96
+	ArcParserAT              = 97
+	ArcParserASSIGN          = 98
+	ArcParserLPAREN          = 99
+	ArcParserRPAREN          = 100
+	ArcParserLBRACE          = 101
+	ArcParserRBRACE          = 102
+	ArcParserLBRACKET        = 103
+	ArcParserRBRACKET        = 104
+	ArcParserCOMMA           = 105
+	ArcParserCOLON           = 106
+	ArcParserSEMICOLON       = 107
+	ArcParserDOT             = 108
+	ArcParserUNDERSCORE      = 109
+	ArcParserBOOLEAN_LITERAL = 110
+	ArcParserINTEGER_LITERAL = 111
+	ArcParserFLOAT_LITERAL   = 112
+	ArcParserSTRING_LITERAL  = 113
+	ArcParserCHAR_LITERAL    = 114
+	ArcParserIDENTIFIER      = 115
+	ArcParserWS              = 116
+	ArcParserLINE_COMMENT    = 117
+	ArcParserBLOCK_COMMENT   = 118
 )
     ArcParser tokens.
 
@@ -268,84 +260,83 @@ const (
 	ArcParserRULE_genericParams            = 9
 	ArcParserRULE_genericParamList         = 10
 	ArcParserRULE_genericArgs              = 11
-	ArcParserRULE_gtClose                  = 12
-	ArcParserRULE_typeList                 = 13
-	ArcParserRULE_functionDecl             = 14
-	ArcParserRULE_returnType               = 15
-	ArcParserRULE_parameterList            = 16
-	ArcParserRULE_parameter                = 17
-	ArcParserRULE_structDecl               = 18
-	ArcParserRULE_structMember             = 19
-	ArcParserRULE_structField              = 20
-	ArcParserRULE_classDecl                = 21
-	ArcParserRULE_classMember              = 22
-	ArcParserRULE_classField               = 23
-	ArcParserRULE_enumDecl                 = 24
-	ArcParserRULE_enumMember               = 25
-	ArcParserRULE_methodDecl               = 26
-	ArcParserRULE_mutatingDecl             = 27
-	ArcParserRULE_deinitDecl               = 28
-	ArcParserRULE_variableDecl             = 29
-	ArcParserRULE_constDecl                = 30
-	ArcParserRULE_tuplePattern             = 31
-	ArcParserRULE_tupleType                = 32
-	ArcParserRULE_type                     = 33
-	ArcParserRULE_qualifiedType            = 34
-	ArcParserRULE_primitiveType            = 35
-	ArcParserRULE_pointerType              = 36
-	ArcParserRULE_referenceType            = 37
-	ArcParserRULE_arrayType                = 38
-	ArcParserRULE_arraySize                = 39
-	ArcParserRULE_block                    = 40
-	ArcParserRULE_statement                = 41
-	ArcParserRULE_assignmentStmt           = 42
-	ArcParserRULE_assignmentOp             = 43
-	ArcParserRULE_leftHandSide             = 44
-	ArcParserRULE_expressionStmt           = 45
-	ArcParserRULE_returnStmt               = 46
-	ArcParserRULE_ifStmt                   = 47
-	ArcParserRULE_forStmt                  = 48
-	ArcParserRULE_switchStmt               = 49
-	ArcParserRULE_switchCase               = 50
-	ArcParserRULE_defaultCase              = 51
-	ArcParserRULE_tryStmt                  = 52
-	ArcParserRULE_exceptClause             = 53
-	ArcParserRULE_finallyClause            = 54
-	ArcParserRULE_breakStmt                = 55
-	ArcParserRULE_continueStmt             = 56
-	ArcParserRULE_deferStmt                = 57
-	ArcParserRULE_expression               = 58
-	ArcParserRULE_logicalOrExpression      = 59
-	ArcParserRULE_logicalAndExpression     = 60
-	ArcParserRULE_bitOrExpression          = 61
-	ArcParserRULE_bitXorExpression         = 62
-	ArcParserRULE_bitAndExpression         = 63
-	ArcParserRULE_equalityExpression       = 64
-	ArcParserRULE_relationalExpression     = 65
-	ArcParserRULE_shiftExpression          = 66
-	ArcParserRULE_rangeExpression          = 67
-	ArcParserRULE_additiveExpression       = 68
-	ArcParserRULE_multiplicativeExpression = 69
-	ArcParserRULE_unaryExpression          = 70
-	ArcParserRULE_postfixExpression        = 71
-	ArcParserRULE_postfixOp                = 72
-	ArcParserRULE_primaryExpression        = 73
-	ArcParserRULE_qualifiedIdentifier      = 74
-	ArcParserRULE_literal                  = 75
-	ArcParserRULE_initializerList          = 76
-	ArcParserRULE_initializerEntry         = 77
-	ArcParserRULE_structLiteral            = 78
-	ArcParserRULE_fieldInit                = 79
-	ArcParserRULE_argumentList             = 80
-	ArcParserRULE_argument                 = 81
-	ArcParserRULE_lambdaExpression         = 82
-	ArcParserRULE_lambdaParamList          = 83
-	ArcParserRULE_lambdaParam              = 84
-	ArcParserRULE_tupleExpression          = 85
-	ArcParserRULE_castExpression           = 86
-	ArcParserRULE_allocaExpression         = 87
-	ArcParserRULE_syscallExpression        = 88
-	ArcParserRULE_intrinsicExpression      = 89
+	ArcParserRULE_typeList                 = 12
+	ArcParserRULE_functionDecl             = 13
+	ArcParserRULE_returnType               = 14
+	ArcParserRULE_parameterList            = 15
+	ArcParserRULE_parameter                = 16
+	ArcParserRULE_structDecl               = 17
+	ArcParserRULE_structMember             = 18
+	ArcParserRULE_structField              = 19
+	ArcParserRULE_classDecl                = 20
+	ArcParserRULE_classMember              = 21
+	ArcParserRULE_classField               = 22
+	ArcParserRULE_enumDecl                 = 23
+	ArcParserRULE_enumMember               = 24
+	ArcParserRULE_methodDecl               = 25
+	ArcParserRULE_mutatingDecl             = 26
+	ArcParserRULE_deinitDecl               = 27
+	ArcParserRULE_variableDecl             = 28
+	ArcParserRULE_constDecl                = 29
+	ArcParserRULE_tuplePattern             = 30
+	ArcParserRULE_tupleType                = 31
+	ArcParserRULE_type                     = 32
+	ArcParserRULE_qualifiedType            = 33
+	ArcParserRULE_primitiveType            = 34
+	ArcParserRULE_pointerType              = 35
+	ArcParserRULE_referenceType            = 36
+	ArcParserRULE_arrayType                = 37
+	ArcParserRULE_arraySize                = 38
+	ArcParserRULE_block                    = 39
+	ArcParserRULE_statement                = 40
+	ArcParserRULE_assignmentStmt           = 41
+	ArcParserRULE_assignmentOp             = 42
+	ArcParserRULE_leftHandSide             = 43
+	ArcParserRULE_expressionStmt           = 44
+	ArcParserRULE_returnStmt               = 45
+	ArcParserRULE_ifStmt                   = 46
+	ArcParserRULE_forStmt                  = 47
+	ArcParserRULE_switchStmt               = 48
+	ArcParserRULE_switchCase               = 49
+	ArcParserRULE_defaultCase              = 50
+	ArcParserRULE_tryStmt                  = 51
+	ArcParserRULE_exceptClause             = 52
+	ArcParserRULE_finallyClause            = 53
+	ArcParserRULE_breakStmt                = 54
+	ArcParserRULE_continueStmt             = 55
+	ArcParserRULE_deferStmt                = 56
+	ArcParserRULE_expression               = 57
+	ArcParserRULE_logicalOrExpression      = 58
+	ArcParserRULE_logicalAndExpression     = 59
+	ArcParserRULE_bitOrExpression          = 60
+	ArcParserRULE_bitXorExpression         = 61
+	ArcParserRULE_bitAndExpression         = 62
+	ArcParserRULE_equalityExpression       = 63
+	ArcParserRULE_relationalExpression     = 64
+	ArcParserRULE_shiftExpression          = 65
+	ArcParserRULE_rangeExpression          = 66
+	ArcParserRULE_additiveExpression       = 67
+	ArcParserRULE_multiplicativeExpression = 68
+	ArcParserRULE_unaryExpression          = 69
+	ArcParserRULE_postfixExpression        = 70
+	ArcParserRULE_postfixOp                = 71
+	ArcParserRULE_primaryExpression        = 72
+	ArcParserRULE_qualifiedIdentifier      = 73
+	ArcParserRULE_literal                  = 74
+	ArcParserRULE_initializerList          = 75
+	ArcParserRULE_initializerEntry         = 76
+	ArcParserRULE_structLiteral            = 77
+	ArcParserRULE_fieldInit                = 78
+	ArcParserRULE_argumentList             = 79
+	ArcParserRULE_argument                 = 80
+	ArcParserRULE_lambdaExpression         = 81
+	ArcParserRULE_lambdaParamList          = 82
+	ArcParserRULE_lambdaParam              = 83
+	ArcParserRULE_tupleExpression          = 84
+	ArcParserRULE_castExpression           = 85
+	ArcParserRULE_allocaExpression         = 86
+	ArcParserRULE_syscallExpression        = 87
+	ArcParserRULE_intrinsicExpression      = 88
 )
     ArcParser rules.
 
@@ -429,7 +420,6 @@ func InitEmptyFunctionDeclContext(p *FunctionDeclContext)
 func InitEmptyGenericArgsContext(p *GenericArgsContext)
 func InitEmptyGenericParamListContext(p *GenericParamListContext)
 func InitEmptyGenericParamsContext(p *GenericParamsContext)
-func InitEmptyGtCloseContext(p *GtCloseContext)
 func InitEmptyIfStmtContext(p *IfStmtContext)
 func InitEmptyImportDeclContext(p *ImportDeclContext)
 func InitEmptyImportSpecContext(p *ImportSpecContext)
@@ -650,8 +640,6 @@ func (p *ArcParser) GenericParamList() (localctx IGenericParamListContext)
 
 func (p *ArcParser) GenericParams() (localctx IGenericParamsContext)
 
-func (p *ArcParser) GtClose() (localctx IGtCloseContext)
-
 func (p *ArcParser) IfStmt() (localctx IIfStmtContext)
 
 func (p *ArcParser) ImportDecl() (localctx IImportDeclContext)
@@ -788,9 +776,6 @@ type ArcParserListener interface {
 
 	// EnterGenericArgs is called when entering the genericArgs production.
 	EnterGenericArgs(c *GenericArgsContext)
-
-	// EnterGtClose is called when entering the gtClose production.
-	EnterGtClose(c *GtCloseContext)
 
 	// EnterTypeList is called when entering the typeList production.
 	EnterTypeList(c *TypeListContext)
@@ -1058,9 +1043,6 @@ type ArcParserListener interface {
 
 	// ExitGenericArgs is called when exiting the genericArgs production.
 	ExitGenericArgs(c *GenericArgsContext)
-
-	// ExitGtClose is called when exiting the gtClose production.
-	ExitGtClose(c *GtCloseContext)
 
 	// ExitTypeList is called when exiting the typeList production.
 	ExitTypeList(c *TypeListContext)
@@ -1334,9 +1316,6 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#genericArgs.
 	VisitGenericArgs(ctx *GenericArgsContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#gtClose.
-	VisitGtClose(ctx *GtCloseContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#typeList.
 	VisitTypeList(ctx *TypeListContext) interface{}
@@ -1679,11 +1658,11 @@ func (s *ArrayTypeContext) EnterRule(listener antlr.ParseTreeListener)
 
 func (s *ArrayTypeContext) ExitRule(listener antlr.ParseTreeListener)
 
+func (s *ArrayTypeContext) GT() antlr.TerminalNode
+
 func (s *ArrayTypeContext) GetParser() antlr.Parser
 
 func (s *ArrayTypeContext) GetRuleContext() antlr.RuleContext
-
-func (s *ArrayTypeContext) GtClose() IGtCloseContext
 
 func (*ArrayTypeContext) IsArrayTypeContext()
 
@@ -1716,21 +1695,25 @@ func (s *AssignmentOpContext) EnterRule(listener antlr.ParseTreeListener)
 
 func (s *AssignmentOpContext) ExitRule(listener antlr.ParseTreeListener)
 
+func (s *AssignmentOpContext) GE() antlr.TerminalNode
+
+func (s *AssignmentOpContext) GT() antlr.TerminalNode
+
 func (s *AssignmentOpContext) GetParser() antlr.Parser
 
 func (s *AssignmentOpContext) GetRuleContext() antlr.RuleContext
 
 func (*AssignmentOpContext) IsAssignmentOpContext()
 
-func (s *AssignmentOpContext) LSHIFT_ASSIGN() antlr.TerminalNode
+func (s *AssignmentOpContext) LE() antlr.TerminalNode
+
+func (s *AssignmentOpContext) LT() antlr.TerminalNode
 
 func (s *AssignmentOpContext) MINUS_ASSIGN() antlr.TerminalNode
 
 func (s *AssignmentOpContext) PERCENT_ASSIGN() antlr.TerminalNode
 
 func (s *AssignmentOpContext) PLUS_ASSIGN() antlr.TerminalNode
-
-func (s *AssignmentOpContext) RSHIFT_ASSIGN() antlr.TerminalNode
 
 func (s *AssignmentOpContext) SLASH_ASSIGN() antlr.TerminalNode
 
@@ -1897,9 +1880,6 @@ func (s *BaseArcParserListener) EnterGenericParamList(ctx *GenericParamListConte
 
 func (s *BaseArcParserListener) EnterGenericParams(ctx *GenericParamsContext)
     EnterGenericParams is called when production genericParams is entered.
-
-func (s *BaseArcParserListener) EnterGtClose(ctx *GtCloseContext)
-    EnterGtClose is called when production gtClose is entered.
 
 func (s *BaseArcParserListener) EnterIfStmt(ctx *IfStmtContext)
     EnterIfStmt is called when production ifStmt is entered.
@@ -2184,9 +2164,6 @@ func (s *BaseArcParserListener) ExitGenericParamList(ctx *GenericParamListContex
 func (s *BaseArcParserListener) ExitGenericParams(ctx *GenericParamsContext)
     ExitGenericParams is called when production genericParams is exited.
 
-func (s *BaseArcParserListener) ExitGtClose(ctx *GtCloseContext)
-    ExitGtClose is called when production gtClose is exited.
-
 func (s *BaseArcParserListener) ExitIfStmt(ctx *IfStmtContext)
     ExitIfStmt is called when production ifStmt is exited.
 
@@ -2429,8 +2406,6 @@ func (v *BaseArcParserVisitor) VisitGenericArgs(ctx *GenericArgsContext) interfa
 func (v *BaseArcParserVisitor) VisitGenericParamList(ctx *GenericParamListContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitGenericParams(ctx *GenericParamsContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitGtClose(ctx *GtCloseContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitIfStmt(ctx *IfStmtContext) interface{}
 
@@ -2698,11 +2673,11 @@ func (s *CastExpressionContext) ExitRule(listener antlr.ParseTreeListener)
 
 func (s *CastExpressionContext) Expression() IExpressionContext
 
+func (s *CastExpressionContext) GT() antlr.TerminalNode
+
 func (s *CastExpressionContext) GetParser() antlr.Parser
 
 func (s *CastExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (s *CastExpressionContext) GtClose() IGtCloseContext
 
 func (*CastExpressionContext) IsCastExpressionContext()
 
@@ -3482,11 +3457,11 @@ func (s *GenericArgsContext) EnterRule(listener antlr.ParseTreeListener)
 
 func (s *GenericArgsContext) ExitRule(listener antlr.ParseTreeListener)
 
+func (s *GenericArgsContext) GT() antlr.TerminalNode
+
 func (s *GenericArgsContext) GetParser() antlr.Parser
 
 func (s *GenericArgsContext) GetRuleContext() antlr.RuleContext
-
-func (s *GenericArgsContext) GtClose() IGtCloseContext
 
 func (*GenericArgsContext) IsGenericArgsContext()
 
@@ -3555,33 +3530,6 @@ func (*GenericParamsContext) IsGenericParamsContext()
 func (s *GenericParamsContext) LT() antlr.TerminalNode
 
 func (s *GenericParamsContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type GtCloseContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyGtCloseContext() *GtCloseContext
-
-func NewGtCloseContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *GtCloseContext
-
-func (s *GtCloseContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *GtCloseContext) EnterRule(listener antlr.ParseTreeListener)
-
-func (s *GtCloseContext) ExitRule(listener antlr.ParseTreeListener)
-
-func (s *GtCloseContext) GT() antlr.TerminalNode
-
-func (s *GtCloseContext) GetParser() antlr.Parser
-
-func (s *GtCloseContext) GetRuleContext() antlr.RuleContext
-
-func (*GtCloseContext) IsGtCloseContext()
-
-func (s *GtCloseContext) RSHIFT() antlr.TerminalNode
-
-func (s *GtCloseContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type IAdditiveExpressionContext interface {
 	antlr.ParserRuleContext
@@ -3681,7 +3629,7 @@ type IArrayTypeContext interface {
 	Type_() ITypeContext
 	COMMA() antlr.TerminalNode
 	ArraySize() IArraySizeContext
-	GtClose() IGtCloseContext
+	GT() antlr.TerminalNode
 
 	// IsArrayTypeContext differentiates from other interfaces.
 	IsArrayTypeContext()
@@ -3704,8 +3652,10 @@ type IAssignmentOpContext interface {
 	BIT_OR_ASSIGN() antlr.TerminalNode
 	BIT_AND_ASSIGN() antlr.TerminalNode
 	BIT_XOR_ASSIGN() antlr.TerminalNode
-	LSHIFT_ASSIGN() antlr.TerminalNode
-	RSHIFT_ASSIGN() antlr.TerminalNode
+	LT() antlr.TerminalNode
+	LE() antlr.TerminalNode
+	GT() antlr.TerminalNode
+	GE() antlr.TerminalNode
 
 	// IsAssignmentOpContext differentiates from other interfaces.
 	IsAssignmentOpContext()
@@ -3820,7 +3770,7 @@ type ICastExpressionContext interface {
 	CAST() antlr.TerminalNode
 	LT() antlr.TerminalNode
 	Type_() ITypeContext
-	GtClose() IGtCloseContext
+	GT() antlr.TerminalNode
 	LPAREN() antlr.TerminalNode
 	Expression() IExpressionContext
 	RPAREN() antlr.TerminalNode
@@ -4249,7 +4199,7 @@ type IGenericArgsContext interface {
 	// Getter signatures
 	LT() antlr.TerminalNode
 	TypeList() ITypeListContext
-	GtClose() IGtCloseContext
+	GT() antlr.TerminalNode
 
 	// IsGenericArgsContext differentiates from other interfaces.
 	IsGenericArgsContext()
@@ -4288,21 +4238,6 @@ type IGenericParamsContext interface {
 	IsGenericParamsContext()
 }
     IGenericParamsContext is an interface to support dynamic dispatch.
-
-type IGtCloseContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	GT() antlr.TerminalNode
-	RSHIFT() antlr.TerminalNode
-
-	// IsGtCloseContext differentiates from other interfaces.
-	IsGtCloseContext()
-}
-    IGtCloseContext is an interface to support dynamic dispatch.
 
 type IIfStmtContext interface {
 	antlr.ParserRuleContext
@@ -4405,7 +4340,7 @@ type IIntrinsicExpressionContext interface {
 	SIZEOF() antlr.TerminalNode
 	LT() antlr.TerminalNode
 	Type_() ITypeContext
-	GtClose() IGtCloseContext
+	GT() antlr.TerminalNode
 	ALIGNOF() antlr.TerminalNode
 	MEMSET() antlr.TerminalNode
 	LPAREN() antlr.TerminalNode
@@ -4929,10 +4864,10 @@ type IShiftExpressionContext interface {
 	// Getter signatures
 	AllRangeExpression() []IRangeExpressionContext
 	RangeExpression(i int) IRangeExpressionContext
-	AllLSHIFT() []antlr.TerminalNode
-	LSHIFT(i int) antlr.TerminalNode
-	AllRSHIFT() []antlr.TerminalNode
-	RSHIFT(i int) antlr.TerminalNode
+	AllLT() []antlr.TerminalNode
+	LT(i int) antlr.TerminalNode
+	AllGT() []antlr.TerminalNode
+	GT(i int) antlr.TerminalNode
 
 	// IsShiftExpressionContext differentiates from other interfaces.
 	IsShiftExpressionContext()
@@ -5468,11 +5403,11 @@ func (s *IntrinsicExpressionContext) ExitRule(listener antlr.ParseTreeListener)
 
 func (s *IntrinsicExpressionContext) Expression(i int) IExpressionContext
 
+func (s *IntrinsicExpressionContext) GT() antlr.TerminalNode
+
 func (s *IntrinsicExpressionContext) GetParser() antlr.Parser
 
 func (s *IntrinsicExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (s *IntrinsicExpressionContext) GtClose() IGtCloseContext
 
 func (s *IntrinsicExpressionContext) IDENTIFIER() antlr.TerminalNode
 
@@ -6422,9 +6357,9 @@ func NewShiftExpressionContext(parser antlr.Parser, parent antlr.ParserRuleConte
 
 func (s *ShiftExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ShiftExpressionContext) AllLSHIFT() []antlr.TerminalNode
+func (s *ShiftExpressionContext) AllGT() []antlr.TerminalNode
 
-func (s *ShiftExpressionContext) AllRSHIFT() []antlr.TerminalNode
+func (s *ShiftExpressionContext) AllLT() []antlr.TerminalNode
 
 func (s *ShiftExpressionContext) AllRangeExpression() []IRangeExpressionContext
 
@@ -6432,15 +6367,15 @@ func (s *ShiftExpressionContext) EnterRule(listener antlr.ParseTreeListener)
 
 func (s *ShiftExpressionContext) ExitRule(listener antlr.ParseTreeListener)
 
+func (s *ShiftExpressionContext) GT(i int) antlr.TerminalNode
+
 func (s *ShiftExpressionContext) GetParser() antlr.Parser
 
 func (s *ShiftExpressionContext) GetRuleContext() antlr.RuleContext
 
 func (*ShiftExpressionContext) IsShiftExpressionContext()
 
-func (s *ShiftExpressionContext) LSHIFT(i int) antlr.TerminalNode
-
-func (s *ShiftExpressionContext) RSHIFT(i int) antlr.TerminalNode
+func (s *ShiftExpressionContext) LT(i int) antlr.TerminalNode
 
 func (s *ShiftExpressionContext) RangeExpression(i int) IRangeExpressionContext
 
