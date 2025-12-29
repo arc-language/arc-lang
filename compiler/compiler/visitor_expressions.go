@@ -1,3 +1,6 @@
+Here's the complete updated `visitor_expressions.go` file:
+
+```go
 package compiler
 
 import (
@@ -95,23 +98,48 @@ func (v *IRVisitor) VisitShiftExpression(ctx *parser.ShiftExpressionContext) int
 	for i := 1; i < len(ctx.AllRangeExpression()); i++ {
 		rhs := v.Visit(ctx.RangeExpression(i)).(ir.Value)
 		
-		opNode := ctx.GetChild(i*2 - 1).(antlr.TerminalNode)
-		tokenType := opNode.GetSymbol().GetTokenType()
-		
-		if tokenType == parser.ArcLexerLSHIFT {
-			result = v.ctx.Builder.CreateShl(result, rhs, "")
-		} else {
-			if intType, ok := result.Type().(*types.IntType); ok && intType.Signed {
-				result = v.ctx.Builder.CreateAShr(result, rhs, "")
-			} else {
-				result = v.ctx.Builder.CreateLShr(result, rhs, "")
+		// Determine operator type by checking tokens
+		opIdx := i*2 - 1
+		if opIdx < ctx.GetChildCount() {
+			child := ctx.GetChild(opIdx)
+			if termNode, ok := child.(antlr.TerminalNode); ok {
+				tokenType := termNode.GetSymbol().GetTokenType()
+				
+				if tokenType == parser.ArcParserLT {
+					// Check if next token is also LT (for <<)
+					if opIdx+1 < ctx.GetChildCount() {
+						nextChild := ctx.GetChild(opIdx + 1)
+						if nextTerm, ok := nextChild.(antlr.TerminalNode); ok && nextTerm.GetSymbol().GetTokenType() == parser.ArcParserLT {
+							// Left shift (<<)
+							result = v.ctx.Builder.CreateShl(result, rhs, "")
+							continue
+						}
+					}
+				} else if tokenType == parser.ArcParserGT {
+					// Check if next token is also GT (for >>)
+					if opIdx+1 < ctx.GetChildCount() {
+						nextChild := ctx.GetChild(opIdx + 1)
+						if nextTerm, ok := nextChild.(antlr.TerminalNode); ok && nextTerm.GetSymbol().GetTokenType() == parser.ArcParserGT {
+							// Right shift (>>)
+							if intType, ok := result.Type().(*types.IntType); ok && intType.Signed {
+								result = v.ctx.Builder.CreateAShr(result, rhs, "")
+							} else {
+								result = v.ctx.Builder.CreateLShr(result, rhs, "")
+							}
+							continue
+						}
+					}
+				}
 			}
 		}
 	}
+	
 	return result
 }
 
 func (v *IRVisitor) VisitRangeExpression(ctx *parser.RangeExpressionContext) interface{} {
+	// Just return the first additive expression
+	// Range operator (..) is handled in for-in loop context
 	return v.Visit(ctx.AdditiveExpression(0))
 }
 
@@ -623,59 +651,138 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 }
 
 func (v *IRVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
-    if ctx.INTEGER_LITERAL() != nil {
-        text := ctx.INTEGER_LITERAL().GetText()
-        val, _ := strconv.ParseInt(text, 0, 64)
-        return v.ctx.Builder.ConstInt(types.I64, val)
-    }
-    if ctx.FLOAT_LITERAL() != nil {
-        text := ctx.FLOAT_LITERAL().GetText()
-        val, _ := strconv.ParseFloat(text, 64)
-        return v.ctx.Builder.ConstFloat(types.F64, val)
-    }
-    if ctx.BOOLEAN_LITERAL() != nil {
-        if ctx.BOOLEAN_LITERAL().GetText() == "true" {
-            return v.ctx.Builder.True()
-        }
-        return v.ctx.Builder.False()
-    }
-    if ctx.STRING_LITERAL() != nil {
-        rawText := ctx.STRING_LITERAL().GetText()
-        content, err := strconv.Unquote(rawText)
-        if err != nil {
-            if len(rawText) >= 2 {
-                content = rawText[1 : len(rawText)-1]
-            } else {
-                content = rawText
-            }
-        }
-        
-        bytes := append([]byte(content), 0)
-        elements := make([]ir.Constant, len(bytes))
-        for i, b := range bytes {
-            elements[i] = v.ctx.Builder.ConstInt(types.I8, int64(b))
-        }
-        
-        arrType := types.NewArray(types.I8, int64(len(bytes)))
-        constArr := &ir.ConstantArray{
-            BaseValue: ir.BaseValue{ValType: arrType},
-            Elements:  elements,
-        }
-        
-        strName := fmt.Sprintf(".str.%d", len(v.ctx.Module.Globals))
-        global := v.ctx.Builder.CreateGlobalConstant(strName, constArr)
-        zero := v.ctx.Builder.ConstInt(types.I32, 0)
-        
-        return v.ctx.Builder.CreateInBoundsGEP(arrType, global, []ir.Value{zero, zero}, "")
-    }
-    if ctx.VectorLiteral() != nil {
-        return v.Visit(ctx.VectorLiteral())
-    }
-    if ctx.MapLiteral() != nil {
-        v.ctx.Logger.Warning("Map literals not yet implemented")
-        return v.ctx.Builder.ConstInt(types.I64, 0)
-    }
-    return v.ctx.Builder.ConstInt(types.I64, 0)
+	if ctx.INTEGER_LITERAL() != nil {
+		text := ctx.INTEGER_LITERAL().GetText()
+		val, _ := parseInt(text)
+		return v.ctx.Builder.ConstInt(types.I64, val)
+	}
+	if ctx.FLOAT_LITERAL() != nil {
+		text := ctx.FLOAT_LITERAL().GetText()
+		val, _ := strconv.ParseFloat(text, 64)
+		return v.ctx.Builder.ConstFloat(types.F64, val)
+	}
+	if ctx.BOOLEAN_LITERAL() != nil {
+		if ctx.BOOLEAN_LITERAL().GetText() == "true" {
+			return v.ctx.Builder.True()
+		}
+		return v.ctx.Builder.False()
+	}
+	if ctx.STRING_LITERAL() != nil {
+		return v.visitStringLiteral(ctx.STRING_LITERAL().GetText())
+	}
+	if ctx.CHAR_LITERAL() != nil {
+		text := ctx.CHAR_LITERAL().GetText()
+		// Remove single quotes
+
+		if len(text) >= 2 {
+			text = text[1 : len(text)-1]
+		}
+		
+		var charValue rune
+		if len(text) > 0 && text[0] == '\\' {
+			// Escape sequence
+			if len(text) >= 2 {
+				switch text[1] {
+				case 'n':
+					charValue = '\n'
+				case 't':
+					charValue = '\t'
+				case 'r':
+					charValue = '\r'
+				case '\\':
+					charValue = '\\'
+				case '\'':
+					charValue = '\''
+				case '0':
+					charValue = '\000'
+				default:
+					charValue = rune(text[1])
+				}
+			}
+		} else if len(text) > 0 {
+			charValue = rune(text[0])
+		}
+		
+		return v.ctx.Builder.ConstInt(types.U32, int64(charValue))
+	}
+	if ctx.NULL() != nil {
+		return v.ctx.Builder.ConstNull(types.NewPointer(types.Void))
+	}
+	if ctx.InitializerList() != nil {
+		return v.visitInitializerList(ctx.InitializerList())
+	}
+	return v.ctx.Builder.ConstInt(types.I64, 0)
+}
+
+func (v *IRVisitor) visitStringLiteral(rawText string) ir.Value {
+	content, err := strconv.Unquote(rawText)
+	if err != nil {
+		if len(rawText) >= 2 {
+			content = rawText[1 : len(rawText)-1]
+		} else {
+			content = rawText
+		}
+	}
+	
+	// Check for string interpolation \(expr)
+	if containsInterpolation(content) {
+		v.ctx.Logger.Warning("String interpolation not yet implemented, treating as raw string")
+	}
+	
+	bytes := append([]byte(content), 0)
+	elements := make([]ir.Constant, len(bytes))
+	for i, b := range bytes {
+		elements[i] = v.ctx.Builder.ConstInt(types.I8, int64(b))
+	}
+	
+	arrType := types.NewArray(types.I8, int64(len(bytes)))
+	constArr := &ir.ConstantArray{
+		BaseValue: ir.BaseValue{ValType: arrType},
+		Elements:  elements,
+	}
+	
+	strName := fmt.Sprintf(".str.%d", len(v.ctx.Module.Globals))
+	global := v.ctx.Builder.CreateGlobalConstant(strName, constArr)
+	zero := v.ctx.Builder.ConstInt(types.I32, 0)
+	
+	return v.ctx.Builder.CreateInBoundsGEP(arrType, global, []ir.Value{zero, zero}, "")
+}
+
+func (v *IRVisitor) visitInitializerList(ctx parser.IInitializerListContext) ir.Value {
+	initCtx := ctx.(*parser.InitializerListContext)
+	exprs := initCtx.AllExpression()
+	
+	if len(exprs) == 0 {
+		return &ir.ConstantArray{
+			BaseValue: ir.BaseValue{ValType: types.NewArray(types.I32, 0)},
+			Elements:  []ir.Constant{},
+		}
+	}
+	
+	elements := make([]ir.Constant, len(exprs))
+	var elemType types.Type
+	
+	for i, expr := range exprs {
+		val := v.Visit(expr).(ir.Value)
+		if i == 0 { 
+			elemType = val.Type() 
+		}
+		
+		if constVal, ok := val.(ir.Constant); ok {
+			elements[i] = constVal
+		} else {
+			elements[i] = v.ctx.Builder.ConstInt(types.I32, 0)
+			if elemType == nil { 
+				elemType = types.I32 
+			}
+		}
+	}
+	
+	arrType := types.NewArray(elemType, int64(len(elements)))
+	return &ir.ConstantArray{
+		BaseValue: ir.BaseValue{ValType: arrType},
+		Elements:  elements,
+	}
 }
 
 func (v *IRVisitor) VisitCastExpression(ctx *parser.CastExpressionContext) interface{} {
@@ -713,9 +820,11 @@ func (v *IRVisitor) VisitSyscallExpression(ctx *parser.SyscallExpressionContext)
 
 func (v *IRVisitor) VisitArgumentList(ctx *parser.ArgumentListContext) interface{} {
 	var args []ir.Value
-	for _, expr := range ctx.AllExpression() {
-		if val, ok := v.Visit(expr).(ir.Value); ok {
-			args = append(args, val)
+	for _, argCtx := range ctx.AllArgument() {
+		if expr := argCtx.(*parser.ArgumentContext).Expression(); expr != nil {
+			if val, ok := v.Visit(expr).(ir.Value); ok {
+				args = append(args, val)
+			}
 		}
 	}
 	return args
@@ -735,37 +844,6 @@ func (v *IRVisitor) VisitLeftHandSide(ctx *parser.LeftHandSideContext) interface
 		return v.Visit(ctx.PostfixExpression())
 	}
 	return v.ctx.Builder.ConstInt(types.I64, 0)
-}
-
-func (v *IRVisitor) VisitVectorLiteral(ctx *parser.VectorLiteralContext) interface{} {
-    exprs := ctx.AllExpression()
-    if len(exprs) == 0 {
-        return &ir.ConstantArray{
-            BaseValue: ir.BaseValue{ValType: types.NewArray(types.I32, 0)},
-            Elements:  []ir.Constant{},
-        }
-    }
-    
-    elements := make([]ir.Constant, len(exprs))
-    var elemType types.Type
-    
-    for i, expr := range exprs {
-        val := v.Visit(expr).(ir.Value)
-        if i == 0 { elemType = val.Type() }
-        
-        if constVal, ok := val.(ir.Constant); ok {
-            elements[i] = constVal
-        } else {
-            elements[i] = v.ctx.Builder.ConstInt(types.I32, 0)
-            if elemType == nil { elemType = types.I32 }
-        }
-    }
-    
-    arrType := types.NewArray(elemType, int64(len(elements)))
-    return &ir.ConstantArray{
-        BaseValue: ir.BaseValue{ValType: arrType},
-        Elements:  elements,
-    }
 }
 
 func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionContext) interface{} {
@@ -826,6 +904,26 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 		v.ctx.Builder.CreateUnreachable()
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
+	if ctx.BIT_CAST() != nil && len(args) == 1 {
+		targetType := v.resolveType(ctx.Type_())
+		// Bit cast reinterprets bits without conversion
+		return v.ctx.Builder.CreateBitCast(args[0], targetType, "")
+	}
+	if ctx.SLICE() != nil && len(args) >= 1 {
+		v.ctx.Logger.Warning("slice() intrinsic not fully implemented")
+		// Would return (ptr, len) tuple
+		return v.ctx.Builder.ConstInt(types.I64, 0)
+	}
 	
 	return v.ctx.Builder.ConstInt(types.I64, 0)
+}
+
+// Helper function to check if string contains interpolation pattern
+func containsInterpolation(s string) bool {
+	for i := 0; i < len(s)-1; i++ {
+		if s[i] == '\\' && s[i+1] == '(' {
+			return true
+		}
+	}
+	return false
 }

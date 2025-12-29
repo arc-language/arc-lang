@@ -135,14 +135,86 @@ func (v *IRVisitor) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 	return nil
 }
 
-func (v *IRVisitor) VisitClassField(ctx *parser.ClassFieldContext) interface{} { return nil }
+func (v *IRVisitor) VisitClassField(ctx *parser.ClassFieldContext) interface{} { 
+	return nil 
+}
+
 func (v *IRVisitor) VisitClassMember(ctx *parser.ClassMemberContext) interface{} {
-	if ctx.ClassField() != nil { return v.Visit(ctx.ClassField()) }
-	if ctx.FunctionDecl() != nil { return v.Visit(ctx.FunctionDecl()) }
-	if ctx.DeinitDecl() != nil { return v.Visit(ctx.DeinitDecl()) }
+	if ctx.ClassField() != nil { 
+		return v.Visit(ctx.ClassField()) 
+	}
+	if ctx.FunctionDecl() != nil { 
+		return v.Visit(ctx.FunctionDecl()) 
+	}
+	if ctx.DeinitDecl() != nil { 
+		return v.Visit(ctx.DeinitDecl()) 
+	}
 	return nil
 }
+
 func (v *IRVisitor) VisitDeinitDecl(ctx *parser.DeinitDeclContext) interface{} {
 	v.ctx.Logger.Warning("deinit is not yet implemented")
+	return nil
+}
+
+func (v *IRVisitor) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
+	name := ctx.IDENTIFIER().GetText()
+	v.logger.Info("Processing enum declaration: %s", name)
+	
+	// Determine underlying type (default int32)
+	underlyingType := types.I32
+	if ctx.PrimitiveType() != nil {
+		typeName := ctx.PrimitiveType().GetText()
+		if typ, ok := v.ctx.GetType(typeName); ok {
+			underlyingType = typ
+		}
+	}
+	
+	// Ensure underlying type is an integer type
+	intType, ok := underlyingType.(*types.IntType)
+	if !ok {
+		v.ctx.Logger.Error("Enum underlying type must be an integer type")
+		intType = types.I32.(*types.IntType)
+	}
+	
+	// Register enum as an alias to underlying type
+	v.ctx.RegisterType(name, intType)
+	
+	// Process enum members as constants
+	value := int64(0)
+	for _, member := range ctx.AllEnumMember() {
+		memberName := member.IDENTIFIER().GetText()
+		
+		if member.Expression() != nil {
+			// Explicit value
+			val := v.Visit(member.Expression())
+			if irVal, ok := val.(ir.Value); ok {
+				if constInt, ok := irVal.(*ir.ConstantInt); ok {
+					value = constInt.Value
+				}
+			}
+		}
+		
+		// Create constant for each enum member
+		constVal := v.ctx.Builder.ConstInt(intType, value)
+		
+		// Register as namespaced constant: EnumName_MemberName
+		fullName := v.getNamespacedName(name + "_" + memberName)
+		global := v.ctx.Builder.CreateGlobalConstant(fullName, constVal)
+		
+		// Also register in current scope for direct access
+		v.ctx.currentScope.DefineConst(memberName, global)
+		
+		v.logger.Debug("Registered enum member: %s.%s = %d", name, memberName, value)
+		
+		value++
+	}
+	
+	v.logger.Info("Completed enum declaration: %s with underlying type %v", name, intType)
+	return nil
+}
+
+func (v *IRVisitor) VisitEnumMember(ctx *parser.EnumMemberContext) interface{} {
+	// Individual enum members are processed in VisitEnumDecl
 	return nil
 }

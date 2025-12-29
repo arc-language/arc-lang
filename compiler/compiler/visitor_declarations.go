@@ -81,6 +81,15 @@ func (v *IRVisitor) VisitExternMember(ctx *parser.ExternMemberContext) interface
 func (v *IRVisitor) VisitExternFunctionDecl(ctx *parser.ExternFunctionDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
 	
+	// Check for explicit external name (e.g. func printf "printf")
+	var externalName string
+	if ctx.STRING_LITERAL() != nil {
+		rawName := ctx.STRING_LITERAL().GetText()
+		externalName = strings.Trim(rawName, "\"")
+	} else {
+		externalName = name
+	}
+	
 	var retType types.Type = types.Void
 	if ctx.Type_() != nil {
 		retType = v.resolveType(ctx.Type_())
@@ -99,15 +108,18 @@ func (v *IRVisitor) VisitExternFunctionDecl(ctx *parser.ExternFunctionDeclContex
 		}
 	}
 	
-	fn := v.ctx.Builder.DeclareFunction(name, retType, paramTypes, variadic)
+	// Use external name for the actual function declaration
+	fn := v.ctx.Builder.DeclareFunction(externalName, retType, paramTypes, variadic)
 	
-	// Register in current namespace
+	// Register in current namespace using the internal name
 	if v.ctx.currentNamespace != nil {
 		v.ctx.currentNamespace.Functions[name] = fn
-		v.logger.Debug("Declared extern function '%s' in namespace '%s'", name, v.ctx.currentNamespace.Name)
+		v.logger.Debug("Declared extern function '%s' (external: '%s') in namespace '%s'", 
+			name, externalName, v.ctx.currentNamespace.Name)
 	} else {
 		v.ctx.currentScope.Define(name, fn)
-		v.logger.Debug("Declared extern function '%s' in global scope", name)
+		v.logger.Debug("Declared extern function '%s' (external: '%s') in global scope", 
+			name, externalName)
 	}
 	
 	return nil
@@ -158,8 +170,19 @@ func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	}
 	
 	var retType types.Type = types.Void
-	if ctx.Type_() != nil {
-		retType = v.resolveType(ctx.Type_())
+	if ctx.ReturnType() != nil {
+		retTypeCtx := ctx.ReturnType()
+		if retTypeCtx.Type_() != nil {
+			retType = v.resolveType(retTypeCtx.Type_())
+		} else if retTypeCtx.TypeList() != nil {
+			// Tuple return type
+			typeListCtx := retTypeCtx.TypeList()
+			tupleTypes := make([]types.Type, 0)
+			for _, t := range typeListCtx.AllType_() {
+				tupleTypes = append(tupleTypes, v.resolveType(t))
+			}
+			retType = types.NewStruct("", tupleTypes, false)
+		}
 	}
 	
 	paramTypes := make([]types.Type, 0)
@@ -172,10 +195,21 @@ func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			variadic = true
 		}
 		for _, param := range paramCtx.AllParameter() {
-			paramName := param.IDENTIFIER().GetText()
-			paramType := v.resolveType(param.Type_())
-			paramNames = append(paramNames, paramName)
-			paramTypes = append(paramTypes, paramType)
+			if param.SELF() != nil {
+				// Self parameter for methods
+				paramName := "self"
+				if param.IDENTIFIER() != nil {
+					paramName = param.IDENTIFIER().GetText()
+				}
+				paramType := v.resolveType(param.Type_())
+				paramNames = append(paramNames, paramName)
+				paramTypes = append(paramTypes, paramType)
+			} else {
+				paramName := param.IDENTIFIER().GetText()
+				paramType := v.resolveType(param.Type_())
+				paramNames = append(paramNames, paramName)
+				paramTypes = append(paramTypes, paramType)
+			}
 		}
 	}
 
@@ -283,81 +317,83 @@ func (v *IRVisitor) emitAsyncFunctionEpilogue(fn *ir.Function) {
 // ============================================================================
 
 func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
-    name := ctx.IDENTIFIER().GetText()
-    
-    v.logger.Debug("Declaring variable: %s", name)
-    
-    var varType types.Type
-    if ctx.Type_() != nil {
-        varType = v.resolveType(ctx.Type_())
-    }
-    
-    var initValue ir.Value
-    if ctx.Expression() != nil {
-        initValue = v.Visit(ctx.Expression()).(ir.Value)
-        
-        if varType == nil {
-            varType = initValue.Type()
-        }
-        
-        // Handle vector initialization specially
-        if vecType, ok := varType.(*types.DynamicVectorType); ok {
-            if constArr, ok := initValue.(*ir.ConstantArray); ok {
-                v.logger.Info("Creating vector with %d elements", len(constArr.Elements))
-                
-                // Cast array elements to match vector element type
-                needsCast := len(constArr.Elements) > 0 && !constArr.Elements[0].Type().Equal(vecType.ElementType)
-                
-                if needsCast {
-                    v.logger.Debug("Casting array elements from %v to %v", 
-                        constArr.Elements[0].Type(), vecType.ElementType)
-                    
-                    castedElements := make([]ir.Constant, len(constArr.Elements))
-                    for i, elem := range constArr.Elements {
-                        castedElements[i] = v.castConstant(elem, vecType.ElementType)
-                    }
-                    
-                    arrType := types.NewArray(vecType.ElementType, int64(len(castedElements)))
-                    constArr = &ir.ConstantArray{
-                        BaseValue: ir.BaseValue{ValType: arrType},
-                        Elements:  castedElements,
-                    }
-                }
-                
-                if len(constArr.Elements) > 0 {
-                    initValue = v.createVectorWithElements(constArr, vecType)
-                } else {
-                    initValue = v.createEmptyVector(vecType)
-                }
-            } else {
-                v.logger.Warning("Vector literal not a ConstantArray, got %T", initValue)
-                initValue = v.createEmptyVector(vecType)
-            }
-            
-            varType = v.ctx.GetVectorRuntimeType(vecType.ElementType)
-            
-        } else if mapType, ok := varType.(*types.MapType); ok {
-            initValue = v.createEmptyMap(mapType)
-            varType = v.ctx.GetMapRuntimeType(mapType.KeyType, mapType.ValueType)
-            
-        } else {
-            if !initValue.Type().Equal(varType) {
-                initValue = v.castValue(initValue, varType)
-            }
-        }
-    } else {
-        if varType == nil {
-            v.ctx.Logger.Error("Variable '%s' needs type annotation or initializer", name)
-            return nil
-        }
-        initValue = v.getZeroValue(varType)
-    }
+	// Check for tuple pattern (let (a, b) = ...)
+	if ctx.TuplePattern() != nil {
+		return v.visitTupleVariableDecl(ctx)
+	}
+	
+	name := ctx.IDENTIFIER().GetText()
+	
+	v.logger.Debug("Declaring variable: %s", name)
+	
+	var varType types.Type
+	if ctx.Type_() != nil {
+		varType = v.resolveType(ctx.Type_())
+	}
+	
+	var initValue ir.Value
+	if ctx.Expression() != nil {
+		initValue = v.Visit(ctx.Expression()).(ir.Value)
+		
+		if varType == nil {
+			varType = initValue.Type()
+		}
+		
+		// Type check and cast if necessary
+		if !initValue.Type().Equal(varType) {
+			initValue = v.castValue(initValue, varType)
+		}
+	} else {
+		if varType == nil {
+			v.ctx.Logger.Error("Variable '%s' needs type annotation or initializer", name)
+			return nil
+		}
+		initValue = v.getZeroValue(varType)
+	}
 
-    alloca := v.ctx.Builder.CreateAlloca(varType, name+".addr")
-    v.ctx.Builder.CreateStore(initValue, alloca)
-    v.ctx.currentScope.Define(name, alloca)
-    
-    return nil
+	alloca := v.ctx.Builder.CreateAlloca(varType, name+".addr")
+	v.ctx.Builder.CreateStore(initValue, alloca)
+	v.ctx.currentScope.Define(name, alloca)
+	
+	return nil
+}
+
+func (v *IRVisitor) visitTupleVariableDecl(ctx *parser.VariableDeclContext) interface{} {
+	tuplePatternCtx := ctx.TuplePattern()
+	names := make([]string, 0)
+	for _, id := range tuplePatternCtx.AllIDENTIFIER() {
+		names = append(names, id.GetText())
+	}
+	
+	if ctx.Expression() == nil {
+		v.ctx.Logger.Error("Tuple destructuring requires an initializer")
+		return nil
+	}
+	
+	// Evaluate the expression (should be a tuple/struct)
+	tupleVal := v.Visit(ctx.Expression()).(ir.Value)
+	tupleType, ok := tupleVal.Type().(*types.StructType)
+	if !ok {
+		v.ctx.Logger.Error("Tuple destructuring requires a tuple value")
+		return nil
+	}
+	
+	if len(names) != len(tupleType.Fields) {
+		v.ctx.Logger.Error("Tuple destructuring: expected %d values, got %d", 
+			len(tupleType.Fields), len(names))
+		return nil
+	}
+	
+	// Extract each field and create variables
+	for i, name := range names {
+		fieldVal := v.ctx.Builder.CreateExtractValue(tupleVal, []int{i}, "")
+		alloca := v.ctx.Builder.CreateAlloca(fieldVal.Type(), name+".addr")
+		v.ctx.Builder.CreateStore(fieldVal, alloca)
+		v.ctx.currentScope.Define(name, alloca)
+		v.logger.Debug("Tuple destructure: %s = field %d", name, i)
+	}
+	
+	return nil
 }
 
 func (v *IRVisitor) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
@@ -375,81 +411,25 @@ func (v *IRVisitor) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 	isGlobal := v.ctx.currentScope == v.ctx.globalScope
 	
 	if isGlobal {
-        // Create mangled name for global
-        globalName := name
-        if v.ctx.currentNamespace != nil && v.ctx.currentNamespace.Name != "" {
-            globalName = v.ctx.currentNamespace.Name + "_" + name
-        }
-        
-        // Create IR Global for the constant
-        if constant, ok := initValue.(ir.Constant); ok {
-            g := v.ctx.Builder.CreateGlobalConstant(globalName, constant)
-            // Register in scope as the global pointer
-            v.ctx.currentScope.Define(name, g)
-            v.logger.Info("Declared global constant '%s' (IR: %s)", name, globalName)
-        } else {
-            v.ctx.Logger.Error("Top-level constant '%s' must have a constant initializer", name)
-        }
+		// Create mangled name for global
+		globalName := name
+		if v.ctx.currentNamespace != nil && v.ctx.currentNamespace.Name != "" {
+			globalName = v.ctx.currentNamespace.Name + "_" + name
+		}
+		
+		// Create IR Global for the constant
+		if constant, ok := initValue.(ir.Constant); ok {
+			g := v.ctx.Builder.CreateGlobalConstant(globalName, constant)
+			// Register in scope as the global pointer
+			v.ctx.currentScope.DefineConst(name, g)
+			v.logger.Info("Declared global constant '%s' (IR: %s)", name, globalName)
+		} else {
+			v.ctx.Logger.Error("Top-level constant '%s' must have a constant initializer", name)
+		}
 	} else {
-	    // Local constant
-	    v.ctx.currentScope.DefineConst(name, initValue)
+		// Local constant
+		v.ctx.currentScope.DefineConst(name, initValue)
 	}
 
 	return nil
-}
-
-func (v *IRVisitor) createEmptyVector(vecType *types.DynamicVectorType) ir.Value {
-    structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
-    fields := []ir.Constant{
-        v.ctx.Builder.ConstNull(types.NewPointer(vecType.ElementType)),
-        v.ctx.Builder.ConstInt(types.I64, 0),
-        v.ctx.Builder.ConstInt(types.I64, 0),
-    }
-    
-    return &ir.ConstantStruct{
-        BaseValue: ir.BaseValue{ValType: structType},
-        Fields:    fields,
-    }
-}
-
-func (v *IRVisitor) createEmptyMap(mapType *types.MapType) ir.Value {
-    structType := v.ctx.GetMapRuntimeType(mapType.KeyType, mapType.ValueType)
-    fields := []ir.Constant{
-        v.ctx.Builder.ConstNull(types.NewPointer(types.Void)),
-        v.ctx.Builder.ConstInt(types.I64, 0),
-        v.ctx.Builder.ConstInt(types.I64, 0),
-    }
-    
-    return &ir.ConstantStruct{
-        BaseValue: ir.BaseValue{ValType: structType},
-        Fields:    fields,
-    }
-}
-
-func (v *IRVisitor) createVectorWithElements(constArr *ir.ConstantArray, vecType *types.DynamicVectorType) ir.Value {
-    structType := v.ctx.GetVectorRuntimeType(vecType.ElementType)
-    elemCount := int64(len(constArr.Elements))
-    
-    arrType := types.NewArray(vecType.ElementType, elemCount)
-    dataArrayName := fmt.Sprintf("__vec_data_%d", len(v.ctx.Module.Globals))
-    
-    globalData := v.ctx.Builder.CreateGlobalConstant(dataArrayName, constArr)
-    globalData.Linkage = ir.InternalLinkage
-    
-    zero := v.ctx.Builder.ConstInt(types.I32, 0)
-    dataPtr := v.ctx.Builder.CreateInBoundsGEP(arrType, globalData, []ir.Value{zero, zero}, "vec.data")
-    
-    vecAlloca := v.ctx.Builder.CreateAlloca(structType, "vec.tmp")
-    
-    dataPtrGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 0, "")
-    v.ctx.Builder.CreateStore(dataPtr, dataPtrGEP)
-    
-    lenGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 1, "")
-    length := v.ctx.Builder.ConstInt(types.I64, elemCount)
-    v.ctx.Builder.CreateStore(length, lenGEP)
-    
-    capGEP := v.ctx.Builder.CreateStructGEP(structType, vecAlloca, 2, "")
-    v.ctx.Builder.CreateStore(length, capGEP)
-    
-    return v.ctx.Builder.CreateLoad(structType, vecAlloca, "vec.init")
 }

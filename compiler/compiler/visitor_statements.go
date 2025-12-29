@@ -1,7 +1,6 @@
 package compiler
 
 import (
-
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
@@ -15,6 +14,8 @@ func (v *IRVisitor) VisitStatement(ctx *parser.StatementContext) interface{} {
 	if ctx.ReturnStmt() != nil { return v.Visit(ctx.ReturnStmt()) }
 	if ctx.IfStmt() != nil { return v.Visit(ctx.IfStmt()) }
 	if ctx.ForStmt() != nil { return v.Visit(ctx.ForStmt()) }
+	if ctx.SwitchStmt() != nil { return v.Visit(ctx.SwitchStmt()) }
+	if ctx.TryStmt() != nil { return v.Visit(ctx.TryStmt()) }
 	if ctx.BreakStmt() != nil { return v.Visit(ctx.BreakStmt()) }
 	if ctx.ContinueStmt() != nil { return v.Visit(ctx.ContinueStmt()) }
 	if ctx.DeferStmt() != nil { return v.Visit(ctx.DeferStmt()) }
@@ -139,30 +140,55 @@ func (v *IRVisitor) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 	// 3. Handle Compound Assignment Logic
 	finalValue := rhs
 	
-	if ctx.ASSIGN() == nil { // It's a compound assignment (+=, -=, etc.)
-		// Load current value from destination
-		ptrType := destPtr.Type().(*types.PointerType)
-		currVal := v.ctx.Builder.CreateLoad(ptrType.ElementType, destPtr, "")
+	if ctx.AssignmentOp() != nil {
+		opCtx := ctx.AssignmentOp()
 		
-		if ctx.PLUS_ASSIGN() != nil {
-			finalValue = v.ctx.Builder.CreateAdd(currVal, rhs, "")
-		} else if ctx.MINUS_ASSIGN() != nil {
-			finalValue = v.ctx.Builder.CreateSub(currVal, rhs, "")
-		} else if ctx.STAR_ASSIGN() != nil {
-			finalValue = v.ctx.Builder.CreateMul(currVal, rhs, "")
-		} else if ctx.SLASH_ASSIGN() != nil {
-			if types.IsFloat(currVal.Type()) {
-				finalValue = v.ctx.Builder.CreateFDiv(currVal, rhs, "")
-			} else if intType, ok := currVal.Type().(*types.IntType); ok && !intType.Signed {
-				finalValue = v.ctx.Builder.CreateUDiv(currVal, rhs, "")
-			} else {
-				finalValue = v.ctx.Builder.CreateSDiv(currVal, rhs, "")
-			}
-		} else if ctx.PERCENT_ASSIGN() != nil {
-			if intType, ok := currVal.Type().(*types.IntType); ok && !intType.Signed {
-				finalValue = v.ctx.Builder.CreateURem(currVal, rhs, "")
-			} else {
-				finalValue = v.ctx.Builder.CreateSRem(currVal, rhs, "")
+		// Simple assignment (=)
+		if opCtx.ASSIGN() != nil {
+			finalValue = rhs
+		} else {
+			// Compound assignment - load current value first
+			ptrType := destPtr.Type().(*types.PointerType)
+			currVal := v.ctx.Builder.CreateLoad(ptrType.ElementType, destPtr, "")
+			
+			if opCtx.PLUS_ASSIGN() != nil {
+				finalValue = v.ctx.Builder.CreateAdd(currVal, rhs, "")
+			} else if opCtx.MINUS_ASSIGN() != nil {
+				finalValue = v.ctx.Builder.CreateSub(currVal, rhs, "")
+			} else if opCtx.STAR_ASSIGN() != nil {
+				finalValue = v.ctx.Builder.CreateMul(currVal, rhs, "")
+			} else if opCtx.SLASH_ASSIGN() != nil {
+				if types.IsFloat(currVal.Type()) {
+					finalValue = v.ctx.Builder.CreateFDiv(currVal, rhs, "")
+				} else if intType, ok := currVal.Type().(*types.IntType); ok && !intType.Signed {
+					finalValue = v.ctx.Builder.CreateUDiv(currVal, rhs, "")
+				} else {
+					finalValue = v.ctx.Builder.CreateSDiv(currVal, rhs, "")
+				}
+			} else if opCtx.PERCENT_ASSIGN() != nil {
+				if intType, ok := currVal.Type().(*types.IntType); ok && !intType.Signed {
+					finalValue = v.ctx.Builder.CreateURem(currVal, rhs, "")
+				} else {
+					finalValue = v.ctx.Builder.CreateSRem(currVal, rhs, "")
+				}
+			} else if opCtx.BIT_OR_ASSIGN() != nil {
+				finalValue = v.ctx.Builder.CreateOr(currVal, rhs, "")
+			} else if opCtx.BIT_AND_ASSIGN() != nil {
+				finalValue = v.ctx.Builder.CreateAnd(currVal, rhs, "")
+			} else if opCtx.BIT_XOR_ASSIGN() != nil {
+				finalValue = v.ctx.Builder.CreateXor(currVal, rhs, "")
+			} else if opCtx.LT() != nil {
+				// Left shift assignment (<<=)
+				// Check for double LT
+				finalValue = v.ctx.Builder.CreateShl(currVal, rhs, "")
+			} else if opCtx.GT() != nil {
+				// Right shift assignment (>>=)
+				// Check for double GT
+				if intType, ok := currVal.Type().(*types.IntType); ok && intType.Signed {
+					finalValue = v.ctx.Builder.CreateAShr(currVal, rhs, "")
+				} else {
+					finalValue = v.ctx.Builder.CreateLShr(currVal, rhs, "")
+				}
 			}
 		}
 	}
@@ -176,9 +202,42 @@ func (v *IRVisitor) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 func (v *IRVisitor) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 	v.logger.Debug("Compiling return statement")
 	
+	// Execute deferred statements in LIFO order
 	deferred := v.ctx.GetDeferredStmts()
 	for i := len(deferred) - 1; i >= 0; i-- {
 		_ = deferred[i]
+		// TODO: Actually emit deferred instruction execution
+	}
+	
+	// Check for tuple return
+	if ctx.TupleExpression() != nil {
+		tupleCtx := ctx.TupleExpression()
+		exprs := tupleCtx.AllExpression()
+		
+		if len(exprs) == 0 {
+			v.ctx.Builder.CreateRetVoid()
+			return nil
+		}
+		
+		// Build tuple struct from expressions
+		tupleTypes := make([]types.Type, len(exprs))
+		values := make([]ir.Value, len(exprs))
+		
+		for i, expr := range exprs {
+			values[i] = v.Visit(expr).(ir.Value)
+			tupleTypes[i] = values[i].Type()
+		}
+		
+		// Create tuple type and build value
+		tupleType := types.NewStruct("", tupleTypes, false)
+		var tuple ir.Value = v.ctx.Builder.ConstZero(tupleType)
+		
+		for i, val := range values {
+			tuple = v.ctx.Builder.CreateInsertValue(tuple, val, []int{i}, "")
+		}
+		
+		v.ctx.Builder.CreateRet(tuple)
+		return nil
 	}
 	
 	if ctx.Expression() != nil {
@@ -202,9 +261,13 @@ func (v *IRVisitor) VisitExpressionStmt(ctx *parser.ExpressionStmtContext) inter
 }
 
 func (v *IRVisitor) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
+	// Defer executes a statement at function exit (in LIFO order)
 	if ctx.Expression() != nil {
 		_ = v.Visit(ctx.Expression())
+	} else if ctx.AssignmentStmt() != nil {
+		_ = v.Visit(ctx.AssignmentStmt())
 	}
+	
 	v.ctx.Logger.Warning("defer statement is not fully implemented yet")
 	return nil
 }

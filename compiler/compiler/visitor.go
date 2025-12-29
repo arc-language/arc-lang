@@ -67,6 +67,10 @@ func (v *IRVisitor) Visit(tree antlr.ParseTree) interface{} {
 		return v.VisitClassField(ctx)
 	case *parser.DeinitDeclContext:
 		return v.VisitDeinitDecl(ctx)
+	case *parser.EnumDeclContext:
+		return v.VisitEnumDecl(ctx)
+	case *parser.EnumMemberContext:
+		return v.VisitEnumMember(ctx)
 	case *parser.BlockContext:
 		return v.VisitBlock(ctx)
 	case *parser.StatementContext:
@@ -83,6 +87,10 @@ func (v *IRVisitor) Visit(tree antlr.ParseTree) interface{} {
 		return v.VisitIfStmt(ctx)
 	case *parser.ForStmtContext:
 		return v.VisitForStmt(ctx)
+	case *parser.SwitchStmtContext:
+		return v.VisitSwitchStmt(ctx)
+	case *parser.TryStmtContext:
+		return v.VisitTryStmt(ctx)
 	case *parser.BreakStmtContext:
 		return v.VisitBreakStmt(ctx)
 	case *parser.ContinueStmtContext:
@@ -97,8 +105,6 @@ func (v *IRVisitor) Visit(tree antlr.ParseTree) interface{} {
 		return v.VisitLogicalOrExpression(ctx)
 	case *parser.LogicalAndExpressionContext:
 		return v.VisitLogicalAndExpression(ctx)
-	
-	// NEW: Bitwise & Shift Expressions
 	case *parser.BitOrExpressionContext:
 		return v.VisitBitOrExpression(ctx)
 	case *parser.BitXorExpressionContext:
@@ -107,7 +113,6 @@ func (v *IRVisitor) Visit(tree antlr.ParseTree) interface{} {
 		return v.VisitBitAndExpression(ctx)
 	case *parser.ShiftExpressionContext:
 		return v.VisitShiftExpression(ctx)
-
 	case *parser.EqualityExpressionContext:
 		return v.VisitEqualityExpression(ctx)
 	case *parser.RelationalExpressionContext:
@@ -126,8 +131,6 @@ func (v *IRVisitor) Visit(tree antlr.ParseTree) interface{} {
 		return v.VisitPrimaryExpression(ctx)
 	case *parser.LiteralContext:
 		return v.VisitLiteral(ctx)
-    case *parser.VectorLiteralContext:
-        return v.VisitVectorLiteral(ctx)
 	case *parser.StructLiteralContext:
 		return v.VisitStructLiteral(ctx)
 	case *parser.CastExpressionContext:
@@ -165,7 +168,7 @@ func (v *IRVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) int
 		v.Visit(ns)
 	}
 
-	// Pass 1: Register all type declarations (structs and classes)
+	// Pass 1: Register all type declarations (structs, classes, and enums)
 	v.logger.Debug("Pass 1 - Registering types")
 	for _, decl := range ctx.AllTopLevelDecl() {
 		if decl.StructDecl() != nil {
@@ -173,6 +176,7 @@ func (v *IRVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) int
 		} else if decl.ClassDecl() != nil {
 			v.registerClassType(decl.ClassDecl().(*parser.ClassDeclContext))
 		}
+		// Note: Enums are processed in pass 2 since they create constants
 	}
 	
 	// Pass 2: Process everything else
@@ -191,6 +195,8 @@ func (v *IRVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) int
 			v.Visit(decl.StructDecl())
 		} else if decl.ClassDecl() != nil {
 			v.Visit(decl.ClassDecl())
+		} else if decl.EnumDecl() != nil {
+			v.Visit(decl.EnumDecl())
 		}
 	}
 	
@@ -207,6 +213,9 @@ func (v *IRVisitor) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface
 	}
 	if ctx.ClassDecl() != nil {
 		return v.Visit(ctx.ClassDecl())
+	}
+	if ctx.EnumDecl() != nil {
+		return v.Visit(ctx.EnumDecl())
 	}
 	if ctx.ExternDecl() != nil {
 		return v.Visit(ctx.ExternDecl())
@@ -257,18 +266,38 @@ func (v *IRVisitor) resolveType(ctx parser.ITypeContext) types.Type {
 		return types.NewPointer(elemType)
 	}
 	
-	if typeCtx.VectorType() != nil {
-		elemType := v.resolveType(typeCtx.VectorType().Type_())
-		return types.NewDynamicVector(elemType)
-	}
-	
-	if typeCtx.MapType() != nil {
-		keyType := v.resolveType(typeCtx.MapType().Type_(0))
-		valueType := v.resolveType(typeCtx.MapType().Type_(1))
-		return types.NewMap(keyType, valueType)
+	if typeCtx.ArrayType() != nil {
+		arrCtx := typeCtx.ArrayType()
+		elemType := v.resolveType(arrCtx.Type_())
+		
+		// Get array size
+		var size int64 = 0
+		if arrCtx.ArraySize() != nil {
+			sizeCtx := arrCtx.ArraySize()
+			if sizeCtx.INTEGER_LITERAL() != nil {
+				// Parse integer literal
+				sizeText := sizeCtx.INTEGER_LITERAL().GetText()
+				var err error
+				size, err = parseInt(sizeText)
+				if err != nil {
+					v.ctx.Logger.Error("Invalid array size: %s", sizeText)
+					size = 0
+				}
+			} else if sizeCtx.IDENTIFIER() != nil {
+				// Constant identifier
+				name := sizeCtx.IDENTIFIER().GetText()
+				if sym, ok := v.ctx.currentScope.Lookup(name); ok {
+					if constInt, ok := sym.Value.(*ir.ConstantInt); ok {
+						size = constInt.Value
+					}
+				}
+			}
+		}
+		
+		return types.NewArray(elemType, size)
 	}
 
-	// NEW: Handle Qualified Type (namespace.Type)
+	// Handle Qualified Type (namespace.Type)
 	if typeCtx.QualifiedType() != nil {
 		qCtx := typeCtx.QualifiedType()
 		parts := make([]string, len(qCtx.AllIDENTIFIER()))
@@ -312,17 +341,9 @@ func (v *IRVisitor) getZeroValue(typ types.Type) ir.Value {
 		return v.ctx.Builder.ConstFloat(typ.(*types.FloatType), 0.0)
 	case types.PointerKind:
 		return v.ctx.Builder.ConstNull(typ.(*types.PointerType))
-	case types.VectorKind:
-		if dvt, ok := typ.(*types.DynamicVectorType); ok {
-			structType := v.ctx.GetVectorRuntimeType(dvt.ElementType)
-			return v.ctx.Builder.ConstZero(structType)
-		}
+	case types.ArrayKind:
 		return v.ctx.Builder.ConstZero(typ)
-	case types.MapKind:
-		if mt, ok := typ.(*types.MapType); ok {
-			structType := v.ctx.GetMapRuntimeType(mt.KeyType, mt.ValueType)
-			return v.ctx.Builder.ConstZero(structType)
-		}
+	case types.StructKind:
 		return v.ctx.Builder.ConstZero(typ)
 	default:
 		return v.ctx.Builder.ConstZero(typ)
@@ -339,44 +360,84 @@ func (v *IRVisitor) findFieldIndex(structType *types.StructType, fieldName strin
 }
 
 func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
-    srcType := val.Type()
-    
-    if types.IsInteger(srcType) && types.IsInteger(targetType) {
-        srcBits := srcType.(*types.IntType).BitWidth
-        destBits := targetType.(*types.IntType).BitWidth
-        if srcBits > destBits {
-            return v.ctx.Builder.CreateTrunc(val, targetType, "")
-        } else if srcBits < destBits {
-            return v.ctx.Builder.CreateSExt(val, targetType, "")
-        }
-    }
-    
-    if types.IsFloat(srcType) && types.IsFloat(targetType) {
-        srcBits := srcType.(*types.FloatType).BitWidth
-        destBits := targetType.(*types.FloatType).BitWidth
-        if srcBits > destBits {
-            return v.ctx.Builder.CreateFPTrunc(val, targetType, "")
-        } else if srcBits < destBits {
-            return v.ctx.Builder.CreateFPExt(val, targetType, "")
-        }
-    }
-    
-    return val
+	srcType := val.Type()
+	
+	if types.IsInteger(srcType) && types.IsInteger(targetType) {
+		srcBits := srcType.(*types.IntType).BitWidth
+		destBits := targetType.(*types.IntType).BitWidth
+		if srcBits > destBits {
+			return v.ctx.Builder.CreateTrunc(val, targetType, "")
+		} else if srcBits < destBits {
+			return v.ctx.Builder.CreateSExt(val, targetType, "")
+		}
+	}
+	
+	if types.IsFloat(srcType) && types.IsFloat(targetType) {
+		srcBits := srcType.(*types.FloatType).BitWidth
+		destBits := targetType.(*types.FloatType).BitWidth
+		if srcBits > destBits {
+			return v.ctx.Builder.CreateFPTrunc(val, targetType, "")
+		} else if srcBits < destBits {
+			return v.ctx.Builder.CreateFPExt(val, targetType, "")
+		}
+	}
+	
+	return val
 }
 
 func (v *IRVisitor) castConstant(constant ir.Constant, targetType types.Type) ir.Constant {
-    srcType := constant.Type()
-    
-    if srcType.Equal(targetType) {
-        return constant
-    }
-    
-    if srcInt, ok := constant.(*ir.ConstantInt); ok {
-        if targetInt, ok := targetType.(*types.IntType); ok {
-            return v.ctx.Builder.ConstInt(targetInt, srcInt.Value)
-        }
-    }
-    
-    v.logger.Warning("Cannot cast constant from %v to %v", srcType, targetType)
-    return constant
+	srcType := constant.Type()
+	
+	if srcType.Equal(targetType) {
+		return constant
+	}
+	
+	if srcInt, ok := constant.(*ir.ConstantInt); ok {
+		if targetInt, ok := targetType.(*types.IntType); ok {
+			return v.ctx.Builder.ConstInt(targetInt, srcInt.Value)
+		}
+	}
+	
+	v.logger.Warning("Cannot cast constant from %v to %v", srcType, targetType)
+	return constant
+}
+
+// Helper function to parse integer literals
+func parseInt(s string) (int64, error) {
+	var base int = 10
+	
+	// Handle hex (0x), octal (0o), binary (0b) prefixes
+	if len(s) > 2 {
+		switch {
+		case s[0:2] == "0x" || s[0:2] == "0X":
+			base = 16
+			s = s[2:]
+		case s[0:2] == "0o" || s[0:2] == "0O":
+			base = 8
+			s = s[2:]
+		case s[0:2] == "0b" || s[0:2] == "0B":
+			base = 2
+			s = s[2:]
+		}
+	}
+	
+	var result int64 = 0
+	for _, ch := range s {
+		var digit int64
+		switch {
+		case ch >= '0' && ch <= '9':
+			digit = int64(ch - '0')
+		case ch >= 'a' && ch <= 'f':
+			digit = int64(ch - 'a' + 10)
+		case ch >= 'A' && ch <= 'F':
+			digit = int64(ch - 'A' + 10)
+		case ch == '_':
+			continue // Allow underscores as separators
+		default:
+			return 0, nil
+		}
+		result = result*int64(base) + digit
+	}
+	
+	return result, nil
 }
