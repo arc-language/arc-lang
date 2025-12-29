@@ -20,6 +20,7 @@ entry:
   %8 = insertvalue %Point %6, i32 %7, 1
   %p.addr = alloca %Point
   store %Point %8, ptr<%Point> %p.addr
-  %9 = call i32 @Point_sum(ptr<%Point> %p.addr)
-  ret i32 %9
+  %9 = load %Point, ptr<%Point> %p.addr
+  %10 = call i32 @Point_sum(%Point %9)
+  ret i32 %10
 }

@@ -374,8 +374,7 @@ func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpC
 	if v.pendingMethodSelf != nil {
 		selfArg := v.pendingMethodSelf
 		
-		// Auto-dereference: If method expects value but we have pointer (and not class type)
-		// Class types are passed by pointer, but Structs are passed by value in methods defined with 'self p: Point'
+		// Auto-dereference: If method expects value but we have pointer
 		if funcType != nil && len(funcType.ParamTypes) > 0 {
 			expectedType := funcType.ParamTypes[0]
 			currentType := selfArg.Type()
@@ -428,13 +427,12 @@ func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpC
 	}
 
 	// Create the call instruction
-	// Builder requires explicit *ir.Function, so we must assert
 	if fn, ok := funcValue.(*ir.Function); ok {
 		result := v.ctx.Builder.CreateCall(fn, args, "")
 		v.logger.Debug("Function call created, return type: %v", result.Type())
 		return result
 	} else {
-		// Limitation: Builder CreateCall requires *ir.Function, indirect calls via pointers need support
+		// Limitation: Builder CreateCall requires *ir.Function
 		v.ctx.Logger.Error("Indirect function calls not supported by builder (requires *ir.Function)")
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
@@ -459,15 +457,29 @@ func (v *IRVisitor) handleMethodCall(base ir.Value, methodName string, op *parse
 	}
 
 	// Find the method in the struct's associated methods
-	// Use the Context's method lookup
 	methodFunc := v.ctx.LookupMethod(structType.Name, methodName)
 	if methodFunc == nil {
 		v.ctx.Logger.Error("Method %s not found on type %s", methodName, structType.Name)
 		return base
 	}
 
+	// Handle auto-dereference for self argument (Mirroring handleFunctionCall logic)
+	selfArg := base
+	if len(methodFunc.FuncType.ParamTypes) > 0 {
+		expectedType := methodFunc.FuncType.ParamTypes[0]
+		currentType := selfArg.Type()
+		
+		// If we have ptr<T> but need T, load it
+		if ptrType, ok := currentType.(*types.PointerType); ok {
+			if ptrType.ElementType.Equal(expectedType) {
+				v.logger.Debug("Auto-dereferencing self argument for method call")
+				selfArg = v.ctx.Builder.CreateLoad(expectedType, selfArg, "")
+			}
+		}
+	}
+
 	// Build arguments: self is the first argument
-	args := []ir.Value{base}
+	args := []ir.Value{selfArg}
 	
 	argList := op.ArgumentList()
 	if argList != nil {
