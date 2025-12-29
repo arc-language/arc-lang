@@ -381,7 +381,8 @@ func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpC
 	if argList != nil {
 		allArgs := argList.(*parser.ArgumentListContext).AllArgument()
 		
-		for i, argCtx := range allArgs {
+		// Fixed: Replaced unused index 'i' with '_'
+		for _, argCtx := range allArgs {
 			// Visit the argument expression
 			var argVal ir.Value
 			
