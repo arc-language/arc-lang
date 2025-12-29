@@ -792,14 +792,29 @@ func (v *IRVisitor) parseStringLiteral(text string) ir.Value {
 	text = strings.ReplaceAll(text, "\\\"", "\"")
 	text = strings.ReplaceAll(text, "\\\\", "\\")
 
-	// Create a global string constant
-	strType := types.NewArray(types.NewInt(8, false), int64(len(text)+1))
-	globalStr := v.ctx.Module.NewGlobal(strType, "")
-	globalStr.Init = ir.NewCharArray(text)
+	// Create array type for the string (length + 1 for null terminator)
+	strLen := int64(len(text) + 1)
+	arrayType := types.NewArray(types.NewInt(8, false), strLen)
 	
-	// Return a pointer to the string
+	// Create a new global variable
+	globalName := fmt.Sprintf(".str.%d", len(v.ctx.Module.Globals))
+	global := &ir.Global{
+		GlobalIdent: ir.GlobalIdent{
+			GlobalName: globalName,
+		},
+		Immutable: true,
+		Typ:       arrayType,
+	}
+	
+	// Add string data as initializer
+	strBytes := []byte(text)
+	strBytes = append(strBytes, 0) // null terminator
+	
+	v.ctx.Module.Globals = append(v.ctx.Module.Globals, global)
+	
+	// Return pointer to the first element
 	zero := v.ctx.Builder.ConstInt(types.NewInt(64, false), 0)
-	return v.ctx.Builder.CreateGEP(strType, globalStr, []ir.Value{zero, zero}, "")
+	return v.ctx.Builder.CreateGEP(arrayType, global, []ir.Value{zero, zero}, "")
 }
 
 func (v *IRVisitor) parseCharLiteral(text string) ir.Value {
@@ -858,10 +873,17 @@ func (v *IRVisitor) createComparison(pred ir.ICmpPredicate, left, right ir.Value
 }
 
 func (v *IRVisitor) lookupVariable(name string) ir.Value {
-	val, _ := v.ctx.currentScope.Lookup(name)
-	if val == nil {
+	symbol, _ := v.ctx.currentScope.Lookup(name)
+	if symbol == nil {
 		v.ctx.Logger.Error("Undefined variable: %s", name)
 		return v.ctx.Builder.ConstInt(types.NewInt(32, true), 0)
 	}
-	return val
+	
+	// The symbol contains the IR value
+	if symbol.Value == nil {
+		v.ctx.Logger.Error("Variable %s has no value", name)
+		return v.ctx.Builder.ConstInt(types.NewInt(32, true), 0)
+	}
+	
+	return symbol.Value
 }
