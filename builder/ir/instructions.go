@@ -1,3 +1,4 @@
+// --- START OF FILE builder/ir/instructions.go ---
 // Package ir - instruction definitions
 package ir
 
@@ -23,6 +24,14 @@ func formatOp(v Value) string {
 		return "null"
 	case *ConstantUndef:
 		return "undef"
+	case *ConstantZero:
+		return "zeroinitializer"
+	case *ConstantStruct:
+		return c.String()
+	case *ConstantArray:
+		return c.String()
+	case *Global:
+		return "@" + c.Name()
 	case *Argument:
 		if c.ValName != "" {
 			return "%" + c.ValName
