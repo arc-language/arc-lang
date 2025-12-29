@@ -253,7 +253,7 @@ async func main() {
 ## Functions, async callback
 ```arc
 // Async callback with single param
-some.func2(args, async (item: string) => {
+onClick(args, async (item: string) => {
     await process(item)
 })
 
