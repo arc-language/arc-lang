@@ -125,7 +125,6 @@ See [BUILDING.md](https://github.com/arc-language/arc-lang/blob/main/BUILDING.md
 * Bit-level operations and type punning with bit_cast
 
 #### High-Level Ergonomics
-* Python-like syntax for rapid AI prototyping
 * Async/await for concurrent I/O and distributed training
 * Defer statements for guaranteed cleanup (RAII-style)
 * Iterator-based for-in loops over datasets and batches
