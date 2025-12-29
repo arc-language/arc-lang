@@ -933,3 +933,15 @@ arr[3] = 42
 // Get pointer to element
 let ptr: *int32 = &arr[0]
 ```
+
+## Intrinsics, slice (array/vector view)
+```arc
+
+let arr: array<int32, 10> = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+let (ptr, len) = slice(arr, 1..4)  // ptr points to arr[1], len = 3
+
+// Use with vectors
+let vec: vector<byte> = {1, 2, 3, 4, 5}
+let (data_ptr, data_len) = slice(vec, 0..3)
+
+```
