@@ -24,6 +24,17 @@ EXTERN: 'extern';
 SELF: 'self';
 NULL: 'null';
 
+// Control flow keywords
+SWITCH: 'switch';
+CASE: 'case';
+DEFAULT: 'default';
+TRY: 'try';
+EXCEPT: 'except';
+FINALLY: 'finally';
+
+// Enum keyword
+ENUM: 'enum';
+
 // Type Keywords
 INT8: 'int8';
 INT16: 'int16';
@@ -42,8 +53,7 @@ BOOL: 'bool';
 CHAR: 'char';
 STRING: 'string';
 VOID: 'void';
-VECTOR: 'vector';
-MAP: 'map';
+ARRAY: 'array';
 
 // Built-in Functions/Intrinsics
 ALLOCA: 'alloca';
@@ -62,13 +72,14 @@ VA_END: 'va_end';
 RAISE: 'raise';
 MEMCMP: 'memcmp';
 BIT_CAST: 'bit_cast';
+SLICE: 'slice';
 
 // Operators (multi-character first!)
 ARROW: '->';
-RANGE: '..';      
-ELLIPSIS: '...';  
-LSHIFT: '<<';     // New
-RSHIFT: '>>';     // New
+RANGE: '..';
+ELLIPSIS: '...';
+LSHIFT: '<<';
+RSHIFT: '>>';
 EQ: '==';
 NE: '!=';
 LE: '<=';
@@ -82,6 +93,7 @@ SLASH_ASSIGN: '/=';
 PERCENT_ASSIGN: '%=';
 INCREMENT: '++';
 DECREMENT: '--';
+FAT_ARROW: '=>';
 
 // Single character operators
 PLUS: '+';
@@ -93,9 +105,9 @@ LT: '<';
 GT: '>';
 NOT: '!';
 AMP: '&';
-BIT_OR: '|';      // New
-BIT_XOR: '^';     // New
-BIT_NOT: '~';     // New
+BIT_OR: '|';
+BIT_XOR: '^';
+BIT_NOT: '~';
 AT: '@';
 ASSIGN: '=';
 
@@ -110,6 +122,7 @@ COMMA: ',';
 COLON: ':';
 SEMICOLON: ';';
 DOT: '.';
+UNDERSCORE: '_';
 
 // Literals
 BOOLEAN_LITERAL: 'true' | 'false';
@@ -134,6 +147,7 @@ FLOAT_LITERAL
 
 fragment EXPONENT: [eE] [+-]? DECIMAL_LITERAL;
 
+// String literal - interpolation \(...) handled by compiler
 STRING_LITERAL
     : '"' (~["\\\r\n] | ESCAPE_SEQUENCE)* '"'
     ;
@@ -143,7 +157,7 @@ CHAR_LITERAL
     ;
 
 fragment ESCAPE_SEQUENCE
-    : '\\' ['"\\nrt0] 
+    : '\\' ['"\\nrt0()]
     | '\\' 'x' HEX_DIGIT HEX_DIGIT
     | '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     | '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT

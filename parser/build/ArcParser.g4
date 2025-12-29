@@ -4,12 +4,18 @@ options {
     tokenVocab=ArcLexer;
 }
 
+// =============================================================================
 // Compilation Unit
+// =============================================================================
+
 compilationUnit
     : (importDecl | namespaceDecl | topLevelDecl)* EOF
     ;
 
+// =============================================================================
 // Import Declaration
+// =============================================================================
+
 importDecl
     : IMPORT STRING_LITERAL
     | IMPORT LPAREN importSpec* RPAREN
@@ -19,16 +25,23 @@ importSpec
     : STRING_LITERAL
     ;
 
+// =============================================================================
 // Namespace Declaration
+// =============================================================================
+
 namespaceDecl
     : NAMESPACE IDENTIFIER
     ;
 
+// =============================================================================
 // Top Level Declarations
+// =============================================================================
+
 topLevelDecl
     : functionDecl
     | structDecl
     | classDecl
+    | enumDecl
     | methodDecl
     | mutatingDecl
     | deinitDecl
@@ -37,7 +50,10 @@ topLevelDecl
     | externDecl
     ;
 
+// =============================================================================
 // Extern Declaration
+// =============================================================================
+
 externDecl
     : EXTERN IDENTIFIER LBRACE externMember* RBRACE
     ;
@@ -55,9 +71,37 @@ externParameterList
     | ELLIPSIS
     ;
 
+// =============================================================================
+// Generics
+// =============================================================================
+
+genericParams
+    : LT genericParamList GT
+    ;
+
+genericParamList
+    : IDENTIFIER (COMMA IDENTIFIER)*
+    ;
+
+genericArgs
+    : LT typeList GT
+    ;
+
+typeList
+    : type (COMMA type)*
+    ;
+
+// =============================================================================
 // Function Declaration
+// =============================================================================
+
 functionDecl
-    : ASYNC? FUNC IDENTIFIER LPAREN parameterList? RPAREN type? block
+    : ASYNC? FUNC IDENTIFIER genericParams? LPAREN parameterList? RPAREN returnType? block
+    ;
+
+returnType
+    : type
+    | LPAREN typeList RPAREN
     ;
 
 parameterList
@@ -69,9 +113,12 @@ parameter
     : SELF? IDENTIFIER COLON type
     ;
 
+// =============================================================================
 // Struct Declaration
+// =============================================================================
+
 structDecl
-    : STRUCT IDENTIFIER LBRACE structMember* RBRACE
+    : STRUCT IDENTIFIER genericParams? LBRACE structMember* RBRACE
     ;
 
 structMember
@@ -84,9 +131,12 @@ structField
     : IDENTIFIER COLON type
     ;
 
+// =============================================================================
 // Class Declaration
+// =============================================================================
+
 classDecl
-    : CLASS IDENTIFIER LBRACE classMember* RBRACE
+    : CLASS IDENTIFIER genericParams? LBRACE classMember* RBRACE
     ;
 
 classMember
@@ -99,41 +149,70 @@ classField
     : IDENTIFIER COLON type
     ;
 
+// =============================================================================
+// Enum Declaration
+// =============================================================================
+
+enumDecl
+    : ENUM IDENTIFIER (COLON primitiveType)? LBRACE enumMember* RBRACE
+    ;
+
+enumMember
+    : IDENTIFIER (ASSIGN expression)?
+    ;
+
+// =============================================================================
 // Method Declarations
+// =============================================================================
+
 methodDecl
-    : ASYNC? FUNC IDENTIFIER LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN type? block
+    : ASYNC? FUNC IDENTIFIER genericParams? LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN returnType? block
     ;
 
 mutatingDecl
-    : MUTATING IDENTIFIER LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN type? block
+    : MUTATING IDENTIFIER LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN returnType? block
     ;
 
 deinitDecl
     : DEINIT LPAREN SELF IDENTIFIER COLON type RPAREN block
     ;
 
+// =============================================================================
 // Variable/Constant Declarations
+// =============================================================================
+
 variableDecl
-    : LET IDENTIFIER (COLON type)? ASSIGN expression
+    : LET tuplePattern (COLON tupleType)? ASSIGN expression
+    | LET IDENTIFIER (COLON type)? ASSIGN expression
     ;
 
 constDecl
     : CONST IDENTIFIER (COLON type)? ASSIGN expression
     ;
 
+tuplePattern
+    : LPAREN IDENTIFIER (COMMA IDENTIFIER)+ RPAREN
+    ;
+
+tupleType
+    : LPAREN typeList RPAREN
+    ;
+
+// =============================================================================
 // Type System
+// =============================================================================
+
 type
     : primitiveType
     | pointerType
     | referenceType
-    | vectorType
-    | mapType
-    | qualifiedType  // New: Supports namespace.Type
-    | IDENTIFIER
+    | arrayType
+    | qualifiedType
+    | IDENTIFIER genericArgs?
     ;
 
 qualifiedType
-    : IDENTIFIER (DOT IDENTIFIER)+
+    : IDENTIFIER (DOT IDENTIFIER)+ genericArgs?
     ;
 
 primitiveType
@@ -154,15 +233,19 @@ referenceType
     : AMP type
     ;
 
-vectorType
-    : VECTOR LT type GT
+arrayType
+    : ARRAY LT type COMMA arraySize GT
     ;
 
-mapType
-    : MAP LT type COMMA type GT
+arraySize
+    : INTEGER_LITERAL
+    | IDENTIFIER
     ;
 
+// =============================================================================
 // Statements
+// =============================================================================
+
 block
     : LBRACE statement* RBRACE
     ;
@@ -175,6 +258,8 @@ statement
     | returnStmt
     | ifStmt
     | forStmt
+    | switchStmt
+    | tryStmt
     | breakStmt
     | continueStmt
     | deferStmt
@@ -198,12 +283,20 @@ expressionStmt
 
 returnStmt
     : RETURN expression?
+    | RETURN tupleExpression
     ;
 
-// Control Flow
+// =============================================================================
+// Control Flow - If
+// =============================================================================
+
 ifStmt
     : IF expression block (ELSE IF expression block)* (ELSE block)?
     ;
+
+// =============================================================================
+// Control Flow - For
+// =============================================================================
 
 forStmt
     : FOR block
@@ -212,6 +305,44 @@ forStmt
     | FOR IDENTIFIER IN expression block
     | FOR IDENTIFIER COMMA IDENTIFIER IN expression block
     ;
+
+// =============================================================================
+// Control Flow - Switch
+// =============================================================================
+
+switchStmt
+    : SWITCH expression LBRACE switchCase* defaultCase? RBRACE
+    ;
+
+switchCase
+    : CASE expression COLON statement*
+    ;
+
+defaultCase
+    : DEFAULT COLON statement*
+    ;
+
+// =============================================================================
+// Control Flow - Try/Except/Finally
+// =============================================================================
+
+tryStmt
+    : TRY block exceptClause+ finallyClause?
+    | TRY block finallyClause
+    ;
+
+exceptClause
+    : EXCEPT qualifiedIdentifier block
+    | EXCEPT IDENTIFIER block
+    ;
+
+finallyClause
+    : FINALLY block
+    ;
+
+// =============================================================================
+// Control Flow - Break/Continue/Defer
+// =============================================================================
 
 breakStmt
     : BREAK
@@ -225,7 +356,10 @@ deferStmt
     : DEFER (assignmentStmt | expression)
     ;
 
-// Expressions (Precedence: Lowest to Highest)
+// =============================================================================
+// Expressions
+// =============================================================================
+
 expression
     : logicalOrExpression
     ;
@@ -238,7 +372,6 @@ logicalAndExpression
     : bitOrExpression (AND bitOrExpression)*
     ;
 
-// New Bitwise Levels
 bitOrExpression
     : bitXorExpression (BIT_OR bitXorExpression)*
     ;
@@ -283,7 +416,7 @@ unaryExpression
     ;
 
 postfixExpression
-    : primaryExpression (postfixOp)*
+    : primaryExpression postfixOp*
     ;
 
 postfixOp
@@ -295,7 +428,10 @@ postfixOp
     | DECREMENT
     ;
 
-// Primary expressions
+// =============================================================================
+// Primary Expressions
+// =============================================================================
+
 primaryExpression
     : literal
     | structLiteral
@@ -303,14 +439,20 @@ primaryExpression
     | allocaExpression
     | syscallExpression
     | intrinsicExpression
+    | lambdaExpression
+    | tupleExpression
     | LPAREN expression RPAREN
-    | qualifiedIdentifier // New: Supports namespace.func()
-    | IDENTIFIER
+    | qualifiedIdentifier genericArgs?
+    | IDENTIFIER genericArgs?
     ;
 
 qualifiedIdentifier
     : IDENTIFIER (DOT IDENTIFIER)+
     ;
+
+// =============================================================================
+// Literals
+// =============================================================================
 
 literal
     : INTEGER_LITERAL
@@ -319,52 +461,99 @@ literal
     | CHAR_LITERAL
     | BOOLEAN_LITERAL
     | NULL
-    | vectorLiteral
-    | mapLiteral
+    | initializerList
     ;
 
-vectorLiteral
-    : LBRACE (expression (COMMA expression)*)? RBRACE
+// Generic initializer list - used for arrays, vectors, maps, structs
+// Compiler determines actual type from context
+initializerList
+    : LBRACE RBRACE
+    | LBRACE expression (COMMA expression)* RBRACE
+    | LBRACE initializerEntry (COMMA initializerEntry)* RBRACE
     ;
 
-mapLiteral
-    : LBRACE (mapEntry (COMMA mapEntry)*)? RBRACE
-    ;
-
-mapEntry
+initializerEntry
     : expression COLON expression
     ;
 
-structLiteral
-    : (IDENTIFIER | qualifiedIdentifier) LBRACE (fieldInit (COMMA fieldInit)*)? RBRACE
-    ;
+// =============================================================================
+// Struct Literal
+// =============================================================================
 
-// Qualified struct literal (net.Socket{...})
-// Note: This logic is usually handled in primaryExpression or a dedicated rule,
-// but for simplicity in ANTLR without left-recursion issues, we can rely on
-// IDENTIFIER lookups or specific qualified rules if needed. 
-// For now, structLiteral only supports simple names. 
-// You might need `qualifiedType LBRACE ...` if you want `net.Socket{}`.
+structLiteral
+    : (IDENTIFIER | qualifiedIdentifier) genericArgs? LBRACE (fieldInit (COMMA fieldInit)*)? RBRACE
+    ;
 
 fieldInit
     : IDENTIFIER COLON expression
     ;
 
+// =============================================================================
+// Arguments
+// =============================================================================
+
 argumentList
-    : expression (COMMA expression)*
+    : argument (COMMA argument)*
     ;
+
+argument
+    : expression
+    | lambdaExpression
+    ;
+
+// =============================================================================
+// Lambda Expression
+// =============================================================================
+
+lambdaExpression
+    : ASYNC? LPAREN lambdaParamList? RPAREN FAT_ARROW block
+    | ASYNC? LPAREN lambdaParamList? RPAREN FAT_ARROW expression
+    ;
+
+lambdaParamList
+    : lambdaParam (COMMA lambdaParam)*
+    ;
+
+lambdaParam
+    : IDENTIFIER COLON type
+    | IDENTIFIER
+    ;
+
+// =============================================================================
+// Tuple Expression
+// =============================================================================
+
+tupleExpression
+    : LPAREN expression COMMA expression (COMMA expression)* RPAREN
+    ;
+
+// =============================================================================
+// Cast Expression
+// =============================================================================
 
 castExpression
     : CAST LT type GT LPAREN expression RPAREN
     ;
 
+// =============================================================================
+// Alloca Expression
+// =============================================================================
+
 allocaExpression
     : ALLOCA LPAREN type (COMMA expression)? RPAREN
     ;
 
+// =============================================================================
+// Syscall Expression
+// =============================================================================
+
 syscallExpression
     : SYSCALL LPAREN expression (COMMA expression)* RPAREN
     ;
+
+// =============================================================================
+// Intrinsic Expressions
+// =============================================================================
 
 intrinsicExpression
     : SIZEOF LT type GT
@@ -380,4 +569,5 @@ intrinsicExpression
     | RAISE LPAREN expression RPAREN
     | MEMCMP LPAREN expression COMMA expression COMMA expression RPAREN
     | BIT_CAST LT type GT LPAREN expression RPAREN
+    | SLICE LPAREN expression COMMA expression RPAREN
     ;

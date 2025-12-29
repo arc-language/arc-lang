@@ -35,8 +35,23 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#externParameterList.
 	VisitExternParameterList(ctx *ExternParameterListContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#genericParams.
+	VisitGenericParams(ctx *GenericParamsContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#genericParamList.
+	VisitGenericParamList(ctx *GenericParamListContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#genericArgs.
+	VisitGenericArgs(ctx *GenericArgsContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#typeList.
+	VisitTypeList(ctx *TypeListContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#functionDecl.
 	VisitFunctionDecl(ctx *FunctionDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#returnType.
+	VisitReturnType(ctx *ReturnTypeContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#parameterList.
 	VisitParameterList(ctx *ParameterListContext) interface{}
@@ -62,6 +77,12 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#classField.
 	VisitClassField(ctx *ClassFieldContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#enumDecl.
+	VisitEnumDecl(ctx *EnumDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#enumMember.
+	VisitEnumMember(ctx *EnumMemberContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#methodDecl.
 	VisitMethodDecl(ctx *MethodDeclContext) interface{}
 
@@ -76,6 +97,12 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#constDecl.
 	VisitConstDecl(ctx *ConstDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#tuplePattern.
+	VisitTuplePattern(ctx *TuplePatternContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#tupleType.
+	VisitTupleType(ctx *TupleTypeContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#type.
 	VisitType(ctx *TypeContext) interface{}
@@ -92,11 +119,11 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#referenceType.
 	VisitReferenceType(ctx *ReferenceTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#vectorType.
-	VisitVectorType(ctx *VectorTypeContext) interface{}
+	// Visit a parse tree produced by ArcParser#arrayType.
+	VisitArrayType(ctx *ArrayTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#mapType.
-	VisitMapType(ctx *MapTypeContext) interface{}
+	// Visit a parse tree produced by ArcParser#arraySize.
+	VisitArraySize(ctx *ArraySizeContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#block.
 	VisitBlock(ctx *BlockContext) interface{}
@@ -121,6 +148,24 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#forStmt.
 	VisitForStmt(ctx *ForStmtContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#switchStmt.
+	VisitSwitchStmt(ctx *SwitchStmtContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#switchCase.
+	VisitSwitchCase(ctx *SwitchCaseContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#defaultCase.
+	VisitDefaultCase(ctx *DefaultCaseContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#tryStmt.
+	VisitTryStmt(ctx *TryStmtContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#exceptClause.
+	VisitExceptClause(ctx *ExceptClauseContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#finallyClause.
+	VisitFinallyClause(ctx *FinallyClauseContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#breakStmt.
 	VisitBreakStmt(ctx *BreakStmtContext) interface{}
@@ -185,14 +230,11 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#literal.
 	VisitLiteral(ctx *LiteralContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#vectorLiteral.
-	VisitVectorLiteral(ctx *VectorLiteralContext) interface{}
+	// Visit a parse tree produced by ArcParser#initializerList.
+	VisitInitializerList(ctx *InitializerListContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#mapLiteral.
-	VisitMapLiteral(ctx *MapLiteralContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#mapEntry.
-	VisitMapEntry(ctx *MapEntryContext) interface{}
+	// Visit a parse tree produced by ArcParser#initializerEntry.
+	VisitInitializerEntry(ctx *InitializerEntryContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#structLiteral.
 	VisitStructLiteral(ctx *StructLiteralContext) interface{}
@@ -202,6 +244,21 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#argumentList.
 	VisitArgumentList(ctx *ArgumentListContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#argument.
+	VisitArgument(ctx *ArgumentContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#lambdaExpression.
+	VisitLambdaExpression(ctx *LambdaExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#lambdaParamList.
+	VisitLambdaParamList(ctx *LambdaParamListContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#lambdaParam.
+	VisitLambdaParam(ctx *LambdaParamContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#tupleExpression.
+	VisitTupleExpression(ctx *TupleExpressionContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#castExpression.
 	VisitCastExpression(ctx *CastExpressionContext) interface{}

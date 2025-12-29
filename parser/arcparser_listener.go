@@ -35,8 +35,23 @@ type ArcParserListener interface {
 	// EnterExternParameterList is called when entering the externParameterList production.
 	EnterExternParameterList(c *ExternParameterListContext)
 
+	// EnterGenericParams is called when entering the genericParams production.
+	EnterGenericParams(c *GenericParamsContext)
+
+	// EnterGenericParamList is called when entering the genericParamList production.
+	EnterGenericParamList(c *GenericParamListContext)
+
+	// EnterGenericArgs is called when entering the genericArgs production.
+	EnterGenericArgs(c *GenericArgsContext)
+
+	// EnterTypeList is called when entering the typeList production.
+	EnterTypeList(c *TypeListContext)
+
 	// EnterFunctionDecl is called when entering the functionDecl production.
 	EnterFunctionDecl(c *FunctionDeclContext)
+
+	// EnterReturnType is called when entering the returnType production.
+	EnterReturnType(c *ReturnTypeContext)
 
 	// EnterParameterList is called when entering the parameterList production.
 	EnterParameterList(c *ParameterListContext)
@@ -62,6 +77,12 @@ type ArcParserListener interface {
 	// EnterClassField is called when entering the classField production.
 	EnterClassField(c *ClassFieldContext)
 
+	// EnterEnumDecl is called when entering the enumDecl production.
+	EnterEnumDecl(c *EnumDeclContext)
+
+	// EnterEnumMember is called when entering the enumMember production.
+	EnterEnumMember(c *EnumMemberContext)
+
 	// EnterMethodDecl is called when entering the methodDecl production.
 	EnterMethodDecl(c *MethodDeclContext)
 
@@ -76,6 +97,12 @@ type ArcParserListener interface {
 
 	// EnterConstDecl is called when entering the constDecl production.
 	EnterConstDecl(c *ConstDeclContext)
+
+	// EnterTuplePattern is called when entering the tuplePattern production.
+	EnterTuplePattern(c *TuplePatternContext)
+
+	// EnterTupleType is called when entering the tupleType production.
+	EnterTupleType(c *TupleTypeContext)
 
 	// EnterType is called when entering the type production.
 	EnterType(c *TypeContext)
@@ -92,11 +119,11 @@ type ArcParserListener interface {
 	// EnterReferenceType is called when entering the referenceType production.
 	EnterReferenceType(c *ReferenceTypeContext)
 
-	// EnterVectorType is called when entering the vectorType production.
-	EnterVectorType(c *VectorTypeContext)
+	// EnterArrayType is called when entering the arrayType production.
+	EnterArrayType(c *ArrayTypeContext)
 
-	// EnterMapType is called when entering the mapType production.
-	EnterMapType(c *MapTypeContext)
+	// EnterArraySize is called when entering the arraySize production.
+	EnterArraySize(c *ArraySizeContext)
 
 	// EnterBlock is called when entering the block production.
 	EnterBlock(c *BlockContext)
@@ -121,6 +148,24 @@ type ArcParserListener interface {
 
 	// EnterForStmt is called when entering the forStmt production.
 	EnterForStmt(c *ForStmtContext)
+
+	// EnterSwitchStmt is called when entering the switchStmt production.
+	EnterSwitchStmt(c *SwitchStmtContext)
+
+	// EnterSwitchCase is called when entering the switchCase production.
+	EnterSwitchCase(c *SwitchCaseContext)
+
+	// EnterDefaultCase is called when entering the defaultCase production.
+	EnterDefaultCase(c *DefaultCaseContext)
+
+	// EnterTryStmt is called when entering the tryStmt production.
+	EnterTryStmt(c *TryStmtContext)
+
+	// EnterExceptClause is called when entering the exceptClause production.
+	EnterExceptClause(c *ExceptClauseContext)
+
+	// EnterFinallyClause is called when entering the finallyClause production.
+	EnterFinallyClause(c *FinallyClauseContext)
 
 	// EnterBreakStmt is called when entering the breakStmt production.
 	EnterBreakStmt(c *BreakStmtContext)
@@ -185,14 +230,11 @@ type ArcParserListener interface {
 	// EnterLiteral is called when entering the literal production.
 	EnterLiteral(c *LiteralContext)
 
-	// EnterVectorLiteral is called when entering the vectorLiteral production.
-	EnterVectorLiteral(c *VectorLiteralContext)
+	// EnterInitializerList is called when entering the initializerList production.
+	EnterInitializerList(c *InitializerListContext)
 
-	// EnterMapLiteral is called when entering the mapLiteral production.
-	EnterMapLiteral(c *MapLiteralContext)
-
-	// EnterMapEntry is called when entering the mapEntry production.
-	EnterMapEntry(c *MapEntryContext)
+	// EnterInitializerEntry is called when entering the initializerEntry production.
+	EnterInitializerEntry(c *InitializerEntryContext)
 
 	// EnterStructLiteral is called when entering the structLiteral production.
 	EnterStructLiteral(c *StructLiteralContext)
@@ -202,6 +244,21 @@ type ArcParserListener interface {
 
 	// EnterArgumentList is called when entering the argumentList production.
 	EnterArgumentList(c *ArgumentListContext)
+
+	// EnterArgument is called when entering the argument production.
+	EnterArgument(c *ArgumentContext)
+
+	// EnterLambdaExpression is called when entering the lambdaExpression production.
+	EnterLambdaExpression(c *LambdaExpressionContext)
+
+	// EnterLambdaParamList is called when entering the lambdaParamList production.
+	EnterLambdaParamList(c *LambdaParamListContext)
+
+	// EnterLambdaParam is called when entering the lambdaParam production.
+	EnterLambdaParam(c *LambdaParamContext)
+
+	// EnterTupleExpression is called when entering the tupleExpression production.
+	EnterTupleExpression(c *TupleExpressionContext)
 
 	// EnterCastExpression is called when entering the castExpression production.
 	EnterCastExpression(c *CastExpressionContext)
@@ -242,8 +299,23 @@ type ArcParserListener interface {
 	// ExitExternParameterList is called when exiting the externParameterList production.
 	ExitExternParameterList(c *ExternParameterListContext)
 
+	// ExitGenericParams is called when exiting the genericParams production.
+	ExitGenericParams(c *GenericParamsContext)
+
+	// ExitGenericParamList is called when exiting the genericParamList production.
+	ExitGenericParamList(c *GenericParamListContext)
+
+	// ExitGenericArgs is called when exiting the genericArgs production.
+	ExitGenericArgs(c *GenericArgsContext)
+
+	// ExitTypeList is called when exiting the typeList production.
+	ExitTypeList(c *TypeListContext)
+
 	// ExitFunctionDecl is called when exiting the functionDecl production.
 	ExitFunctionDecl(c *FunctionDeclContext)
+
+	// ExitReturnType is called when exiting the returnType production.
+	ExitReturnType(c *ReturnTypeContext)
 
 	// ExitParameterList is called when exiting the parameterList production.
 	ExitParameterList(c *ParameterListContext)
@@ -269,6 +341,12 @@ type ArcParserListener interface {
 	// ExitClassField is called when exiting the classField production.
 	ExitClassField(c *ClassFieldContext)
 
+	// ExitEnumDecl is called when exiting the enumDecl production.
+	ExitEnumDecl(c *EnumDeclContext)
+
+	// ExitEnumMember is called when exiting the enumMember production.
+	ExitEnumMember(c *EnumMemberContext)
+
 	// ExitMethodDecl is called when exiting the methodDecl production.
 	ExitMethodDecl(c *MethodDeclContext)
 
@@ -283,6 +361,12 @@ type ArcParserListener interface {
 
 	// ExitConstDecl is called when exiting the constDecl production.
 	ExitConstDecl(c *ConstDeclContext)
+
+	// ExitTuplePattern is called when exiting the tuplePattern production.
+	ExitTuplePattern(c *TuplePatternContext)
+
+	// ExitTupleType is called when exiting the tupleType production.
+	ExitTupleType(c *TupleTypeContext)
 
 	// ExitType is called when exiting the type production.
 	ExitType(c *TypeContext)
@@ -299,11 +383,11 @@ type ArcParserListener interface {
 	// ExitReferenceType is called when exiting the referenceType production.
 	ExitReferenceType(c *ReferenceTypeContext)
 
-	// ExitVectorType is called when exiting the vectorType production.
-	ExitVectorType(c *VectorTypeContext)
+	// ExitArrayType is called when exiting the arrayType production.
+	ExitArrayType(c *ArrayTypeContext)
 
-	// ExitMapType is called when exiting the mapType production.
-	ExitMapType(c *MapTypeContext)
+	// ExitArraySize is called when exiting the arraySize production.
+	ExitArraySize(c *ArraySizeContext)
 
 	// ExitBlock is called when exiting the block production.
 	ExitBlock(c *BlockContext)
@@ -328,6 +412,24 @@ type ArcParserListener interface {
 
 	// ExitForStmt is called when exiting the forStmt production.
 	ExitForStmt(c *ForStmtContext)
+
+	// ExitSwitchStmt is called when exiting the switchStmt production.
+	ExitSwitchStmt(c *SwitchStmtContext)
+
+	// ExitSwitchCase is called when exiting the switchCase production.
+	ExitSwitchCase(c *SwitchCaseContext)
+
+	// ExitDefaultCase is called when exiting the defaultCase production.
+	ExitDefaultCase(c *DefaultCaseContext)
+
+	// ExitTryStmt is called when exiting the tryStmt production.
+	ExitTryStmt(c *TryStmtContext)
+
+	// ExitExceptClause is called when exiting the exceptClause production.
+	ExitExceptClause(c *ExceptClauseContext)
+
+	// ExitFinallyClause is called when exiting the finallyClause production.
+	ExitFinallyClause(c *FinallyClauseContext)
 
 	// ExitBreakStmt is called when exiting the breakStmt production.
 	ExitBreakStmt(c *BreakStmtContext)
@@ -392,14 +494,11 @@ type ArcParserListener interface {
 	// ExitLiteral is called when exiting the literal production.
 	ExitLiteral(c *LiteralContext)
 
-	// ExitVectorLiteral is called when exiting the vectorLiteral production.
-	ExitVectorLiteral(c *VectorLiteralContext)
+	// ExitInitializerList is called when exiting the initializerList production.
+	ExitInitializerList(c *InitializerListContext)
 
-	// ExitMapLiteral is called when exiting the mapLiteral production.
-	ExitMapLiteral(c *MapLiteralContext)
-
-	// ExitMapEntry is called when exiting the mapEntry production.
-	ExitMapEntry(c *MapEntryContext)
+	// ExitInitializerEntry is called when exiting the initializerEntry production.
+	ExitInitializerEntry(c *InitializerEntryContext)
 
 	// ExitStructLiteral is called when exiting the structLiteral production.
 	ExitStructLiteral(c *StructLiteralContext)
@@ -409,6 +508,21 @@ type ArcParserListener interface {
 
 	// ExitArgumentList is called when exiting the argumentList production.
 	ExitArgumentList(c *ArgumentListContext)
+
+	// ExitArgument is called when exiting the argument production.
+	ExitArgument(c *ArgumentContext)
+
+	// ExitLambdaExpression is called when exiting the lambdaExpression production.
+	ExitLambdaExpression(c *LambdaExpressionContext)
+
+	// ExitLambdaParamList is called when exiting the lambdaParamList production.
+	ExitLambdaParamList(c *LambdaParamListContext)
+
+	// ExitLambdaParam is called when exiting the lambdaParam production.
+	ExitLambdaParam(c *LambdaParamContext)
+
+	// ExitTupleExpression is called when exiting the tupleExpression production.
+	ExitTupleExpression(c *TupleExpressionContext)
 
 	// ExitCastExpression is called when exiting the castExpression production.
 	ExitCastExpression(c *CastExpressionContext)

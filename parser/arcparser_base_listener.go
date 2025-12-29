@@ -75,11 +75,41 @@ func (s *BaseArcParserListener) EnterExternParameterList(ctx *ExternParameterLis
 // ExitExternParameterList is called when production externParameterList is exited.
 func (s *BaseArcParserListener) ExitExternParameterList(ctx *ExternParameterListContext) {}
 
+// EnterGenericParams is called when production genericParams is entered.
+func (s *BaseArcParserListener) EnterGenericParams(ctx *GenericParamsContext) {}
+
+// ExitGenericParams is called when production genericParams is exited.
+func (s *BaseArcParserListener) ExitGenericParams(ctx *GenericParamsContext) {}
+
+// EnterGenericParamList is called when production genericParamList is entered.
+func (s *BaseArcParserListener) EnterGenericParamList(ctx *GenericParamListContext) {}
+
+// ExitGenericParamList is called when production genericParamList is exited.
+func (s *BaseArcParserListener) ExitGenericParamList(ctx *GenericParamListContext) {}
+
+// EnterGenericArgs is called when production genericArgs is entered.
+func (s *BaseArcParserListener) EnterGenericArgs(ctx *GenericArgsContext) {}
+
+// ExitGenericArgs is called when production genericArgs is exited.
+func (s *BaseArcParserListener) ExitGenericArgs(ctx *GenericArgsContext) {}
+
+// EnterTypeList is called when production typeList is entered.
+func (s *BaseArcParserListener) EnterTypeList(ctx *TypeListContext) {}
+
+// ExitTypeList is called when production typeList is exited.
+func (s *BaseArcParserListener) ExitTypeList(ctx *TypeListContext) {}
+
 // EnterFunctionDecl is called when production functionDecl is entered.
 func (s *BaseArcParserListener) EnterFunctionDecl(ctx *FunctionDeclContext) {}
 
 // ExitFunctionDecl is called when production functionDecl is exited.
 func (s *BaseArcParserListener) ExitFunctionDecl(ctx *FunctionDeclContext) {}
+
+// EnterReturnType is called when production returnType is entered.
+func (s *BaseArcParserListener) EnterReturnType(ctx *ReturnTypeContext) {}
+
+// ExitReturnType is called when production returnType is exited.
+func (s *BaseArcParserListener) ExitReturnType(ctx *ReturnTypeContext) {}
 
 // EnterParameterList is called when production parameterList is entered.
 func (s *BaseArcParserListener) EnterParameterList(ctx *ParameterListContext) {}
@@ -129,6 +159,18 @@ func (s *BaseArcParserListener) EnterClassField(ctx *ClassFieldContext) {}
 // ExitClassField is called when production classField is exited.
 func (s *BaseArcParserListener) ExitClassField(ctx *ClassFieldContext) {}
 
+// EnterEnumDecl is called when production enumDecl is entered.
+func (s *BaseArcParserListener) EnterEnumDecl(ctx *EnumDeclContext) {}
+
+// ExitEnumDecl is called when production enumDecl is exited.
+func (s *BaseArcParserListener) ExitEnumDecl(ctx *EnumDeclContext) {}
+
+// EnterEnumMember is called when production enumMember is entered.
+func (s *BaseArcParserListener) EnterEnumMember(ctx *EnumMemberContext) {}
+
+// ExitEnumMember is called when production enumMember is exited.
+func (s *BaseArcParserListener) ExitEnumMember(ctx *EnumMemberContext) {}
+
 // EnterMethodDecl is called when production methodDecl is entered.
 func (s *BaseArcParserListener) EnterMethodDecl(ctx *MethodDeclContext) {}
 
@@ -158,6 +200,18 @@ func (s *BaseArcParserListener) EnterConstDecl(ctx *ConstDeclContext) {}
 
 // ExitConstDecl is called when production constDecl is exited.
 func (s *BaseArcParserListener) ExitConstDecl(ctx *ConstDeclContext) {}
+
+// EnterTuplePattern is called when production tuplePattern is entered.
+func (s *BaseArcParserListener) EnterTuplePattern(ctx *TuplePatternContext) {}
+
+// ExitTuplePattern is called when production tuplePattern is exited.
+func (s *BaseArcParserListener) ExitTuplePattern(ctx *TuplePatternContext) {}
+
+// EnterTupleType is called when production tupleType is entered.
+func (s *BaseArcParserListener) EnterTupleType(ctx *TupleTypeContext) {}
+
+// ExitTupleType is called when production tupleType is exited.
+func (s *BaseArcParserListener) ExitTupleType(ctx *TupleTypeContext) {}
 
 // EnterType is called when production type is entered.
 func (s *BaseArcParserListener) EnterType(ctx *TypeContext) {}
@@ -189,17 +243,17 @@ func (s *BaseArcParserListener) EnterReferenceType(ctx *ReferenceTypeContext) {}
 // ExitReferenceType is called when production referenceType is exited.
 func (s *BaseArcParserListener) ExitReferenceType(ctx *ReferenceTypeContext) {}
 
-// EnterVectorType is called when production vectorType is entered.
-func (s *BaseArcParserListener) EnterVectorType(ctx *VectorTypeContext) {}
+// EnterArrayType is called when production arrayType is entered.
+func (s *BaseArcParserListener) EnterArrayType(ctx *ArrayTypeContext) {}
 
-// ExitVectorType is called when production vectorType is exited.
-func (s *BaseArcParserListener) ExitVectorType(ctx *VectorTypeContext) {}
+// ExitArrayType is called when production arrayType is exited.
+func (s *BaseArcParserListener) ExitArrayType(ctx *ArrayTypeContext) {}
 
-// EnterMapType is called when production mapType is entered.
-func (s *BaseArcParserListener) EnterMapType(ctx *MapTypeContext) {}
+// EnterArraySize is called when production arraySize is entered.
+func (s *BaseArcParserListener) EnterArraySize(ctx *ArraySizeContext) {}
 
-// ExitMapType is called when production mapType is exited.
-func (s *BaseArcParserListener) ExitMapType(ctx *MapTypeContext) {}
+// ExitArraySize is called when production arraySize is exited.
+func (s *BaseArcParserListener) ExitArraySize(ctx *ArraySizeContext) {}
 
 // EnterBlock is called when production block is entered.
 func (s *BaseArcParserListener) EnterBlock(ctx *BlockContext) {}
@@ -248,6 +302,42 @@ func (s *BaseArcParserListener) EnterForStmt(ctx *ForStmtContext) {}
 
 // ExitForStmt is called when production forStmt is exited.
 func (s *BaseArcParserListener) ExitForStmt(ctx *ForStmtContext) {}
+
+// EnterSwitchStmt is called when production switchStmt is entered.
+func (s *BaseArcParserListener) EnterSwitchStmt(ctx *SwitchStmtContext) {}
+
+// ExitSwitchStmt is called when production switchStmt is exited.
+func (s *BaseArcParserListener) ExitSwitchStmt(ctx *SwitchStmtContext) {}
+
+// EnterSwitchCase is called when production switchCase is entered.
+func (s *BaseArcParserListener) EnterSwitchCase(ctx *SwitchCaseContext) {}
+
+// ExitSwitchCase is called when production switchCase is exited.
+func (s *BaseArcParserListener) ExitSwitchCase(ctx *SwitchCaseContext) {}
+
+// EnterDefaultCase is called when production defaultCase is entered.
+func (s *BaseArcParserListener) EnterDefaultCase(ctx *DefaultCaseContext) {}
+
+// ExitDefaultCase is called when production defaultCase is exited.
+func (s *BaseArcParserListener) ExitDefaultCase(ctx *DefaultCaseContext) {}
+
+// EnterTryStmt is called when production tryStmt is entered.
+func (s *BaseArcParserListener) EnterTryStmt(ctx *TryStmtContext) {}
+
+// ExitTryStmt is called when production tryStmt is exited.
+func (s *BaseArcParserListener) ExitTryStmt(ctx *TryStmtContext) {}
+
+// EnterExceptClause is called when production exceptClause is entered.
+func (s *BaseArcParserListener) EnterExceptClause(ctx *ExceptClauseContext) {}
+
+// ExitExceptClause is called when production exceptClause is exited.
+func (s *BaseArcParserListener) ExitExceptClause(ctx *ExceptClauseContext) {}
+
+// EnterFinallyClause is called when production finallyClause is entered.
+func (s *BaseArcParserListener) EnterFinallyClause(ctx *FinallyClauseContext) {}
+
+// ExitFinallyClause is called when production finallyClause is exited.
+func (s *BaseArcParserListener) ExitFinallyClause(ctx *FinallyClauseContext) {}
 
 // EnterBreakStmt is called when production breakStmt is entered.
 func (s *BaseArcParserListener) EnterBreakStmt(ctx *BreakStmtContext) {}
@@ -375,23 +465,17 @@ func (s *BaseArcParserListener) EnterLiteral(ctx *LiteralContext) {}
 // ExitLiteral is called when production literal is exited.
 func (s *BaseArcParserListener) ExitLiteral(ctx *LiteralContext) {}
 
-// EnterVectorLiteral is called when production vectorLiteral is entered.
-func (s *BaseArcParserListener) EnterVectorLiteral(ctx *VectorLiteralContext) {}
+// EnterInitializerList is called when production initializerList is entered.
+func (s *BaseArcParserListener) EnterInitializerList(ctx *InitializerListContext) {}
 
-// ExitVectorLiteral is called when production vectorLiteral is exited.
-func (s *BaseArcParserListener) ExitVectorLiteral(ctx *VectorLiteralContext) {}
+// ExitInitializerList is called when production initializerList is exited.
+func (s *BaseArcParserListener) ExitInitializerList(ctx *InitializerListContext) {}
 
-// EnterMapLiteral is called when production mapLiteral is entered.
-func (s *BaseArcParserListener) EnterMapLiteral(ctx *MapLiteralContext) {}
+// EnterInitializerEntry is called when production initializerEntry is entered.
+func (s *BaseArcParserListener) EnterInitializerEntry(ctx *InitializerEntryContext) {}
 
-// ExitMapLiteral is called when production mapLiteral is exited.
-func (s *BaseArcParserListener) ExitMapLiteral(ctx *MapLiteralContext) {}
-
-// EnterMapEntry is called when production mapEntry is entered.
-func (s *BaseArcParserListener) EnterMapEntry(ctx *MapEntryContext) {}
-
-// ExitMapEntry is called when production mapEntry is exited.
-func (s *BaseArcParserListener) ExitMapEntry(ctx *MapEntryContext) {}
+// ExitInitializerEntry is called when production initializerEntry is exited.
+func (s *BaseArcParserListener) ExitInitializerEntry(ctx *InitializerEntryContext) {}
 
 // EnterStructLiteral is called when production structLiteral is entered.
 func (s *BaseArcParserListener) EnterStructLiteral(ctx *StructLiteralContext) {}
@@ -410,6 +494,36 @@ func (s *BaseArcParserListener) EnterArgumentList(ctx *ArgumentListContext) {}
 
 // ExitArgumentList is called when production argumentList is exited.
 func (s *BaseArcParserListener) ExitArgumentList(ctx *ArgumentListContext) {}
+
+// EnterArgument is called when production argument is entered.
+func (s *BaseArcParserListener) EnterArgument(ctx *ArgumentContext) {}
+
+// ExitArgument is called when production argument is exited.
+func (s *BaseArcParserListener) ExitArgument(ctx *ArgumentContext) {}
+
+// EnterLambdaExpression is called when production lambdaExpression is entered.
+func (s *BaseArcParserListener) EnterLambdaExpression(ctx *LambdaExpressionContext) {}
+
+// ExitLambdaExpression is called when production lambdaExpression is exited.
+func (s *BaseArcParserListener) ExitLambdaExpression(ctx *LambdaExpressionContext) {}
+
+// EnterLambdaParamList is called when production lambdaParamList is entered.
+func (s *BaseArcParserListener) EnterLambdaParamList(ctx *LambdaParamListContext) {}
+
+// ExitLambdaParamList is called when production lambdaParamList is exited.
+func (s *BaseArcParserListener) ExitLambdaParamList(ctx *LambdaParamListContext) {}
+
+// EnterLambdaParam is called when production lambdaParam is entered.
+func (s *BaseArcParserListener) EnterLambdaParam(ctx *LambdaParamContext) {}
+
+// ExitLambdaParam is called when production lambdaParam is exited.
+func (s *BaseArcParserListener) ExitLambdaParam(ctx *LambdaParamContext) {}
+
+// EnterTupleExpression is called when production tupleExpression is entered.
+func (s *BaseArcParserListener) EnterTupleExpression(ctx *TupleExpressionContext) {}
+
+// ExitTupleExpression is called when production tupleExpression is exited.
+func (s *BaseArcParserListener) ExitTupleExpression(ctx *TupleExpressionContext) {}
 
 // EnterCastExpression is called when production castExpression is entered.
 func (s *BaseArcParserListener) EnterCastExpression(ctx *CastExpressionContext) {}
