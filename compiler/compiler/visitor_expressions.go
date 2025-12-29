@@ -594,7 +594,7 @@ func (v *IRVisitor) handlePostIncrement(base ir.Value) ir.Value {
 	newVal := v.ctx.Builder.CreateAdd(currentVal, one, "")
 
 	// Store back
-	if ptrType, ok := base.Type().(*types.PointerType); ok {
+	if _, ok := base.Type().(*types.PointerType); ok {
 		v.ctx.Builder.CreateStore(newVal, base)
 	}
 
@@ -622,7 +622,7 @@ func (v *IRVisitor) handlePostDecrement(base ir.Value) ir.Value {
 	newVal := v.ctx.Builder.CreateSub(currentVal, one, "")
 
 	// Store back
-	if ptrType, ok := base.Type().(*types.PointerType); ok {
+	if _, ok := base.Type().(*types.PointerType); ok {
 		v.ctx.Builder.CreateStore(newVal, base)
 	}
 
