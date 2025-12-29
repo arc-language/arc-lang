@@ -513,7 +513,7 @@ Module has 2 functions, 1 globals
 ✓ Object file written to /tmp/arc_tests/test_class.o
 
 To create executable:
-  gcc /tmp/arc_tests/test_class.o -o test_class && ./test_class
+  gcc  -o test_class && ./test_class
 
 
 Step 2: Linking with gcc...
@@ -522,7 +522,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: -1
 ❌ Test FAILED: expected exit=0, got exit=-1
-❌ FAIL (0.16s)
+❌ FAIL (0.15s)
     Expected exit=0, got exit=-1
 [8/33] test_comparison                               
 --- Testing: test_comparison ---
@@ -659,7 +659,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.04s)
+✅ PASS (0.05s)
 [10/33] test_constant                                 
 --- Testing: test_constant ---
 Source file: tests/test_constant.arc
@@ -725,7 +725,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.06s)
 [11/33] test_defer                                    
 --- Testing: test_defer ---
 Source file: tests/test_defer.arc
@@ -856,7 +856,7 @@ Compiling tests/test_enum.arc...
   Errors: 1
 Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
 
-❌ FAIL (0.04s)
+❌ FAIL (0.03s)
     Compilation failed
     Compile output:
       Compiling tests/test_enum.arc...
@@ -972,7 +972,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.06s)
 [14/33] test_for_in_range                             
 --- Testing: test_for_in_range ---
 Source file: tests/test_for_in_range.arc
@@ -1312,7 +1312,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.07s)
 [18/33] test_if_statement                             
 --- Testing: test_if_statement ---
 Source file: tests/test_if_statement.arc
@@ -1375,7 +1375,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.07s)
+✅ PASS (0.09s)
 [19/33] test_import_multiple                          
 --- Testing: test_import_multiple ---
 Source file: tests/test_import_multiple.arc
@@ -1399,27 +1399,27 @@ Compiling tests/test_import_multiple.arc...
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
 panic: runtime error: invalid memory address or nil pointer dereference
-[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59b20b]
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59b22b]
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0001b9100, 0x635e60?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/visitor_declarations.go:18 +0x2b
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x82e4b0?, {0x6984c0?, 0xc0000e0c00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/visitor.go:51 +0x731
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0001b9100, 0xc0000e0a80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/visitor.go:163 +0x1fa
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x82e430?, {0x698388?, 0xc0000e0a80?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/visitor.go:45 +0x266
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc000010078, {0xc00002a400, 0x40}, 0x1)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/compiler.go:147 +0x432
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010078, {0x7ffd6eb794cc, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/compiler.go:41 +0x18b
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc000552600, 0x635e60?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/visitor_declarations.go:18 +0x2b
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x82e4b0?, {0x6984c0?, 0xc00010ac00?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/visitor.go:51 +0x731
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc000552600, 0xc00010aa80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/visitor.go:163 +0x1fa
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x82e430?, {0x698388?, 0xc00010aa80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/visitor.go:45 +0x266
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a4060, {0xc0000c6080, 0x40}, 0x1)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/compiler.go:147 +0x432
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a4060, {0x7fff053bf693, 0x1e})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/compiler.go:41 +0x18b
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
 main.main()
 	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Compilation failed
     Compile output:
       Compiling tests/test_import_multiple.arc...
@@ -1436,22 +1436,22 @@ main.main()
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
       panic: runtime error: invalid memory address or nil pointer dereference
-      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59b20b]
+      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59b22b]
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0001b9100, 0x635e60?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/visitor_declarations.go:18 +0x2b
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x82e4b0?, {0x6984c0?, 0xc0000e0c00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/visitor.go:51 +0x731
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0001b9100, 0xc0000e0a80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/visitor.go:163 +0x1fa
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x82e430?, {0x698388?, 0xc0000e0a80?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/visitor.go:45 +0x266
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc000010078, {0xc00002a400, 0x40}, 0x1)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/compiler.go:147 +0x432
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010078, {0x7ffd6eb794cc, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229103630-c62c99c492aa/compiler/compiler/compiler.go:41 +0x18b
-      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc000552600, 0x635e60?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/visitor_declarations.go:18 +0x2b
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x82e4b0?, {0x6984c0?, 0xc00010ac00?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/visitor.go:51 +0x731
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc000552600, 0xc00010aa80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/visitor.go:163 +0x1fa
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x82e430?, {0x698388?, 0xc00010aa80?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/visitor.go:45 +0x266
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a4060, {0xc0000c6080, 0x40}, 0x1)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/compiler.go:147 +0x432
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a4060, {0x7fff053bf693, 0x1e})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229104812-71cba769526d/compiler/compiler/compiler.go:41 +0x18b
+      main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
       main.main()
       	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
@@ -1505,7 +1505,7 @@ Compiling tests/test_import_single.arc...
   Errors: 1
 Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
 
-❌ FAIL (0.02s)
+❌ FAIL (0.03s)
     Compilation failed
     Compile output:
       Compiling tests/test_import_single.arc...
@@ -1616,7 +1616,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 1
 ❌ Test FAILED: expected exit=0, got exit=1
-❌ FAIL (0.06s)
+❌ FAIL (0.05s)
     Expected exit=0, got exit=1
 [22/33] test_namespace                                
 --- Testing: test_namespace ---
@@ -1932,7 +1932,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.04s)
+✅ PASS (0.05s)
 [27/33] test_struct_basic                             
 --- Testing: test_struct_basic ---
 Source file: tests/test_struct_basic.arc
@@ -2006,7 +2006,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.07s)
 [28/33] test_struct_method                            
 --- Testing: test_struct_method ---
 Source file: tests/test_struct_method.arc
@@ -2093,10 +2093,9 @@ Step 2: Linking with gcc...
 Linking successful
 
 Step 3: Running executable...
-Process exited with code: 1
-❌ Test FAILED: expected exit=0, got exit=1
-❌ FAIL (0.10s)
-    Expected exit=0, got exit=1
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.07s)
 [29/33] test_switch                                   
 --- Testing: test_switch ---
 Source file: tests/test_switch.arc
@@ -2421,7 +2420,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.07s)
 [32/33] test_variable_inferred                        
 --- Testing: test_variable_inferred ---
 Source file: tests/test_variable_inferred.arc
@@ -2484,7 +2483,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.06s)
 [33/33] test_variable_typed                           
 --- Testing: test_variable_typed ---
 Source file: tests/test_variable_typed.arc
@@ -2547,16 +2546,16 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.04s)
+✅ PASS (0.05s)
 
 ======================================================================
 Total Tests:      33
-Passed:           24 (72.7%)
-Failed:           9
+Passed:           25 (75.8%)
+Failed:           8
   Compile errors: 5
   Link errors:    0
-  Runtime errors: 4
-Total Duration:   1.72s
+  Runtime errors: 3
+Total Duration:   1.81s
 
 Failed Tests:
   ❌ test_class                               (runtime)
@@ -2566,6 +2565,5 @@ Failed Tests:
   ❌ test_import_multiple                     (compile)
   ❌ test_import_single                       (compile)
   ❌ test_increment                           (runtime)
-  ❌ test_struct_method                       (runtime)
   ❌ test_try_except                          (compile)
 
