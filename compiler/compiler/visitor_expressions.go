@@ -633,6 +633,12 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 				continue
 			}
 			
+			// Cast field value to match field type
+			expectedType := structType.Fields[idx]
+			if !fieldVal.Type().Equal(expectedType) {
+				fieldVal = v.castValue(fieldVal, expectedType)
+			}
+			
 			gep := v.ctx.Builder.CreateStructGEP(structType, ptrToClass, idx, "")
 			v.ctx.Builder.CreateStore(fieldVal, gep)
 		}
@@ -653,6 +659,13 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 			v.ctx.Logger.Error("Struct %s has no field %s", irName, fieldName)
 			continue
 		}
+		
+		// Cast field value to match field type
+		expectedType := structType.Fields[idx]
+		if !fieldVal.Type().Equal(expectedType) {
+			fieldVal = v.castValue(fieldVal, expectedType)
+		}
+		
 		agg = v.ctx.Builder.CreateInsertValue(agg, fieldVal, []int{idx}, "")
 	}
 	return agg

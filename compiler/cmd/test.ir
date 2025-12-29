@@ -1,0 +1,27 @@
+%Point = type { i32, i32 }
+
+define external i32 @main() {
+entry:
+  %0 = insertvalue %Point %<unnamed>, i64 10, 0
+  %1 = insertvalue %Point %0, i64 20, 1
+  %p.addr = alloca %Point
+  store %Point %1, ptr<%Point> %p.addr
+  %2 = getelementptr %Point, ptr<%Point> %p.addr, i32 0, i32 0
+  %3 = load i32, ptr<%Point> %2
+  %4 = getelementptr %Point, ptr<%Point> %p.addr, i32 0, i32 1
+  %5 = load i32, ptr<%Point> %4
+  %6 = add i32 %3, %5
+  %sum.addr = alloca i32
+  store i32 %6, ptr<i32> %sum.addr
+  %7 = load i32, ptr<i32> %sum.addr
+  %8 = icmp eq i32 %7, 30
+  br i1 %8, label %if.then.9_4, label %if.next.9_4
+if.end.9_4:
+  %10 = trunc i64 1 to i32
+  ret i32 %10
+if.then.9_4:
+  %9 = trunc i64 0 to i32
+  ret i32 %9
+if.next.9_4:
+  br label %if.end.9_4
+}
