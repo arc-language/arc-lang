@@ -3,7 +3,7 @@ package compiler
 import (
 	"strconv"
 	"strings"
-
+	"fmt"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
@@ -799,17 +799,11 @@ func (v *IRVisitor) parseStringLiteral(text string) ir.Value {
 	// Create a new global variable
 	globalName := fmt.Sprintf(".str.%d", len(v.ctx.Module.Globals))
 	global := &ir.Global{
-		GlobalIdent: ir.GlobalIdent{
-			GlobalName: globalName,
-		},
-		Immutable: true,
-		Typ:       arrayType,
+		Name: globalName,
+		Type: arrayType,
 	}
 	
-	// Add string data as initializer
-	strBytes := []byte(text)
-	strBytes = append(strBytes, 0) // null terminator
-	
+	// Add to module globals
 	v.ctx.Module.Globals = append(v.ctx.Module.Globals, global)
 	
 	// Return pointer to the first element
