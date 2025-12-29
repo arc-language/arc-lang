@@ -28,7 +28,7 @@ entry:
   %c.addr = alloca ptr<%Client>
   store ptr<%Client> %Client.instance, ptr<ptr<%Client>> %c.addr
   %9 = load ptr<%Client>, ptr<ptr<%Client>> %c.addr
-  %10 = call i32 @Client_get_port()
+  %10 = call i32 @Client_get_port(ptr<%Client> %9)
   %port.addr = alloca i32
   store i32 %10, ptr<i32> %port.addr
   %11 = load i32, ptr<i32> %port.addr

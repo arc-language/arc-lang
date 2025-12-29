@@ -719,6 +719,20 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			return currentVal
 		}
 
+		// Check if it's an enum type access (e.g., Status.OK)
+		if _, isType := v.ctx.GetType(firstPart); isType {
+			if len(parts) == 2 {
+				memberName := parts[1]
+				fullName := v.getNamespacedName(firstPart + "_" + memberName)
+				if global := v.ctx.Module.GetGlobal(fullName); global != nil {
+					ptrType := global.Type().(*types.PointerType)
+					return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+				}
+				v.ctx.Logger.Error("Enum '%s' has no member '%s'", firstPart, memberName)
+				return v.ctx.Builder.ConstInt(types.I64, 0)
+			}
+		}
+
 		nsName := firstPart
 		memberName := parts[1]
 		
