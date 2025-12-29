@@ -1211,20 +1211,27 @@ func (c *compiler) memCmpOp(inst *ir.MemCmpInst) error {
 	return nil
 }
 
-// raise - abort execution with message
+// raise - set exception state instead of aborting
 func (c *compiler) raiseOp(inst *ir.RaiseInst) error {
-	// Implementation: call exit(1) or trigger SIGABRT
-	// For simplicity, we'll use exit syscall
+	// Instead of calling exit(), we set a global exception flag
+	// The runtime will check this flag after function calls
 	
-	// Load exit code 1 into RDI
-	c.loadConstInt(RDI, 1)
+	// Load the exception message
+	message := inst.Operands()[0]
+	c.loadToReg(RCX, message)
 	
-	// Load syscall number for exit (60 on Linux x86_64)
-	c.loadConstInt(RAX, 60)
+	// Load address of __exception_state global
+	c.emitLeaRipRelative(RAX, "__exception_state")
 	
-	// syscall
-	c.emitBytes(0x0F, 0x05)
+	// Set hasException = true (first field, i1)
+	// mov byte ptr [rax], 1
+	c.emitBytes(0xC6, 0x00, 0x01)
 	
-	// This never returns
+	// Store exception message (second field, ptr)
+	// mov [rax + 8], rcx (offset 8 because of alignment: i1 + padding = 8 bytes)
+	c.emitBytes(0x48, 0x89, 0x48, 0x08)
+	
+	// Don't exit - just return normally
+	// The caller will check the exception state
 	return nil
 }

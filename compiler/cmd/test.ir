@@ -36,6 +36,7 @@ try.9_4:
 try.end.9_4:
   ret i32 0
 catch.9_4:
+except.9_4.0:
   %10 = sub i64 0, 1
   %11 = trunc i64 %10 to i32
   ret i32 %11

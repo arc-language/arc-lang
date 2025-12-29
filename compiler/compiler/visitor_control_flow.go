@@ -481,11 +481,44 @@ func (v *IRVisitor) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 	v.ctx.SetInsertBlock(tryBlock)
 	v.Visit(ctx.Block())
 	
-	if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
-		if finallyBlock != nil {
-			v.ctx.Builder.CreateBr(finallyBlock)
+	// After try block, check exception state
+	if catchBlock != nil {
+		exceptionStateGlobal := v.ctx.Module.GetGlobal("__exception_state")
+		if exceptionStateGlobal != nil {
+			// Check if exception occurred
+			zero := v.ctx.Builder.ConstInt(types.I32, 0)
+			hasExceptionPtr := v.ctx.Builder.CreateStructGEP(
+				exceptionStateGlobal.Type().(*types.PointerType).ElementType,
+				exceptionStateGlobal,
+				0,
+				"",
+			)
+			hasException := v.ctx.Builder.CreateLoad(types.I1, hasExceptionPtr, "")
+			
+			// Branch based on exception state
+			if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
+				nextBlock := finallyBlock
+				if nextBlock == nil {
+					nextBlock = endBlock
+				}
+				v.ctx.Builder.CreateCondBr(hasException, catchBlock, nextBlock)
+			}
 		} else {
-			v.ctx.Builder.CreateBr(endBlock)
+			if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
+				if finallyBlock != nil {
+					v.ctx.Builder.CreateBr(finallyBlock)
+				} else {
+					v.ctx.Builder.CreateBr(endBlock)
+				}
+			}
+		}
+	} else {
+		if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
+			if finallyBlock != nil {
+				v.ctx.Builder.CreateBr(finallyBlock)
+			} else {
+				v.ctx.Builder.CreateBr(endBlock)
+			}
 		}
 	}
 	
@@ -493,25 +526,38 @@ func (v *IRVisitor) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 	if catchBlock != nil {
 		v.ctx.SetInsertBlock(catchBlock)
 		
-		// In a full implementation, this would:
-		// 1. Check the type of the thrown exception
-		// 2. Match it against each except clause
-		// 3. Execute the matching handler
-		// 4. Clear the exception state
-		
 		for i, except := range ctx.AllExceptClause() {
 			v.logger.Debug("Processing except clause %d", i+1)
 			
-			// Create a block for this specific handler
-			handlerBlock := v.ctx.Builder.CreateBlock(fmt.Sprintf("except.%s.%d", uniqueID, i))
-			v.ctx.SetInsertBlock(handlerBlock)
+			// Clear the exception state
+			exceptionStateGlobal := v.ctx.Module.GetGlobal("__exception_state")
+			if exceptionStateGlobal != nil {
+				zero := v.ctx.Builder.ConstInt(types.I32, 0)
+				hasExceptionPtr := v.ctx.Builder.CreateStructGEP(
+					exceptionStateGlobal.Type().(*types.PointerType).ElementType,
+					exceptionStateGlobal,
+					0,
+					"",
+				)
+				v.ctx.Builder.CreateStore(v.ctx.Builder.False(), hasExceptionPtr)
+			}
 			
 			// If the except clause has an identifier, bind the exception to it
 			if except.IDENTIFIER() != nil {
 				errName := except.IDENTIFIER().GetText()
-				// TODO: Create alloca for exception binding
-				// errPtr := v.ctx.Builder.CreateAlloca(exceptionType, errName+".addr")
-				// v.ctx.currentScope.Define(errName, errPtr)
+				// Get exception message from global state
+				if exceptionStateGlobal != nil {
+					messagePtrFieldPtr := v.ctx.Builder.CreateStructGEP(
+						exceptionStateGlobal.Type().(*types.PointerType).ElementType,
+						exceptionStateGlobal,
+						1,
+						"",
+					)
+					exceptionMsg := v.ctx.Builder.CreateLoad(types.NewPointer(types.I8), messagePtrFieldPtr, "")
+					errPtr := v.ctx.Builder.CreateAlloca(types.NewPointer(types.I8), errName+".addr")
+					v.ctx.Builder.CreateStore(exceptionMsg, errPtr)
+					v.ctx.currentScope.Define(errName, errPtr)
+				}
 				v.logger.Debug("Binding exception to variable: %s", errName)
 			}
 			
@@ -527,6 +573,8 @@ func (v *IRVisitor) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 					v.ctx.Builder.CreateBr(endBlock)
 				}
 			}
+			
+			break // For now, only handle first except clause
 		}
 	}
 	
@@ -543,8 +591,6 @@ func (v *IRVisitor) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 	}
 	
 	v.ctx.SetInsertBlock(endBlock)
-	
-	v.ctx.Logger.Warning("Try-except-finally uses simplified exception model - full exception handling not yet implemented")
 	return nil
 }
 
@@ -554,18 +600,49 @@ func (v *IRVisitor) VisitThrowStmt(ctx *parser.ThrowStmtContext) interface{} {
 	// Evaluate the exception expression
 	exceptionValue := v.Visit(ctx.Expression()).(ir.Value)
 	
-	// For now, we'll use the raise intrinsic to throw
-	// In a full implementation, this would:
-	// 1. Store the exception in a thread-local exception register
-	// 2. Unwind the stack to the nearest try block
-	// 3. Jump to the appropriate except handler
+	// Instead of calling raise (which exits), we need to:
+	// 1. Store the exception in a global exception state
+	// 2. Return from the current function with an error indicator
 	
-	// Create a builder call to raise with the exception value
-	v.ctx.Builder.CreateRaise(exceptionValue)
+	// Get or create the global exception state variable
+	exceptionStateGlobal := v.ctx.Module.GetGlobal("__exception_state")
+	if exceptionStateGlobal == nil {
+		// Create the exception state global
+		// Structure: { i1 hasException, ptr<i8> exceptionMessage }
+		stateType := types.NewStruct("", []types.Type{types.I1, types.NewPointer(types.I8)}, false)
+		zeroState := &ir.ConstantStruct{
+			BaseValue: ir.BaseValue{ValType: stateType},
+			Fields: []ir.Constant{
+				v.ctx.Builder.ConstInt(types.I1, 0),
+				v.ctx.Builder.ConstNull(types.NewPointer(types.I8)),
+			},
+		}
+		exceptionStateGlobal = v.ctx.Builder.CreateGlobalVariable("__exception_state", stateType, zeroState)
+	}
 	
-	// Note: In a real implementation, throw would be catchable unlike raise()
-	// This is a simplified version that maps throw to raise for now
-	v.ctx.Logger.Warning("throw statement maps to raise() - proper exception handling not yet implemented")
+	// Set hasException = true
+	zero := v.ctx.Builder.ConstInt(types.I32, 0)
+	hasExceptionPtr := v.ctx.Builder.CreateStructGEP(
+		exceptionStateGlobal.Type().(*types.PointerType).ElementType, 
+		exceptionStateGlobal, 
+		0, 
+		"",
+	)
+	v.ctx.Builder.CreateStore(v.ctx.Builder.True(), hasExceptionPtr)
+	
+	// Store exception message
+	messagePtrFieldPtr := v.ctx.Builder.CreateStructGEP(
+		exceptionStateGlobal.Type().(*types.PointerType).ElementType,
+		exceptionStateGlobal,
+		1,
+		"",
+	)
+	v.ctx.Builder.CreateStore(exceptionValue, messagePtrFieldPtr)
+	
+	// Return an error code (-1) instead of exiting
+	// This allows the caller to check if an exception occurred
+	errorCode := v.ctx.Builder.ConstInt(types.I32, -1)
+	v.ctx.Builder.CreateRet(errorCode)
 	
 	return nil
 }
