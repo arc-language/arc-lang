@@ -530,6 +530,7 @@ func (v *IRVisitor) handleMemberAccess(base ir.Value, memberName string) ir.Valu
 			if v.ctx.IsClassType(structType.Name) {
 				methodName := structType.Name + "_" + memberName
 				if fn := v.ctx.Module.GetFunction(methodName); fn != nil {
+					v.pendingMethodSelf = base  // FIX: Set pendingMethodSelf for class methods
 					return fn
 				}
 			}
