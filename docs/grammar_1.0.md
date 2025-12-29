@@ -825,3 +825,63 @@ enum Color: uint8 {
     BLUE = 0x0000FF
 }
 ```
+
+
+## Control Flow, try-except
+```arc
+// Basic try-except block
+try {
+    let result = divide(10, 0)
+    io.printf("Result: %d\n", result)
+} except err {
+    io.printf("Error: %s\n", err)
+}
+
+// Try-except with typed errors
+enum FileError {
+    NotFound
+    PermissionDenied
+    IOError
+}
+
+func read_file(path: string) string throws FileError {
+    if !exists(path) {
+        throw FileError.NotFound
+    }
+    return contents
+}
+
+try {
+    let data = read_file("/tmp/config.txt")
+    process(data)
+} except FileError.NotFound {
+    io.printf("File not found\n")
+} except FileError.PermissionDenied {
+    io.printf("Permission denied\n")
+} except err {
+    // Catch-all for other errors
+    io.printf("Unexpected error\n")
+}
+
+// Try-except with finally (always executes)
+try {
+    let file = open("data.txt")
+    process(file)
+} except err {
+    io.printf("Error: %s\n", err)
+} finally {
+    // Cleanup code always runs
+    cleanup()
+}
+
+// Try-except with ref-counted classes (automatic cleanup)
+try {
+    let client = HttpClient{}  // Ref count = 1
+    let data = client.fetch("https://api.example.com")
+    process(data)
+} except err {
+    // If exception thrown, client is automatically released
+    io.printf("Failed to fetch: %s\n", err)
+}
+// client ref count decremented here (or during exception unwinding)
+```
