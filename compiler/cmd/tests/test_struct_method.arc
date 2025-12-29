@@ -1,3 +1,4 @@
+// --- START OF FILE tests/test_struct_method.arc ---
 struct Point {
     x: int32
     y: int32
@@ -9,5 +10,9 @@ struct Point {
 
 func main() int32 {
     let p = Point{x: 10, y: 20}
-    return p.sum()
+    let s = p.sum()
+    if s == 30 {
+        return 0
+    }
+    return 1
 }
