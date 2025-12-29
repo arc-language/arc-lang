@@ -1,29 +1,38 @@
-%Point = type { i32, i32 }
+define external { i32, i1 } @divide(i32 %a, i32 %b) {
+entry:
+  %a.addr = alloca i32
+  store i32 %a, ptr<i32> %a.addr
+  %b.addr = alloca i32
+  store i32 %b, ptr<i32> %b.addr
+  %0 = load i32, ptr<i32> %b.addr
+  %1 = icmp eq i32 %0, 0
+  br i1 %1, label %if.then.2_4, label %if.next.2_4
+if.end.2_4:
+  ret i64 0
+if.then.2_4:
+  ret i64 0
+if.next.2_4:
+  br label %if.end.2_4
+}
 
 define external i32 @main() {
 entry:
-  %0 = trunc i64 10 to i32
-  %1 = insertvalue %Point %<unnamed>, i32 %0, 0
-  %2 = trunc i64 20 to i32
-  %3 = insertvalue %Point %1, i32 %2, 1
-  %p.addr = alloca %Point
-  store %Point %3, ptr<%Point> %p.addr
-  %4 = getelementptr %Point, ptr<%Point> %p.addr, i32 0, i32 0
-  %5 = load i32, ptr<%Point> %4
-  %6 = getelementptr %Point, ptr<%Point> %p.addr, i32 0, i32 1
-  %7 = load i32, ptr<%Point> %6
-  %8 = add i32 %5, %7
-  %sum.addr = alloca i32
-  store i32 %8, ptr<i32> %sum.addr
-  %9 = load i32, ptr<i32> %sum.addr
-  %10 = icmp eq i32 %9, 30
-  br i1 %10, label %if.then.9_4, label %if.next.9_4
-if.end.9_4:
-  %12 = trunc i64 1 to i32
-  ret i32 %12
-if.then.9_4:
-  %11 = trunc i64 0 to i32
-  ret i32 %11
-if.next.9_4:
-  br label %if.end.9_4
+  %2 = call { i32, i1 } @divide(i64 10, i64 2)
+  %3 = extractvalue { i32, i1 } %2, 0
+  %result.addr = alloca { i32, i1 }
+  store { i32, i1 } %3, ptr<{ i32, i1 }> %result.addr
+  %4 = extractvalue { i32, i1 } %2, 1
+  %ok.addr = alloca { i32, i1 }
+  store { i32, i1 } %4, ptr<{ i32, i1 }> %ok.addr
+  %5 = load { i32, i1 }, ptr<{ i32, i1 }> %ok.addr
+  br i1 %5, label %if.then.10_4, label %if.next.10_4
+if.end.10_4:
+  %7 = sub i64 0, 1
+  %8 = trunc i64 %7 to i32
+  ret i32 %8
+if.then.10_4:
+  %6 = load { i32, i1 }, ptr<{ i32, i1 }> %result.addr
+  ret { i32, i1 } %6
+if.next.10_4:
+  br label %if.end.10_4
 }

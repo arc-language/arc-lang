@@ -373,7 +373,7 @@ func (v *IRVisitor) visitTupleVariableDecl(ctx *parser.VariableDeclContext) inte
 	tupleVal := v.Visit(ctx.Expression()).(ir.Value)
 	tupleType, ok := tupleVal.Type().(*types.StructType)
 	if !ok {
-		v.ctx.Logger.Error("Tuple destructuring requires a tuple value")
+		v.ctx.Logger.Error("Tuple destructuring requires a tuple value, got %T", tupleVal.Type())
 		return nil
 	}
 	
@@ -386,7 +386,9 @@ func (v *IRVisitor) visitTupleVariableDecl(ctx *parser.VariableDeclContext) inte
 	// Extract each field and create variables
 	for i, name := range names {
 		fieldVal := v.ctx.Builder.CreateExtractValue(tupleVal, []int{i}, "")
-		alloca := v.ctx.Builder.CreateAlloca(fieldVal.Type(), name+".addr")
+		
+		// Create alloca and store the field value
+		alloca := v.ctx.Builder.CreateAlloca(tupleType.Fields[i], name+".addr")
 		v.ctx.Builder.CreateStore(fieldVal, alloca)
 		v.ctx.currentScope.Define(name, alloca)
 		v.logger.Debug("Tuple destructure: %s = field %d", name, i)
