@@ -420,15 +420,23 @@ func (v *IRVisitor) handleMethodCall(base ir.Value, methodName string, op *parse
 		return base
 	}
 
-	// Find the method - look it up by name from the module
-	methodFunc := v.ctx.Module.LookupFunction(structType.Name + "." + methodName)
-	if methodFunc == nil {
-		// Try without struct name prefix
-		methodFunc = v.ctx.Module.LookupFunction(methodName)
-		if methodFunc == nil {
-			v.ctx.Logger.Error("Method %s not found on type %s", methodName, structType.Name)
-			return base
+	// Find the method - look it up by name from the module's function list
+	var methodFunc *ir.Function
+	for _, fn := range v.ctx.Module.Functions {
+		if fn.Name() == structType.Name+"."+methodName {
+			methodFunc = fn
+			break
 		}
+		// Try without struct name prefix
+		if fn.Name() == methodName {
+			methodFunc = fn
+			break
+		}
+	}
+	
+	if methodFunc == nil {
+		v.ctx.Logger.Error("Method %s not found on type %s", methodName, structType.Name)
+		return base
 	}
 
 	// Build arguments: self is the first argument
@@ -474,6 +482,7 @@ func (v *IRVisitor) handleMethodCall(base ir.Value, methodName string, op *parse
 	
 	return result
 }
+
 
 func (v *IRVisitor) handleMemberAccess(base ir.Value, memberName string) ir.Value {
 	v.logger.Debug("Handling member access: .%s", memberName)
@@ -783,7 +792,14 @@ func (v *IRVisitor) parseStringLiteral(text string) ir.Value {
 	text = strings.ReplaceAll(text, "\\\"", "\"")
 	text = strings.ReplaceAll(text, "\\\\", "\\")
 
-	return v.ctx.Builder.CreateGlobalString(text, "")
+	// Create a global string constant
+	strType := types.NewArray(types.NewInt(8, false), int64(len(text)+1))
+	globalStr := v.ctx.Module.NewGlobal(strType, "")
+	globalStr.Init = ir.NewCharArray(text)
+	
+	// Return a pointer to the string
+	zero := v.ctx.Builder.ConstInt(types.NewInt(64, false), 0)
+	return v.ctx.Builder.CreateGEP(strType, globalStr, []ir.Value{zero, zero}, "")
 }
 
 func (v *IRVisitor) parseCharLiteral(text string) ir.Value {
@@ -842,7 +858,7 @@ func (v *IRVisitor) createComparison(pred ir.ICmpPredicate, left, right ir.Value
 }
 
 func (v *IRVisitor) lookupVariable(name string) ir.Value {
-	val := v.ctx.currentScope.Lookup(name)
+	val, _ := v.ctx.currentScope.Lookup(name)
 	if val == nil {
 		v.ctx.Logger.Error("Undefined variable: %s", name)
 		return v.ctx.Builder.ConstInt(types.NewInt(32, true), 0)
