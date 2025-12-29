@@ -209,6 +209,7 @@ type
     | arrayType
     | qualifiedType
     | IDENTIFIER genericArgs?
+    | UNDERSCORE
     ;
 
 qualifiedType
@@ -281,8 +282,8 @@ assignmentOp
     | BIT_OR_ASSIGN
     | BIT_AND_ASSIGN
     | BIT_XOR_ASSIGN
-    | LSHIFT_ASSIGN
-    | RSHIFT_ASSIGN
+    | LT LE  // Decomposed <<=
+    | GT GE  // Decomposed >>=
     ;
 
 leftHandSide
@@ -408,7 +409,7 @@ relationalExpression
     ;
 
 shiftExpression
-    : rangeExpression ((LSHIFT | RSHIFT) rangeExpression)*
+    : rangeExpression ((LT LT | GT GT) rangeExpression)* // Decomposed << and >>
     ;
 
 rangeExpression
