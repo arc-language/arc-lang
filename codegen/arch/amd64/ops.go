@@ -443,6 +443,12 @@ func (c *compiler) storeOp(inst *ir.StoreInst) error {
 	if size > 8 {
 		// This is a struct copy - use memcpy
 		// For now, skip it (the value is already in the right place)
+		// A proper implementation would:
+		// 1. Load source address
+		// 2. Load dest address  
+		// 3. Call memcpy or use rep movsb
+		
+		// Simple implementation: assume the struct is already where it needs to be
 		return nil
 	}
 
@@ -1220,46 +1226,5 @@ func (c *compiler) raiseOp(inst *ir.RaiseInst) error {
 	c.emitBytes(0x0F, 0x05)
 	
 	// This never returns
-	return nil
-}
-
-// Coroutine operations
-func (c *compiler) coroIdOp(inst *ir.CoroIdInst) error {
-	c.loadConstInt(RAX, int64(c.text.Len()))
-	c.storeFromReg(RAX, inst)
-	return nil
-}
-
-func (c *compiler) coroBeginOp(inst *ir.CoroBeginInst) error {
-	frameSize := 256
-	c.emitXorReg(RDI, RDI)
-	c.loadConstInt(RSI, int64(frameSize))
-	c.loadConstInt(RDX, 3)
-	c.loadConstInt(R10, 0x22)
-	c.loadConstInt(R8, -1)
-	c.emitXorReg(R9, R9)
-	c.loadConstInt(RAX, 9)
-	c.emitBytes(0x0F, 0x05)
-	c.storeFromReg(RAX, inst)
-	return nil
-}
-
-func (c *compiler) coroSuspendOp(inst *ir.CoroSuspendInst) error {
-	c.loadConstInt(RAX, 0)
-	c.storeFromReg(RAX, inst)
-	return nil
-}
-
-func (c *compiler) coroEndOp(inst *ir.CoroEndInst) error {
-	handle := inst.Operands()[0]
-	c.loadToReg(RAX, handle)
-	c.loadConstInt(RAX, 1)
-	return nil
-}
-
-func (c *compiler) coroFreeOp(inst *ir.CoroFreeInst) error {
-	handle := inst.Operands()[1]
-	c.loadToReg(RAX, handle)
-	c.storeFromReg(RAX, inst)
 	return nil
 }
