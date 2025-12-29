@@ -19,20 +19,20 @@ define external i32 @main() {
 entry:
   %2 = call { i32, i1 } @divide(i64 10, i64 2)
   %3 = extractvalue { i32, i1 } %2, 0
-  %result.addr = alloca { i32, i1 }
-  store { i32, i1 } %3, ptr<{ i32, i1 }> %result.addr
+  %result.addr = alloca i32
+  store { i32, i1 } %3, ptr<i32> %result.addr
   %4 = extractvalue { i32, i1 } %2, 1
-  %ok.addr = alloca { i32, i1 }
-  store { i32, i1 } %4, ptr<{ i32, i1 }> %ok.addr
-  %5 = load { i32, i1 }, ptr<{ i32, i1 }> %ok.addr
+  %ok.addr = alloca i1
+  store { i32, i1 } %4, ptr<i1> %ok.addr
+  %5 = load i1, ptr<i1> %ok.addr
   br i1 %5, label %if.then.10_4, label %if.next.10_4
 if.end.10_4:
   %7 = sub i64 0, 1
   %8 = trunc i64 %7 to i32
   ret i32 %8
 if.then.10_4:
-  %6 = load { i32, i1 }, ptr<{ i32, i1 }> %result.addr
-  ret { i32, i1 } %6
+  %6 = load i32, ptr<i32> %result.addr
+  ret i32 %6
 if.next.10_4:
   br label %if.end.10_4
 }

@@ -206,7 +206,6 @@ func (v *IRVisitor) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 	deferred := v.ctx.GetDeferredStmts()
 	for i := len(deferred) - 1; i >= 0; i-- {
 		_ = deferred[i]
-		// TODO: Actually emit deferred instruction execution
 	}
 	
 	// Check for tuple return
@@ -219,39 +218,55 @@ func (v *IRVisitor) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 			return nil
 		}
 		
+		// Get expected return type
+		var expectedRetType types.Type
+		if v.ctx.currentFunction != nil {
+			expectedRetType = v.ctx.currentFunction.FuncType.ReturnType
+		}
+		
 		// Build tuple struct from expressions
-		tupleTypes := make([]types.Type, len(exprs))
 		values := make([]ir.Value, len(exprs))
 		
 		for i, expr := range exprs {
 			values[i] = v.Visit(expr).(ir.Value)
-			tupleTypes[i] = values[i].Type()
 		}
 		
-		// Create tuple type and build value
-		tupleType := types.NewStruct("", tupleTypes, false)
-		var tuple ir.Value = v.ctx.Builder.ConstZero(tupleType)
-		
-		for i, val := range values {
-			// Cast value to match expected type if needed
-			expectedType := tupleTypes[i]
-			if !val.Type().Equal(expectedType) {
-				val = v.castValue(val, expectedType)
+		// If function expects a struct/tuple return, build it
+		if structType, ok := expectedRetType.(*types.StructType); ok {
+			if len(structType.Fields) != len(values) {
+				v.ctx.Logger.Error("Tuple return size mismatch: expected %d, got %d", 
+					len(structType.Fields), len(values))
 			}
-			tuple = v.ctx.Builder.CreateInsertValue(tuple, val, []int{i}, "")
-		}
-		
-		// Check if the function expects this tuple type as return
-		if v.ctx.currentFunction != nil {
-			expectedRetType := v.ctx.currentFunction.FuncType.ReturnType
-			// If function returns a scalar but we're returning a tuple, extract first element
-			if !expectedRetType.Equal(tupleType) && expectedRetType.Kind() != types.VoidKind {
-				// Extract the appropriate element
-				tuple = v.ctx.Builder.CreateExtractValue(tuple, []int{0}, "")
+			
+			// Build the tuple
+			var tuple ir.Value = v.ctx.Builder.ConstZero(structType)
+			
+			for i, val := range values {
+				// Cast value to match expected field type
+				expectedFieldType := structType.Fields[i]
+				if !val.Type().Equal(expectedFieldType) {
+					val = v.castValue(val, expectedFieldType)
+				}
+				tuple = v.ctx.Builder.CreateInsertValue(tuple, val, []int{i}, "")
 			}
+			
+			v.ctx.Builder.CreateRet(tuple)
+			return nil
 		}
 		
-		v.ctx.Builder.CreateRet(tuple)
+		// Otherwise, if single value in tuple and function expects scalar, extract it
+		if len(values) == 1 {
+			retVal := values[0]
+			if expectedRetType != nil && !retVal.Type().Equal(expectedRetType) {
+				retVal = v.castValue(retVal, expectedRetType)
+			}
+			v.ctx.Builder.CreateRet(retVal)
+			return nil
+		}
+		
+		// Shouldn't reach here for valid code
+		v.ctx.Logger.Error("Cannot return tuple when function doesn't expect tuple")
+		v.ctx.Builder.CreateRetVoid()
 		return nil
 	}
 	
