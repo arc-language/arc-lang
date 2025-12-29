@@ -1,4 +1,4 @@
-// Package compiler provides the Arc language compiler implementation.
+// --- START OF FILE compiler/context.go ---
 package compiler
 
 import (
@@ -158,6 +158,12 @@ func (c *Context) GetOrCreateNamespace(name string) *Namespace {
 func (c *Context) LookupInNamespace(namespaceName, functionName string) (*ir.Function, bool) {
 	ns := c.GetOrCreateNamespace(namespaceName)
 	return ns.LookupFunction(functionName)
+}
+
+// LookupMethod resolves a method for a given type name
+func (c *Context) LookupMethod(typeName, methodName string) *ir.Function {
+	mangledName := typeName + "_" + methodName
+	return c.Module.GetFunction(mangledName)
 }
 
 // registerBuiltinTypes registers primitive and builtin types

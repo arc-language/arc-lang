@@ -1,3 +1,4 @@
+// --- START OF FILE compiler/visitor_expressions.go ---
 package compiler
 
 import (
@@ -396,11 +397,16 @@ func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpC
 	}
 
 	// Create the call instruction
-	result := v.ctx.Builder.CreateCall(funcValue, args, "")
-	
-	v.logger.Debug("Function call created, return type: %v", result.Type())
-	
-	return result
+	// Builder requires explicit *ir.Function, so we must assert
+	if fn, ok := funcValue.(*ir.Function); ok {
+		result := v.ctx.Builder.CreateCall(fn, args, "")
+		v.logger.Debug("Function call created, return type: %v", result.Type())
+		return result
+	} else {
+		// Limitation: Builder CreateCall requires *ir.Function, indirect calls via pointers need support
+		v.ctx.Logger.Error("Indirect function calls not supported by builder (requires *ir.Function)")
+		return v.ctx.Builder.ConstInt(types.I64, 0)
+	}
 }
 
 func (v *IRVisitor) handleMethodCall(base ir.Value, methodName string, op *parser.PostfixOpContext) ir.Value {
@@ -422,6 +428,7 @@ func (v *IRVisitor) handleMethodCall(base ir.Value, methodName string, op *parse
 	}
 
 	// Find the method in the struct's associated methods
+	// Use the Context's method lookup
 	methodFunc := v.ctx.LookupMethod(structType.Name, methodName)
 	if methodFunc == nil {
 		v.ctx.Logger.Error("Method %s not found on type %s", methodName, structType.Name)
@@ -477,60 +484,56 @@ func (v *IRVisitor) handleMemberAccess(base ir.Value, memberName string) ir.Valu
 
 	baseType := base.Type()
 
-	// If base is a pointer, we need to load it first or use GEP
-	var structVal ir.Value
-	var structType *types.StructType
-
+	// 1. Handle Pointer to Struct (e.g. Class instance or Struct pointer)
 	if ptrType, ok := baseType.(*types.PointerType); ok {
-		// Base is a pointer to a struct
-		if st, ok := ptrType.ElementType.(*types.StructType); ok {
-			structType = st
-			structVal = base // Keep as pointer for GEP
-		} else {
-			v.ctx.Logger.Error("Cannot access member of non-struct pointer type: %v", ptrType.ElementType)
+		if structType, ok := ptrType.ElementType.(*types.StructType); ok {
+			
+			// Check for Class Method (as value/delegate)
+			if v.ctx.IsClassType(structType.Name) {
+				methodName := structType.Name + "_" + memberName
+				if fn := v.ctx.Module.GetFunction(methodName); fn != nil {
+					return fn
+				}
+			}
+			
+			// Find Field Index
+			var fieldIdx int = -1
+			if v.ctx.IsClassType(structType.Name) {
+				if idx, ok := v.ctx.ClassFieldIndices[structType.Name][memberName]; ok {
+					fieldIdx = idx
+				}
+			} else {
+				fieldIdx = v.findFieldIndex(structType, memberName)
+			}
+			
+			if fieldIdx >= 0 {
+				gep := v.ctx.Builder.CreateStructGEP(structType, base, fieldIdx, "")
+				return v.ctx.Builder.CreateLoad(structType.Fields[fieldIdx], gep, "")
+			}
+			
+			v.ctx.Logger.Error("Struct/Class '%s' has no member '%s'", structType.Name, memberName)
 			return base
 		}
-	} else if st, ok := baseType.(*types.StructType); ok {
-		// Base is a struct value - need to get its address
-		structType = st
-		// For struct values, we need an address to do GEP
-		// This might require storing to a temporary and getting its address
-		temp := v.ctx.Builder.CreateAlloca(structType, "temp.struct")
-		v.ctx.Builder.CreateStore(base, temp)
-		structVal = temp
-	} else {
-		v.ctx.Logger.Error("Cannot access member of non-struct type: %v", baseType)
-		return base
 	}
-
-	// Find the field index
-	fieldIndex := -1
-	for i, field := range structType.Fields {
-		if structType.FieldNames != nil && i < len(structType.FieldNames) {
-			if structType.FieldNames[i] == memberName {
-				fieldIndex = i
-				break
-			}
+	
+	// 2. Handle Direct Struct Value
+	if structType, ok := baseType.(*types.StructType); ok {
+		if v.ctx.IsClassType(structType.Name) {
+			v.ctx.Logger.Error("Class instances must be accessed via pointer")
+			return base
 		}
-	}
-
-	if fieldIndex == -1 {
-		v.ctx.Logger.Error("Field %s not found in struct %s", memberName, structType.Name)
+		
+		fieldIdx := v.findFieldIndex(structType, memberName)
+		if fieldIdx >= 0 {
+			return v.ctx.Builder.CreateExtractValue(base, []int{fieldIdx}, "")
+		}
+		
+		v.ctx.Logger.Error("Struct '%s' has no member '%s'", structType.Name, memberName)
 		return base
 	}
-
-	// Create GEP to get pointer to the field
-	indices := []ir.Value{
-		v.ctx.Builder.ConstInt(types.NewInt(32), 0),
-		v.ctx.Builder.ConstInt(types.NewInt(32), int64(fieldIndex)),
-	}
-
-	fieldPtr := v.ctx.Builder.CreateGEP(structType, structVal, indices, "")
-
-	// Load the field value
-	fieldValue := v.ctx.Builder.CreateLoad(structType.Fields[fieldIndex], fieldPtr, "")
-
-	return fieldValue
+	
+	v.ctx.Logger.Error("Cannot access member '%s' of type '%v'", memberName, baseType)
+	return base
 }
 
 func (v *IRVisitor) handleIndexing(base ir.Value, index ir.Value) ir.Value {
@@ -558,7 +561,7 @@ func (v *IRVisitor) handleIndexing(base ir.Value, index ir.Value) ir.Value {
 
 		// Create GEP with two indices: [0][index]
 		indices := []ir.Value{
-			v.ctx.Builder.ConstInt(types.NewInt(32), 0),
+			v.ctx.Builder.ConstInt(types.NewInt(32, false), 0),
 			index,
 		}
 		elemPtr := v.ctx.Builder.CreateGEP(arrayType, arrayPtr, indices, "")
@@ -581,7 +584,13 @@ func (v *IRVisitor) handlePostIncrement(base ir.Value) ir.Value {
 	}
 
 	// Create the increment
-	one := v.ctx.Builder.ConstInt(currentVal.Type(), 1)
+	var one ir.Constant
+	if intType, ok := currentVal.Type().(*types.IntType); ok {
+		one = v.ctx.Builder.ConstInt(intType, 1)
+	} else {
+		one = v.ctx.Builder.ConstInt(types.I64, 1)
+	}
+	
 	newVal := v.ctx.Builder.CreateAdd(currentVal, one, "")
 
 	// Store back
@@ -603,7 +612,13 @@ func (v *IRVisitor) handlePostDecrement(base ir.Value) ir.Value {
 	}
 
 	// Create the decrement
-	one := v.ctx.Builder.ConstInt(currentVal.Type(), 1)
+	var one ir.Constant
+	if intType, ok := currentVal.Type().(*types.IntType); ok {
+		one = v.ctx.Builder.ConstInt(intType, 1)
+	} else {
+		one = v.ctx.Builder.ConstInt(types.I64, 1)
+	}
+	
 	newVal := v.ctx.Builder.CreateSub(currentVal, one, "")
 
 	// Store back
@@ -613,154 +628,6 @@ func (v *IRVisitor) handlePostDecrement(base ir.Value) ir.Value {
 
 	// Return the original value (post-decrement returns old value)
 	return currentVal
-}
-
-func (v *IRVisitor) visitPostfixOp(base ir.Value, ctx *parser.PostfixOpContext, baseIdentifier string) ir.Value {
-	if ctx.LPAREN() != nil {
-		var args []ir.Value
-		if ctx.ArgumentList() != nil {
-			argResult := v.Visit(ctx.ArgumentList())
-			if argResult != nil {
-				args = argResult.([]ir.Value)
-			} else {
-				args = []ir.Value{}
-			}
-		}
-		
-		if fn, ok := base.(*ir.Function); ok {
-			if v.pendingMethodSelf != nil {
-				args = append([]ir.Value{v.pendingMethodSelf}, args...)
-				v.pendingMethodSelf = nil
-			}
-			return v.ctx.Builder.CreateCall(fn, args, "")
-		}
-		v.ctx.Logger.Error("Cannot call non-function")
-		return base
-	}
-	
-	if ctx.LBRACKET() != nil {
-		if ctx.Expression() == nil { return base }
-		indexExpr := v.Visit(ctx.Expression()).(ir.Value)
-		
-		if ptrType, ok := base.Type().(*types.PointerType); ok {
-			elemPtr := v.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, base, []ir.Value{indexExpr}, "")
-			return v.ctx.Builder.CreateLoad(ptrType.ElementType, elemPtr, "")
-		}
-		v.ctx.Logger.Error("Cannot index non-pointer type: %v", base.Type())
-		return base
-	}
-	
-	if ctx.DOT() != nil && ctx.IDENTIFIER() != nil {
-		memberName := ctx.IDENTIFIER().GetText()
-		v.pendingMethodSelf = nil
-		
-		if baseIdentifier != "" {
-			if ns, ok := v.ctx.NamespaceRegistry[baseIdentifier]; ok {
-				if fn, ok := ns.LookupFunction(memberName); ok {
-					return fn
-				}
-			}
-		}
-		
-		return v.handleMemberAccess(base, memberName)
-	}
-
-	// Post-Increment (i++)
-	if ctx.INCREMENT() != nil {
-		if baseIdentifier != "" {
-			if sym, ok := v.ctx.currentScope.Lookup(baseIdentifier); ok {
-				ptr := sym.Value
-				if !types.IsPointer(ptr.Type()) {
-					v.ctx.Logger.Error("Cannot increment non-lvalue")
-					return base
-				}
-				
-				var one ir.Constant
-				if intType, ok := base.Type().(*types.IntType); ok {
-					one = v.ctx.Builder.ConstInt(intType, 1)
-				} else {
-					one = v.ctx.Builder.ConstInt(types.I64, 1)
-				}
-				newVal := v.ctx.Builder.CreateAdd(base, one, "")
-				v.ctx.Builder.CreateStore(newVal, ptr)
-				
-				// Post-inc returns OLD value (which is 'base')
-				return base
-			}
-		}
-		v.ctx.Logger.Error("Post-increment only supported on simple variables for now")
-		return base
-	}
-
-	// Post-Decrement (i--)
-	if ctx.DECREMENT() != nil {
-		if baseIdentifier != "" {
-			if sym, ok := v.ctx.currentScope.Lookup(baseIdentifier); ok {
-				ptr := sym.Value
-				if !types.IsPointer(ptr.Type()) {
-					v.ctx.Logger.Error("Cannot decrement non-lvalue")
-					return base
-				}
-				
-				var one ir.Constant
-				if intType, ok := base.Type().(*types.IntType); ok {
-					one = v.ctx.Builder.ConstInt(intType, 1)
-				} else {
-					one = v.ctx.Builder.ConstInt(types.I64, 1)
-				}
-				newVal := v.ctx.Builder.CreateSub(base, one, "")
-				v.ctx.Builder.CreateStore(newVal, ptr)
-				return base
-			}
-		}
-		v.ctx.Logger.Error("Post-decrement only supported on simple variables for now")
-		return base
-	}
-	
-	return base
-}
-
-func (v *IRVisitor) handleMemberAccess(base ir.Value, memberName string) ir.Value {
-	if ptrType, ok := base.Type().(*types.PointerType); ok {
-		if structType, ok := ptrType.ElementType.(*types.StructType); ok {
-			
-			if v.ctx.IsClassType(structType.Name) {
-				methodName := structType.Name + "_" + memberName
-				if fn := v.ctx.Module.GetFunction(methodName); fn != nil {
-					v.pendingMethodSelf = base
-					return fn
-				}
-			}
-			
-			var fieldIdx int = -1
-			if v.ctx.IsClassType(structType.Name) {
-				if idx, ok := v.ctx.ClassFieldIndices[structType.Name][memberName]; ok {
-					fieldIdx = idx
-				}
-			} else {
-				fieldIdx = v.findFieldIndex(structType, memberName)
-			}
-			
-			if fieldIdx >= 0 {
-				gep := v.ctx.Builder.CreateStructGEP(structType, base, fieldIdx, "")
-				return v.ctx.Builder.CreateLoad(structType.Fields[fieldIdx], gep, "")
-			}
-		}
-	}
-	
-	if structType, ok := base.Type().(*types.StructType); ok {
-		if v.ctx.IsClassType(structType.Name) {
-			v.ctx.Logger.Error("Class instances must be accessed via pointer")
-			return base
-		}
-		fieldIdx := v.findFieldIndex(structType, memberName)
-		if fieldIdx >= 0 {
-			return v.ctx.Builder.CreateExtractValue(base, []int{fieldIdx}, "")
-		}
-	}
-	
-	v.ctx.Logger.Error("Type '%v' has no member '%s'", base.Type(), memberName)
-	return base
 }
 
 func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
