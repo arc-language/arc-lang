@@ -93,12 +93,6 @@ func (s *BaseArcParserListener) EnterGenericArgs(ctx *GenericArgsContext) {}
 // ExitGenericArgs is called when production genericArgs is exited.
 func (s *BaseArcParserListener) ExitGenericArgs(ctx *GenericArgsContext) {}
 
-// EnterGtClose is called when production gtClose is entered.
-func (s *BaseArcParserListener) EnterGtClose(ctx *GtCloseContext) {}
-
-// ExitGtClose is called when production gtClose is exited.
-func (s *BaseArcParserListener) ExitGtClose(ctx *GtCloseContext) {}
-
 // EnterTypeList is called when production typeList is entered.
 func (s *BaseArcParserListener) EnterTypeList(ctx *TypeListContext) {}
 
