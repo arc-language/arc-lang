@@ -396,10 +396,6 @@ func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpC
 			}
 			
 			// Cast to expected parameter type if function type is known
-			// Adjust index if we added self
-			paramIdx := i + len(args) - len(allArgs) // This logic is flawed if we split args loop
-			// Correct approach: check against funcType.ParamTypes directly
-			
 			targetParamIdx := len(args) // Current position in args being built (includes self)
 			
 			if funcType != nil && targetParamIdx < len(funcType.ParamTypes) {
