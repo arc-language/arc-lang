@@ -1,45 +1,20 @@
-%Client = type { ptr<i8>, i32 }
-
-@.str.0 = external constant [5 x i8] [i8 116, i8 101, i8 115, i8 116, i8 0]
-
-define external i32 @Client_get_port(ptr<%Client> %c) {
-entry:
-  %c.addr = alloca ptr<%Client>
-  store ptr<%Client> %c, ptr<ptr<%Client>> %c.addr
-  %0 = load ptr<%Client>, ptr<ptr<%Client>> %c.addr
-  %1 = getelementptr %Client, ptr<%Client> %0, i32 0, i32 1
-  %2 = load i32, ptr<%Client> %1
-  ret i32 %2
-}
-
 define external i32 @main() {
 entry:
-  %Client.instance = alloca %Client
-  %3 = getelementptr %Client, ptr<%Client> %Client.instance, i32 0, i32 0
-  store ptr<i8> null, ptr<%Client> %3
-  %4 = getelementptr %Client, ptr<%Client> %Client.instance, i32 0, i32 1
-  store i32 0, ptr<%Client> %4
-  %5 = getelementptr inbounds [5 x i8], ptr<[5 x i8]> @.str.0, i32 0, i32 0
-  %6 = getelementptr %Client, ptr<%Client> %Client.instance, i32 0, i32 0
-  store ptr<[5 x i8]> %5, ptr<%Client> %6
-  %7 = trunc i64 8080 to i32
-  %8 = getelementptr %Client, ptr<%Client> %Client.instance, i32 0, i32 1
-  store i32 %7, ptr<%Client> %8
-  %c.addr = alloca ptr<%Client>
-  store ptr<%Client> %Client.instance, ptr<ptr<%Client>> %c.addr
-  %9 = load ptr<%Client>, ptr<ptr<%Client>> %c.addr
-  %10 = call i32 @Client_get_port(ptr<%Client> %9)
-  %port.addr = alloca i32
-  store i32 %10, ptr<i32> %port.addr
-  %11 = load i32, ptr<i32> %port.addr
-  %12 = icmp eq i32 %11, 8080
-  br i1 %12, label %if.then.16_4, label %if.next.16_4
-if.end.16_4:
-  %14 = trunc i64 1 to i32
-  ret i32 %14
-if.then.16_4:
-  %13 = trunc i64 0 to i32
-  ret i32 %13
-if.next.16_4:
-  br label %if.end.16_4
+  %i.addr = alloca i64
+  store i64 0, ptr<i64> %i.addr
+  %0 = load i64, ptr<i64> %i.addr
+  %1 = add i64 %0, 1
+  %2 = load i64, ptr<i64> %i.addr
+  %3 = add i64 %2, 1
+  %4 = load i64, ptr<i64> %i.addr
+  %5 = icmp eq i64 %4, 2
+  br i1 %5, label %if.then.5_4, label %if.next.5_4
+if.end.5_4:
+  %7 = trunc i64 1 to i32
+  ret i32 %7
+if.then.5_4:
+  %6 = trunc i64 0 to i32
+  ret i32 %6
+if.next.5_4:
+  br label %if.end.5_4
 }

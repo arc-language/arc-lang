@@ -289,8 +289,33 @@ func (v *IRVisitor) getExpressionAddress(ctx *parser.UnaryExpressionContext) ir.
 func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
 	v.logger.Debug("Visiting postfix expression")
 
+	// Check if any postfix operation is increment/decrement
+	needsLValue := false
+	for _, opCtx := range ctx.AllPostfixOp() {
+		op := opCtx.(*parser.PostfixOpContext)
+		if op.INCREMENT() != nil || op.DECREMENT() != nil {
+			needsLValue = true
+			break
+		}
+	}
+
 	// Start with the primary expression
-	result := v.Visit(ctx.PrimaryExpression()).(ir.Value)
+	var result ir.Value
+	if needsLValue && ctx.PrimaryExpression().IDENTIFIER() != nil {
+		// For increment/decrement, we need the address, not the value
+		name := ctx.PrimaryExpression().IDENTIFIER().GetText()
+		if sym, ok := v.ctx.currentScope.Lookup(name); ok {
+			if ptr, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
+				result = ptr  // Return the address, don't load yet
+			} else {
+				result = v.Visit(ctx.PrimaryExpression()).(ir.Value)
+			}
+		} else {
+			result = v.Visit(ctx.PrimaryExpression()).(ir.Value)
+		}
+	} else {
+		result = v.Visit(ctx.PrimaryExpression()).(ir.Value)
+	}
 
 	// Apply each postfix operation
 	for _, opCtx := range ctx.AllPostfixOp() {
@@ -630,10 +655,17 @@ func (v *IRVisitor) handleIndexing(base ir.Value, index ir.Value) ir.Value {
 func (v *IRVisitor) handlePostIncrement(base ir.Value) ir.Value {
 	v.logger.Debug("Handling post-increment")
 
-	// Load the current value
-	currentVal := base
+	var ptr ir.Value
+	var currentVal ir.Value
+	
 	if ptrType, ok := base.Type().(*types.PointerType); ok {
+		// base is a pointer (address)
+		ptr = base
 		currentVal = v.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
+	} else {
+		// base is already a value (shouldn't happen with the fix above, but handle it)
+		v.ctx.Logger.Error("Post-increment requires an lvalue")
+		return base
 	}
 
 	// Create the increment
@@ -645,11 +677,9 @@ func (v *IRVisitor) handlePostIncrement(base ir.Value) ir.Value {
 	}
 	
 	newVal := v.ctx.Builder.CreateAdd(currentVal, one, "")
-
+	
 	// Store back
-	if _, ok := base.Type().(*types.PointerType); ok {
-		v.ctx.Builder.CreateStore(newVal, base)
-	}
+	v.ctx.Builder.CreateStore(newVal, ptr)
 
 	// Return the original value (post-increment returns old value)
 	return currentVal
@@ -658,10 +688,17 @@ func (v *IRVisitor) handlePostIncrement(base ir.Value) ir.Value {
 func (v *IRVisitor) handlePostDecrement(base ir.Value) ir.Value {
 	v.logger.Debug("Handling post-decrement")
 
-	// Load the current value
-	currentVal := base
+	var ptr ir.Value
+	var currentVal ir.Value
+	
 	if ptrType, ok := base.Type().(*types.PointerType); ok {
+		// base is a pointer (address)
+		ptr = base
 		currentVal = v.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
+	} else {
+		// base is already a value (shouldn't happen with the fix above, but handle it)
+		v.ctx.Logger.Error("Post-decrement requires an lvalue")
+		return base
 	}
 
 	// Create the decrement
@@ -673,11 +710,9 @@ func (v *IRVisitor) handlePostDecrement(base ir.Value) ir.Value {
 	}
 	
 	newVal := v.ctx.Builder.CreateSub(currentVal, one, "")
-
+	
 	// Store back
-	if _, ok := base.Type().(*types.PointerType); ok {
-		v.ctx.Builder.CreateStore(newVal, base)
-	}
+	v.ctx.Builder.CreateStore(newVal, ptr)
 
 	// Return the original value (post-decrement returns old value)
 	return currentVal
