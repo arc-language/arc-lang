@@ -345,6 +345,12 @@ func (s *BaseArcParserListener) EnterFinallyClause(ctx *FinallyClauseContext) {}
 // ExitFinallyClause is called when production finallyClause is exited.
 func (s *BaseArcParserListener) ExitFinallyClause(ctx *FinallyClauseContext) {}
 
+// EnterThrowStmt is called when production throwStmt is entered.
+func (s *BaseArcParserListener) EnterThrowStmt(ctx *ThrowStmtContext) {}
+
+// ExitThrowStmt is called when production throwStmt is exited.
+func (s *BaseArcParserListener) ExitThrowStmt(ctx *ThrowStmtContext) {}
+
 // EnterBreakStmt is called when production breakStmt is entered.
 func (s *BaseArcParserListener) EnterBreakStmt(ctx *BreakStmtContext) {}
 

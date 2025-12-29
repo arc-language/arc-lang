@@ -262,6 +262,7 @@ statement
     | forStmt
     | switchStmt
     | tryStmt
+    | throwStmt
     | breakStmt
     | continueStmt
     | deferStmt
@@ -354,6 +355,14 @@ exceptClause
 
 finallyClause
     : FINALLY block
+    ;
+
+// =============================================================================
+// Control Flow - Throw
+// =============================================================================
+
+throwStmt
+    : THROW expression
     ;
 
 // =============================================================================

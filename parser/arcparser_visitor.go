@@ -170,6 +170,9 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#finallyClause.
 	VisitFinallyClause(ctx *FinallyClauseContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#throwStmt.
+	VisitThrowStmt(ctx *ThrowStmtContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#breakStmt.
 	VisitBreakStmt(ctx *BreakStmtContext) interface{}
 

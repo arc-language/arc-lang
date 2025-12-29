@@ -1,11 +1,42 @@
-define external void @cleanup() {
+@.str.0 = external constant [17 x i8] [i8 68, i8 105, i8 118, i8 105, i8 115, i8 105, i8 111, i8 110, i8 32, i8 98, i8 121, i8 32, i8 122, i8 101, i8 114, i8 111, i8 0]
+
+define external i32 @divide(i32 %a, i32 %b) {
 entry:
-  ret void
+  %a.addr = alloca i32
+  store i32 %a, ptr<i32> %a.addr
+  %b.addr = alloca i32
+  store i32 %b, ptr<i32> %b.addr
+  %0 = load i32, ptr<i32> %b.addr
+  %1 = icmp eq i32 %0, 0
+  br i1 %1, label %if.then.2_4, label %if.next.2_4
+if.end.2_4:
+  %3 = load i32, ptr<i32> %a.addr
+  %4 = load i32, ptr<i32> %b.addr
+  %5 = sdiv i32 %3, %4
+  ret i32 %5
+if.then.2_4:
+  %2 = getelementptr inbounds [17 x i8], ptr<[17 x i8]> @.str.0, i32 0, i32 0
+  raise ptr<[17 x i8]> %2
+  br label %if.end.2_4
+if.next.2_4:
+  br label %if.end.2_4
 }
 
 define external i32 @main() {
 entry:
-  call void @cleanup()
-  %0 = trunc i64 0 to i32
-  ret i32 %0
+  br label %try.9_4
+try.9_4:
+  %6 = trunc i64 10 to i32
+  %7 = trunc i64 2 to i32
+  %8 = call i32 @divide(i32 %6, i32 %7)
+  %result.addr = alloca i32
+  store i32 %8, ptr<i32> %result.addr
+  %9 = trunc i64 0 to i32
+  ret i32 %9
+try.end.9_4:
+  ret i32 0
+catch.9_4:
+  %10 = sub i64 0, 1
+  %11 = trunc i64 %10 to i32
+  ret i32 %11
 }

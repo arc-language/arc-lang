@@ -29,98 +29,99 @@ const (
 	ArcLexerCASE            = 24
 	ArcLexerDEFAULT         = 25
 	ArcLexerTRY             = 26
-	ArcLexerEXCEPT          = 27
-	ArcLexerFINALLY         = 28
-	ArcLexerENUM            = 29
-	ArcLexerINT8            = 30
-	ArcLexerINT16           = 31
-	ArcLexerINT32           = 32
-	ArcLexerINT64           = 33
-	ArcLexerUINT8           = 34
-	ArcLexerUINT16          = 35
-	ArcLexerUINT32          = 36
-	ArcLexerUINT64          = 37
-	ArcLexerUSIZE           = 38
-	ArcLexerISIZE           = 39
-	ArcLexerFLOAT32         = 40
-	ArcLexerFLOAT64         = 41
-	ArcLexerBYTE            = 42
-	ArcLexerBOOL            = 43
-	ArcLexerCHAR            = 44
-	ArcLexerSTRING          = 45
-	ArcLexerVOID            = 46
-	ArcLexerARRAY           = 47
-	ArcLexerALLOCA          = 48
-	ArcLexerCAST            = 49
-	ArcLexerSYSCALL         = 50
-	ArcLexerSIZEOF          = 51
-	ArcLexerALIGNOF         = 52
-	ArcLexerMEMSET          = 53
-	ArcLexerMEMCPY          = 54
-	ArcLexerMEMMOVE         = 55
-	ArcLexerSTRLEN          = 56
-	ArcLexerMEMCHR          = 57
-	ArcLexerVA_START        = 58
-	ArcLexerVA_ARG          = 59
-	ArcLexerVA_END          = 60
-	ArcLexerRAISE           = 61
-	ArcLexerMEMCMP          = 62
-	ArcLexerBIT_CAST        = 63
-	ArcLexerSLICE           = 64
-	ArcLexerARROW           = 65
-	ArcLexerRANGE           = 66
-	ArcLexerELLIPSIS        = 67
-	ArcLexerEQ              = 68
-	ArcLexerNE              = 69
-	ArcLexerLE              = 70
-	ArcLexerGE              = 71
-	ArcLexerAND             = 72
-	ArcLexerOR              = 73
-	ArcLexerPLUS_ASSIGN     = 74
-	ArcLexerMINUS_ASSIGN    = 75
-	ArcLexerSTAR_ASSIGN     = 76
-	ArcLexerSLASH_ASSIGN    = 77
-	ArcLexerPERCENT_ASSIGN  = 78
-	ArcLexerBIT_OR_ASSIGN   = 79
-	ArcLexerBIT_AND_ASSIGN  = 80
-	ArcLexerBIT_XOR_ASSIGN  = 81
-	ArcLexerINCREMENT       = 82
-	ArcLexerDECREMENT       = 83
-	ArcLexerFAT_ARROW       = 84
-	ArcLexerPLUS            = 85
-	ArcLexerMINUS           = 86
-	ArcLexerSTAR            = 87
-	ArcLexerSLASH           = 88
-	ArcLexerPERCENT         = 89
-	ArcLexerLT              = 90
-	ArcLexerGT              = 91
-	ArcLexerNOT             = 92
-	ArcLexerAMP             = 93
-	ArcLexerBIT_OR          = 94
-	ArcLexerBIT_XOR         = 95
-	ArcLexerBIT_NOT         = 96
-	ArcLexerAT              = 97
-	ArcLexerASSIGN          = 98
-	ArcLexerLPAREN          = 99
-	ArcLexerRPAREN          = 100
-	ArcLexerLBRACE          = 101
-	ArcLexerRBRACE          = 102
-	ArcLexerLBRACKET        = 103
-	ArcLexerRBRACKET        = 104
-	ArcLexerCOMMA           = 105
-	ArcLexerCOLON           = 106
-	ArcLexerSEMICOLON       = 107
-	ArcLexerDOT             = 108
-	ArcLexerUNDERSCORE      = 109
-	ArcLexerBOOLEAN_LITERAL = 110
-	ArcLexerINTEGER_LITERAL = 111
-	ArcLexerFLOAT_LITERAL   = 112
-	ArcLexerSTRING_LITERAL  = 113
-	ArcLexerCHAR_LITERAL    = 114
-	ArcLexerIDENTIFIER      = 115
-	ArcLexerWS              = 116
-	ArcLexerLINE_COMMENT    = 117
-	ArcLexerBLOCK_COMMENT   = 118
+	ArcLexerTHROW           = 27
+	ArcLexerEXCEPT          = 28
+	ArcLexerFINALLY         = 29
+	ArcLexerENUM            = 30
+	ArcLexerINT8            = 31
+	ArcLexerINT16           = 32
+	ArcLexerINT32           = 33
+	ArcLexerINT64           = 34
+	ArcLexerUINT8           = 35
+	ArcLexerUINT16          = 36
+	ArcLexerUINT32          = 37
+	ArcLexerUINT64          = 38
+	ArcLexerUSIZE           = 39
+	ArcLexerISIZE           = 40
+	ArcLexerFLOAT32         = 41
+	ArcLexerFLOAT64         = 42
+	ArcLexerBYTE            = 43
+	ArcLexerBOOL            = 44
+	ArcLexerCHAR            = 45
+	ArcLexerSTRING          = 46
+	ArcLexerVOID            = 47
+	ArcLexerARRAY           = 48
+	ArcLexerALLOCA          = 49
+	ArcLexerCAST            = 50
+	ArcLexerSYSCALL         = 51
+	ArcLexerSIZEOF          = 52
+	ArcLexerALIGNOF         = 53
+	ArcLexerMEMSET          = 54
+	ArcLexerMEMCPY          = 55
+	ArcLexerMEMMOVE         = 56
+	ArcLexerSTRLEN          = 57
+	ArcLexerMEMCHR          = 58
+	ArcLexerVA_START        = 59
+	ArcLexerVA_ARG          = 60
+	ArcLexerVA_END          = 61
+	ArcLexerRAISE           = 62
+	ArcLexerMEMCMP          = 63
+	ArcLexerBIT_CAST        = 64
+	ArcLexerSLICE           = 65
+	ArcLexerARROW           = 66
+	ArcLexerRANGE           = 67
+	ArcLexerELLIPSIS        = 68
+	ArcLexerEQ              = 69
+	ArcLexerNE              = 70
+	ArcLexerLE              = 71
+	ArcLexerGE              = 72
+	ArcLexerAND             = 73
+	ArcLexerOR              = 74
+	ArcLexerPLUS_ASSIGN     = 75
+	ArcLexerMINUS_ASSIGN    = 76
+	ArcLexerSTAR_ASSIGN     = 77
+	ArcLexerSLASH_ASSIGN    = 78
+	ArcLexerPERCENT_ASSIGN  = 79
+	ArcLexerBIT_OR_ASSIGN   = 80
+	ArcLexerBIT_AND_ASSIGN  = 81
+	ArcLexerBIT_XOR_ASSIGN  = 82
+	ArcLexerINCREMENT       = 83
+	ArcLexerDECREMENT       = 84
+	ArcLexerFAT_ARROW       = 85
+	ArcLexerPLUS            = 86
+	ArcLexerMINUS           = 87
+	ArcLexerSTAR            = 88
+	ArcLexerSLASH           = 89
+	ArcLexerPERCENT         = 90
+	ArcLexerLT              = 91
+	ArcLexerGT              = 92
+	ArcLexerNOT             = 93
+	ArcLexerAMP             = 94
+	ArcLexerBIT_OR          = 95
+	ArcLexerBIT_XOR         = 96
+	ArcLexerBIT_NOT         = 97
+	ArcLexerAT              = 98
+	ArcLexerASSIGN          = 99
+	ArcLexerLPAREN          = 100
+	ArcLexerRPAREN          = 101
+	ArcLexerLBRACE          = 102
+	ArcLexerRBRACE          = 103
+	ArcLexerLBRACKET        = 104
+	ArcLexerRBRACKET        = 105
+	ArcLexerCOMMA           = 106
+	ArcLexerCOLON           = 107
+	ArcLexerSEMICOLON       = 108
+	ArcLexerDOT             = 109
+	ArcLexerUNDERSCORE      = 110
+	ArcLexerBOOLEAN_LITERAL = 111
+	ArcLexerINTEGER_LITERAL = 112
+	ArcLexerFLOAT_LITERAL   = 113
+	ArcLexerSTRING_LITERAL  = 114
+	ArcLexerCHAR_LITERAL    = 115
+	ArcLexerIDENTIFIER      = 116
+	ArcLexerWS              = 117
+	ArcLexerLINE_COMMENT    = 118
+	ArcLexerBLOCK_COMMENT   = 119
 )
     ArcLexer tokens.
 
@@ -152,98 +153,99 @@ const (
 	ArcParserCASE            = 24
 	ArcParserDEFAULT         = 25
 	ArcParserTRY             = 26
-	ArcParserEXCEPT          = 27
-	ArcParserFINALLY         = 28
-	ArcParserENUM            = 29
-	ArcParserINT8            = 30
-	ArcParserINT16           = 31
-	ArcParserINT32           = 32
-	ArcParserINT64           = 33
-	ArcParserUINT8           = 34
-	ArcParserUINT16          = 35
-	ArcParserUINT32          = 36
-	ArcParserUINT64          = 37
-	ArcParserUSIZE           = 38
-	ArcParserISIZE           = 39
-	ArcParserFLOAT32         = 40
-	ArcParserFLOAT64         = 41
-	ArcParserBYTE            = 42
-	ArcParserBOOL            = 43
-	ArcParserCHAR            = 44
-	ArcParserSTRING          = 45
-	ArcParserVOID            = 46
-	ArcParserARRAY           = 47
-	ArcParserALLOCA          = 48
-	ArcParserCAST            = 49
-	ArcParserSYSCALL         = 50
-	ArcParserSIZEOF          = 51
-	ArcParserALIGNOF         = 52
-	ArcParserMEMSET          = 53
-	ArcParserMEMCPY          = 54
-	ArcParserMEMMOVE         = 55
-	ArcParserSTRLEN          = 56
-	ArcParserMEMCHR          = 57
-	ArcParserVA_START        = 58
-	ArcParserVA_ARG          = 59
-	ArcParserVA_END          = 60
-	ArcParserRAISE           = 61
-	ArcParserMEMCMP          = 62
-	ArcParserBIT_CAST        = 63
-	ArcParserSLICE           = 64
-	ArcParserARROW           = 65
-	ArcParserRANGE           = 66
-	ArcParserELLIPSIS        = 67
-	ArcParserEQ              = 68
-	ArcParserNE              = 69
-	ArcParserLE              = 70
-	ArcParserGE              = 71
-	ArcParserAND             = 72
-	ArcParserOR              = 73
-	ArcParserPLUS_ASSIGN     = 74
-	ArcParserMINUS_ASSIGN    = 75
-	ArcParserSTAR_ASSIGN     = 76
-	ArcParserSLASH_ASSIGN    = 77
-	ArcParserPERCENT_ASSIGN  = 78
-	ArcParserBIT_OR_ASSIGN   = 79
-	ArcParserBIT_AND_ASSIGN  = 80
-	ArcParserBIT_XOR_ASSIGN  = 81
-	ArcParserINCREMENT       = 82
-	ArcParserDECREMENT       = 83
-	ArcParserFAT_ARROW       = 84
-	ArcParserPLUS            = 85
-	ArcParserMINUS           = 86
-	ArcParserSTAR            = 87
-	ArcParserSLASH           = 88
-	ArcParserPERCENT         = 89
-	ArcParserLT              = 90
-	ArcParserGT              = 91
-	ArcParserNOT             = 92
-	ArcParserAMP             = 93
-	ArcParserBIT_OR          = 94
-	ArcParserBIT_XOR         = 95
-	ArcParserBIT_NOT         = 96
-	ArcParserAT              = 97
-	ArcParserASSIGN          = 98
-	ArcParserLPAREN          = 99
-	ArcParserRPAREN          = 100
-	ArcParserLBRACE          = 101
-	ArcParserRBRACE          = 102
-	ArcParserLBRACKET        = 103
-	ArcParserRBRACKET        = 104
-	ArcParserCOMMA           = 105
-	ArcParserCOLON           = 106
-	ArcParserSEMICOLON       = 107
-	ArcParserDOT             = 108
-	ArcParserUNDERSCORE      = 109
-	ArcParserBOOLEAN_LITERAL = 110
-	ArcParserINTEGER_LITERAL = 111
-	ArcParserFLOAT_LITERAL   = 112
-	ArcParserSTRING_LITERAL  = 113
-	ArcParserCHAR_LITERAL    = 114
-	ArcParserIDENTIFIER      = 115
-	ArcParserWS              = 116
-	ArcParserLINE_COMMENT    = 117
-	ArcParserBLOCK_COMMENT   = 118
+	ArcParserTHROW           = 27
+	ArcParserEXCEPT          = 28
+	ArcParserFINALLY         = 29
+	ArcParserENUM            = 30
+	ArcParserINT8            = 31
+	ArcParserINT16           = 32
+	ArcParserINT32           = 33
+	ArcParserINT64           = 34
+	ArcParserUINT8           = 35
+	ArcParserUINT16          = 36
+	ArcParserUINT32          = 37
+	ArcParserUINT64          = 38
+	ArcParserUSIZE           = 39
+	ArcParserISIZE           = 40
+	ArcParserFLOAT32         = 41
+	ArcParserFLOAT64         = 42
+	ArcParserBYTE            = 43
+	ArcParserBOOL            = 44
+	ArcParserCHAR            = 45
+	ArcParserSTRING          = 46
+	ArcParserVOID            = 47
+	ArcParserARRAY           = 48
+	ArcParserALLOCA          = 49
+	ArcParserCAST            = 50
+	ArcParserSYSCALL         = 51
+	ArcParserSIZEOF          = 52
+	ArcParserALIGNOF         = 53
+	ArcParserMEMSET          = 54
+	ArcParserMEMCPY          = 55
+	ArcParserMEMMOVE         = 56
+	ArcParserSTRLEN          = 57
+	ArcParserMEMCHR          = 58
+	ArcParserVA_START        = 59
+	ArcParserVA_ARG          = 60
+	ArcParserVA_END          = 61
+	ArcParserRAISE           = 62
+	ArcParserMEMCMP          = 63
+	ArcParserBIT_CAST        = 64
+	ArcParserSLICE           = 65
+	ArcParserARROW           = 66
+	ArcParserRANGE           = 67
+	ArcParserELLIPSIS        = 68
+	ArcParserEQ              = 69
+	ArcParserNE              = 70
+	ArcParserLE              = 71
+	ArcParserGE              = 72
+	ArcParserAND             = 73
+	ArcParserOR              = 74
+	ArcParserPLUS_ASSIGN     = 75
+	ArcParserMINUS_ASSIGN    = 76
+	ArcParserSTAR_ASSIGN     = 77
+	ArcParserSLASH_ASSIGN    = 78
+	ArcParserPERCENT_ASSIGN  = 79
+	ArcParserBIT_OR_ASSIGN   = 80
+	ArcParserBIT_AND_ASSIGN  = 81
+	ArcParserBIT_XOR_ASSIGN  = 82
+	ArcParserINCREMENT       = 83
+	ArcParserDECREMENT       = 84
+	ArcParserFAT_ARROW       = 85
+	ArcParserPLUS            = 86
+	ArcParserMINUS           = 87
+	ArcParserSTAR            = 88
+	ArcParserSLASH           = 89
+	ArcParserPERCENT         = 90
+	ArcParserLT              = 91
+	ArcParserGT              = 92
+	ArcParserNOT             = 93
+	ArcParserAMP             = 94
+	ArcParserBIT_OR          = 95
+	ArcParserBIT_XOR         = 96
+	ArcParserBIT_NOT         = 97
+	ArcParserAT              = 98
+	ArcParserASSIGN          = 99
+	ArcParserLPAREN          = 100
+	ArcParserRPAREN          = 101
+	ArcParserLBRACE          = 102
+	ArcParserRBRACE          = 103
+	ArcParserLBRACKET        = 104
+	ArcParserRBRACKET        = 105
+	ArcParserCOMMA           = 106
+	ArcParserCOLON           = 107
+	ArcParserSEMICOLON       = 108
+	ArcParserDOT             = 109
+	ArcParserUNDERSCORE      = 110
+	ArcParserBOOLEAN_LITERAL = 111
+	ArcParserINTEGER_LITERAL = 112
+	ArcParserFLOAT_LITERAL   = 113
+	ArcParserSTRING_LITERAL  = 114
+	ArcParserCHAR_LITERAL    = 115
+	ArcParserIDENTIFIER      = 116
+	ArcParserWS              = 117
+	ArcParserLINE_COMMENT    = 118
+	ArcParserBLOCK_COMMENT   = 119
 )
     ArcParser tokens.
 
@@ -302,41 +304,42 @@ const (
 	ArcParserRULE_tryStmt                  = 51
 	ArcParserRULE_exceptClause             = 52
 	ArcParserRULE_finallyClause            = 53
-	ArcParserRULE_breakStmt                = 54
-	ArcParserRULE_continueStmt             = 55
-	ArcParserRULE_deferStmt                = 56
-	ArcParserRULE_expression               = 57
-	ArcParserRULE_logicalOrExpression      = 58
-	ArcParserRULE_logicalAndExpression     = 59
-	ArcParserRULE_bitOrExpression          = 60
-	ArcParserRULE_bitXorExpression         = 61
-	ArcParserRULE_bitAndExpression         = 62
-	ArcParserRULE_equalityExpression       = 63
-	ArcParserRULE_relationalExpression     = 64
-	ArcParserRULE_shiftExpression          = 65
-	ArcParserRULE_rangeExpression          = 66
-	ArcParserRULE_additiveExpression       = 67
-	ArcParserRULE_multiplicativeExpression = 68
-	ArcParserRULE_unaryExpression          = 69
-	ArcParserRULE_postfixExpression        = 70
-	ArcParserRULE_postfixOp                = 71
-	ArcParserRULE_primaryExpression        = 72
-	ArcParserRULE_qualifiedIdentifier      = 73
-	ArcParserRULE_literal                  = 74
-	ArcParserRULE_initializerList          = 75
-	ArcParserRULE_initializerEntry         = 76
-	ArcParserRULE_structLiteral            = 77
-	ArcParserRULE_fieldInit                = 78
-	ArcParserRULE_argumentList             = 79
-	ArcParserRULE_argument                 = 80
-	ArcParserRULE_lambdaExpression         = 81
-	ArcParserRULE_lambdaParamList          = 82
-	ArcParserRULE_lambdaParam              = 83
-	ArcParserRULE_tupleExpression          = 84
-	ArcParserRULE_castExpression           = 85
-	ArcParserRULE_allocaExpression         = 86
-	ArcParserRULE_syscallExpression        = 87
-	ArcParserRULE_intrinsicExpression      = 88
+	ArcParserRULE_throwStmt                = 54
+	ArcParserRULE_breakStmt                = 55
+	ArcParserRULE_continueStmt             = 56
+	ArcParserRULE_deferStmt                = 57
+	ArcParserRULE_expression               = 58
+	ArcParserRULE_logicalOrExpression      = 59
+	ArcParserRULE_logicalAndExpression     = 60
+	ArcParserRULE_bitOrExpression          = 61
+	ArcParserRULE_bitXorExpression         = 62
+	ArcParserRULE_bitAndExpression         = 63
+	ArcParserRULE_equalityExpression       = 64
+	ArcParserRULE_relationalExpression     = 65
+	ArcParserRULE_shiftExpression          = 66
+	ArcParserRULE_rangeExpression          = 67
+	ArcParserRULE_additiveExpression       = 68
+	ArcParserRULE_multiplicativeExpression = 69
+	ArcParserRULE_unaryExpression          = 70
+	ArcParserRULE_postfixExpression        = 71
+	ArcParserRULE_postfixOp                = 72
+	ArcParserRULE_primaryExpression        = 73
+	ArcParserRULE_qualifiedIdentifier      = 74
+	ArcParserRULE_literal                  = 75
+	ArcParserRULE_initializerList          = 76
+	ArcParserRULE_initializerEntry         = 77
+	ArcParserRULE_structLiteral            = 78
+	ArcParserRULE_fieldInit                = 79
+	ArcParserRULE_argumentList             = 80
+	ArcParserRULE_argument                 = 81
+	ArcParserRULE_lambdaExpression         = 82
+	ArcParserRULE_lambdaParamList          = 83
+	ArcParserRULE_lambdaParam              = 84
+	ArcParserRULE_tupleExpression          = 85
+	ArcParserRULE_castExpression           = 86
+	ArcParserRULE_allocaExpression         = 87
+	ArcParserRULE_syscallExpression        = 88
+	ArcParserRULE_intrinsicExpression      = 89
 )
     ArcParser rules.
 
@@ -460,6 +463,7 @@ func InitEmptyStructMemberContext(p *StructMemberContext)
 func InitEmptySwitchCaseContext(p *SwitchCaseContext)
 func InitEmptySwitchStmtContext(p *SwitchStmtContext)
 func InitEmptySyscallExpressionContext(p *SyscallExpressionContext)
+func InitEmptyThrowStmtContext(p *ThrowStmtContext)
 func InitEmptyTopLevelDeclContext(p *TopLevelDeclContext)
 func InitEmptyTryStmtContext(p *TryStmtContext)
 func InitEmptyTupleExpressionContext(p *TupleExpressionContext)
@@ -720,6 +724,8 @@ func (p *ArcParser) SwitchStmt() (localctx ISwitchStmtContext)
 
 func (p *ArcParser) SyscallExpression() (localctx ISyscallExpressionContext)
 
+func (p *ArcParser) ThrowStmt() (localctx IThrowStmtContext)
+
 func (p *ArcParser) TopLevelDecl() (localctx ITopLevelDeclContext)
 
 func (p *ArcParser) TryStmt() (localctx ITryStmtContext)
@@ -902,6 +908,9 @@ type ArcParserListener interface {
 
 	// EnterFinallyClause is called when entering the finallyClause production.
 	EnterFinallyClause(c *FinallyClauseContext)
+
+	// EnterThrowStmt is called when entering the throwStmt production.
+	EnterThrowStmt(c *ThrowStmtContext)
 
 	// EnterBreakStmt is called when entering the breakStmt production.
 	EnterBreakStmt(c *BreakStmtContext)
@@ -1169,6 +1178,9 @@ type ArcParserListener interface {
 
 	// ExitFinallyClause is called when exiting the finallyClause production.
 	ExitFinallyClause(c *FinallyClauseContext)
+
+	// ExitThrowStmt is called when exiting the throwStmt production.
+	ExitThrowStmt(c *ThrowStmtContext)
 
 	// ExitBreakStmt is called when exiting the breakStmt production.
 	ExitBreakStmt(c *BreakStmtContext)
@@ -1442,6 +1454,9 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#finallyClause.
 	VisitFinallyClause(ctx *FinallyClauseContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#throwStmt.
+	VisitThrowStmt(ctx *ThrowStmtContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#breakStmt.
 	VisitBreakStmt(ctx *BreakStmtContext) interface{}
@@ -2010,6 +2025,9 @@ func (s *BaseArcParserListener) EnterSyscallExpression(ctx *SyscallExpressionCon
     EnterSyscallExpression is called when production syscallExpression is
     entered.
 
+func (s *BaseArcParserListener) EnterThrowStmt(ctx *ThrowStmtContext)
+    EnterThrowStmt is called when production throwStmt is entered.
+
 func (s *BaseArcParserListener) EnterTopLevelDecl(ctx *TopLevelDeclContext)
     EnterTopLevelDecl is called when production topLevelDecl is entered.
 
@@ -2290,6 +2308,9 @@ func (s *BaseArcParserListener) ExitSwitchStmt(ctx *SwitchStmtContext)
 func (s *BaseArcParserListener) ExitSyscallExpression(ctx *SyscallExpressionContext)
     ExitSyscallExpression is called when production syscallExpression is exited.
 
+func (s *BaseArcParserListener) ExitThrowStmt(ctx *ThrowStmtContext)
+    ExitThrowStmt is called when production throwStmt is exited.
+
 func (s *BaseArcParserListener) ExitTopLevelDecl(ctx *TopLevelDeclContext)
     ExitTopLevelDecl is called when production topLevelDecl is exited.
 
@@ -2486,6 +2507,8 @@ func (v *BaseArcParserVisitor) VisitSwitchCase(ctx *SwitchCaseContext) interface
 func (v *BaseArcParserVisitor) VisitSwitchStmt(ctx *SwitchStmtContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitSyscallExpression(ctx *SyscallExpressionContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitThrowStmt(ctx *ThrowStmtContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitTopLevelDecl(ctx *TopLevelDeclContext) interface{}
 
@@ -4890,6 +4913,7 @@ type IStatementContext interface {
 	ForStmt() IForStmtContext
 	SwitchStmt() ISwitchStmtContext
 	TryStmt() ITryStmtContext
+	ThrowStmt() IThrowStmtContext
 	BreakStmt() IBreakStmtContext
 	ContinueStmt() IContinueStmtContext
 	DeferStmt() IDeferStmtContext
@@ -5031,6 +5055,21 @@ type ISyscallExpressionContext interface {
 	IsSyscallExpressionContext()
 }
     ISyscallExpressionContext is an interface to support dynamic dispatch.
+
+type IThrowStmtContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	THROW() antlr.TerminalNode
+	Expression() IExpressionContext
+
+	// IsThrowStmtContext differentiates from other interfaces.
+	IsThrowStmtContext()
+}
+    IThrowStmtContext is an interface to support dynamic dispatch.
 
 type ITopLevelDeclContext interface {
 	antlr.ParserRuleContext
@@ -6424,6 +6463,8 @@ func (s *StatementContext) ReturnStmt() IReturnStmtContext
 
 func (s *StatementContext) SwitchStmt() ISwitchStmtContext
 
+func (s *StatementContext) ThrowStmt() IThrowStmtContext
+
 func (s *StatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 func (s *StatementContext) TryStmt() ITryStmtContext
@@ -6672,6 +6713,33 @@ func (s *SyscallExpressionContext) RPAREN() antlr.TerminalNode
 func (s *SyscallExpressionContext) SYSCALL() antlr.TerminalNode
 
 func (s *SyscallExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ThrowStmtContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyThrowStmtContext() *ThrowStmtContext
+
+func NewThrowStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ThrowStmtContext
+
+func (s *ThrowStmtContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ThrowStmtContext) EnterRule(listener antlr.ParseTreeListener)
+
+func (s *ThrowStmtContext) ExitRule(listener antlr.ParseTreeListener)
+
+func (s *ThrowStmtContext) Expression() IExpressionContext
+
+func (s *ThrowStmtContext) GetParser() antlr.Parser
+
+func (s *ThrowStmtContext) GetRuleContext() antlr.RuleContext
+
+func (*ThrowStmtContext) IsThrowStmtContext()
+
+func (s *ThrowStmtContext) THROW() antlr.TerminalNode
+
+func (s *ThrowStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type TopLevelDeclContext struct {
 	antlr.BaseParserRuleContext

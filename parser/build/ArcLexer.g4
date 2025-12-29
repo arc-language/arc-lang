@@ -29,6 +29,7 @@ SWITCH: 'switch';
 CASE: 'case';
 DEFAULT: 'default';
 TRY: 'try';
+THROW: 'throw';
 EXCEPT: 'except';
 FINALLY: 'finally';
 

@@ -224,6 +224,10 @@ func (v *BaseArcParserVisitor) VisitFinallyClause(ctx *FinallyClauseContext) int
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseArcParserVisitor) VisitThrowStmt(ctx *ThrowStmtContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseArcParserVisitor) VisitBreakStmt(ctx *BreakStmtContext) interface{} {
 	return v.VisitChildren(ctx)
 }

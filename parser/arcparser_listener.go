@@ -170,6 +170,9 @@ type ArcParserListener interface {
 	// EnterFinallyClause is called when entering the finallyClause production.
 	EnterFinallyClause(c *FinallyClauseContext)
 
+	// EnterThrowStmt is called when entering the throwStmt production.
+	EnterThrowStmt(c *ThrowStmtContext)
+
 	// EnterBreakStmt is called when entering the breakStmt production.
 	EnterBreakStmt(c *BreakStmtContext)
 
@@ -436,6 +439,9 @@ type ArcParserListener interface {
 
 	// ExitFinallyClause is called when exiting the finallyClause production.
 	ExitFinallyClause(c *FinallyClauseContext)
+
+	// ExitThrowStmt is called when exiting the throwStmt production.
+	ExitThrowStmt(c *ThrowStmtContext)
 
 	// ExitBreakStmt is called when exiting the breakStmt production.
 	ExitBreakStmt(c *BreakStmtContext)
