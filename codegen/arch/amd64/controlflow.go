@@ -307,14 +307,66 @@ func (c *compiler) insertValueOp(inst *ir.InsertValueInst) error {
 	agg := ops[0]
 	value := ops[1]
 
-	// This is complex - need to copy aggregate and modify one field
-	// For simplicity, we'll load the aggregate, modify it, and store back
-	// A proper implementation would use temporary storage
+	// Calculate the size of the aggregate
+	aggSize := SizeOf(inst.Type())
+	
+	// Allocate temporary space for the result struct on the stack
+	// We need to store it at the instruction's stack location
+	destOffset, ok := c.stackMap[inst]
+	if !ok {
+		return fmt.Errorf("no stack location for insertvalue result")
+	}
 
-	c.loadToReg(RCX, agg) // Aggregate address/value
-	c.loadToReg(RAX, value)
+	// Step 1: Copy the source aggregate to the destination
+	// Handle ConstantZero specially
+	if _, isZero := agg.(*ir.ConstantZero); isZero {
+		// Zero out the destination
+		// lea rax, [rbp + destOffset]
+		c.emitBytes(0x48, 0x8D, 0x85)
+		c.emitInt32(int32(destOffset))
+		
+		// xor ecx, ecx
+		c.emitXorReg(RCX, RCX)
+		
+		// mov rcx, aggSize/8 (number of qwords)
+		c.loadConstInt(RCX, int64((aggSize+7)/8))
+		
+		// Move RAX to RDI for stosq
+		c.emitBytes(0x48, 0x89, 0xC7)
+		
+		// xor rax, rax (value to store)
+		c.emitXorReg(RAX, RAX)
+		
+		// rep stosq - fill with zeros
+		c.emitBytes(0xF3, 0x48, 0xAB)
+	} else {
+		// Copy from source aggregate location
+		srcOffset, ok := c.stackMap[agg]
+		if !ok {
+			// Try to handle it as a constant or other value
+			c.loadToReg(RAX, agg)
+			c.emitStoreToStack(RAX, destOffset, aggSize)
+		} else {
+			// Copy struct from srcOffset to destOffset
+			if aggSize <= 8 {
+				// Small struct - simple copy
+				c.emitLoadFromStack(RAX, srcOffset, aggSize)
+				c.emitStoreToStack(RAX, destOffset, aggSize)
+			} else {
+				// Larger struct - copy multiple words
+				for off := 0; off < aggSize; off += 8 {
+					size := 8
+					if off+8 > aggSize {
+						size = aggSize - off
+					}
+					c.emitLoadFromStack(RAX, srcOffset+off, size)
+					c.emitStoreToStack(RAX, destOffset+off, size)
+				}
+			}
+		}
+	}
 
-	// Calculate offset
+	// Step 2: Calculate the offset for the field to modify
 	currentType := agg.Type()
 	offset := 0
 
@@ -330,16 +382,14 @@ func (c *compiler) insertValueOp(inst *ir.InsertValueInst) error {
 		}
 	}
 
-	// Store value at aggregate + offset
-	if offset > 0 {
-		if offset <= 127 {
-			c.emitBytes(0x48, 0x83, 0xC1, byte(offset))
-		} else {
-			c.emitBytes(0x48, 0x81, 0xC1)
-			c.emitInt32(int32(offset))
-		}
-	}
-
+	// Step 3: Store the new value at destOffset + offset
+	c.loadToReg(RAX, value)
+	
+	// lea rcx, [rbp + destOffset + offset]
+	c.emitBytes(0x48, 0x8D, 0x8D)
+	c.emitInt32(int32(destOffset + offset))
+	
+	// Store value to [rcx]
 	size := SizeOf(value.Type())
 	switch size {
 	case 1:
@@ -352,7 +402,8 @@ func (c *compiler) insertValueOp(inst *ir.InsertValueInst) error {
 		c.emitBytes(0x48, 0x89, 0x01) // mov qword ptr [rcx], rax
 	}
 
-	c.storeFromReg(RCX, inst)
+	// The result is already in place at destOffset
+	// No need to call storeFromReg since the value is already where it should be
 	return nil
 }
 

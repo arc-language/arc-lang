@@ -2,26 +2,28 @@
 
 define external i32 @main() {
 entry:
-  %0 = insertvalue %Point %<unnamed>, i64 10, 0
-  %1 = insertvalue %Point %0, i64 20, 1
+  %0 = trunc i64 10 to i32
+  %1 = insertvalue %Point %<unnamed>, i32 %0, 0
+  %2 = trunc i64 20 to i32
+  %3 = insertvalue %Point %1, i32 %2, 1
   %p.addr = alloca %Point
-  store %Point %1, ptr<%Point> %p.addr
-  %2 = getelementptr %Point, ptr<%Point> %p.addr, i32 0, i32 0
-  %3 = load i32, ptr<%Point> %2
-  %4 = getelementptr %Point, ptr<%Point> %p.addr, i32 0, i32 1
+  store %Point %3, ptr<%Point> %p.addr
+  %4 = getelementptr %Point, ptr<%Point> %p.addr, i32 0, i32 0
   %5 = load i32, ptr<%Point> %4
-  %6 = add i32 %3, %5
+  %6 = getelementptr %Point, ptr<%Point> %p.addr, i32 0, i32 1
+  %7 = load i32, ptr<%Point> %6
+  %8 = add i32 %5, %7
   %sum.addr = alloca i32
-  store i32 %6, ptr<i32> %sum.addr
-  %7 = load i32, ptr<i32> %sum.addr
-  %8 = icmp eq i32 %7, 30
-  br i1 %8, label %if.then.9_4, label %if.next.9_4
+  store i32 %8, ptr<i32> %sum.addr
+  %9 = load i32, ptr<i32> %sum.addr
+  %10 = icmp eq i32 %9, 30
+  br i1 %10, label %if.then.9_4, label %if.next.9_4
 if.end.9_4:
-  %10 = trunc i64 1 to i32
-  ret i32 %10
+  %12 = trunc i64 1 to i32
+  ret i32 %12
 if.then.9_4:
-  %9 = trunc i64 0 to i32
-  ret i32 %9
+  %11 = trunc i64 0 to i32
+  ret i32 %11
 if.next.9_4:
   br label %if.end.9_4
 }
