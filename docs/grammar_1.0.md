@@ -1,5 +1,11 @@
 # arc Language Grammar Snippets (Version 1.0 - Core Features & Intrinsics)
 
+## Collections, implementation note
+* Note: vector<T> and map<K,V> are NOT compiler builtins.
+* They are generic structs defined in the standard library.
+* See "Generics, struct" for implementation patterns.
+
+
 ## Comments
 ```arc
 // Single-line comment
@@ -970,5 +976,61 @@ switch status {
         io.print("Error")
     default:
         io.print("Unknown")
+}
+```
+
+## Generics, struct, monomorphizes
+```arc
+struct vector<T> {
+    data: *T
+    len: usize
+    cap: usize
+    
+    func push(self v: *vector<T>, item: T) {
+        if v.len >= v.cap {
+            v.grow()
+        }
+        v.data[v.len] = item
+        v.len++
+    }
+    
+    func get(self v: *vector<T>, idx: usize) *T {
+        return &v.data[idx]
+    }
+}
+```
+
+## Generics, multiple type parameters, monomorphizes
+```arc
+struct Entry<K, V> {
+    key: K
+    value: V
+}
+
+struct map<K, V> {
+    buckets: *vector<Entry<K, V>>
+    count: usize
+    
+    func insert(self m: *map<K, V>, key: K, val: V) {
+        // ...
+    }
+}
+```
+
+## Generics, functions, monomorphizes
+```arc
+func swap<T>(a: *T, b: *T) {
+    let tmp: T = *a
+    *a = *b
+    *b = tmp
+}
+
+func find<T>(arr: *T, len: usize, val: T) isize {
+    for let i: usize = 0; i < len; i++ {
+        if arr[i] == val {
+            return cast<isize>(i)
+        }
+    }
+    return -1
 }
 ```
