@@ -885,3 +885,17 @@ try {
 }
 // client ref count decremented here (or during exception unwinding)
 ```
+
+
+## Functions Return Tuples
+```arc
+func divide(a: int32, b: int32) -> (int32, bool) {
+    if b == 0 {
+        return (0, false)
+    }
+    return (a / b, true)
+}
+
+let (result, ok) = divide(10, 2)
+```
+
