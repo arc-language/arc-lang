@@ -1,3 +1,4 @@
+// --- START OF FILE codegen/arch/amd64/ops.go ---
 package amd64
 
 import (
@@ -683,6 +684,151 @@ func (c *compiler) syscallOp(inst *ir.SyscallInst) error {
 	return nil
 }
 
+// Extract value from aggregate
+func (c *compiler) extractValueOp(inst *ir.ExtractValueInst) error {
+	agg := inst.Operands()[0]
+	// Do not load aggregate value to register (as done before), because it might be
+	// a large struct or we need to access fields by offset in stack.
+	
+	// Calculate offset from the base of the aggregate in the stack
+	baseOffset, ok := c.stackMap[agg]
+	if !ok {
+		return fmt.Errorf("extractvalue operand not in stack map: %s", agg.Name())
+	}
+
+	// Calculate offset based on indices
+	currentType := agg.Type()
+	offset := 0
+
+	for _, idx := range inst.Indices {
+		switch ty := currentType.(type) {
+		case *types.StructType:
+			offset += GetStructFieldOffset(ty, idx)
+			currentType = ty.Fields[idx]
+		case *types.ArrayType:
+			elemSize := SizeOf(ty.ElementType)
+			offset += idx * elemSize
+			currentType = ty.ElementType
+		default:
+			return fmt.Errorf("extractvalue on non-aggregate type: %T", ty)
+		}
+	}
+
+	// Load the value from stack location
+	// The address is RBP + baseOffset + offset
+	size := SizeOf(inst.Type())
+	c.emitLoadFromStack(RAX, baseOffset+offset, size)
+
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+// Insert value into aggregate
+func (c *compiler) insertValueOp(inst *ir.InsertValueInst) error {
+	ops := inst.Operands()
+	agg := ops[0]
+	value := ops[1]
+
+	// Calculate the size of the aggregate
+	aggSize := SizeOf(inst.Type())
+	
+	// Allocate temporary space for the result struct on the stack
+	// We need to store it at the instruction's stack location
+	destOffset, ok := c.stackMap[inst]
+	if !ok {
+		return fmt.Errorf("no stack location for insertvalue result")
+	}
+
+	// Step 1: Copy the source aggregate to the destination
+	// Handle ConstantZero specially
+	if _, isZero := agg.(*ir.ConstantZero); isZero {
+		// Zero out the destination
+		// lea rax, [rbp + destOffset]
+		c.emitBytes(0x48, 0x8D, 0x85)
+		c.emitInt32(int32(destOffset))
+		
+		// xor ecx, ecx
+		c.emitXorReg(RCX, RCX)
+		
+		// mov rcx, aggSize/8 (number of qwords)
+		c.loadConstInt(RCX, int64((aggSize+7)/8))
+		
+		// Move RAX to RDI for stosq
+		c.emitBytes(0x48, 0x89, 0xC7)
+		
+		// xor rax, rax (value to store)
+		c.emitXorReg(RAX, RAX)
+		
+		// rep stosq - fill with zeros
+		c.emitBytes(0xF3, 0x48, 0xAB)
+	} else {
+		// Copy from source aggregate location
+		srcOffset, ok := c.stackMap[agg]
+		if !ok {
+			// Try to handle it as a constant or other value
+			c.loadToReg(RAX, agg)
+			c.emitStoreToStack(RAX, destOffset, aggSize)
+		} else {
+			// Copy struct from srcOffset to destOffset
+			if aggSize <= 8 {
+				// Small struct - simple copy
+				c.emitLoadFromStack(RAX, srcOffset, aggSize)
+				c.emitStoreToStack(RAX, destOffset, aggSize)
+			} else {
+				// Larger struct - copy multiple words
+				for off := 0; off < aggSize; off += 8 {
+					size := 8
+					if off+8 > aggSize {
+						size = aggSize - off
+					}
+					c.emitLoadFromStack(RAX, srcOffset+off, size)
+					c.emitStoreToStack(RAX, destOffset+off, size)
+				}
+			}
+		}
+	}
+
+	// Step 2: Calculate the offset for the field to modify
+	currentType := agg.Type()
+	offset := 0
+
+	for _, idx := range inst.Indices {
+		switch ty := currentType.(type) {
+		case *types.StructType:
+			offset += GetStructFieldOffset(ty, idx)
+			currentType = ty.Fields[idx]
+		case *types.ArrayType:
+			elemSize := SizeOf(ty.ElementType)
+			offset += idx * elemSize
+			currentType = ty.ElementType
+		}
+	}
+
+	// Step 3: Store the new value at destOffset + offset
+	c.loadToReg(RAX, value)
+	
+	// lea rcx, [rbp + destOffset + offset]
+	c.emitBytes(0x48, 0x8D, 0x8D)
+	c.emitInt32(int32(destOffset + offset))
+	
+	// Store value to [rcx]
+	size := SizeOf(value.Type())
+	switch size {
+	case 1:
+		c.emitBytes(0x88, 0x01) // mov byte ptr [rcx], al
+	case 2:
+		c.emitBytes(0x66, 0x89, 0x01) // mov word ptr [rcx], ax
+	case 4:
+		c.emitBytes(0x89, 0x01) // mov dword ptr [rcx], eax
+	case 8:
+		c.emitBytes(0x48, 0x89, 0x01) // mov qword ptr [rcx], rax
+	}
+
+	// The result is already in place at destOffset
+	// No need to call storeFromReg since the value is already where it should be
+	return nil
+}
+
 // ============================================================================
 // Variadic Operations
 // ============================================================================
@@ -970,5 +1116,46 @@ func (c *compiler) raiseOp(inst *ir.RaiseInst) error {
 	c.emitBytes(0x0F, 0x05)
 	
 	// This never returns
+	return nil
+}
+
+// Coroutine Operations
+func (c *compiler) coroIdOp(inst *ir.CoroIdInst) error {
+	c.loadConstInt(RAX, int64(c.text.Len()))
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+func (c *compiler) coroBeginOp(inst *ir.CoroBeginInst) error {
+	frameSize := 256
+	c.emitXorReg(RDI, RDI)
+	c.loadConstInt(RSI, int64(frameSize))
+	c.loadConstInt(RDX, 3)
+	c.loadConstInt(R10, 0x22)
+	c.loadConstInt(R8, -1)
+	c.emitXorReg(R9, R9)
+	c.loadConstInt(RAX, 9)
+	c.emitBytes(0x0F, 0x05)
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+func (c *compiler) coroSuspendOp(inst *ir.CoroSuspendInst) error {
+	c.loadConstInt(RAX, 0)
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+func (c *compiler) coroEndOp(inst *ir.CoroEndInst) error {
+	handle := inst.Operands()[0]
+	c.loadToReg(RAX, handle)
+	c.loadConstInt(RAX, 1)
+	return nil
+}
+
+func (c *compiler) coroFreeOp(inst *ir.CoroFreeInst) error {
+	handle := inst.Operands()[1]
+	c.loadToReg(RAX, handle)
+	c.storeFromReg(RAX, inst)
 	return nil
 }

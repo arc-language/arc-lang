@@ -1,3 +1,4 @@
+// --- START OF FILE builder/builder.go ---
 // Package builder provides the IR Builder pattern for constructing IR.
 // This is the main API users interact with to create IR.
 package builder
@@ -775,7 +776,20 @@ func (b *Builder) CreateExtractValue(agg ir.Value, indices []int, name string) *
 	}
 	inst.Op = ir.OpExtractValue
 	inst.SetName(name)
-	inst.SetType(agg.Type()) // Approximation
+	
+	// Calculate proper return type based on indices
+	typ := agg.Type()
+	for _, idx := range indices {
+		if st, ok := typ.(*types.StructType); ok {
+			if idx >= 0 && idx < len(st.Fields) {
+				typ = st.Fields[idx]
+			}
+		} else if at, ok := typ.(*types.ArrayType); ok {
+			typ = at.ElementType
+		}
+	}
+	inst.SetType(typ)
+	
 	inst.SetOperand(0, agg)
 	b.insert(inst)
 	return inst
