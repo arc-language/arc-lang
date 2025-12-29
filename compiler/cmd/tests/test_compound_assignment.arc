@@ -4,5 +4,8 @@ func main() int32 {
     x -= 3
     x *= 2
     x /= 4
-    return x
+    if x == 6 {
+        return 0
+    }
+    return 1
 }

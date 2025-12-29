@@ -6,5 +6,9 @@ func main() int32 {
     let prod = a * b
     let quot = a / b
     let rem = a % b
-    return sum + diff + prod + quot + rem
+    let total = sum + diff + prod + quot + rem
+    if total == 72 {
+        return 0
+    }
+    return 1
 }

@@ -7,5 +7,8 @@ func main() int32 {
     let shl = a << 1
     let shr = a >> 1
     let b_not = ~a
-    return b_or
+    if b_or == 7 {
+        return 0
+    }
+    return 1
 }

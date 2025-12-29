@@ -3,5 +3,8 @@ func main() int32 {
     for i in 0..10 {
         sum = sum + i
     }
-    return sum
+    if sum == 45 {
+        return 0
+    }
+    return 1
 }

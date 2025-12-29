@@ -545,6 +545,17 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
 
+		// Handle global constants stored in scope
+		if sym.IsConst {
+			// If it's a global variable pointer, load it
+			if globalVar, ok := sym.Value.(*ir.GlobalVariable); ok {
+				ptrType := globalVar.Type().(*types.PointerType)
+				return v.ctx.Builder.CreateLoad(ptrType.ElementType, globalVar, "")
+			}
+			// Otherwise return the constant value directly
+			return sym.Value
+		}
+
 		if ptr, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
 			ptrType := ptr.Type().(*types.PointerType)
 			return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")

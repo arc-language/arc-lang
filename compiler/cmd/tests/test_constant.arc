@@ -1,5 +1,10 @@
+namespace main
+
 const MAX: int32 = 100
 
 func main() int32 {
-    return MAX
+    if MAX == 100 {
+        return 0
+    }
+    return 1
 }

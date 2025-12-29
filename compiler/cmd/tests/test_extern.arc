@@ -3,5 +3,9 @@ extern libc {
 }
 
 func main() int32 {
-    return abs(-42)
+    let result = abs(-42)
+    if result == 42 {
+        return 0
+    }
+    return 1
 }

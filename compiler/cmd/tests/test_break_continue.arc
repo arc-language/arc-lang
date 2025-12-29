@@ -9,5 +9,8 @@ func main() int32 {
         }
         sum = sum + i
     }
-    return sum
+    if sum == 23 {
+        return 0
+    }
+    return 1
 }
