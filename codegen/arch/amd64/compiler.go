@@ -186,8 +186,11 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 	c.fixups = nil
 	c.nextTemp = 0
 
-	// Check if function is variadic
-	isVariadic := fn.IsVarArg
+	// Check if function is variadic by checking the function type
+	isVariadic := false
+	if fnType, ok := fn.Type().(*types.FunctionType); ok {
+		isVariadic = fnType.Variadic
+	}
 
 	// 1. Analyze and allocate stack space
 	offset := 0

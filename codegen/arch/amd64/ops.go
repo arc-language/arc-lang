@@ -2,6 +2,7 @@
 package amd64
 
 import (
+	"encoding/binary"
 	"fmt"
 
 	"github.com/arc-language/arc-lang/builder/ir"
@@ -945,14 +946,6 @@ func (c *compiler) bitcastOp(inst *ir.CastInst) error {
 
 // va_start - initialize va_list with register save area
 func (c *compiler) vaStartOp(inst *ir.VaStartInst) error {
-	// System V AMD64 ABI va_list structure:
-	// struct {
-	//   uint32 gp_offset;              // 0-48 (6 GP regs * 8 bytes)
-	//   uint32 fp_offset;              // 48-176 (8 FP regs * 16 bytes)
-	//   void*  overflow_arg_area;      // pointer to stack args
-	//   void*  reg_save_area;          // pointer to saved registers
-	// }
-	
 	vaList := inst.Operands()[0]
 	c.loadToReg(RAX, vaList) // Get va_list pointer
 
@@ -962,21 +955,16 @@ func (c *compiler) vaStartOp(inst *ir.VaStartInst) error {
 	// Initialize fp_offset to 48
 	c.emitBytes(0xC7, 0x40, 0x04, 0x30, 0x00, 0x00, 0x00)
 
-	// Set overflow_arg_area to first stack arg
-	// Stack layout: [rbp+0]=old rbp, [rbp+8]=ret addr, [rbp+16]=arg7, [rbp+24]=arg8...
+	// Set overflow_arg_area to first stack arg [rbp + 16]
 	c.emitBytes(0x48, 0x8D, 0x8D, 0x10, 0x00, 0x00, 0x00) // lea rcx, [rbp + 16]
 	c.emitBytes(0x48, 0x89, 0x48, 0x08)                   // mov [rax + 8], rcx
 
-	// Set reg_save_area to our register save area in the stack frame
-	// The register save area should have been allocated and populated by the prologue
-	// For variadic functions, we need a special area at a known offset
-	// Let's use [rbp - (framesize + 176)] where 176 = 6*8 (GP) + 8*16 (FP)
-	
-	// FIX: Calculate address of register save area
-	regSaveOffset := -(c.currentFrame + 176) // Below normal frame
-	c.emitBytes(0x48, 0x8D, 0x8D)             // lea rcx, [rbp + offset]
+	// Set reg_save_area to point to saved registers at bottom of frame
+	// The register save area is at offset -c.currentFrame
+	regSaveOffset := -c.currentFrame
+	c.emitBytes(0x48, 0x8D, 0x8D)  // lea rcx, [rbp + offset]
 	c.emitInt32(int32(regSaveOffset))
-	c.emitBytes(0x48, 0x89, 0x48, 0x10)       // mov [rax + 16], rcx
+	c.emitBytes(0x48, 0x89, 0x48, 0x10) // mov [rax + 16], rcx
 
 	return nil
 }
@@ -993,7 +981,7 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 	size := SizeOf(argType)
 
 	if isFloat {
-		// FP argument - check fp_offset
+		// ========== FLOATING POINT PATH ==========
 		// Load fp_offset: mov ecx, [rax + 4]
 		c.emitBytes(0x8B, 0x48, 0x04)
 		
@@ -1002,11 +990,11 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		c.emitBytes(0x81, 0xF9, 0xB0, 0x00, 0x00, 0x00)
 		
 		// jae use_stack (jump if >= 176)
-		c.emitBytes(0x0F, 0x83) // Long conditional jump
+		c.emitBytes(0x0F, 0x83)
 		stackPathOffset := c.text.Len()
-		c.emitUint32(0) // Will be fixed up
+		c.emitUint32(0) // Placeholder
 		
-		// Register path: load from reg_save_area + fp_offset
+		// --- Register path ---
 		// mov rdx, [rax + 16] (reg_save_area)
 		c.emitBytes(0x48, 0x8B, 0x50, 0x10)
 		
@@ -1021,21 +1009,48 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		}
 		
 		// Advance fp_offset by 16
-		c.emitBytes(0x83, 0xC1, 0x10)           // add ecx, 16
-		c.emitBytes(0x89, 0x48, 0x04)           // mov [rax + 4], ecx
+		c.emitBytes(0x83, 0xC1, 0x10)  // add ecx, 16
+		c.emitBytes(0x89, 0x48, 0x04)  // mov [rax + 4], ecx
 		
-		// Store result and jump to end
+		// Store result
 		c.storeFromFpReg(0, inst)
 		
-		c.emitBytes(0xEB) // Short jump to end
+		// Jump to end
+		c.emitBytes(0xEB)
 		endJumpOffset := c.text.Len()
-		c.emitBytes(0) // Will be fixed up
+		c.emitBytes(0) // Placeholder
 		
-		// Stack path starts here
+		// --- Stack path ---
 		stackPathStart := c.text.Len()
 		
+		// Fix up jump to stack path
+		stackRel := stackPathStart - (stackPathOffset + 4)
+		text := c.text.Bytes()
+		binary.LittleEndian.PutUint32(text[stackPathOffset:], uint32(stackRel))
+		
+		// Load overflow_arg_area: mov rcx, [rax + 8]
+		c.emitBytes(0x48, 0x8B, 0x48, 0x08)
+		
+		// Load from stack
+		if size == 4 {
+			c.emitBytes(0xF3, 0x0F, 0x10, 0x01) // movss xmm0, [rcx]
+		} else {
+			c.emitBytes(0xF2, 0x0F, 0x10, 0x01) // movsd xmm0, [rcx]
+		}
+		
+		// Advance overflow_arg_area by 8
+		c.emitBytes(0x48, 0x83, 0xC1, 0x08)
+		c.emitBytes(0x48, 0x89, 0x48, 0x08)
+		
+		c.storeFromFpReg(0, inst)
+		
+		// Fix up end jump
+		endPos := c.text.Len()
+		endRel := endPos - (endJumpOffset + 1)
+		c.text.Bytes()[endJumpOffset] = byte(endRel)
+		
 	} else {
-		// Integer/pointer argument - check gp_offset
+		// ========== INTEGER/POINTER PATH ==========
 		// Load gp_offset: mov ecx, [rax]
 		c.emitBytes(0x8B, 0x08)
 		
@@ -1046,10 +1061,10 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		// jae use_stack
 		c.emitBytes(0x0F, 0x83)
 		stackPathOffset := c.text.Len()
-		c.emitUint32(0)
+		c.emitUint32(0) // Placeholder
 		
-		// Register path: load from reg_save_area + gp_offset
-		// mov rdx, [rax + 16]
+		// --- Register path ---
+		// mov rdx, [rax + 16] (reg_save_area)
 		c.emitBytes(0x48, 0x8B, 0x50, 0x10)
 		
 		// Add gp_offset: add rdx, rcx
@@ -1065,58 +1080,59 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 			c.emitBytes(0x8B, 0x02)             // mov eax, [rdx]
 		case 8:
 			c.emitBytes(0x48, 0x8B, 0x02)       // mov rax, [rdx]
+		default:
+			c.emitBytes(0x48, 0x8B, 0x02)       // default to 8 bytes
 		}
 		
 		// Advance gp_offset by 8
 		c.emitBytes(0x83, 0xC1, 0x08)  // add ecx, 8
 		c.emitBytes(0x89, 0x08)        // mov [rax], ecx
 		
+		// Store result
 		c.storeFromReg(RAX, inst)
 		
+		// Jump to end
 		c.emitBytes(0xEB)
 		endJumpOffset := c.text.Len()
-		c.emitBytes(0)
+		c.emitBytes(0) // Placeholder
 		
+		// --- Stack path ---
 		stackPathStart := c.text.Len()
 		
 		// Fix up jump to stack path
 		stackRel := stackPathStart - (stackPathOffset + 4)
 		text := c.text.Bytes()
 		binary.LittleEndian.PutUint32(text[stackPathOffset:], uint32(stackRel))
+		
+		// Load overflow_arg_area: mov rcx, [rax + 8]
+		c.emitBytes(0x48, 0x8B, 0x48, 0x08)
+		
+		// Load argument from stack
+		switch size {
+		case 1:
+			c.emitBytes(0x48, 0x0F, 0xB6, 0x01) // movzx rax, byte [rcx]
+		case 2:
+			c.emitBytes(0x48, 0x0F, 0xB7, 0x01) // movzx rax, word [rcx]
+		case 4:
+			c.emitBytes(0x8B, 0x01)             // mov eax, [rcx]
+		case 8:
+			c.emitBytes(0x48, 0x8B, 0x01)       // mov rax, [rcx]
+		default:
+			c.emitBytes(0x48, 0x8B, 0x01)       // default to 8 bytes
+		}
+		
+		// Advance overflow_arg_area by 8
+		c.emitBytes(0x48, 0x83, 0xC1, 0x08)
+		c.emitBytes(0x48, 0x89, 0x48, 0x08)
+		
+		c.storeFromReg(RAX, inst)
+		
+		// Fix up end jump
+		endPos := c.text.Len()
+		endRel := endPos - (endJumpOffset + 1)
+		c.text.Bytes()[endJumpOffset] = byte(endRel)
 	}
 
-	// Stack path (common for both GP and FP after registers exhausted)
-	// Load overflow_arg_area: mov rcx, [rax + 8]
-	c.emitBytes(0x48, 0x8B, 0x48, 0x08)
-	
-	// Load argument from stack
-	switch size {
-	case 1:
-		c.emitBytes(0x48, 0x0F, 0xB6, 0x01)
-	case 2:
-		c.emitBytes(0x48, 0x0F, 0xB7, 0x01)
-	case 4:
-		c.emitBytes(0x8B, 0x01)
-		c.emitBytes(0x48, 0x89, 0xC0)
-	case 8:
-		c.emitBytes(0x48, 0x8B, 0x01)
-	}
-	
-	// Advance overflow_arg_area by 8
-	c.emitBytes(0x48, 0x83, 0xC1, 0x08)
-	c.emitBytes(0x48, 0x89, 0x48, 0x08)
-	
-	if !isFloat {
-		c.storeFromReg(RAX, inst)
-	} else {
-		c.storeFromFpReg(0, inst)
-	}
-	
-	// Fix up end jump
-	endPos := c.text.Len()
-	endRel := endPos - (endJumpOffset + 1)
-	c.text.Bytes()[endJumpOffset] = byte(endRel)
-	
 	return nil
 }
 
