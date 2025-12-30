@@ -976,14 +976,17 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 
 	c.loadToReg(RAX, vaList) // Get va_list pointer
 
+	// CRITICAL FIX: Save va_list pointer to R10 before we clobber RAX with argument value
+	c.emitBytes(0x49, 0x89, 0xC2) // mov r10, rax
+
 	// Determine if this is a GP or FP argument
 	isFloat := types.IsFloat(argType)
 	size := SizeOf(argType)
 
 	if isFloat {
 		// ========== FLOATING POINT PATH ==========
-		// Load fp_offset: mov ecx, [rax + 4]
-		c.emitBytes(0x8B, 0x48, 0x04)
+		// Load fp_offset: mov ecx, [r10 + 4]
+		c.emitBytes(0x41, 0x8B, 0x4A, 0x04)
 		
 		// Check if FP registers exhausted (fp_offset >= 176)
 		// cmp ecx, 176
@@ -995,8 +998,8 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		c.emitUint32(0) // Placeholder
 		
 		// --- Register path ---
-		// mov rdx, [rax + 16] (reg_save_area)
-		c.emitBytes(0x48, 0x8B, 0x50, 0x10)
+		// mov rdx, [r10 + 16] (reg_save_area)
+		c.emitBytes(0x49, 0x8B, 0x52, 0x10)
 		
 		// Add fp_offset: add rdx, rcx
 		c.emitBytes(0x48, 0x01, 0xCA)
@@ -1009,8 +1012,8 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		}
 		
 		// Advance fp_offset by 16
-		c.emitBytes(0x83, 0xC1, 0x10)  // add ecx, 16
-		c.emitBytes(0x89, 0x48, 0x04)  // mov [rax + 4], ecx
+		c.emitBytes(0x83, 0xC1, 0x10)       // add ecx, 16
+		c.emitBytes(0x41, 0x89, 0x4A, 0x04) // mov [r10 + 4], ecx  *** FIXED ***
 		
 		// Store result
 		c.storeFromFpReg(0, inst)
@@ -1028,8 +1031,8 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		text := c.text.Bytes()
 		binary.LittleEndian.PutUint32(text[stackPathOffset:], uint32(stackRel))
 		
-		// Load overflow_arg_area: mov rcx, [rax + 8]
-		c.emitBytes(0x48, 0x8B, 0x48, 0x08)
+		// Load overflow_arg_area: mov rcx, [r10 + 8]  *** FIXED ***
+		c.emitBytes(0x49, 0x8B, 0x4A, 0x08)
 		
 		// Load from stack
 		if size == 4 {
@@ -1040,7 +1043,7 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		
 		// Advance overflow_arg_area by 8
 		c.emitBytes(0x48, 0x83, 0xC1, 0x08)
-		c.emitBytes(0x48, 0x89, 0x48, 0x08)
+		c.emitBytes(0x49, 0x89, 0x4A, 0x08) // mov [r10 + 8], rcx  *** FIXED ***
 		
 		c.storeFromFpReg(0, inst)
 		
@@ -1051,8 +1054,8 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		
 	} else {
 		// ========== INTEGER/POINTER PATH ==========
-		// Load gp_offset: mov ecx, [rax]
-		c.emitBytes(0x8B, 0x08)
+		// Load gp_offset: mov ecx, [r10]  *** FIXED ***
+		c.emitBytes(0x41, 0x8B, 0x0A)
 		
 		// Check if GP registers exhausted (gp_offset >= 48)
 		// cmp ecx, 48
@@ -1064,8 +1067,8 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		c.emitUint32(0) // Placeholder
 		
 		// --- Register path ---
-		// mov rdx, [rax + 16] (reg_save_area)
-		c.emitBytes(0x48, 0x8B, 0x50, 0x10)
+		// mov rdx, [r10 + 16] (reg_save_area)  *** FIXED ***
+		c.emitBytes(0x49, 0x8B, 0x52, 0x10)
 		
 		// Add gp_offset: add rdx, rcx
 		c.emitBytes(0x48, 0x01, 0xCA)
@@ -1086,7 +1089,7 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		
 		// Advance gp_offset by 8
 		c.emitBytes(0x83, 0xC1, 0x08)  // add ecx, 8
-		c.emitBytes(0x89, 0x08)        // mov [rax], ecx
+		c.emitBytes(0x41, 0x89, 0x0A)  // mov [r10], ecx  *** FIXED ***
 		
 		// Store result
 		c.storeFromReg(RAX, inst)
@@ -1104,8 +1107,8 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		text := c.text.Bytes()
 		binary.LittleEndian.PutUint32(text[stackPathOffset:], uint32(stackRel))
 		
-		// Load overflow_arg_area: mov rcx, [rax + 8]
-		c.emitBytes(0x48, 0x8B, 0x48, 0x08)
+		// Load overflow_arg_area: mov rcx, [r10 + 8]  *** FIXED ***
+		c.emitBytes(0x49, 0x8B, 0x4A, 0x08)
 		
 		// Load argument from stack
 		switch size {
@@ -1123,7 +1126,7 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 		
 		// Advance overflow_arg_area by 8
 		c.emitBytes(0x48, 0x83, 0xC1, 0x08)
-		c.emitBytes(0x48, 0x89, 0x48, 0x08)
+		c.emitBytes(0x49, 0x89, 0x4A, 0x08) // mov [r10 + 8], rcx  *** FIXED ***
 		
 		c.storeFromReg(RAX, inst)
 		
