@@ -1,4 +1,3 @@
-// --- START OF FILE compiler/context.go ---
 package compiler
 
 import (
@@ -237,7 +236,15 @@ func (c *Context) registerBuiltinTypes() {
 	c.namedTypes["string"] = types.NewPointer(types.I8) // For now, *i8
 	
 	// Variadic arguments support
-	c.namedTypes["va_list"] = types.NewPointer(types.I8)
+	// For x86_64 System V ABI, va_list is a struct { i32, i32, i8*, i8* }
+	// We define it as a struct to ensure sufficient stack space allocation.
+	// This prevents va_start from overwriting adjacent stack variables.
+	c.namedTypes["va_list"] = types.NewStruct("struct.va_list", []types.Type{
+		types.I32,                  // gp_offset
+		types.I32,                  // fp_offset
+		types.NewPointer(types.I8), // overflow_arg_area
+		types.NewPointer(types.I8), // reg_save_area
+	}, false)
 	
 	c.Logger.Debug("Registered %d builtin types", len(c.namedTypes))
 }

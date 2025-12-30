@@ -1,4 +1,3 @@
-// --- START OF FILE compiler/visitor_expressions.go ---
 package compiler
 
 import (
@@ -978,11 +977,17 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 	if ctx.VA_START() != nil {
 		vaListType := v.ctx.namedTypes["va_list"]
 		if vaListType == nil {
+			// Fallback (though registerBuiltinTypes should have handled it)
 			vaListType = types.NewPointer(types.I8)
 			v.ctx.namedTypes["va_list"] = vaListType
 		}
 		vaListPtr := v.ctx.Builder.CreateAlloca(vaListType, "va_list")
-		v.ctx.Builder.CreateVaStart(vaListPtr)
+		
+		// Bitcast the struct pointer to i8* (void*) because standard llvm.va_start intrinsic expects i8*
+		i8PtrType := types.NewPointer(types.I8)
+		vaStartArg := v.ctx.Builder.CreateBitCast(vaListPtr, i8PtrType, "")
+		
+		v.ctx.Builder.CreateVaStart(vaStartArg)
 		return vaListPtr
 	}
 	var args []ir.Value
