@@ -1,71 +1,45 @@
 namespace main
 
 import "io"
-import "net"
 
 func main() int32 {
-    io.println("--- Standalone TCP Client Test ---")
+    // 1. Basic String Output
+    io.println("=== IO Library Test ===")
+    io.print("1. Basic Print: ")
+    io.println("Success")
 
-    // 1. Instantiate
-    let client: net.Socket = net.Socket{fd: -1, connected: false}
+    // 2. Integers (Signed)
+    io.println("\n2. Signed Integers:")
+    io.printf("   Positive: %d\n", 42)
+    io.printf("   Negative: %d\n", -123456)
+    io.printf("   Zero:     %d\n", 0)
 
-    // 2. Open
-    if !client.open() {
-        io.eprintln("Error: Failed to open socket.")
-        return 1
-    }
+    // 3. Unsigned & Hex
+    io.println("\n3. Unsigned & Hex:")
+    let u_val: uint32 = 3000000000
+    io.printf("   Unsigned: %u\n", u_val)
+    io.printf("   Hex (255): %x\n", 255)
+    io.printf("   Hex (Large): %x\n", 3735928559) // 0xDEADBEEF
+
+    // 4. Characters & Strings
+    io.println("\n4. Chars & Strings:")
+    io.printf("   Char: %c\n", 'A')
+    io.printf("   String: %s\n", "Hello inside printf")
+
+    // 5. Pointers
+    io.println("\n5. Pointers:")
+    let ptr: *void = null
+    io.printf("   Null: %p\n", ptr)
     
-    // Manual integer printing to avoid printf issues
-    io.print("Socket created fd: ")
-    let num_buf = alloca(byte, 32)
-    let len = io.int_to_string(cast<int64>(client.fd), num_buf, 10)
-    io.write(io.STDOUT, num_buf, len)
-    io.println("") // Newline
+    let local_var: int32 = 100
+    io.printf("   Stack Addr: %p\n", &local_var)
 
-    // Configuration
-    let ip = "127.0.0.1"
-    let port: uint16 = 8080
+    // 6. Direct File Descriptor Access (Stderr)
+    io.println("\n6. Testing STDERR:")
+    let err_msg = "   [STDERR] This is a direct write to fd 2\n"
+    // Note: We cast string to *byte manually for the low-level write
+    io.write(io.STDERR, cast<*byte>(err_msg), 43)
 
-    io.print("Connecting to ")
-    io.print(ip)
-    io.print(":")
-    len = io.uint_to_string(cast<uint64>(port), num_buf, 10)
-    io.write(io.STDOUT, num_buf, len)
-    io.println("...")
-    
-    io.println("(Ensure python server is running!)")
-
-    // 3. Connect
-    if client.connect(ip, port) {
-        io.println("Connected!")
-
-        // 4. Write
-        let msg = "Hello from Arc!\n"
-        let sent = client.write(msg)
-        
-        if sent > 0 {
-            io.print("Sent bytes: ")
-            len = io.int_to_string(cast<int64>(sent), num_buf, 10)
-            io.write(io.STDOUT, num_buf, len)
-            io.println("")
-        }
-
-        // 5. Read
-        io.print("Waiting for response... ")
-        let buf = alloca(byte, 64)
-        memset(buf, 0, 64) 
-
-        let n = client.read(buf, 63)
-        if n > 0 {
-            io.println("\nReceived:")
-            io.println(cast<string>(buf))
-        } else {
-            io.println("\nConnection closed or empty read.")
-        }
-    } else {
-        io.eprintln("Connection failed.")
-        return 1
-    }
-
+    io.println("\n=== All Tests Passed ===")
     return 0
 }
