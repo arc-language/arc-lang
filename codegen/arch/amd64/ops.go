@@ -1,4 +1,3 @@
-// --- START OF FILE codegen/arch/amd64/ops.go ---
 package amd64
 
 import (
@@ -1386,56 +1385,5 @@ func (c *compiler) raiseOp(inst *ir.RaiseInst) error {
 	
 	// Don't exit - just return normally
 	// The caller will check the exception state
-	return nil
-}
-
-// Coroutine Operations
-// These map to LLVM coroutine intrinsics and implement async/await
-
-// coroIdOp - Initialize coroutine (llvm.coro.id)
-func (c *compiler) coroIdOp(inst *ir.CoroIdInst) error {
-	// Store a unique ID (use instruction address)
-	c.loadConstInt(RAX, int64(c.text.Len()))
-	c.storeFromReg(RAX, inst)
-	return nil
-}
-
-// coroBeginOp - Begin coroutine execution (llvm.coro.begin)
-func (c *compiler) coroBeginOp(inst *ir.CoroBeginInst) error {
-	frameSize := 256
-	// mmap(NULL, frameSize, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0)
-	c.emitXorReg(RDI, RDI)                    // addr = NULL
-	c.loadConstInt(RSI, int64(frameSize))     // length
-	c.loadConstInt(RDX, 3)                     // prot = PROT_READ | PROT_WRITE
-	c.loadConstInt(R10, 0x22)                  // flags = MAP_PRIVATE | MAP_ANONYMOUS
-	c.loadConstInt(R8, -1)                     // fd = -1
-	c.emitXorReg(R9, R9)                       // offset = 0
-	c.loadConstInt(RAX, 9)                     // syscall number for mmap
-	c.emitBytes(0x0F, 0x05)                    // syscall
-	
-	c.storeFromReg(RAX, inst)
-	return nil
-}
-
-// coroSuspendOp - Suspend coroutine execution (llvm.coro.suspend)
-func (c *compiler) coroSuspendOp(inst *ir.CoroSuspendInst) error {
-	c.loadConstInt(RAX, 0)
-	c.storeFromReg(RAX, inst)
-	return nil
-}
-
-// coroEndOp - End coroutine scope (llvm.coro.end)
-func (c *compiler) coroEndOp(inst *ir.CoroEndInst) error {
-	handle := inst.Operands()[0]
-	c.loadToReg(RAX, handle)
-	c.loadConstInt(RAX, 1)
-	return nil
-}
-
-// coroFreeOp - Get memory to free for coroutine (llvm.coro.free)
-func (c *compiler) coroFreeOp(inst *ir.CoroFreeInst) error {
-	handle := inst.Operands()[1]
-	c.loadToReg(RAX, handle)
-	c.storeFromReg(RAX, inst)
 	return nil
 }
