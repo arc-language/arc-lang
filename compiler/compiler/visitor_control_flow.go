@@ -477,47 +477,49 @@ func (v *IRVisitor) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 	
 	v.ctx.Builder.CreateBr(tryBlock)
 	
-	// Try block
+	// Try block - process each statement and check for exceptions after each one
 	v.ctx.SetInsertBlock(tryBlock)
-	v.Visit(ctx.Block())
 	
-	// After try block, check exception state
-	if catchBlock != nil {
-		exceptionStateGlobal := v.ctx.Module.GetGlobal("__exception_state")
-		if exceptionStateGlobal != nil {
-			// Check if exception occurred
-			hasExceptionPtr := v.ctx.Builder.CreateStructGEP(
-				exceptionStateGlobal.Type().(*types.PointerType).ElementType,
-				exceptionStateGlobal,
-				0,
-				"",
-			)
-			hasException := v.ctx.Builder.CreateLoad(types.I1, hasExceptionPtr, "")
-			
-			// Branch based on exception state
-			if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
-				nextBlock := finallyBlock
-				if nextBlock == nil {
-					nextBlock = endBlock
-				}
-				v.ctx.Builder.CreateCondBr(hasException, catchBlock, nextBlock)
-			}
-		} else {
-			if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
-				if finallyBlock != nil {
-					v.ctx.Builder.CreateBr(finallyBlock)
-				} else {
-					v.ctx.Builder.CreateBr(endBlock)
-				}
+	// Visit each statement in the try block
+	for _, stmt := range ctx.Block().AllStatement() {
+		v.Visit(stmt)
+		
+		// After each statement, check if an exception occurred
+		if catchBlock != nil && v.ctx.Builder.GetInsertBlock().Terminator() == nil {
+			exceptionStateGlobal := v.ctx.Module.GetGlobal("__exception_state")
+			if exceptionStateGlobal != nil {
+				// Check if exception occurred
+				hasExceptionPtr := v.ctx.Builder.CreateStructGEP(
+					exceptionStateGlobal.Type().(*types.PointerType).ElementType,
+					exceptionStateGlobal,
+					0,
+					"",
+				)
+				hasException := v.ctx.Builder.CreateLoad(types.I1, hasExceptionPtr, "")
+				
+				// Create a continuation block
+				continueBlock := v.ctx.Builder.CreateBlock(fmt.Sprintf("try.continue.%d", len(ctx.Block().AllStatement())))
+				
+				// Branch: if exception, go to catch; otherwise continue
+				v.ctx.Builder.CreateCondBr(hasException, catchBlock, continueBlock)
+				
+				// Set insertion point to continuation
+				v.ctx.SetInsertBlock(continueBlock)
 			}
 		}
-	} else {
-		if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
-			if finallyBlock != nil {
-				v.ctx.Builder.CreateBr(finallyBlock)
-			} else {
-				v.ctx.Builder.CreateBr(endBlock)
-			}
+		
+		// If statement created a terminator, stop processing
+		if v.ctx.Builder.GetInsertBlock().Terminator() != nil {
+			break
+		}
+	}
+	
+	// If no terminator yet, jump to finally or end
+	if v.ctx.Builder.GetInsertBlock().Terminator() == nil {
+		if finallyBlock != nil {
+			v.ctx.Builder.CreateBr(finallyBlock)
+		} else {
+			v.ctx.Builder.CreateBr(endBlock)
 		}
 	}
 	

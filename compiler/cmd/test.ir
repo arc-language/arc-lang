@@ -1,4 +1,5 @@
 @.str.0 = external constant [17 x i8] [i8 68, i8 105, i8 118, i8 105, i8 115, i8 105, i8 111, i8 110, i8 32, i8 98, i8 121, i8 32, i8 122, i8 101, i8 114, i8 111, i8 0]
+@__exception_state = external global { i1, ptr<i8> } zeroinitializer
 
 define external i32 @divide(i32 %a, i32 %b) {
 entry:
@@ -10,14 +11,17 @@ entry:
   %1 = icmp eq i32 %0, 0
   br i1 %1, label %if.then.2_4, label %if.next.2_4
 if.end.2_4:
-  %3 = load i32, ptr<i32> %a.addr
-  %4 = load i32, ptr<i32> %b.addr
-  %5 = sdiv i32 %3, %4
-  ret i32 %5
+  %5 = load i32, ptr<i32> %a.addr
+  %6 = load i32, ptr<i32> %b.addr
+  %7 = sdiv i32 %5, %6
+  ret i32 %7
 if.then.2_4:
   %2 = getelementptr inbounds [17 x i8], ptr<[17 x i8]> @.str.0, i32 0, i32 0
-  raise ptr<[17 x i8]> %2
-  br label %if.end.2_4
+  %3 = getelementptr { i1, ptr<i8> }, ptr<{ i1, ptr<i8> }> @__exception_state, i32 0, i32 0
+  store i1 1, ptr<{ i1, ptr<i8> }> %3
+  %4 = getelementptr { i1, ptr<i8> }, ptr<{ i1, ptr<i8> }> @__exception_state, i32 0, i32 1
+  store ptr<[17 x i8]> %2, ptr<{ i1, ptr<i8> }> %4
+  ret i32 -1
 if.next.2_4:
   br label %if.end.2_4
 }
@@ -26,18 +30,26 @@ define external i32 @main() {
 entry:
   br label %try.9_4
 try.9_4:
-  %6 = trunc i64 10 to i32
-  %7 = trunc i64 2 to i32
-  %8 = call i32 @divide(i32 %6, i32 %7)
+  %8 = trunc i64 10 to i32
+  %9 = trunc i64 2 to i32
+  %10 = call i32 @divide(i32 %8, i32 %9)
   %result.addr = alloca i32
-  store i32 %8, ptr<i32> %result.addr
-  %9 = trunc i64 0 to i32
-  ret i32 %9
+  store i32 %10, ptr<i32> %result.addr
+  %11 = trunc i64 0 to i32
+  ret i32 %11
+  %12 = getelementptr { i1, ptr<i8> }, ptr<{ i1, ptr<i8> }> @__exception_state, i32 0, i32 0
+  %13 = load i1, ptr<{ i1, ptr<i8> }> %12
+  br i1 %13, label %catch.9_4, label %try.end.9_4
 try.end.9_4:
   ret i32 0
 catch.9_4:
-except.9_4.0:
-  %10 = sub i64 0, 1
-  %11 = trunc i64 %10 to i32
-  ret i32 %11
+  %14 = getelementptr { i1, ptr<i8> }, ptr<{ i1, ptr<i8> }> @__exception_state, i32 0, i32 0
+  store i1 0, ptr<{ i1, ptr<i8> }> %14
+  %15 = getelementptr { i1, ptr<i8> }, ptr<{ i1, ptr<i8> }> @__exception_state, i32 0, i32 1
+  %16 = load ptr<i8>, ptr<{ i1, ptr<i8> }> %15
+  %err.addr = alloca ptr<i8>
+  store ptr<i8> %16, ptr<ptr<i8>> %err.addr
+  %17 = sub i64 0, 1
+  %18 = trunc i64 %17 to i32
+  ret i32 %18
 }
