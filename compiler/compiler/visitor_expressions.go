@@ -574,9 +574,13 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 		}
 	} else if ctx.QualifiedIdentifier() != nil {
 		qCtx := ctx.QualifiedIdentifier()
-		if len(qCtx.AllIDENTIFIER()) == 2 {
-			nsName := qCtx.IDENTIFIER(0).GetText()
-			typeName := qCtx.IDENTIFIER(1).GetText()
+		var parts []string
+		if qCtx.SYSCALL() != nil { parts = append(parts, "syscall") }
+		for _, node := range qCtx.AllIDENTIFIER() { parts = append(parts, node.GetText()) }
+		
+		if len(parts) >= 2 {
+			nsName := parts[0]
+			typeName := parts[1]
 			if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
 				if typ, ok := ns.Types[typeName]; ok {
 					if st, ok := typ.(*types.StructType); ok {
@@ -719,16 +723,19 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
 
-    // ... (rest of function remains unchanged) ...
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
 		
 		// Check for Generic Instantiation Call: foo<T>(...)
 		if ctx.GenericArgs() != nil {
+			// Try to instantiate as function
 			fn := v.instantiateFunction(name, ctx.GenericArgs())
 			if fn != nil {
 				return fn
 			}
+			
+			// Try to instantiate as struct (unlikely as primary expr value, but maybe constructor?)
+			// For now, only generic function calls are expected here as values.
 			v.ctx.Logger.Error("Unknown generic function: %s", name)
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
@@ -768,18 +775,25 @@ func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			return v.ctx.Builder.ConstInt(types.I64, 0)
 		}
 
+		// Handle global constants stored in scope
 		if sym.IsConst {
+			// If it's a global pointer, load it
 			if global, ok := sym.Value.(*ir.Global); ok {
 				ptrType := global.Type().(*types.PointerType)
+				// For aggregates (arrays/structs), return the pointer directly to avoid
+				// massive loads that the backend might not handle well.
 				if types.IsAggregate(ptrType.ElementType) {
 					return global
 				}
 				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
 			}
+			// Otherwise return the constant value directly
 			return sym.Value
 		}
 
 		if ptr, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
+			// For aggregates (arrays/structs), return the pointer directly to avoid
+			// loading the entire value onto the stack/register, which the backend handles poorly.
 			if types.IsAggregate(ptr.AllocatedType) {
 				return ptr
 			}

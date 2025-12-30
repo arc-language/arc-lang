@@ -256,7 +256,7 @@ func arcparserParserInit() {
 		0, 0, 197, 198, 1, 0, 0, 0, 198, 200, 1, 0, 0, 0, 199, 197, 1, 0, 0, 0,
 		200, 202, 5, 101, 0, 0, 201, 190, 1, 0, 0, 0, 201, 192, 1, 0, 0, 0, 202,
 		3, 1, 0, 0, 0, 203, 204, 5, 114, 0, 0, 204, 5, 1, 0, 0, 0, 205, 206, 5,
-		2, 0, 0, 206, 207, 5, 116, 0, 0, 207, 7, 1, 0, 0, 0, 208, 219, 3, 26, 13,
+		2, 0, 0, 206, 207, 7, 0, 0, 0, 207, 7, 1, 0, 0, 0, 208, 219, 3, 26, 13,
 		0, 209, 219, 3, 34, 17, 0, 210, 219, 3, 40, 20, 0, 211, 219, 3, 46, 23,
 		0, 212, 219, 3, 50, 25, 0, 213, 219, 3, 52, 26, 0, 214, 219, 3, 54, 27,
 		0, 215, 219, 3, 56, 28, 0, 216, 219, 3, 58, 29, 0, 217, 219, 3, 10, 5,
@@ -1505,6 +1505,7 @@ type INamespaceDeclContext interface {
 	// Getter signatures
 	NAMESPACE() antlr.TerminalNode
 	IDENTIFIER() antlr.TerminalNode
+	SYSCALL() antlr.TerminalNode
 
 	// IsNamespaceDeclContext differentiates from other interfaces.
 	IsNamespaceDeclContext()
@@ -1550,6 +1551,10 @@ func (s *NamespaceDeclContext) IDENTIFIER() antlr.TerminalNode {
 	return s.GetToken(ArcParserIDENTIFIER, 0)
 }
 
+func (s *NamespaceDeclContext) SYSCALL() antlr.TerminalNode {
+	return s.GetToken(ArcParserSYSCALL, 0)
+}
+
 func (s *NamespaceDeclContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
@@ -1583,6 +1588,8 @@ func (s *NamespaceDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{
 func (p *ArcParser) NamespaceDecl() (localctx INamespaceDeclContext) {
 	localctx = NewNamespaceDeclContext(p, p.GetParserRuleContext(), p.GetState())
 	p.EnterRule(localctx, 6, ArcParserRULE_namespaceDecl)
+	var _la int
+
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(205)
@@ -1594,10 +1601,13 @@ func (p *ArcParser) NamespaceDecl() (localctx INamespaceDeclContext) {
 	}
 	{
 		p.SetState(206)
-		p.Match(ArcParserIDENTIFIER)
-		if p.HasError() {
-			// Recognition error - abort rule
-			goto errorExit
+		_la = p.GetTokenStream().LA(1)
+
+		if !(_la == ArcParserSYSCALL || _la == ArcParserIDENTIFIER) {
+			p.GetErrorHandler().RecoverInline(p)
+		} else {
+			p.GetErrorHandler().ReportMatch(p)
+			p.Consume()
 		}
 	}
 

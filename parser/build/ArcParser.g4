@@ -30,7 +30,7 @@ importSpec
 // =============================================================================
 
 namespaceDecl
-    : NAMESPACE IDENTIFIER
+    : NAMESPACE (IDENTIFIER | SYSCALL)
     ;
 
 // =============================================================================
@@ -212,7 +212,6 @@ type
     | UNDERSCORE
     ;
 
-// MODIFIED: Allows types like 'syscall.Errno'
 qualifiedType
     : (IDENTIFIER | SYSCALL) (DOT IDENTIFIER)+ genericArgs?
     ;
@@ -472,7 +471,6 @@ primaryExpression
     | IDENTIFIER genericArgs?
     ;
 
-// MODIFIED: Allows 'syscall' to be the start of a dotted path (e.g., syscall.Write)
 qualifiedIdentifier
     : (IDENTIFIER | SYSCALL) (DOT IDENTIFIER)+
     ;
@@ -574,7 +572,6 @@ allocaExpression
 // Syscall Expression
 // =============================================================================
 
-// This handles the intrinsic syscall(0, ...)
 syscallExpression
     : SYSCALL LPAREN expression (COMMA expression)* RPAREN
     ;

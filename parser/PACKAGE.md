@@ -4604,6 +4604,7 @@ type INamespaceDeclContext interface {
 	// Getter signatures
 	NAMESPACE() antlr.TerminalNode
 	IDENTIFIER() antlr.TerminalNode
+	SYSCALL() antlr.TerminalNode
 
 	// IsNamespaceDeclContext differentiates from other interfaces.
 	IsNamespaceDeclContext()
@@ -5890,6 +5891,8 @@ func (s *NamespaceDeclContext) IDENTIFIER() antlr.TerminalNode
 func (*NamespaceDeclContext) IsNamespaceDeclContext()
 
 func (s *NamespaceDeclContext) NAMESPACE() antlr.TerminalNode
+
+func (s *NamespaceDeclContext) SYSCALL() antlr.TerminalNode
 
 func (s *NamespaceDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 

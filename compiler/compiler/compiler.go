@@ -28,6 +28,25 @@ func NewCompiler(moduleName string, entryFile string) *Compiler {
 	}
 }
 
+// syntaxErrorListener captures ANTLR syntax errors and logs them to the compiler logger
+type syntaxErrorListener struct {
+	*antlr.DefaultErrorListener
+	logger   *Logger
+	filename string
+}
+
+func newSyntaxErrorListener(logger *Logger, filename string) *syntaxErrorListener {
+	return &syntaxErrorListener{
+		DefaultErrorListener: antlr.NewDefaultErrorListener(),
+		logger:               logger,
+		filename:             filename,
+	}
+}
+
+func (l *syntaxErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
+	l.logger.ErrorAt(l.filename, line, column, "%s", msg)
+}
+
 // CompileFile compiles an Arc source file to IR
 func (c *Compiler) CompileFile(filename string) (*ir.Module, error) {
 	c.logger.Info("Compiling file: %s", filename)
@@ -120,6 +139,7 @@ func (c *Compiler) CompilePackage(dirPath string) (*PackageInfo, error) {
 	return pkgInfo, nil
 }
 
+// compileFileInternal handles the parsing and visiting of a single file
 func (c *Compiler) compileFileInternal(filename string, isEntry bool) (*ir.Module, error) {
 	c.logger.Debug("Internal compilation of file: %s (isEntry=%v)", filename, isEntry)
 	
@@ -138,12 +158,19 @@ func (c *Compiler) compileFileInternal(filename string, isEntry bool) (*ir.Modul
 	// Parse
 	c.logger.Debug("Parsing file: %s", filename)
 	p := parser.NewArcParser(stream)
+	
+	// Remove default console listener and add our custom logger listener
+	p.RemoveErrorListeners()
+	listener := newSyntaxErrorListener(c.context.Logger, filename)
+	p.AddErrorListener(listener)
+	
 	tree := p.CompilationUnit()
 	
-	// Check for Syntax Errors BEFORE Visiting
-	if p.GetNumberOfSyntaxErrors() > 0 {
-		c.context.Logger.Error("Found %d syntax error(s) in %s", p.GetNumberOfSyntaxErrors(), filename)
-		c.context.Logger.errorCount += p.GetNumberOfSyntaxErrors()
+	// Check for Syntax Errors recorded by our listener
+	if c.context.Logger.HasErrors() {
+		if isEntry {
+			c.context.Logger.PrintSummary()
+		}
 		return nil, fmt.Errorf("syntax errors found in %s", filename)
 	}
 	
@@ -184,7 +211,18 @@ func (c *Compiler) CompileString(source string) (*ir.Module, error) {
 	
 	// Parse
 	p := parser.NewArcParser(stream)
+	
+	// Error handling
+	p.RemoveErrorListeners()
+	listener := newSyntaxErrorListener(c.context.Logger, "<string>")
+	p.AddErrorListener(listener)
+	
 	tree := p.CompilationUnit()
+	
+	if c.context.Logger.HasErrors() {
+		c.context.Logger.PrintSummary()
+		return nil, fmt.Errorf("syntax errors found")
+	}
 	
 	// Generate IR
 	visitor := NewIRVisitor(c, "<string>")
@@ -213,7 +251,6 @@ func (c *Compiler) GetContext() *Context {
 }
 
 // EnableAsyncTransformation controls whether async transformation is applied
-// This can be set via a compiler flag
 func (c *Compiler) EnableAsyncTransformation(enable bool) {
 	c.asyncTransformEnabled = enable
 	if enable {
