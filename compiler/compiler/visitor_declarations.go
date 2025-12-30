@@ -475,23 +475,3 @@ func (v *IRVisitor) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 
 	return nil
 }
-
-func (v *IRVisitor) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
-    // If this is a generic struct definition, we skip it here during the main pass.
-    // We only process it when it is instantiated (via instantiateStruct), at which point
-    // v.overrideStructName will be set.
-    if ctx.GenericParams() != nil && v.overrideStructName == "" {
-        return nil
-    }
-
-	name := ctx.IDENTIFIER().GetText()
-	v.logger.Debug("Processing struct declaration: %s", name)
-	
-	for _, member := range ctx.AllStructMember() {
-		if member.FunctionDecl() != nil {
-			v.Visit(member.FunctionDecl())
-		}
-	}
-	
-	return nil
-}

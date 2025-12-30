@@ -120,6 +120,9 @@ func (v *IRVisitor) registerClassType(ctx *parser.ClassDeclContext) {
 }
 
 func (v *IRVisitor) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
+    // If this is a generic struct definition, we skip it here during the main pass.
+    // We only process it when it is instantiated (via instantiateStruct), at which point
+    // v.overrideStructName will be set.
     if ctx.GenericParams() != nil && v.overrideStructName == "" {
         return nil
     }
