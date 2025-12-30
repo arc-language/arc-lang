@@ -7,7 +7,7 @@ import (
 
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/codegen/arch/amd64"
-	"github.com/arc-language/arc-lang/codegen/elf"
+	"github.com/arc-language/arc-lang/codegen/format/elf"
 )
 
 // GenerateObject creates a relocatable ELF object file (.o)
