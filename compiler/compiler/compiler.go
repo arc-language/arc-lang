@@ -120,7 +120,6 @@ func (c *Compiler) CompilePackage(dirPath string) (*PackageInfo, error) {
 	return pkgInfo, nil
 }
 
-// compileFileInternal handles the parsing and visiting of a single file
 func (c *Compiler) compileFileInternal(filename string, isEntry bool) (*ir.Module, error) {
 	c.logger.Debug("Internal compilation of file: %s (isEntry=%v)", filename, isEntry)
 	
@@ -141,12 +140,19 @@ func (c *Compiler) compileFileInternal(filename string, isEntry bool) (*ir.Modul
 	p := parser.NewArcParser(stream)
 	tree := p.CompilationUnit()
 	
+	// Check for Syntax Errors BEFORE Visiting
+	if p.GetNumberOfSyntaxErrors() > 0 {
+		c.context.Logger.Error("Found %d syntax error(s) in %s", p.GetNumberOfSyntaxErrors(), filename)
+		c.context.Logger.errorCount += p.GetNumberOfSyntaxErrors()
+		return nil, fmt.Errorf("syntax errors found in %s", filename)
+	}
+	
 	// Generate IR
 	c.logger.Debug("Generating IR for file: %s", filename)
 	visitor := NewIRVisitor(c, filename)
 	visitor.Visit(tree)
 	
-	// Check for compilation errors
+	// Check for compilation errors (semantic)
 	if c.context.Logger.HasErrors() {
 		if isEntry {
 			c.context.Logger.PrintSummary()

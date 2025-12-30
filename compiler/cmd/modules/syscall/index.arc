@@ -1,4 +1,4 @@
-namespace syscalls
+namespace syscall
 
 // Standard syscall number for write on Linux x86_64
 const SYS_WRITE: usize = 1

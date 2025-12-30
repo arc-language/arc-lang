@@ -236,7 +236,18 @@ func (v *IRVisitor) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface
 }
 
 func (v *IRVisitor) VisitNamespaceDecl(ctx *parser.NamespaceDeclContext) interface{} {
-	name := ctx.IDENTIFIER().GetText()
+	var name string
+	// Check for standard identifier or allowed keyword (SYSCALL)
+	if ctx.IDENTIFIER() != nil {
+		name = ctx.IDENTIFIER().GetText()
+	} else if ctx.SYSCALL() != nil {
+		name = ctx.SYSCALL().GetText()
+	} else {
+		// This happens if there was a syntax error but we proceeded anyway
+		v.ctx.Logger.Error("Invalid namespace declaration")
+		return nil
+	}
+	
 	v.logger.Info("Setting current namespace to '%s'", name)
 	v.ctx.SetNamespace(name)
 	return nil
@@ -247,6 +258,7 @@ func (v *IRVisitor) VisitNamespaceDecl(ctx *parser.NamespaceDeclContext) interfa
 // ============================================================================
 
 func (v *IRVisitor) instantiateFunction(name string, genericArgs parser.IGenericArgsContext) *ir.Function {
+	// ... (content remains unchanged) ...
 	// 1. Resolve Type Arguments
 	if genericArgs == nil {
 		return nil
@@ -283,8 +295,7 @@ func (v *IRVisitor) instantiateFunction(name string, genericArgs parser.IGeneric
 	// 4. Find AST
 	ast, ok := v.ctx.GenericFunctionDecls[name]
 	if !ok {
-		// It might be a method of a generic struct, but we typically handle that via struct member access
-		v.ctx.Logger.Debug("Generic function declaration '%s' not found (may be method or not registered)", name)
+		v.ctx.Logger.Debug("Generic function declaration '%s' not found", name)
 		return nil
 	}
 	
@@ -299,7 +310,7 @@ func (v *IRVisitor) instantiateFunction(name string, genericArgs parser.IGeneric
 	params := gpl.AllIDENTIFIER()
 	
 	if len(params) != len(typeArgs) {
-		v.ctx.Logger.Error("Generic argument count mismatch for %s: expected %d, got %d", name, len(params), len(typeArgs))
+		v.ctx.Logger.Error("Generic argument count mismatch for %s", name)
 		return nil
 	}
 	
@@ -315,13 +326,12 @@ func (v *IRVisitor) instantiateFunction(name string, genericArgs parser.IGeneric
 		v.ctx.CurrentTypeParams[paramName] = typeArgs[i]
 	}
 
-	// SAVE CONTEXT: Preserve current function, block, and scope state
-	// This is critical because instantiation can happen inside another function (e.g. main)
+	// SAVE CONTEXT
 	prevFn := v.ctx.currentFunction
 	prevBlock := v.ctx.Builder.GetInsertBlock()
 	prevScope := v.ctx.currentScope
 
-	// Switch to global scope for independent compilation of the generic function
+	// Switch to global scope
 	v.ctx.currentScope = v.ctx.globalScope
 	
 	// 6. Visit AST with override name
@@ -336,7 +346,6 @@ func (v *IRVisitor) instantiateFunction(name string, genericArgs parser.IGeneric
 		v.ctx.SetInsertBlock(prevBlock)
 	}
 
-	// Restore type params
 	v.ctx.CurrentTypeParams = oldParams
 	
 	// 7. Return Result
@@ -348,7 +357,7 @@ func (v *IRVisitor) instantiateFunction(name string, genericArgs parser.IGeneric
 }
 
 func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericArgsContext) types.Type {
-	// 1. Resolve Type Args
+	// ... (content remains unchanged) ...
 	if genericArgs == nil { return types.I64 }
 	typeList := genericArgs.TypeList()
 	typeArgs := []types.Type{}
@@ -356,7 +365,6 @@ func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericAr
 		typeArgs = append(typeArgs, v.resolveType(typeCtx))
 	}
 	
-	// 2. Mangle Name
 	mangledName := name + "<"
 	for i, t := range typeArgs {
 		if i > 0 { mangledName += "," }
@@ -364,7 +372,6 @@ func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericAr
 	}
 	mangledName += ">"
 	
-	// 3. Check Cache
 	if st, ok := v.ctx.InstantiatedStructs[mangledName]; ok {
 		return st
 	}
@@ -372,7 +379,6 @@ func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericAr
 		return t
 	}
 	
-	// 4. Find AST
 	ast, ok := v.ctx.GenericStructDecls[name]
 	if !ok {
 		v.ctx.Logger.Error("Unknown generic struct: %s", name)
@@ -381,7 +387,6 @@ func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericAr
 	
 	v.logger.Info("Instantiating struct %s as %s", name, mangledName)
 	
-	// 5. Setup Type Parameters
 	gp := ast.GenericParams()
 	params := gp.GenericParamList().AllIDENTIFIER()
 	
@@ -398,8 +403,6 @@ func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericAr
 		v.ctx.CurrentTypeParams[param.GetText()] = typeArgs[i]
 	}
 	
-	// 6. Create Struct Type
-	// Create field map
 	fieldMap := make(map[string]int)
 	fieldTypes := make([]types.Type, 0)
 	
@@ -408,7 +411,6 @@ func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericAr
 		if member.StructField() != nil {
 			field := member.StructField()
 			fieldName := field.IDENTIFIER().GetText()
-			// This resolveType will use v.ctx.CurrentTypeParams
 			fieldType := v.resolveType(field.Type_())
 			
 			fieldTypes = append(fieldTypes, fieldType)
@@ -417,22 +419,14 @@ func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericAr
 		}
 	}
 	
-	// Register mapping using IR name
 	v.ctx.StructFieldIndices[mangledName] = fieldMap
 
-	// Create struct type with IR name
 	structType := types.NewStruct(mangledName, fieldTypes, false)
 	
-	// Register in symbol table
 	v.ctx.RegisterType(mangledName, structType)
 	v.ctx.Module.Types[mangledName] = structType
 	v.ctx.InstantiatedStructs[mangledName] = structType
 	
-	// 7. Visit Members (Methods)
-	// We set overrideStructName so VisitFunctionDecl knows which parent struct it belongs to
-	// and creates mangled method names like vector<int32>_push
-	
-	// SAVE CONTEXT: Preserve current function, block, and scope state
 	prevFn := v.ctx.currentFunction
 	prevBlock := v.ctx.Builder.GetInsertBlock()
 	prevScope := v.ctx.currentScope
@@ -449,7 +443,6 @@ func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericAr
 	
 	v.overrideStructName = ""
 	
-	// RESTORE CONTEXT
 	v.ctx.currentScope = prevScope
 	v.ctx.currentFunction = prevFn
 	if prevBlock != nil {
@@ -495,12 +488,10 @@ func (v *IRVisitor) resolveType(ctx parser.ITypeContext) types.Type {
 		arrCtx := typeCtx.ArrayType()
 		elemType := v.resolveType(arrCtx.Type_())
 		
-		// Get array size
 		var size int64 = 0
 		if arrCtx.ArraySize() != nil {
 			sizeCtx := arrCtx.ArraySize()
 			if sizeCtx.INTEGER_LITERAL() != nil {
-				// Parse integer literal
 				sizeText := sizeCtx.INTEGER_LITERAL().GetText()
 				var err error
 				size, err = parseInt(sizeText)
@@ -509,7 +500,6 @@ func (v *IRVisitor) resolveType(ctx parser.ITypeContext) types.Type {
 					size = 0
 				}
 			} else if sizeCtx.IDENTIFIER() != nil {
-				// Constant identifier
 				name := sizeCtx.IDENTIFIER().GetText()
 				if sym, ok := v.ctx.currentScope.Lookup(name); ok {
 					if constInt, ok := sym.Value.(*ir.ConstantInt); ok {
@@ -522,12 +512,17 @@ func (v *IRVisitor) resolveType(ctx parser.ITypeContext) types.Type {
 		return types.NewArray(elemType, size)
 	}
 
-	// Handle Qualified Type (namespace.Type)
+	// Handle Qualified Type (namespace.Type or syscall.Type)
 	if typeCtx.QualifiedType() != nil {
 		qCtx := typeCtx.QualifiedType()
-		parts := make([]string, len(qCtx.AllIDENTIFIER()))
-		for i, node := range qCtx.AllIDENTIFIER() {
-			parts[i] = node.GetText()
+		var parts []string
+		
+		// Reconstruct the qualified name handling SYSCALL token
+		if qCtx.SYSCALL() != nil {
+			parts = append(parts, "syscall")
+		}
+		for _, id := range qCtx.AllIDENTIFIER() {
+			parts = append(parts, id.GetText())
 		}
 		
 		if len(parts) >= 2 {
@@ -549,12 +544,10 @@ func (v *IRVisitor) resolveType(ctx parser.ITypeContext) types.Type {
 	if typeCtx.IDENTIFIER() != nil {
 		name := typeCtx.IDENTIFIER().GetText()
 		
-		// 1. Check Current Type Parameters (Generic T, U, etc.)
 		if typ, ok := v.ctx.CurrentTypeParams[name]; ok {
 			return typ
 		}
 		
-		// 2. Check for Generic Instantiation (Vector<int>)
 		if typeCtx.GenericArgs() != nil {
 			return v.instantiateStruct(name, typeCtx.GenericArgs())
 		}
@@ -571,6 +564,7 @@ func (v *IRVisitor) resolveType(ctx parser.ITypeContext) types.Type {
 }
 
 func (v *IRVisitor) getZeroValue(typ types.Type) ir.Value {
+	// ... (remains unchanged) ...
 	switch typ.Kind() {
 	case types.IntegerKind:
 		return v.ctx.Builder.ConstInt(typ.(*types.IntType), 0)
@@ -597,6 +591,7 @@ func (v *IRVisitor) findFieldIndex(structType *types.StructType, fieldName strin
 }
 
 func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
+	// ... (remains unchanged) ...
 	srcType := val.Type()
 	
 	if types.IsInteger(srcType) && types.IsInteger(targetType) {
@@ -605,12 +600,9 @@ func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
 		if srcBits > destBits {
 			return v.ctx.Builder.CreateTrunc(val, targetType, "")
 		} else if srcBits < destBits {
-			// FIX: Check signedness of the source type
 			if srcInt, ok := srcType.(*types.IntType); ok && !srcInt.Signed {
-				// Use Zero Extension for unsigned types
 				return v.ctx.Builder.CreateZExt(val, targetType, "")
 			}
-			// Use Sign Extension for signed types
 			return v.ctx.Builder.CreateSExt(val, targetType, "")
 		}
 	}
@@ -625,10 +617,8 @@ func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
 		}
 	}
 
-	// Handle Constant Array Casting (e.g., [5 x i64] -> [5 x i32])
 	if constArr, ok := val.(*ir.ConstantArray); ok {
 		if targetArr, ok := targetType.(*types.ArrayType); ok {
-			// Check if lengths match
 			if constArr.Type().(*types.ArrayType).Length == targetArr.Length {
 				newElements := make([]ir.Constant, len(constArr.Elements))
 				changed := false
@@ -655,6 +645,7 @@ func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
 }
 
 func (v *IRVisitor) castConstant(constant ir.Constant, targetType types.Type) ir.Constant {
+	// ... (remains unchanged) ...
 	srcType := constant.Type()
 	
 	if srcType.Equal(targetType) {
@@ -677,11 +668,9 @@ func (v *IRVisitor) castConstant(constant ir.Constant, targetType types.Type) ir
 	return constant
 }
 
-// Helper function to parse integer literals
 func parseInt(s string) (int64, error) {
+	// ... (remains unchanged) ...
 	var base int = 10
-	
-	// Handle hex (0x), octal (0o), binary (0b) prefixes
 	if len(s) > 2 {
 		switch {
 		case s[0:2] == "0x" || s[0:2] == "0X":
@@ -707,7 +696,7 @@ func parseInt(s string) (int64, error) {
 		case ch >= 'A' && ch <= 'F':
 			digit = int64(ch - 'A' + 10)
 		case ch == '_':
-			continue // Allow underscores as separators
+			continue
 		default:
 			return 0, nil
 		}
