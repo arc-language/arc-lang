@@ -11,155 +11,6 @@ import (
 	"github.com/arc-language/arc-lang/parser"
 )
 
-// ... (Existing Expression visits)
-
-func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
-	if ctx.StructLiteral() != nil { return v.Visit(ctx.StructLiteral()) }
-	if ctx.Literal() != nil { return v.Visit(ctx.Literal()) }
-	if ctx.Expression() != nil { return v.Visit(ctx.Expression()) }
-	if ctx.CastExpression() != nil { return v.Visit(ctx.CastExpression()) }
-	if ctx.AllocaExpression() != nil { return v.Visit(ctx.AllocaExpression()) }
-	if ctx.SyscallExpression() != nil { return v.Visit(ctx.SyscallExpression()) }
-	if ctx.IntrinsicExpression() != nil { return v.Visit(ctx.IntrinsicExpression()) }
-	
-	// Handle Qualified Identifiers
-	if ctx.QualifiedIdentifier() != nil {
-		qCtx := ctx.QualifiedIdentifier()
-		parts := make([]string, len(qCtx.AllIDENTIFIER()))
-		for i, node := range qCtx.AllIDENTIFIER() {
-			parts[i] = node.GetText()
-		}
-		
-		if len(parts) < 2 { return v.ctx.Builder.ConstInt(types.I64, 0) }
-		firstPart := parts[0]
-
-		if sym, ok := v.ctx.currentScope.Lookup(firstPart); ok {
-			var currentVal ir.Value = sym.Value
-			
-			if ptr, isAlloca := currentVal.(*ir.AllocaInst); isAlloca {
-				if _, isPtr := ptr.AllocatedType.(*types.PointerType); isPtr {
-					currentVal = v.ctx.Builder.CreateLoad(ptr.AllocatedType, ptr, "")
-				} else {
-					currentVal = ptr
-				}
-			}
-			
-			for i := 1; i < len(parts); i++ {
-				currentVal = v.handleMemberAccess(currentVal, parts[i])
-			}
-			return currentVal
-		}
-
-		// Check if it's an enum type access (e.g., Status.OK)
-		if _, isType := v.ctx.GetType(firstPart); isType {
-			if len(parts) == 2 {
-				memberName := parts[1]
-				fullName := v.getNamespacedName(firstPart + "_" + memberName)
-				if global := v.ctx.Module.GetGlobal(fullName); global != nil {
-					ptrType := global.Type().(*types.PointerType)
-					return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
-				}
-				v.ctx.Logger.Error("Enum '%s' has no member '%s'", firstPart, memberName)
-				return v.ctx.Builder.ConstInt(types.I64, 0)
-			}
-		}
-
-		nsName := firstPart
-		memberName := parts[1]
-		
-		if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
-			if fn, ok := ns.LookupFunction(memberName); ok {
-				return fn
-			}
-			
-			mangledName := nsName + "_" + memberName
-			if global := v.ctx.Module.GetGlobal(mangledName); global != nil {
-				ptrType := global.Type().(*types.PointerType)
-				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
-			}
-			
-			v.ctx.Logger.Error("Member '%s' not found in namespace '%s'", memberName, nsName)
-		} else {
-			v.ctx.Logger.Error("Unknown namespace or variable: %s", nsName)
-		}
-		return v.ctx.Builder.ConstInt(types.I64, 0)
-	}
-
-	if ctx.IDENTIFIER() != nil {
-		name := ctx.IDENTIFIER().GetText()
-		
-		// Check for Generic Instantiation Call: foo<T>(...)
-		if ctx.GenericArgs() != nil {
-			// Try to instantiate as function
-			fn := v.instantiateFunction(name, ctx.GenericArgs())
-			if fn != nil {
-				return fn
-			}
-			
-			// Try to instantiate as struct (unlikely as primary expr value, but maybe constructor?)
-			// For now, only generic function calls are expected here as values.
-			v.ctx.Logger.Error("Unknown generic function: %s", name)
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
-		if _, isType := v.ctx.GetType(name); isType {
-			v.ctx.Logger.Error("Type '%s' used as value", name)
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
-		if _, isNamespace := v.ctx.NamespaceRegistry[name]; isNamespace {
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
-		sym, ok := v.ctx.currentScope.Lookup(name)
-		if !ok {
-			if v.ctx.currentNamespace != nil {
-				mangled := v.ctx.currentNamespace.Name + "_" + name
-				if global := v.ctx.Module.GetGlobal(mangled); global != nil {
-					ptrType := global.Type().(*types.PointerType)
-					return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
-				}
-			}
-			if global := v.ctx.Module.GetGlobal(name); global != nil {
-				ptrType := global.Type().(*types.PointerType)
-				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
-			}
-			
-			if v.ctx.currentNamespace != nil {
-				if fn, ok := v.ctx.currentNamespace.Functions[name]; ok {
-					return fn
-				}
-			}
-			if fn := v.ctx.Module.GetFunction(name); fn != nil {
-				return fn
-			}
-			v.ctx.Logger.Error("Undefined: %s", name)
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-
-		// Handle global constants stored in scope
-		if sym.IsConst {
-			// If it's a global pointer, load it
-			if global, ok := sym.Value.(*ir.Global); ok {
-				ptrType := global.Type().(*types.PointerType)
-				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
-			}
-			// Otherwise return the constant value directly
-			return sym.Value
-		}
-
-		if ptr, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
-			ptrType := ptr.Type().(*types.PointerType)
-			return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
-		}
-
-		return sym.Value
-	}
-	
-	return v.ctx.Builder.ConstInt(types.I64, 0)
-}
-
-// ... (Rest of visitor_expressions.go methods like VisitLiteral, etc.)
 func (v *IRVisitor) VisitExpression(ctx *parser.ExpressionContext) interface{} {
 	return v.Visit(ctx.LogicalOrExpression())
 }
@@ -633,6 +484,18 @@ func (v *IRVisitor) handleIndexing(base ir.Value, index ir.Value) ir.Value {
 	baseType := base.Type()
 	if ptrType, ok := baseType.(*types.PointerType); ok {
 		elemType := ptrType.ElementType
+		
+		// If we have a pointer to an array (e.g. from alloca of array),
+		// we need to dereference the pointer first (index 0), then access the element.
+		if arrType, ok := elemType.(*types.ArrayType); ok {
+			zero := v.ctx.Builder.ConstInt(types.I32, 0)
+			indices := []ir.Value{zero, index}
+			// Result is pointer to element
+			elemPtr := v.ctx.Builder.CreateInBoundsGEP(arrType, base, indices, "")
+			return v.ctx.Builder.CreateLoad(arrType.ElementType, elemPtr, "")
+		}
+		
+		// Standard pointer indexing (C-style array decay)
 		indices := []ir.Value{index}
 		elemPtr := v.ctx.Builder.CreateGEP(elemType, base, indices, "")
 		return v.ctx.Builder.CreateLoad(elemType, elemPtr, "")
@@ -774,6 +637,163 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 		agg = v.ctx.Builder.CreateInsertValue(agg, fieldVal, []int{idx}, "")
 	}
 	return agg
+}
+
+func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
+	if ctx.StructLiteral() != nil { return v.Visit(ctx.StructLiteral()) }
+	if ctx.Literal() != nil { return v.Visit(ctx.Literal()) }
+	if ctx.Expression() != nil { return v.Visit(ctx.Expression()) }
+	if ctx.CastExpression() != nil { return v.Visit(ctx.CastExpression()) }
+	if ctx.AllocaExpression() != nil { return v.Visit(ctx.AllocaExpression()) }
+	if ctx.SyscallExpression() != nil { return v.Visit(ctx.SyscallExpression()) }
+	if ctx.IntrinsicExpression() != nil { return v.Visit(ctx.IntrinsicExpression()) }
+	
+	// Handle Qualified Identifiers
+	if ctx.QualifiedIdentifier() != nil {
+		qCtx := ctx.QualifiedIdentifier()
+		parts := make([]string, len(qCtx.AllIDENTIFIER()))
+		for i, node := range qCtx.AllIDENTIFIER() {
+			parts[i] = node.GetText()
+		}
+		
+		if len(parts) < 2 { return v.ctx.Builder.ConstInt(types.I64, 0) }
+		firstPart := parts[0]
+
+		if sym, ok := v.ctx.currentScope.Lookup(firstPart); ok {
+			var currentVal ir.Value = sym.Value
+			
+			if ptr, isAlloca := currentVal.(*ir.AllocaInst); isAlloca {
+				if _, isPtr := ptr.AllocatedType.(*types.PointerType); isPtr {
+					currentVal = v.ctx.Builder.CreateLoad(ptr.AllocatedType, ptr, "")
+				} else {
+					currentVal = ptr
+				}
+			}
+			
+			for i := 1; i < len(parts); i++ {
+				currentVal = v.handleMemberAccess(currentVal, parts[i])
+			}
+			return currentVal
+		}
+
+		// Check if it's an enum type access (e.g., Status.OK)
+		if _, isType := v.ctx.GetType(firstPart); isType {
+			if len(parts) == 2 {
+				memberName := parts[1]
+				fullName := v.getNamespacedName(firstPart + "_" + memberName)
+				if global := v.ctx.Module.GetGlobal(fullName); global != nil {
+					ptrType := global.Type().(*types.PointerType)
+					return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+				}
+				v.ctx.Logger.Error("Enum '%s' has no member '%s'", firstPart, memberName)
+				return v.ctx.Builder.ConstInt(types.I64, 0)
+			}
+		}
+
+		nsName := firstPart
+		memberName := parts[1]
+		
+		if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
+			if fn, ok := ns.LookupFunction(memberName); ok {
+				return fn
+			}
+			
+			mangledName := nsName + "_" + memberName
+			if global := v.ctx.Module.GetGlobal(mangledName); global != nil {
+				ptrType := global.Type().(*types.PointerType)
+				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+			}
+			
+			v.ctx.Logger.Error("Member '%s' not found in namespace '%s'", memberName, nsName)
+		} else {
+			v.ctx.Logger.Error("Unknown namespace or variable: %s", nsName)
+		}
+		return v.ctx.Builder.ConstInt(types.I64, 0)
+	}
+
+	if ctx.IDENTIFIER() != nil {
+		name := ctx.IDENTIFIER().GetText()
+		
+		// Check for Generic Instantiation Call: foo<T>(...)
+		if ctx.GenericArgs() != nil {
+			// Try to instantiate as function
+			fn := v.instantiateFunction(name, ctx.GenericArgs())
+			if fn != nil {
+				return fn
+			}
+			
+			// Try to instantiate as struct (unlikely as primary expr value, but maybe constructor?)
+			// For now, only generic function calls are expected here as values.
+			v.ctx.Logger.Error("Unknown generic function: %s", name)
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		if _, isType := v.ctx.GetType(name); isType {
+			v.ctx.Logger.Error("Type '%s' used as value", name)
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		if _, isNamespace := v.ctx.NamespaceRegistry[name]; isNamespace {
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		sym, ok := v.ctx.currentScope.Lookup(name)
+		if !ok {
+			if v.ctx.currentNamespace != nil {
+				mangled := v.ctx.currentNamespace.Name + "_" + name
+				if global := v.ctx.Module.GetGlobal(mangled); global != nil {
+					ptrType := global.Type().(*types.PointerType)
+					return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+				}
+			}
+			if global := v.ctx.Module.GetGlobal(name); global != nil {
+				ptrType := global.Type().(*types.PointerType)
+				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+			}
+			
+			if v.ctx.currentNamespace != nil {
+				if fn, ok := v.ctx.currentNamespace.Functions[name]; ok {
+					return fn
+				}
+			}
+			if fn := v.ctx.Module.GetFunction(name); fn != nil {
+				return fn
+			}
+			v.ctx.Logger.Error("Undefined: %s", name)
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+
+		// Handle global constants stored in scope
+		if sym.IsConst {
+			// If it's a global pointer, load it
+			if global, ok := sym.Value.(*ir.Global); ok {
+				ptrType := global.Type().(*types.PointerType)
+				// For aggregates (arrays/structs), return the pointer directly to avoid
+				// massive loads that the backend might not handle well.
+				if types.IsAggregate(ptrType.ElementType) {
+					return global
+				}
+				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+			}
+			// Otherwise return the constant value directly
+			return sym.Value
+		}
+
+		if ptr, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
+			// For aggregates (arrays/structs), return the pointer directly to avoid
+			// loading the entire value onto the stack/register, which the backend handles poorly.
+			if types.IsAggregate(ptr.AllocatedType) {
+				return ptr
+			}
+
+			ptrType := ptr.Type().(*types.PointerType)
+			return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
+		}
+
+		return sym.Value
+	}
+	
+	return v.ctx.Builder.ConstInt(types.I64, 0)
 }
 
 func (v *IRVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {

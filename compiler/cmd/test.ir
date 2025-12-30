@@ -1,24 +1,33 @@
 define external i32 @main() {
 entry:
   %arr.addr = alloca [5 x i32]
-  store [5 x i32] [5 x i32] [i32 1, i32 2, i32 3, i32 4, i32 5], ptr<[5 x i32]> %arr.addr
-  %0 = load [5 x i32], ptr<[5 x i32]> %arr.addr
+  %0 = getelementptr inbounds [5 x i32], ptr<[5 x i32]> %arr.addr, i32 0, i32 0
+  store i32 1, ptr<[5 x i32]> %0
+  %1 = getelementptr inbounds [5 x i32], ptr<[5 x i32]> %arr.addr, i32 0, i32 1
+  store i32 2, ptr<[5 x i32]> %1
+  %2 = getelementptr inbounds [5 x i32], ptr<[5 x i32]> %arr.addr, i32 0, i32 2
+  store i32 3, ptr<[5 x i32]> %2
+  %3 = getelementptr inbounds [5 x i32], ptr<[5 x i32]> %arr.addr, i32 0, i32 3
+  store i32 4, ptr<[5 x i32]> %3
+  %4 = getelementptr inbounds [5 x i32], ptr<[5 x i32]> %arr.addr, i32 0, i32 4
+  store i32 5, ptr<[5 x i32]> %4
+  %5 = load [5 x i32], ptr<[5 x i32]> %arr.addr
   %temp.array = alloca [5 x i32]
-  store [5 x i32] %0, ptr<[5 x i32]> %temp.array
-  %1 = getelementptr [5 x i32], ptr<[5 x i32]> %temp.array, u32 0, i64 0
-  %2 = load i32, ptr<[5 x i32]> %1
+  store [5 x i32] %5, ptr<[5 x i32]> %temp.array
+  %6 = getelementptr [5 x i32], ptr<[5 x i32]> %temp.array, u32 0, i64 0
+  %7 = load i32, ptr<[5 x i32]> %6
   %val.addr = alloca i32
-  store i32 %2, ptr<i32> %val.addr
-  %3 = load i32, ptr<i32> %val.addr
-  %4 = icmp eq i32 %3, 1
-  br i1 %4, label %if.then.4_4, label %if.next.4_4
+  store i32 %7, ptr<i32> %val.addr
+  %8 = load i32, ptr<i32> %val.addr
+  %9 = icmp eq i32 %8, 1
+  br i1 %9, label %if.then.4_4, label %if.next.4_4
 if.end.4_4:
-  %6 = sub i64 0, 1
-  %7 = trunc i64 %6 to i32
-  ret i32 %7
+  %11 = sub i64 0, 1
+  %12 = trunc i64 %11 to i32
+  ret i32 %12
 if.then.4_4:
-  %5 = trunc i64 0 to i32
-  ret i32 %5
+  %10 = trunc i64 0 to i32
+  ret i32 %10
 if.next.4_4:
   br label %if.end.4_4
 }
