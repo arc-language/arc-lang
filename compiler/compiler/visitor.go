@@ -1,4 +1,3 @@
-// --- START OF FILE compiler/visitor.go ---
 package compiler
 
 import (
@@ -606,6 +605,12 @@ func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
 		if srcBits > destBits {
 			return v.ctx.Builder.CreateTrunc(val, targetType, "")
 		} else if srcBits < destBits {
+			// FIX: Check signedness of the source type
+			if srcInt, ok := srcType.(*types.IntType); ok && !srcInt.Signed {
+				// Use Zero Extension for unsigned types
+				return v.ctx.Builder.CreateZExt(val, targetType, "")
+			}
+			// Use Sign Extension for signed types
 			return v.ctx.Builder.CreateSExt(val, targetType, "")
 		}
 	}
