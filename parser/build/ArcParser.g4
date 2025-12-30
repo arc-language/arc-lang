@@ -212,8 +212,9 @@ type
     | UNDERSCORE
     ;
 
+// MODIFIED: Allows types like 'syscall.Errno'
 qualifiedType
-    : IDENTIFIER (DOT IDENTIFIER)+ genericArgs?
+    : (IDENTIFIER | SYSCALL) (DOT IDENTIFIER)+ genericArgs?
     ;
 
 primitiveType
@@ -471,8 +472,9 @@ primaryExpression
     | IDENTIFIER genericArgs?
     ;
 
+// MODIFIED: Allows 'syscall' to be the start of a dotted path (e.g., syscall.Write)
 qualifiedIdentifier
-    : IDENTIFIER (DOT IDENTIFIER)+
+    : (IDENTIFIER | SYSCALL) (DOT IDENTIFIER)+
     ;
 
 // =============================================================================
@@ -572,6 +574,7 @@ allocaExpression
 // Syscall Expression
 // =============================================================================
 
+// This handles the intrinsic syscall(0, ...)
 syscallExpression
     : SYSCALL LPAREN expression (COMMA expression)* RPAREN
     ;

@@ -4765,6 +4765,7 @@ type IQualifiedIdentifierContext interface {
 	// Getter signatures
 	AllIDENTIFIER() []antlr.TerminalNode
 	IDENTIFIER(i int) antlr.TerminalNode
+	SYSCALL() antlr.TerminalNode
 	AllDOT() []antlr.TerminalNode
 	DOT(i int) antlr.TerminalNode
 
@@ -4782,6 +4783,7 @@ type IQualifiedTypeContext interface {
 	// Getter signatures
 	AllIDENTIFIER() []antlr.TerminalNode
 	IDENTIFIER(i int) antlr.TerminalNode
+	SYSCALL() antlr.TerminalNode
 	AllDOT() []antlr.TerminalNode
 	DOT(i int) antlr.TerminalNode
 	GenericArgs() IGenericArgsContext
@@ -6191,6 +6193,8 @@ func (s *QualifiedIdentifierContext) IDENTIFIER(i int) antlr.TerminalNode
 
 func (*QualifiedIdentifierContext) IsQualifiedIdentifierContext()
 
+func (s *QualifiedIdentifierContext) SYSCALL() antlr.TerminalNode
+
 func (s *QualifiedIdentifierContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type QualifiedTypeContext struct {
@@ -6223,6 +6227,8 @@ func (s *QualifiedTypeContext) GetRuleContext() antlr.RuleContext
 func (s *QualifiedTypeContext) IDENTIFIER(i int) antlr.TerminalNode
 
 func (*QualifiedTypeContext) IsQualifiedTypeContext()
+
+func (s *QualifiedTypeContext) SYSCALL() antlr.TerminalNode
 
 func (s *QualifiedTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
