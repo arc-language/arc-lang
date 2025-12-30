@@ -315,12 +315,28 @@ func (v *IRVisitor) instantiateFunction(name string, genericArgs parser.IGeneric
 		paramName := param.GetText()
 		v.ctx.CurrentTypeParams[paramName] = typeArgs[i]
 	}
+
+	// SAVE CONTEXT: Preserve current function, block, and scope state
+	// This is critical because instantiation can happen inside another function (e.g. main)
+	prevFn := v.ctx.currentFunction
+	prevBlock := v.ctx.Builder.GetInsertBlock()
+	prevScope := v.ctx.currentScope
+
+	// Switch to global scope for independent compilation of the generic function
+	v.ctx.currentScope = v.ctx.globalScope
 	
 	// 6. Visit AST with override name
 	v.overrideFunctionName = mangledName
 	v.Visit(ast)
 	v.overrideFunctionName = ""
 	
+	// RESTORE CONTEXT
+	v.ctx.currentScope = prevScope
+	v.ctx.currentFunction = prevFn
+	if prevBlock != nil {
+		v.ctx.SetInsertBlock(prevBlock)
+	}
+
 	// Restore type params
 	v.ctx.CurrentTypeParams = oldParams
 	
@@ -416,6 +432,14 @@ func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericAr
 	// 7. Visit Members (Methods)
 	// We set overrideStructName so VisitFunctionDecl knows which parent struct it belongs to
 	// and creates mangled method names like vector<int32>_push
+	
+	// SAVE CONTEXT: Preserve current function, block, and scope state
+	prevFn := v.ctx.currentFunction
+	prevBlock := v.ctx.Builder.GetInsertBlock()
+	prevScope := v.ctx.currentScope
+
+	v.ctx.currentScope = v.ctx.globalScope
+
 	v.overrideStructName = mangledName
 	
 	for _, member := range ast.AllStructMember() {
@@ -425,6 +449,14 @@ func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericAr
 	}
 	
 	v.overrideStructName = ""
+	
+	// RESTORE CONTEXT
+	v.ctx.currentScope = prevScope
+	v.ctx.currentFunction = prevFn
+	if prevBlock != nil {
+		v.ctx.SetInsertBlock(prevBlock)
+	}
+
 	v.ctx.CurrentTypeParams = oldParams
 	
 	return structType

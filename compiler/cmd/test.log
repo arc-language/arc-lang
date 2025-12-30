@@ -31,20 +31,12 @@ Compiling tests/test_alloca.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: ptr
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: val
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -68,7 +60,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.09s)
 [2/36] test_arithmetic                               
 --- Testing: test_arithmetic ---
 Source file: tests/test_arithmetic.arc
@@ -98,39 +90,18 @@ Compiling tests/test_arithmetic.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: a
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: b
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: sum
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: diff
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: prod
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: quot
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: rem
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: total
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 9 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -154,7 +125,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.10s)
 [3/36] test_array                                    
 --- Testing: test_array ---
 Source file: tests/test_array.arc
@@ -184,19 +155,8 @@ Compiling tests/test_array.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: arr
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: val
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Array indexing
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Handling array indexing
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -220,7 +180,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.07s)
 [4/36] test_bitwise                                  
 --- Testing: test_bitwise ---
 Source file: tests/test_bitwise.arc
@@ -250,35 +210,18 @@ Compiling tests/test_bitwise.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: a
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: b
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: b_or
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: b_and
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: b_xor
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: shl
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: shr
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: b_not
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 9 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -302,7 +245,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.06s)
 [5/36] test_cast                                     
 --- Testing: test_cast ---
 Source file: tests/test_cast.arc
@@ -332,19 +275,12 @@ Compiling tests/test_cast.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: x
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: y
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -368,7 +304,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.04s)
+✅ PASS (0.05s)
 [6/36] test_char_literal                             
 --- Testing: test_char_literal ---
 Source file: tests/test_char_literal.arc
@@ -398,11 +334,8 @@ Compiling tests/test_char_literal.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: newline
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: tab
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -426,7 +359,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.04s)
+✅ PASS (0.07s)
 [7/36] test_class                                    
 --- Testing: test_class ---
 Source file: tests/test_class.arc
@@ -463,8 +396,6 @@ Compiling tests/test_class.arc...
 [Context] [DEBUG] Entered function 'Client_get_port'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Handling member access: .port
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'Client_get_port'
@@ -477,25 +408,12 @@ Compiling tests/test_class.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: c
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Creating struct literal for type: Client
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: port
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Handling member access: .get_port
-[Visitor] [DEBUG] Function call
-[Visitor] [DEBUG] Handling function call
-[Visitor] [DEBUG] Function call created, return type: i32
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -522,7 +440,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.07s)
+✅ PASS (0.08s)
 [8/36] test_comparison                               
 --- Testing: test_comparison ---
 Source file: tests/test_comparison.arc
@@ -552,22 +470,12 @@ Compiling tests/test_comparison.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: a
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: b
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -621,20 +529,11 @@ Compiling tests/test_compound_assignment.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: x
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 6 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -686,21 +585,16 @@ Compiling tests/test_constant.arc...
 [Visitor] [DEBUG] Pass 1 - Registering types
 [Visitor] [DEBUG] Pass 2 - Processing declarations
 [Visitor] [DEBUG] Declaring constant: MAX
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [INFO] Declared global constant 'MAX' (IR: main_MAX)
 [Visitor] [DEBUG] Declaring function: main (IR: main)
 [Context] [DEBUG] Pushed new scope
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -724,7 +618,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.04s)
+✅ PASS (0.05s)
 [11/36] test_defer                                    
 --- Testing: test_defer ---
 Source file: tests/test_defer.arc
@@ -760,13 +654,8 @@ Compiling tests/test_defer.arc...
 [Context] [DEBUG] Pushed new scope
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Function call
-[Visitor] [DEBUG] Handling function call
-[Visitor] [DEBUG] Function call created, return type: void
 [Context] [WARN] defer statement is not fully implemented yet
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -820,11 +709,8 @@ Compiling tests/test_enum.arc...
 [Visitor] [DEBUG] Pass 2 - Processing declarations
 [Visitor] [INFO] Processing enum declaration: Status
 [Context] [DEBUG] Registered type 'Status'
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Registered enum member: Status.OK = 0
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Registered enum member: Status.ERROR = 1
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Registered enum member: Status.PENDING = 2
 [Visitor] [INFO] Completed enum declaration: Status with underlying type i32
 [Visitor] [DEBUG] Declaring function: main (IR: main)
@@ -832,10 +718,7 @@ Compiling tests/test_enum.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: s
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -859,7 +742,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.05s)
 [13/36] test_extern                                   
 --- Testing: test_extern ---
 Source file: tests/test_extern.arc
@@ -892,21 +775,11 @@ Compiling tests/test_extern.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: result
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Function call
-[Visitor] [DEBUG] Handling function call
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 0 from i64 to i32
-[Visitor] [DEBUG] Function call created, return type: i32
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -930,7 +803,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.05s)
 [14/36] test_for_in_range                             
 --- Testing: test_for_in_range ---
 Source file: tests/test_for_in_range.arc
@@ -960,26 +833,17 @@ Compiling tests/test_for_in_range.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: sum
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed loop context
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Popped loop context
 [Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -1003,7 +867,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.04s)
 [15/36] test_function_basic                           
 --- Testing: test_function_basic ---
 Source file: tests/test_function_basic.arc
@@ -1033,8 +897,6 @@ Compiling tests/test_function_basic.arc...
 [Context] [DEBUG] Entered function 'add'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'add'
@@ -1044,23 +906,11 @@ Compiling tests/test_function_basic.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: result
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Function call
-[Visitor] [DEBUG] Handling function call
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 0 from i64 to i32
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 1 from i64 to i32
-[Visitor] [DEBUG] Function call created, return type: i32
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -1084,7 +934,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.06s)
 [16/36] test_generics                                 
 --- Testing: test_generics ---
 Source file: tests/test_generics.arc
@@ -1092,8 +942,8 @@ Object file: /tmp/arc_tests/test_generics.o
 Executable: /tmp/arc_tests/test_generics
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_generics.arc...
 [Compiler:test_generics] [INFO] Creating compiler for module 'test_generics' with entry file 'tests/test_generics.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -1109,117 +959,51 @@ Compiling tests/test_generics.arc...
 [Visitor] [DEBUG] Pass 0 - Processing imports
 [Visitor] [DEBUG] Pass 1 - Registering types
 [Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: swap (IR: swap)
-[Context] [ERROR] Unknown type: T
-[Context] [ERROR] Unknown type: T
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'swap'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: tmp
-[Context] [ERROR] Unknown type: T
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'swap'
-[Context] [DEBUG] Popped scope
+[Visitor] [INFO] Registered generic function definition: swap
 [Visitor] [DEBUG] Declaring function: main (IR: main)
 [Context] [DEBUG] Pushed new scope
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: x
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: y
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Function call
-[Visitor] [DEBUG] Handling function call
-[Visitor] [DEBUG] Function call created, return type: void
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
+[Visitor] [INFO] Instantiating function swap as swap<i32>
+[Visitor] [DEBUG] Declaring function: swap (IR: swap<i32>)
+[Context] [DEBUG] Pushed new scope
+[Context] [DEBUG] Entered function 'swap<i32>'
+[Context] [DEBUG] Pushed new scope
+[Visitor] [DEBUG] Declaring variable: tmp
+[Context] [DEBUG] Popped scope
+[Context] [DEBUG] Exited function 'swap<i32>'
+[Context] [DEBUG] Popped scope
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
 [Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
+[Compiler:test_generics] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
+Module has 2 functions, 0 globals
+[Compiler:test_generics] [INFO] Generating object file to: /tmp/arc_tests/test_generics.o
+[Compiler:test_generics] [DEBUG] Calling code generator for module 'test_generics'
+[Compiler:test_generics] [DEBUG] Generated 1192 bytes of object code
+[Compiler:test_generics] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_generics.o
+✓ Object file written to /tmp/arc_tests/test_generics.o
 
-[Context] Compilation Summary:
-  Errors: 3
-Compilation failed: compilation failed with 3 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
+To create executable:
+  gcc /tmp/arc_tests/test_generics.o -o test_generics && ./test_generics
 
-❌ FAIL (0.04s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_generics.arc...
-      [Compiler:test_generics] [INFO] Creating compiler for module 'test_generics' with entry file 'tests/test_generics.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_generics'
-      [Compiler:test_generics] [INFO] Compiling file: tests/test_generics.arc
-      [Compiler:test_generics] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc (isEntry=true)
-      [Compiler:test_generics] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      [Compiler:test_generics] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      [Compiler:test_generics] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: swap (IR: swap)
-      [Context] [ERROR] Unknown type: T
-      [Context] [ERROR] Unknown type: T
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'swap'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: tmp
-      [Context] [ERROR] Unknown type: T
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'swap'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: x
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Visitor] [DEBUG] Declaring variable: y
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Visitor] [DEBUG] Function call
-      [Visitor] [DEBUG] Handling function call
-      [Visitor] [DEBUG] Function call created, return type: void
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Visiting postfix expression
-      [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      
-      [Context] Compilation Summary:
-        Errors: 3
-      Compilation failed: compilation failed with 3 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
+
+Step 2: Linking with gcc...
+Linking successful
+
+Step 3: Running executable...
+Process exited with code: -1
+❌ Test FAILED: expected exit=0, got exit=-1
+❌ FAIL (0.17s)
+    Expected exit=0, got exit=-1
 [17/36] test_if_else                                  
 --- Testing: test_if_else ---
 Source file: tests/test_if_else.arc
@@ -1249,17 +1033,12 @@ Compiling tests/test_if_else.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: x
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Popped scope
@@ -1314,16 +1093,11 @@ Compiling tests/test_if_statement.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: x
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -1347,7 +1121,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.05s)
 [19/36] test_import_multiple                          
 --- Testing: test_import_multiple ---
 Source file: tests/test_import_multiple.arc
@@ -1371,21 +1145,21 @@ Compiling tests/test_import_multiple.arc...
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
 panic: runtime error: invalid memory address or nil pointer dereference
-[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59d80b]
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59ff6b]
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0001b52c0, 0x639460?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor_declarations.go:18 +0x2b
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69c2e0?, 0xc0000f0c00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:51 +0x757
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0001b52c0, 0xc0000f0a80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:165 +0x1fa
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69c1a8?, 0xc0000f0a80?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:45 +0x266
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0004d6a80, 0x63cf00?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/visitor_declarations.go:18 +0x2b
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8394b0?, {0x6a01e8?, 0xc0000dec00?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/visitor.go:56 +0x757
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0004d6a80, 0xc0000dea80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/visitor.go:170 +0x1fa
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x839430?, {0x6a00b0?, 0xc0000dea80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/visitor.go:50 +0x266
 github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc000010078, {0xc00002a3c0, 0x40}, 0x1)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/compiler.go:147 +0x432
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010078, {0x7ffd27105693, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/compiler.go:41 +0x18b
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/compiler.go:147 +0x432
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010078, {0x7ffde86ee693, 0x1e})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/compiler.go:41 +0x18b
 main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
 main.main()
@@ -1408,21 +1182,21 @@ main.main()
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
       panic: runtime error: invalid memory address or nil pointer dereference
-      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59d80b]
+      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59ff6b]
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0001b52c0, 0x639460?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor_declarations.go:18 +0x2b
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69c2e0?, 0xc0000f0c00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:51 +0x757
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0001b52c0, 0xc0000f0a80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:165 +0x1fa
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69c1a8?, 0xc0000f0a80?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:45 +0x266
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0004d6a80, 0x63cf00?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/visitor_declarations.go:18 +0x2b
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8394b0?, {0x6a01e8?, 0xc0000dec00?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/visitor.go:56 +0x757
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0004d6a80, 0xc0000dea80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/visitor.go:170 +0x1fa
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x839430?, {0x6a00b0?, 0xc0000dea80?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/visitor.go:50 +0x266
       github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc000010078, {0xc00002a3c0, 0x40}, 0x1)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/compiler.go:147 +0x432
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010078, {0x7ffd27105693, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/compiler.go:41 +0x18b
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/compiler.go:147 +0x432
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010078, {0x7ffde86ee693, 0x1e})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230002134-7bc008e88fa8/compiler/compiler/compiler.go:41 +0x18b
       main.handleBuild({0xc000022070?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
       main.main()
@@ -1466,7 +1240,6 @@ Compiling tests/test_import_single.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -1477,7 +1250,7 @@ Compiling tests/test_import_single.arc...
   Errors: 1
 Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
 
-❌ FAIL (0.04s)
+❌ FAIL (0.02s)
     Compilation failed
     Compile output:
       Compiling tests/test_import_single.arc...
@@ -1510,7 +1283,6 @@ Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/c
       [Context] [DEBUG] Entered function 'main'
       [Context] [DEBUG] Pushed new scope
       [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Visiting postfix expression
       [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
       [Context] [DEBUG] Popped scope
       [Context] [DEBUG] Exited function 'main'
@@ -1549,22 +1321,11 @@ Compiling tests/test_increment.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: i
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Post-increment
-[Visitor] [DEBUG] Handling post-increment
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Post-increment
-[Visitor] [DEBUG] Handling post-increment
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -1620,7 +1381,6 @@ Compiling tests/test_namespace.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -1644,7 +1404,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.04s)
+✅ PASS (0.06s)
 [23/36] test_null_check                               
 --- Testing: test_null_check ---
 Source file: tests/test_null_check.arc
@@ -1674,16 +1434,11 @@ Compiling tests/test_null_check.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: ptr
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -1737,19 +1492,13 @@ Compiling tests/test_pointer.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: x
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: ptr
 [Visitor] [DEBUG] Declaring variable: val
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -1773,7 +1522,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.04s)
+✅ PASS (0.05s)
 [25/36] test_sizeof                                   
 --- Testing: test_sizeof ---
 Source file: tests/test_sizeof.arc
@@ -1803,19 +1552,12 @@ Compiling tests/test_sizeof.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: sz
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: size_val
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -1869,22 +1611,14 @@ Compiling tests/test_string_interpolation.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: name
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: age
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: msg
-[Visitor] [DEBUG] Visiting postfix expression
-[Context] [WARN] String interpolation not yet implemented, treating as raw string
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-
-[Context] Compilation Summary:
-  Warnings: 1
 [Compiler:test_string_interpolation] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
 Module has 1 functions, 2 globals
 [Compiler:test_string_interpolation] [INFO] Generating object file to: /tmp/arc_tests/test_string_interpolation.o
@@ -1936,24 +1670,12 @@ Compiling tests/test_struct_basic.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: p
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Creating struct literal for type: Point
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: sum
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Handling member access: .x
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Handling member access: .y
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -1977,7 +1699,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.12s)
+✅ PASS (0.06s)
 [28/36] test_struct_method                            
 --- Testing: test_struct_method ---
 Source file: tests/test_struct_method.arc
@@ -2010,10 +1732,6 @@ Compiling tests/test_struct_method.arc...
 [Context] [DEBUG] Entered function 'Point_sum'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Handling member access: .x
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Handling member access: .y
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'Point_sum'
@@ -2023,26 +1741,12 @@ Compiling tests/test_struct_method.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: p
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Creating struct literal for type: Point
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: s
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Handling member access: .sum
-[Visitor] [DEBUG] Function call
-[Visitor] [DEBUG] Handling function call
-[Visitor] [DEBUG] Auto-dereferencing self argument for method call
-[Visitor] [DEBUG] Function call created, return type: i32
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -2066,7 +1770,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.13s)
+✅ PASS (0.07s)
 [29/36] test_switch                                   
 --- Testing: test_switch ---
 Source file: tests/test_switch.arc
@@ -2096,26 +1800,12 @@ Compiling tests/test_switch.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: status
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Declaring variable: result
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -2168,15 +1858,9 @@ Compiling tests/test_try_except_raise.arc...
 [Context] [DEBUG] Pushed new scope
 [Context] [DEBUG] Entered function 'divide'
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'divide'
@@ -2187,21 +1871,11 @@ Compiling tests/test_try_except_raise.arc...
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing try-except-finally block
 [Visitor] [DEBUG] Declaring variable: result
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Function call
-[Visitor] [DEBUG] Handling function call
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 0 from i64 to i32
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 1 from i64 to i32
-[Visitor] [DEBUG] Function call created, return type: i32
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Processing except clause 1
 [Visitor] [DEBUG] Binding exception to variable: err
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Popped scope
@@ -2227,7 +1901,7 @@ Output:
 test_try_except_raise:(.text+0xe0): undefined reference to `__exception_state'
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.09s)
+❌ FAIL (0.06s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: in function `divide':
@@ -2264,15 +1938,9 @@ Compiling tests/test_try_except_raise_err.arc...
 [Context] [DEBUG] Pushed new scope
 [Context] [DEBUG] Entered function 'divide'
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'divide'
@@ -2283,25 +1951,14 @@ Compiling tests/test_try_except_raise_err.arc...
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing try-except-finally block
 [Visitor] [DEBUG] Declaring variable: result
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Function call
-[Visitor] [DEBUG] Handling function call
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 0 from i64 to i32
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 1 from i64 to i32
-[Visitor] [DEBUG] Function call created, return type: i32
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Processing except clause 1
 [Visitor] [DEBUG] Binding exception to variable: err
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -2326,7 +1983,7 @@ Output:
 test_try_except_raise_err:(.text+0xe0): undefined reference to `__exception_state'
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.13s)
+❌ FAIL (0.07s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_try_except_raise_err.o: in function `divide':
@@ -2360,16 +2017,11 @@ Compiling tests/test_try_except_throw.arc...
 [Context] [DEBUG] Pushed new scope
 [Context] [DEBUG] Entered function 'divide'
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing throw statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'divide'
@@ -2380,21 +2032,11 @@ Compiling tests/test_try_except_throw.arc...
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing try-except-finally block
 [Visitor] [DEBUG] Declaring variable: result
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Function call
-[Visitor] [DEBUG] Handling function call
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 0 from i64 to i32
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 1 from i64 to i32
-[Visitor] [DEBUG] Function call created, return type: i32
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Processing except clause 1
 [Visitor] [DEBUG] Binding exception to variable: err
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Popped scope
@@ -2448,16 +2090,11 @@ Compiling tests/test_try_except_throw_err.arc...
 [Context] [DEBUG] Pushed new scope
 [Context] [DEBUG] Entered function 'divide'
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing throw statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'divide'
@@ -2468,21 +2105,11 @@ Compiling tests/test_try_except_throw_err.arc...
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing try-except-finally block
 [Visitor] [DEBUG] Declaring variable: result
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Function call
-[Visitor] [DEBUG] Handling function call
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 0 from i64 to i32
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 1 from i64 to i32
-[Visitor] [DEBUG] Function call created, return type: i32
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Processing except clause 1
 [Visitor] [DEBUG] Binding exception to variable: err
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Popped scope
@@ -2507,7 +2134,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.07s)
 [34/36] test_tuple_return                             
 --- Testing: test_tuple_return ---
 Source file: tests/test_tuple_return.arc
@@ -2536,22 +2163,15 @@ Compiling tests/test_tuple_return.arc...
 [Context] [DEBUG] Pushed new scope
 [Context] [DEBUG] Entered function 'divide'
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
 [Visitor] [DEBUG] Processing tuple expression return
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Building tuple return value with 2 fields
 [Visitor] [DEBUG] Casting tuple element 0 from i64 to i32
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
 [Visitor] [DEBUG] Processing tuple expression return
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Building tuple return value with 2 fields
 [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
 [Context] [DEBUG] Popped scope
@@ -2561,28 +2181,15 @@ Compiling tests/test_tuple_return.arc...
 [Context] [DEBUG] Pushed new scope
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Function call
-[Visitor] [DEBUG] Handling function call
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 0 from i64 to i32
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Casting argument 1 from i64 to i32
-[Visitor] [DEBUG] Function call created, return type: { i32, i1 }
 [Visitor] [DEBUG] Tuple destructure: result = field 0 (type: i32)
 [Visitor] [DEBUG] Tuple destructure: ok = field 1 (type: i1)
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -2606,7 +2213,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.06s)
 [35/36] test_variable_inferred                        
 --- Testing: test_variable_inferred ---
 Source file: tests/test_variable_inferred.arc
@@ -2636,16 +2243,11 @@ Compiling tests/test_variable_inferred.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: x
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -2669,7 +2271,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.06s)
 [36/36] test_variable_typed                           
 --- Testing: test_variable_typed ---
 Source file: tests/test_variable_typed.arc
@@ -2699,16 +2301,11 @@ Compiling tests/test_variable_typed.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: x
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Visiting postfix expression
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
 [Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
@@ -2738,13 +2335,13 @@ Process exited with code: 0
 Total Tests:      36
 Passed:           31 (86.1%)
 Failed:           5
-  Compile errors: 3
+  Compile errors: 2
   Link errors:    2
-  Runtime errors: 0
-Total Duration:   2.04s
+  Runtime errors: 1
+Total Duration:   2.12s
 
 Failed Tests:
-  ❌ test_generics                            (compile)
+  ❌ test_generics                            (runtime)
   ❌ test_import_multiple                     (compile)
   ❌ test_import_single                       (compile)
   ❌ test_try_except_raise                    (link)
