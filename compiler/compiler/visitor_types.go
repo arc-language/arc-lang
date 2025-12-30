@@ -244,3 +244,78 @@ func (v *IRVisitor) VisitEnumMember(ctx *parser.EnumMemberContext) interface{} {
 	// Individual enum members are processed in VisitEnumDecl
 	return nil
 }
+
+func (v *IRVisitor) castValue(val ir.Value, targetType types.Type) ir.Value {
+	srcType := val.Type()
+	
+	if types.IsInteger(srcType) && types.IsInteger(targetType) {
+		srcBits := srcType.(*types.IntType).BitWidth
+		destBits := targetType.(*types.IntType).BitWidth
+		if srcBits > destBits {
+			return v.ctx.Builder.CreateTrunc(val, targetType, "")
+		} else if srcBits < destBits {
+			return v.ctx.Builder.CreateSExt(val, targetType, "")
+		}
+	}
+	
+	if types.IsFloat(srcType) && types.IsFloat(targetType) {
+		srcBits := srcType.(*types.FloatType).BitWidth
+		destBits := targetType.(*types.FloatType).BitWidth
+		if srcBits > destBits {
+			return v.ctx.Builder.CreateFPTrunc(val, targetType, "")
+		} else if srcBits < destBits {
+			return v.ctx.Builder.CreateFPExt(val, targetType, "")
+		}
+	}
+
+	// Handle Constant Array Casting (e.g., [5 x i64] -> [5 x i32])
+	if constArr, ok := val.(*ir.ConstantArray); ok {
+		if targetArr, ok := targetType.(*types.ArrayType); ok {
+			// Check if lengths match
+			if constArr.Type().(*types.ArrayType).Length == targetArr.Length {
+				newElements := make([]ir.Constant, len(constArr.Elements))
+				changed := false
+				
+				for i, elem := range constArr.Elements {
+					newElem := v.castConstant(elem, targetArr.ElementType)
+					newElements[i] = newElem
+					if newElem != elem {
+						changed = true
+					}
+				}
+				
+				if changed {
+					return &ir.ConstantArray{
+						BaseValue: ir.BaseValue{ValType: targetArr},
+						Elements:  newElements,
+					}
+				}
+			}
+		}
+	}
+	
+	return val
+}
+
+func (v *IRVisitor) castConstant(constant ir.Constant, targetType types.Type) ir.Constant {
+	srcType := constant.Type()
+	
+	if srcType.Equal(targetType) {
+		return constant
+	}
+	
+	if srcInt, ok := constant.(*ir.ConstantInt); ok {
+		if targetInt, ok := targetType.(*types.IntType); ok {
+			return v.ctx.Builder.ConstInt(targetInt, srcInt.Value)
+		}
+	}
+
+	if srcFloat, ok := constant.(*ir.ConstantFloat); ok {
+		if targetFloat, ok := targetType.(*types.FloatType); ok {
+			return v.ctx.Builder.ConstFloat(targetFloat, srcFloat.Value)
+		}
+	}
+	
+	v.logger.Warning("Cannot cast constant from %v to %v", srcType, targetType)
+	return constant
+}
