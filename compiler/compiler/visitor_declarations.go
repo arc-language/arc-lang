@@ -373,6 +373,26 @@ func (v *IRVisitor) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 	}
 
 	alloca := v.ctx.Builder.CreateAlloca(varType, name+".addr")
+
+	// Workaround for backend limitation:
+	// If initialization value is a ConstantArray, decompose it into individual stores
+	// because the backend might not generate correct code for aggregate stores to stack.
+	if arrType, ok := varType.(*types.ArrayType); ok {
+		if constArr, ok := initValue.(*ir.ConstantArray); ok {
+			v.logger.Debug("Expanding array initialization for %s into %d stores", name, len(constArr.Elements))
+			for i, elem := range constArr.Elements {
+				// GEP to index i
+				// Indices for array GEP: [0, i] (dereference pointer, then index)
+				idx := v.ctx.Builder.ConstInt(types.I32, int64(i))
+				zero := v.ctx.Builder.ConstInt(types.I32, 0)
+				gep := v.ctx.Builder.CreateInBoundsGEP(arrType, alloca, []ir.Value{zero, idx}, "")
+				v.ctx.Builder.CreateStore(elem, gep)
+			}
+			v.ctx.currentScope.Define(name, alloca)
+			return nil
+		}
+	}
+
 	v.ctx.Builder.CreateStore(initValue, alloca)
 	v.ctx.currentScope.Define(name, alloca)
 	
