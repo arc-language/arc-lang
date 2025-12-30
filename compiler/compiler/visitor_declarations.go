@@ -132,6 +132,19 @@ func (v *IRVisitor) VisitExternFunctionDecl(ctx *parser.ExternFunctionDeclContex
 func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
 	
+	// Check for Generic Definition
+	if ctx.GenericParams() != nil {
+		// If we are NOT in an instantiation context (overrideFunctionName is empty),
+		// this is the generic definition. Store it and skip code generation.
+		if v.overrideFunctionName == "" {
+			v.ctx.GenericFunctionDecls[name] = ctx
+			v.logger.Info("Registered generic function definition: %s", name)
+			return nil
+		}
+		// If overrideFunctionName is set, we proceed to generate code for this instantiation.
+		// The generic types T, U, etc., are already mapped in v.ctx.CurrentTypeParams.
+	}
+
 	// Check if this is an async function
 	isAsync := ctx.ASYNC() != nil
 	
@@ -147,20 +160,27 @@ func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		} else if structMember, ok := parent.(*parser.StructMemberContext); ok {
 			if structDecl, ok := structMember.GetParent().(*parser.StructDeclContext); ok {
 				structName := structDecl.IDENTIFIER().GetText()
+				// If we are instantiating a generic struct, use the mangled struct name override
+				if v.overrideStructName != "" {
+					structName = v.overrideStructName
+				}
 				methodPrefix = structName + "_"
 				name = methodPrefix + name
 			}
 		}
 	}
 	
-	// Handle Namespacing
-	var irName string = name
-	
-	// Special Case: main function should not be mangled
-	isMain := name == "main" && (v.ctx.currentNamespace == nil || v.ctx.currentNamespace.Name == "main" || v.ctx.currentNamespace.Name == "")
-	
-	if !isMain && v.ctx.currentNamespace != nil && v.ctx.currentNamespace.Name != "" {
-		irName = v.ctx.currentNamespace.Name + "_" + name
+	// Handle Namespacing (if not a method, and not main)
+	var irName string
+	if v.overrideFunctionName != "" {
+		irName = v.overrideFunctionName
+	} else {
+		irName = name
+		// Special Case: main function should not be mangled
+		isMain := name == "main" && (v.ctx.currentNamespace == nil || v.ctx.currentNamespace.Name == "main" || v.ctx.currentNamespace.Name == "")
+		if !isMain && v.ctx.currentNamespace != nil && v.ctx.currentNamespace.Name != "" {
+			irName = v.ctx.currentNamespace.Name + "_" + name
+		}
 	}
 
 	if isAsync {
@@ -221,8 +241,9 @@ func (v *IRVisitor) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		v.logger.Info("Marked function '%s' as async/coroutine", irName)
 	}
 	
-	// Register function in the current namespace
-	if v.ctx.currentNamespace != nil {
+	// Register function in the current namespace (if not instantiating with override)
+	// If instantiating, it's cached in InstantiatedFunctions by the caller
+	if v.ctx.currentNamespace != nil && v.overrideFunctionName == "" {
 		v.ctx.currentNamespace.Functions[name] = fn
 	}
 
@@ -452,5 +473,25 @@ func (v *IRVisitor) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 		v.ctx.currentScope.DefineConst(name, initValue)
 	}
 
+	return nil
+}
+
+func (v *IRVisitor) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
+    // If this is a generic struct definition, we skip it here during the main pass.
+    // We only process it when it is instantiated (via instantiateStruct), at which point
+    // v.overrideStructName will be set.
+    if ctx.GenericParams() != nil && v.overrideStructName == "" {
+        return nil
+    }
+
+	name := ctx.IDENTIFIER().GetText()
+	v.logger.Debug("Processing struct declaration: %s", name)
+	
+	for _, member := range ctx.AllStructMember() {
+		if member.FunctionDecl() != nil {
+			v.Visit(member.FunctionDecl())
+		}
+	}
+	
 	return nil
 }

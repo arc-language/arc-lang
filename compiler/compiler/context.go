@@ -5,6 +5,7 @@ import (
 	"github.com/arc-language/arc-lang/builder/builder"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
+	"github.com/arc-language/arc-lang/parser"
 )
 
 // LoopInfo holds the target blocks for control flow within a loop
@@ -81,6 +82,18 @@ type Context struct {
 
 	// Loop stack for break/continue
 	loopStack []LoopInfo
+
+	// Generics Support: Storage for ASTs
+	GenericFunctionDecls map[string]*parser.FunctionDeclContext
+	GenericStructDecls   map[string]*parser.StructDeclContext
+	GenericClassDecls    map[string]*parser.ClassDeclContext
+
+	// Instantiation Cache
+	InstantiatedFunctions map[string]*ir.Function
+	InstantiatedStructs   map[string]*types.StructType
+
+	// Type Parameters for current generic instantiation (e.g., T -> int32)
+	CurrentTypeParams map[string]types.Type
 }
 
 // NewContext creates a new compilation context
@@ -106,6 +119,14 @@ func NewContext(entryFile string, moduleName string) *Context {
 		rootNamespace:      rootNs,
 		currentNamespace:   rootNs,
 		NamespaceRegistry:  make(map[string]*Namespace),
+		
+		// Generics initialization
+		GenericFunctionDecls:  make(map[string]*parser.FunctionDeclContext),
+		GenericStructDecls:    make(map[string]*parser.StructDeclContext),
+		GenericClassDecls:     make(map[string]*parser.ClassDeclContext),
+		InstantiatedFunctions: make(map[string]*ir.Function),
+		InstantiatedStructs:   make(map[string]*types.StructType),
+		CurrentTypeParams:     make(map[string]types.Type),
 	}
 	
 	ctx.currentScope = ctx.globalScope

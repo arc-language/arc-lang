@@ -302,7 +302,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.05s)
 [5/36] test_cast                                     
 --- Testing: test_cast ---
 Source file: tests/test_cast.arc
@@ -368,7 +368,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.04s)
 [6/36] test_char_literal                             
 --- Testing: test_char_literal ---
 Source file: tests/test_char_literal.arc
@@ -426,7 +426,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.04s)
 [7/36] test_class                                    
 --- Testing: test_class ---
 Source file: tests/test_class.arc
@@ -658,7 +658,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.07s)
+✅ PASS (0.05s)
 [10/36] test_constant                                 
 --- Testing: test_constant ---
 Source file: tests/test_constant.arc
@@ -724,7 +724,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.04s)
 [11/36] test_defer                                    
 --- Testing: test_defer ---
 Source file: tests/test_defer.arc
@@ -1003,7 +1003,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.07s)
+✅ PASS (0.05s)
 [15/36] test_function_basic                           
 --- Testing: test_function_basic ---
 Source file: tests/test_function_basic.arc
@@ -1137,9 +1137,16 @@ Compiling tests/test_generics.arc...
 [Visitor] [DEBUG] Function call
 [Visitor] [DEBUG] Handling function call
 [Visitor] [DEBUG] Function call created, return type: void
+[Visitor] [DEBUG] Visiting postfix expression
+[Visitor] [DEBUG] Visiting postfix expression
+[Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Compiling return statement
 [Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
+[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
+[Context] [DEBUG] Popped scope
+[Visitor] [DEBUG] Compiling return statement
+[Visitor] [DEBUG] Visiting postfix expression
+[Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
 [Context] [DEBUG] Popped scope
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
@@ -1149,7 +1156,7 @@ Compiling tests/test_generics.arc...
   Errors: 3
 Compilation failed: compilation failed with 3 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Compilation failed
     Compile output:
       Compiling tests/test_generics.arc...
@@ -1195,9 +1202,16 @@ Compilation failed: compilation failed with 3 error(s) in /workspaces/arc-lang/c
       [Visitor] [DEBUG] Function call
       [Visitor] [DEBUG] Handling function call
       [Visitor] [DEBUG] Function call created, return type: void
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Context] [DEBUG] Pushed new scope
       [Visitor] [DEBUG] Compiling return statement
       [Visitor] [DEBUG] Visiting postfix expression
-      [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
+      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
+      [Context] [DEBUG] Popped scope
+      [Visitor] [DEBUG] Compiling return statement
+      [Visitor] [DEBUG] Visiting postfix expression
+      [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
       [Context] [DEBUG] Popped scope
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
@@ -1270,7 +1284,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.07s)
+✅ PASS (0.05s)
 [18/36] test_if_statement                             
 --- Testing: test_if_statement ---
 Source file: tests/test_if_statement.arc
@@ -1333,7 +1347,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.10s)
+✅ PASS (0.06s)
 [19/36] test_import_multiple                          
 --- Testing: test_import_multiple ---
 Source file: tests/test_import_multiple.arc
@@ -1357,27 +1371,27 @@ Compiling tests/test_import_multiple.arc...
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
 panic: runtime error: invalid memory address or nil pointer dereference
-[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59d44b]
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59d80b]
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc00049e9c0, 0x639460?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/visitor_declarations.go:18 +0x2b
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69c1e0?, 0xc00010ac00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/visitor.go:51 +0x757
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc00049e9c0, 0xc00010aa80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/visitor.go:165 +0x1fa
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69c0a8?, 0xc00010aa80?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/visitor.go:45 +0x266
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a6060, {0xc0000c6080, 0x40}, 0x1)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/compiler.go:147 +0x432
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a6060, {0x7ffcf9bbd693, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/compiler.go:41 +0x18b
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0001b52c0, 0x639460?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor_declarations.go:18 +0x2b
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69c2e0?, 0xc0000f0c00?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:51 +0x757
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0001b52c0, 0xc0000f0a80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:165 +0x1fa
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69c1a8?, 0xc0000f0a80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:45 +0x266
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc000010078, {0xc00002a3c0, 0x40}, 0x1)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/compiler.go:147 +0x432
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010078, {0x7ffd27105693, 0x1e})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/compiler.go:41 +0x18b
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
 main.main()
 	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
 
-❌ FAIL (0.03s)
+❌ FAIL (0.02s)
     Compilation failed
     Compile output:
       Compiling tests/test_import_multiple.arc...
@@ -1394,22 +1408,22 @@ main.main()
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
       panic: runtime error: invalid memory address or nil pointer dereference
-      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59d44b]
+      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59d80b]
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc00049e9c0, 0x639460?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/visitor_declarations.go:18 +0x2b
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69c1e0?, 0xc00010ac00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/visitor.go:51 +0x757
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc00049e9c0, 0xc00010aa80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/visitor.go:165 +0x1fa
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69c0a8?, 0xc00010aa80?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/visitor.go:45 +0x266
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a6060, {0xc0000c6080, 0x40}, 0x1)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/compiler.go:147 +0x432
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a6060, {0x7ffcf9bbd693, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251229235327-7ae06a9bd2c6/compiler/compiler/compiler.go:41 +0x18b
-      main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0001b52c0, 0x639460?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor_declarations.go:18 +0x2b
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69c2e0?, 0xc0000f0c00?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:51 +0x757
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0001b52c0, 0xc0000f0a80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:165 +0x1fa
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69c1a8?, 0xc0000f0a80?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/visitor.go:45 +0x266
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc000010078, {0xc00002a3c0, 0x40}, 0x1)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/compiler.go:147 +0x432
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010078, {0x7ffd27105693, 0x1e})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230000056-08edd4cc028c/compiler/compiler/compiler.go:41 +0x18b
+      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
       main.main()
       	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
@@ -1463,7 +1477,7 @@ Compiling tests/test_import_single.arc...
   Errors: 1
 Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
 
-❌ FAIL (0.02s)
+❌ FAIL (0.04s)
     Compilation failed
     Compile output:
       Compiling tests/test_import_single.arc...
@@ -1574,7 +1588,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.05s)
 [22/36] test_namespace                                
 --- Testing: test_namespace ---
 Source file: tests/test_namespace.arc
@@ -1693,7 +1707,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.04s)
+✅ PASS (0.05s)
 [24/36] test_pointer                                  
 --- Testing: test_pointer ---
 Source file: tests/test_pointer.arc
@@ -1759,7 +1773,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.04s)
 [25/36] test_sizeof                                   
 --- Testing: test_sizeof ---
 Source file: tests/test_sizeof.arc
@@ -1963,7 +1977,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.12s)
 [28/36] test_struct_method                            
 --- Testing: test_struct_method ---
 Source file: tests/test_struct_method.arc
@@ -2052,7 +2066,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.07s)
+✅ PASS (0.13s)
 [29/36] test_switch                                   
 --- Testing: test_switch ---
 Source file: tests/test_switch.arc
@@ -2172,7 +2186,6 @@ Compiling tests/test_try_except_raise.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing try-except-finally block
-[Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: result
 [Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Function call
@@ -2184,8 +2197,6 @@ Compiling tests/test_try_except_raise.arc...
 [Visitor] [DEBUG] Function call created, return type: i32
 [Visitor] [DEBUG] Compiling return statement
 [Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Processing except clause 1
 [Visitor] [DEBUG] Binding exception to variable: err
 [Context] [DEBUG] Pushed new scope
@@ -2216,7 +2227,7 @@ Output:
 test_try_except_raise:(.text+0xe0): undefined reference to `__exception_state'
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.06s)
+❌ FAIL (0.09s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: in function `divide':
@@ -2271,7 +2282,6 @@ Compiling tests/test_try_except_raise_err.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing try-except-finally block
-[Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: result
 [Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Function call
@@ -2283,8 +2293,6 @@ Compiling tests/test_try_except_raise_err.arc...
 [Visitor] [DEBUG] Function call created, return type: i32
 [Visitor] [DEBUG] Compiling return statement
 [Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Processing except clause 1
 [Visitor] [DEBUG] Binding exception to variable: err
 [Context] [DEBUG] Pushed new scope
@@ -2318,7 +2326,7 @@ Output:
 test_try_except_raise_err:(.text+0xe0): undefined reference to `__exception_state'
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.10s)
+❌ FAIL (0.13s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_try_except_raise_err.o: in function `divide':
@@ -2371,7 +2379,6 @@ Compiling tests/test_try_except_throw.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing try-except-finally block
-[Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: result
 [Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Function call
@@ -2383,8 +2390,6 @@ Compiling tests/test_try_except_throw.arc...
 [Visitor] [DEBUG] Function call created, return type: i32
 [Visitor] [DEBUG] Compiling return statement
 [Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Processing except clause 1
 [Visitor] [DEBUG] Binding exception to variable: err
 [Context] [DEBUG] Pushed new scope
@@ -2414,7 +2419,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.08s)
+✅ PASS (0.06s)
 [33/36] test_try_except_throw_err                     
 --- Testing: test_try_except_throw_err ---
 Source file: tests/test_try_except_throw_err.arc
@@ -2462,7 +2467,6 @@ Compiling tests/test_try_except_throw_err.arc...
 [Context] [DEBUG] Entered function 'main'
 [Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Processing try-except-finally block
-[Context] [DEBUG] Pushed new scope
 [Visitor] [DEBUG] Declaring variable: result
 [Visitor] [DEBUG] Visiting postfix expression
 [Visitor] [DEBUG] Function call
@@ -2474,8 +2478,6 @@ Compiling tests/test_try_except_throw_err.arc...
 [Visitor] [DEBUG] Function call created, return type: i32
 [Visitor] [DEBUG] Compiling return statement
 [Visitor] [DEBUG] Visiting postfix expression
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
 [Visitor] [DEBUG] Processing except clause 1
 [Visitor] [DEBUG] Binding exception to variable: err
 [Context] [DEBUG] Pushed new scope
@@ -2503,10 +2505,9 @@ Step 2: Linking with gcc...
 Linking successful
 
 Step 3: Running executable...
-Process exited with code: 255
-❌ Test FAILED: expected exit=0, got exit=255
-❌ FAIL (0.06s)
-    Expected exit=0, got exit=255
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.06s)
 [34/36] test_tuple_return                             
 --- Testing: test_tuple_return ---
 Source file: tests/test_tuple_return.arc
@@ -2605,7 +2606,7 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.07s)
+✅ PASS (0.05s)
 [35/36] test_variable_inferred                        
 --- Testing: test_variable_inferred ---
 Source file: tests/test_variable_inferred.arc
@@ -2731,16 +2732,16 @@ Linking successful
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.05s)
 
 ======================================================================
 Total Tests:      36
-Passed:           30 (83.3%)
-Failed:           6
+Passed:           31 (86.1%)
+Failed:           5
   Compile errors: 3
   Link errors:    2
-  Runtime errors: 1
-Total Duration:   2.02s
+  Runtime errors: 0
+Total Duration:   2.04s
 
 Failed Tests:
   ❌ test_generics                            (compile)
@@ -2748,5 +2749,4 @@ Failed Tests:
   ❌ test_import_single                       (compile)
   ❌ test_try_except_raise                    (link)
   ❌ test_try_except_raise_err                (link)
-  ❌ test_try_except_throw_err                (runtime)
 

@@ -11,6 +11,155 @@ import (
 	"github.com/arc-language/arc-lang/parser"
 )
 
+// ... (Existing Expression visits)
+
+func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
+	if ctx.StructLiteral() != nil { return v.Visit(ctx.StructLiteral()) }
+	if ctx.Literal() != nil { return v.Visit(ctx.Literal()) }
+	if ctx.Expression() != nil { return v.Visit(ctx.Expression()) }
+	if ctx.CastExpression() != nil { return v.Visit(ctx.CastExpression()) }
+	if ctx.AllocaExpression() != nil { return v.Visit(ctx.AllocaExpression()) }
+	if ctx.SyscallExpression() != nil { return v.Visit(ctx.SyscallExpression()) }
+	if ctx.IntrinsicExpression() != nil { return v.Visit(ctx.IntrinsicExpression()) }
+	
+	// Handle Qualified Identifiers
+	if ctx.QualifiedIdentifier() != nil {
+		qCtx := ctx.QualifiedIdentifier()
+		parts := make([]string, len(qCtx.AllIDENTIFIER()))
+		for i, node := range qCtx.AllIDENTIFIER() {
+			parts[i] = node.GetText()
+		}
+		
+		if len(parts) < 2 { return v.ctx.Builder.ConstInt(types.I64, 0) }
+		firstPart := parts[0]
+
+		if sym, ok := v.ctx.currentScope.Lookup(firstPart); ok {
+			var currentVal ir.Value = sym.Value
+			
+			if ptr, isAlloca := currentVal.(*ir.AllocaInst); isAlloca {
+				if _, isPtr := ptr.AllocatedType.(*types.PointerType); isPtr {
+					currentVal = v.ctx.Builder.CreateLoad(ptr.AllocatedType, ptr, "")
+				} else {
+					currentVal = ptr
+				}
+			}
+			
+			for i := 1; i < len(parts); i++ {
+				currentVal = v.handleMemberAccess(currentVal, parts[i])
+			}
+			return currentVal
+		}
+
+		// Check if it's an enum type access (e.g., Status.OK)
+		if _, isType := v.ctx.GetType(firstPart); isType {
+			if len(parts) == 2 {
+				memberName := parts[1]
+				fullName := v.getNamespacedName(firstPart + "_" + memberName)
+				if global := v.ctx.Module.GetGlobal(fullName); global != nil {
+					ptrType := global.Type().(*types.PointerType)
+					return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+				}
+				v.ctx.Logger.Error("Enum '%s' has no member '%s'", firstPart, memberName)
+				return v.ctx.Builder.ConstInt(types.I64, 0)
+			}
+		}
+
+		nsName := firstPart
+		memberName := parts[1]
+		
+		if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
+			if fn, ok := ns.LookupFunction(memberName); ok {
+				return fn
+			}
+			
+			mangledName := nsName + "_" + memberName
+			if global := v.ctx.Module.GetGlobal(mangledName); global != nil {
+				ptrType := global.Type().(*types.PointerType)
+				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+			}
+			
+			v.ctx.Logger.Error("Member '%s' not found in namespace '%s'", memberName, nsName)
+		} else {
+			v.ctx.Logger.Error("Unknown namespace or variable: %s", nsName)
+		}
+		return v.ctx.Builder.ConstInt(types.I64, 0)
+	}
+
+	if ctx.IDENTIFIER() != nil {
+		name := ctx.IDENTIFIER().GetText()
+		
+		// Check for Generic Instantiation Call: foo<T>(...)
+		if ctx.GenericArgs() != nil {
+			// Try to instantiate as function
+			fn := v.instantiateFunction(name, ctx.GenericArgs())
+			if fn != nil {
+				return fn
+			}
+			
+			// Try to instantiate as struct (unlikely as primary expr value, but maybe constructor?)
+			// For now, only generic function calls are expected here as values.
+			v.ctx.Logger.Error("Unknown generic function: %s", name)
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		if _, isType := v.ctx.GetType(name); isType {
+			v.ctx.Logger.Error("Type '%s' used as value", name)
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		if _, isNamespace := v.ctx.NamespaceRegistry[name]; isNamespace {
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+		
+		sym, ok := v.ctx.currentScope.Lookup(name)
+		if !ok {
+			if v.ctx.currentNamespace != nil {
+				mangled := v.ctx.currentNamespace.Name + "_" + name
+				if global := v.ctx.Module.GetGlobal(mangled); global != nil {
+					ptrType := global.Type().(*types.PointerType)
+					return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+				}
+			}
+			if global := v.ctx.Module.GetGlobal(name); global != nil {
+				ptrType := global.Type().(*types.PointerType)
+				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+			}
+			
+			if v.ctx.currentNamespace != nil {
+				if fn, ok := v.ctx.currentNamespace.Functions[name]; ok {
+					return fn
+				}
+			}
+			if fn := v.ctx.Module.GetFunction(name); fn != nil {
+				return fn
+			}
+			v.ctx.Logger.Error("Undefined: %s", name)
+			return v.ctx.Builder.ConstInt(types.I64, 0)
+		}
+
+		// Handle global constants stored in scope
+		if sym.IsConst {
+			// If it's a global pointer, load it
+			if global, ok := sym.Value.(*ir.Global); ok {
+				ptrType := global.Type().(*types.PointerType)
+				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
+			}
+			// Otherwise return the constant value directly
+			return sym.Value
+		}
+
+		if ptr, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
+			ptrType := ptr.Type().(*types.PointerType)
+			return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
+		}
+
+		return sym.Value
+	}
+	
+	return v.ctx.Builder.ConstInt(types.I64, 0)
+}
+
+// ... (Rest of visitor_expressions.go methods like VisitLiteral, etc.)
 func (v *IRVisitor) VisitExpression(ctx *parser.ExpressionContext) interface{} {
 	return v.Visit(ctx.LogicalOrExpression())
 }
@@ -92,33 +241,25 @@ func (v *IRVisitor) VisitRelationalExpression(ctx *parser.RelationalExpressionCo
 
 func (v *IRVisitor) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} {
 	result := v.Visit(ctx.RangeExpression(0)).(ir.Value)
-	
 	for i := 1; i < len(ctx.AllRangeExpression()); i++ {
 		rhs := v.Visit(ctx.RangeExpression(i)).(ir.Value)
-		
-		// Determine operator type by checking tokens
 		opIdx := i*2 - 1
 		if opIdx < ctx.GetChildCount() {
 			child := ctx.GetChild(opIdx)
 			if termNode, ok := child.(antlr.TerminalNode); ok {
 				tokenType := termNode.GetSymbol().GetTokenType()
-				
 				if tokenType == parser.ArcParserLT {
-					// Check if next token is also LT (for <<)
 					if opIdx+1 < ctx.GetChildCount() {
 						nextChild := ctx.GetChild(opIdx + 1)
 						if nextTerm, ok := nextChild.(antlr.TerminalNode); ok && nextTerm.GetSymbol().GetTokenType() == parser.ArcParserLT {
-							// Left shift (<<)
 							result = v.ctx.Builder.CreateShl(result, rhs, "")
 							continue
 						}
 					}
 				} else if tokenType == parser.ArcParserGT {
-					// Check if next token is also GT (for >>)
 					if opIdx+1 < ctx.GetChildCount() {
 						nextChild := ctx.GetChild(opIdx + 1)
 						if nextTerm, ok := nextChild.(antlr.TerminalNode); ok && nextTerm.GetSymbol().GetTokenType() == parser.ArcParserGT {
-							// Right shift (>>)
 							if intType, ok := result.Type().(*types.IntType); ok && intType.Signed {
 								result = v.ctx.Builder.CreateAShr(result, rhs, "")
 							} else {
@@ -131,13 +272,10 @@ func (v *IRVisitor) VisitShiftExpression(ctx *parser.ShiftExpressionContext) int
 			}
 		}
 	}
-	
 	return result
 }
 
 func (v *IRVisitor) VisitRangeExpression(ctx *parser.RangeExpressionContext) interface{} {
-	// Just return the first additive expression
-	// Range operator (..) is handled in for-in loop context
 	return v.Visit(ctx.AdditiveExpression(0))
 }
 
@@ -176,15 +314,12 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		_ = v.ctx.Builder.CreateCoroSuspend(false, "")
 		return val
 	}
-	
-	// Pre-Increment (++i)
 	if ctx.INCREMENT() != nil {
 		if childCtx, ok := ctx.UnaryExpression().(*parser.UnaryExpressionContext); ok {
 			ptr := v.getExpressionAddress(childCtx)
 			if ptr != nil && types.IsPointer(ptr.Type()) {
 				valType := ptr.Type().(*types.PointerType).ElementType
 				val := v.ctx.Builder.CreateLoad(valType, ptr, "")
-				
 				var one ir.Constant
 				if intType, ok := valType.(*types.IntType); ok {
 					one = v.ctx.Builder.ConstInt(intType, 1)
@@ -199,15 +334,12 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		v.ctx.Logger.Error("Invalid operand for pre-increment")
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
-	
-	// Pre-Decrement (--i)
 	if ctx.DECREMENT() != nil {
 		if childCtx, ok := ctx.UnaryExpression().(*parser.UnaryExpressionContext); ok {
 			ptr := v.getExpressionAddress(childCtx)
 			if ptr != nil && types.IsPointer(ptr.Type()) {
 				valType := ptr.Type().(*types.PointerType).ElementType
 				val := v.ctx.Builder.CreateLoad(valType, ptr, "")
-				
 				var one ir.Constant
 				if intType, ok := valType.(*types.IntType); ok {
 					one = v.ctx.Builder.ConstInt(intType, 1)
@@ -222,20 +354,17 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		v.ctx.Logger.Error("Invalid operand for pre-decrement")
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
-	
 	if ctx.MINUS() != nil {
 		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
 		if val == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		zero := v.getZeroValue(val.Type())
 		return v.ctx.Builder.CreateSub(zero, val, "")
 	}
-	
 	if ctx.NOT() != nil {
 		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
 		if val == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
 		return v.ctx.Builder.CreateXor(val, v.ctx.Builder.ConstInt(types.I1, 1), "")
 	}
-
 	if ctx.BIT_NOT() != nil {
 		val := v.Visit(ctx.UnaryExpression()).(ir.Value)
 		if val == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
@@ -247,7 +376,6 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		}
 		return v.ctx.Builder.CreateXor(val, allOnes, "")
 	}
-	
 	if ctx.STAR() != nil {
 		ptr := v.Visit(ctx.UnaryExpression()).(ir.Value)
 		if ptr == nil { return v.ctx.Builder.ConstInt(types.I64, 0) }
@@ -258,14 +386,12 @@ func (v *IRVisitor) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		}
 		return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
 	}
-	
 	if ctx.AMP() != nil {
 		if childCtx, ok := ctx.UnaryExpression().(*parser.UnaryExpressionContext); ok {
 			return v.getExpressionAddress(childCtx)
 		}
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
-	
 	return v.Visit(ctx.PostfixExpression())
 }
 
@@ -287,9 +413,6 @@ func (v *IRVisitor) getExpressionAddress(ctx *parser.UnaryExpressionContext) ir.
 }
 
 func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
-	v.logger.Debug("Visiting postfix expression")
-
-	// Check if any postfix operation is increment/decrement
 	needsLValue := false
 	for _, opCtx := range ctx.AllPostfixOp() {
 		op := opCtx.(*parser.PostfixOpContext)
@@ -298,15 +421,12 @@ func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			break
 		}
 	}
-
-	// Start with the primary expression
 	var result ir.Value
 	if needsLValue && ctx.PrimaryExpression().IDENTIFIER() != nil {
-		// For increment/decrement, we need the address, not the value
 		name := ctx.PrimaryExpression().IDENTIFIER().GetText()
 		if sym, ok := v.ctx.currentScope.Lookup(name); ok {
 			if ptr, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
-				result = ptr  // Return the address, don't load yet
+				result = ptr 
 			} else {
 				result = v.Visit(ctx.PrimaryExpression()).(ir.Value)
 			}
@@ -316,69 +436,40 @@ func (v *IRVisitor) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	} else {
 		result = v.Visit(ctx.PrimaryExpression()).(ir.Value)
 	}
-
-	// Apply each postfix operation
 	for _, opCtx := range ctx.AllPostfixOp() {
 		result = v.applyPostfixOp(result, opCtx)
 	}
-
 	return result
 }
 
 func (v *IRVisitor) applyPostfixOp(base ir.Value, opCtx parser.IPostfixOpContext) ir.Value {
 	op := opCtx.(*parser.PostfixOpContext)
-
-	// Member access: base.member
 	if op.DOT() != nil && op.IDENTIFIER() != nil {
 		memberName := op.IDENTIFIER().GetText()
-		v.logger.Debug("Member access: .%s", memberName)
-
-		// Check if this is a method call (has LPAREN)
 		if op.LPAREN() != nil {
-			// This is a method call: base.method(args)
 			return v.handleMethodCall(base, memberName, op)
 		}
-
-		// Regular member access
 		return v.handleMemberAccess(base, memberName)
 	}
-
-	// Function call: base(args)
 	if op.LPAREN() != nil && op.DOT() == nil {
-		v.logger.Debug("Function call")
 		return v.handleFunctionCall(base, op)
 	}
-
-	// Array/pointer indexing: base[index]
 	if op.LBRACKET() != nil {
-		v.logger.Debug("Array indexing")
 		indexVal := v.Visit(op.Expression()).(ir.Value)
 		return v.handleIndexing(base, indexVal)
 	}
-
-	// Post-increment: base++
 	if op.INCREMENT() != nil {
-		v.logger.Debug("Post-increment")
 		return v.handlePostIncrement(base)
 	}
-
-	// Post-decrement: base--
 	if op.DECREMENT() != nil {
-		v.logger.Debug("Post-decrement")
 		return v.handlePostDecrement(base)
 	}
-
 	v.ctx.Logger.Error("Unknown postfix operation")
 	return base
 }
 
 func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpContext) ir.Value {
-	v.logger.Debug("Handling function call")
-
-	// Get the function type
 	var funcType *types.FunctionType
-	
-	// If funcValue is a pointer to a function, dereference it
 	if ptrType, ok := funcValue.Type().(*types.PointerType); ok {
 		if ft, ok := ptrType.ElementType.(*types.FunctionType); ok {
 			funcType = ft
@@ -386,181 +477,116 @@ func (v *IRVisitor) handleFunctionCall(funcValue ir.Value, op *parser.PostfixOpC
 	} else if ft, ok := funcValue.Type().(*types.FunctionType); ok {
 		funcType = ft
 	}
-
-	// Build arguments with proper type casting
 	args := []ir.Value{}
-	
-	// Inject pending self argument if this is a method call found via handleMemberAccess
 	if v.pendingMethodSelf != nil {
 		selfArg := v.pendingMethodSelf
-		
-		// Auto-dereference: If method expects value but we have pointer
 		if funcType != nil && len(funcType.ParamTypes) > 0 {
 			expectedType := funcType.ParamTypes[0]
 			currentType := selfArg.Type()
-			
-			// If we have ptr<T> but need T, load it
 			if ptrType, ok := currentType.(*types.PointerType); ok {
 				if ptrType.ElementType.Equal(expectedType) {
-					v.logger.Debug("Auto-dereferencing self argument for method call")
 					selfArg = v.ctx.Builder.CreateLoad(expectedType, selfArg, "")
 				}
 			}
 		}
-		
 		args = append(args, selfArg)
-		v.pendingMethodSelf = nil // Consumed
+		v.pendingMethodSelf = nil
 	}
-	
 	argList := op.ArgumentList()
-	
 	if argList != nil {
 		allArgs := argList.(*parser.ArgumentListContext).AllArgument()
-		
 		for _, argCtx := range allArgs {
-			// Visit the argument expression
 			var argVal ir.Value
-			
 			argContext := argCtx.(*parser.ArgumentContext)
 			if argContext.Expression() != nil {
 				argVal = v.Visit(argContext.Expression()).(ir.Value)
 			} else if argContext.LambdaExpression() != nil {
 				argVal = v.Visit(argContext.LambdaExpression()).(ir.Value)
 			} else {
-				v.ctx.Logger.Error("Invalid argument type")
 				continue
 			}
-			
-			// Cast to expected parameter type if function type is known
-			targetParamIdx := len(args) // Current position in args being built (includes self)
-			
+			targetParamIdx := len(args)
 			if funcType != nil && targetParamIdx < len(funcType.ParamTypes) {
 				expectedType := funcType.ParamTypes[targetParamIdx]
 				if !argVal.Type().Equal(expectedType) {
-					v.logger.Debug("Casting argument %d from %v to %v", targetParamIdx, argVal.Type(), expectedType)
 					argVal = v.castValue(argVal, expectedType)
 				}
 			}
-			
 			args = append(args, argVal)
 		}
 	}
-
-	// Create the call instruction
 	if fn, ok := funcValue.(*ir.Function); ok {
-		result := v.ctx.Builder.CreateCall(fn, args, "")
-		v.logger.Debug("Function call created, return type: %v", result.Type())
-		return result
+		return v.ctx.Builder.CreateCall(fn, args, "")
 	} else {
-		// Limitation: Builder CreateCall requires *ir.Function
 		v.ctx.Logger.Error("Indirect function calls not supported by builder (requires *ir.Function)")
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
 }
 
 func (v *IRVisitor) handleMethodCall(base ir.Value, methodName string, op *parser.PostfixOpContext) ir.Value {
-	v.logger.Debug("Handling method call: %s", methodName)
-
-	// Get the base type
 	baseType := base.Type()
-	
-	// If base is a pointer, get the element type
 	if ptrType, ok := baseType.(*types.PointerType); ok {
 		baseType = ptrType.ElementType
 	}
-
-	// Look up the method
 	structType, ok := baseType.(*types.StructType)
 	if !ok {
 		v.ctx.Logger.Error("Cannot call method on non-struct type: %v", baseType)
 		return base
 	}
-
-	// Find the method in the struct's associated methods
 	methodFunc := v.ctx.LookupMethod(structType.Name, methodName)
 	if methodFunc == nil {
 		v.ctx.Logger.Error("Method %s not found on type %s", methodName, structType.Name)
 		return base
 	}
-
-	// Handle auto-dereference for self argument (Mirroring handleFunctionCall logic)
 	selfArg := base
 	if len(methodFunc.FuncType.ParamTypes) > 0 {
 		expectedType := methodFunc.FuncType.ParamTypes[0]
 		currentType := selfArg.Type()
-		
-		// If we have ptr<T> but need T, load it
 		if ptrType, ok := currentType.(*types.PointerType); ok {
 			if ptrType.ElementType.Equal(expectedType) {
-				v.logger.Debug("Auto-dereferencing self argument for method call")
 				selfArg = v.ctx.Builder.CreateLoad(expectedType, selfArg, "")
 			}
 		}
 	}
-
-	// Build arguments: self is the first argument
 	args := []ir.Value{selfArg}
-	
 	argList := op.ArgumentList()
 	if argList != nil {
 		allArgs := argList.(*parser.ArgumentListContext).AllArgument()
-		
-		// Get function type for parameter type checking
 		funcType := methodFunc.FuncType
-		
 		for i, argCtx := range allArgs {
-			// Visit the argument expression
 			var argVal ir.Value
-			
 			argContext := argCtx.(*parser.ArgumentContext)
 			if argContext.Expression() != nil {
 				argVal = v.Visit(argContext.Expression()).(ir.Value)
 			} else if argContext.LambdaExpression() != nil {
 				argVal = v.Visit(argContext.LambdaExpression()).(ir.Value)
 			} else {
-				v.ctx.Logger.Error("Invalid argument type")
 				continue
 			}
-			
-			// Cast to expected parameter type (i+1 because self is param 0)
 			paramIndex := i + 1
 			if paramIndex < len(funcType.ParamTypes) {
 				expectedType := funcType.ParamTypes[paramIndex]
 				if !argVal.Type().Equal(expectedType) {
-					v.logger.Debug("Casting method argument %d from %v to %v", i, argVal.Type(), expectedType)
 					argVal = v.castValue(argVal, expectedType)
 				}
 			}
-			
 			args = append(args, argVal)
 		}
 	}
-
-	// Create the call instruction
-	result := v.ctx.Builder.CreateCall(methodFunc, args, "")
-	
-	return result
+	return v.ctx.Builder.CreateCall(methodFunc, args, "")
 }
 
 func (v *IRVisitor) handleMemberAccess(base ir.Value, memberName string) ir.Value {
-	v.logger.Debug("Handling member access: .%s", memberName)
-
 	baseType := base.Type()
-
-	// 1. Handle Pointer to Struct (e.g. Class instance or Struct pointer)
 	if ptrType, ok := baseType.(*types.PointerType); ok {
 		if structType, ok := ptrType.ElementType.(*types.StructType); ok {
-			
-			// Check for Class Method (as value/delegate)
 			if v.ctx.IsClassType(structType.Name) {
 				methodName := structType.Name + "_" + memberName
 				if fn := v.ctx.Module.GetFunction(methodName); fn != nil {
-					v.pendingMethodSelf = base  // FIX: Set pendingMethodSelf for class methods
+					v.pendingMethodSelf = base
 					return fn
 				}
 			}
-			
-			// Find Field Index
 			var fieldIdx int = -1
 			if v.ctx.IsClassType(structType.Name) {
 				if idx, ok := v.ctx.ClassFieldIndices[structType.Name][memberName]; ok {
@@ -569,290 +595,107 @@ func (v *IRVisitor) handleMemberAccess(base ir.Value, memberName string) ir.Valu
 			} else {
 				fieldIdx = v.findFieldIndex(structType, memberName)
 			}
-			
 			if fieldIdx >= 0 {
 				gep := v.ctx.Builder.CreateStructGEP(structType, base, fieldIdx, "")
 				return v.ctx.Builder.CreateLoad(structType.Fields[fieldIdx], gep, "")
 			}
-			
-			// Method on pointer to struct (generic case, e.g. for methods taking pointer receiver)
 			methodName := structType.Name + "_" + memberName
 			if fn := v.ctx.Module.GetFunction(methodName); fn != nil {
 				v.pendingMethodSelf = base
 				return fn
 			}
-			
 			v.ctx.Logger.Error("Struct/Class '%s' has no member '%s'", structType.Name, memberName)
 			return base
 		}
 	}
-	
-	// 2. Handle Direct Struct Value
 	if structType, ok := baseType.(*types.StructType); ok {
 		if v.ctx.IsClassType(structType.Name) {
 			v.ctx.Logger.Error("Class instances must be accessed via pointer")
 			return base
 		}
-		
 		fieldIdx := v.findFieldIndex(structType, memberName)
 		if fieldIdx >= 0 {
 			return v.ctx.Builder.CreateExtractValue(base, []int{fieldIdx}, "")
 		}
-		
-		// Method on struct value
 		methodName := structType.Name + "_" + memberName
 		if fn := v.ctx.Module.GetFunction(methodName); fn != nil {
 			v.pendingMethodSelf = base
 			return fn
 		}
-		
 		v.ctx.Logger.Error("Struct '%s' has no member '%s'", structType.Name, memberName)
 		return base
 	}
-	
 	v.ctx.Logger.Error("Cannot access member '%s' of type '%v'", memberName, baseType)
 	return base
 }
 
 func (v *IRVisitor) handleIndexing(base ir.Value, index ir.Value) ir.Value {
-	v.logger.Debug("Handling array indexing")
-
 	baseType := base.Type()
-
-	// Handle pointer types
 	if ptrType, ok := baseType.(*types.PointerType); ok {
 		elemType := ptrType.ElementType
-
-		// Create GEP
 		indices := []ir.Value{index}
 		elemPtr := v.ctx.Builder.CreateGEP(elemType, base, indices, "")
-
-		// Load the element
 		return v.ctx.Builder.CreateLoad(elemType, elemPtr, "")
 	}
-
-	// Handle array types
 	if arrayType, ok := baseType.(*types.ArrayType); ok {
-		// Need to get pointer to array first
 		arrayPtr := v.ctx.Builder.CreateAlloca(arrayType, "temp.array")
 		v.ctx.Builder.CreateStore(base, arrayPtr)
-
-		// Create GEP with two indices: [0][index]
 		indices := []ir.Value{
 			v.ctx.Builder.ConstInt(types.NewInt(32, false), 0),
 			index,
 		}
 		elemPtr := v.ctx.Builder.CreateGEP(arrayType, arrayPtr, indices, "")
-
-		// Load the element
 		return v.ctx.Builder.CreateLoad(arrayType.ElementType, elemPtr, "")
 	}
-
 	v.ctx.Logger.Error("Cannot index non-pointer/non-array type: %v", baseType)
 	return base
 }
 
 func (v *IRVisitor) handlePostIncrement(base ir.Value) ir.Value {
-	v.logger.Debug("Handling post-increment")
-
 	var ptr ir.Value
 	var currentVal ir.Value
-	
 	if ptrType, ok := base.Type().(*types.PointerType); ok {
-		// base is a pointer (address)
 		ptr = base
 		currentVal = v.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
 	} else {
-		// base is already a value (shouldn't happen with the fix above, but handle it)
 		v.ctx.Logger.Error("Post-increment requires an lvalue")
 		return base
 	}
-
-	// Create the increment
 	var one ir.Constant
 	if intType, ok := currentVal.Type().(*types.IntType); ok {
 		one = v.ctx.Builder.ConstInt(intType, 1)
 	} else {
 		one = v.ctx.Builder.ConstInt(types.I64, 1)
 	}
-	
 	newVal := v.ctx.Builder.CreateAdd(currentVal, one, "")
-	
-	// Store back
 	v.ctx.Builder.CreateStore(newVal, ptr)
-
-	// Return the original value (post-increment returns old value)
 	return currentVal
 }
 
 func (v *IRVisitor) handlePostDecrement(base ir.Value) ir.Value {
-	v.logger.Debug("Handling post-decrement")
-
 	var ptr ir.Value
 	var currentVal ir.Value
-	
 	if ptrType, ok := base.Type().(*types.PointerType); ok {
-		// base is a pointer (address)
 		ptr = base
 		currentVal = v.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
 	} else {
-		// base is already a value (shouldn't happen with the fix above, but handle it)
 		v.ctx.Logger.Error("Post-decrement requires an lvalue")
 		return base
 	}
-
-	// Create the decrement
 	var one ir.Constant
 	if intType, ok := currentVal.Type().(*types.IntType); ok {
 		one = v.ctx.Builder.ConstInt(intType, 1)
 	} else {
 		one = v.ctx.Builder.ConstInt(types.I64, 1)
 	}
-	
 	newVal := v.ctx.Builder.CreateSub(currentVal, one, "")
-	
-	// Store back
 	v.ctx.Builder.CreateStore(newVal, ptr)
-
-	// Return the original value (post-decrement returns old value)
 	return currentVal
-}
-
-func (v *IRVisitor) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
-	if ctx.StructLiteral() != nil { return v.Visit(ctx.StructLiteral()) }
-	if ctx.Literal() != nil { return v.Visit(ctx.Literal()) }
-	if ctx.Expression() != nil { return v.Visit(ctx.Expression()) }
-	if ctx.CastExpression() != nil { return v.Visit(ctx.CastExpression()) }
-	if ctx.AllocaExpression() != nil { return v.Visit(ctx.AllocaExpression()) }
-	if ctx.SyscallExpression() != nil { return v.Visit(ctx.SyscallExpression()) }
-	if ctx.IntrinsicExpression() != nil { return v.Visit(ctx.IntrinsicExpression()) }
-	
-	if ctx.QualifiedIdentifier() != nil {
-		qCtx := ctx.QualifiedIdentifier()
-		parts := make([]string, len(qCtx.AllIDENTIFIER()))
-		for i, node := range qCtx.AllIDENTIFIER() {
-			parts[i] = node.GetText()
-		}
-		
-		if len(parts) < 2 { return v.ctx.Builder.ConstInt(types.I64, 0) }
-		firstPart := parts[0]
-
-		if sym, ok := v.ctx.currentScope.Lookup(firstPart); ok {
-			var currentVal ir.Value = sym.Value
-			
-			if ptr, isAlloca := currentVal.(*ir.AllocaInst); isAlloca {
-				if _, isPtr := ptr.AllocatedType.(*types.PointerType); isPtr {
-					currentVal = v.ctx.Builder.CreateLoad(ptr.AllocatedType, ptr, "")
-				} else {
-					currentVal = ptr
-				}
-			}
-			
-			for i := 1; i < len(parts); i++ {
-				currentVal = v.handleMemberAccess(currentVal, parts[i])
-			}
-			return currentVal
-		}
-
-		// Check if it's an enum type access (e.g., Status.OK)
-		if _, isType := v.ctx.GetType(firstPart); isType {
-			if len(parts) == 2 {
-				memberName := parts[1]
-				fullName := v.getNamespacedName(firstPart + "_" + memberName)
-				if global := v.ctx.Module.GetGlobal(fullName); global != nil {
-					ptrType := global.Type().(*types.PointerType)
-					return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
-				}
-				v.ctx.Logger.Error("Enum '%s' has no member '%s'", firstPart, memberName)
-				return v.ctx.Builder.ConstInt(types.I64, 0)
-			}
-		}
-
-		nsName := firstPart
-		memberName := parts[1]
-		
-		if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
-			if fn, ok := ns.LookupFunction(memberName); ok {
-				return fn
-			}
-			
-			mangledName := nsName + "_" + memberName
-			if global := v.ctx.Module.GetGlobal(mangledName); global != nil {
-				ptrType := global.Type().(*types.PointerType)
-				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
-			}
-			
-			v.ctx.Logger.Error("Member '%s' not found in namespace '%s'", memberName, nsName)
-		} else {
-			v.ctx.Logger.Error("Unknown namespace or variable: %s", nsName)
-		}
-		return v.ctx.Builder.ConstInt(types.I64, 0)
-	}
-
-	if ctx.IDENTIFIER() != nil {
-		name := ctx.IDENTIFIER().GetText()
-		
-		if _, isType := v.ctx.GetType(name); isType {
-			v.ctx.Logger.Error("Type '%s' used as value", name)
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
-		if _, isNamespace := v.ctx.NamespaceRegistry[name]; isNamespace {
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-		
-		sym, ok := v.ctx.currentScope.Lookup(name)
-		if !ok {
-			if v.ctx.currentNamespace != nil {
-				mangled := v.ctx.currentNamespace.Name + "_" + name
-				if global := v.ctx.Module.GetGlobal(mangled); global != nil {
-					ptrType := global.Type().(*types.PointerType)
-					return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
-				}
-			}
-			if global := v.ctx.Module.GetGlobal(name); global != nil {
-				ptrType := global.Type().(*types.PointerType)
-				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
-			}
-			
-			if v.ctx.currentNamespace != nil {
-				if fn, ok := v.ctx.currentNamespace.Functions[name]; ok {
-					return fn
-				}
-			}
-			if fn := v.ctx.Module.GetFunction(name); fn != nil {
-				return fn
-			}
-			v.ctx.Logger.Error("Undefined: %s", name)
-			return v.ctx.Builder.ConstInt(types.I64, 0)
-		}
-
-		// Handle global constants stored in scope
-		if sym.IsConst {
-			// If it's a global pointer, load it
-			if global, ok := sym.Value.(*ir.Global); ok {
-				ptrType := global.Type().(*types.PointerType)
-				return v.ctx.Builder.CreateLoad(ptrType.ElementType, global, "")
-			}
-			// Otherwise return the constant value directly
-			return sym.Value
-		}
-
-		if ptr, isAlloca := sym.Value.(*ir.AllocaInst); isAlloca {
-			ptrType := ptr.Type().(*types.PointerType)
-			return v.ctx.Builder.CreateLoad(ptrType.ElementType, ptr, "")
-		}
-
-		return sym.Value
-	}
-	
-	return v.ctx.Builder.ConstInt(types.I64, 0)
 }
 
 func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {
 	var name string
 	var structType *types.StructType
-	
 	if ctx.IDENTIFIER() != nil {
 		name = ctx.IDENTIFIER().GetText()
 		if v.ctx.currentNamespace != nil && v.ctx.currentNamespace.Name != "" {
@@ -872,7 +715,6 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 		if len(qCtx.AllIDENTIFIER()) == 2 {
 			nsName := qCtx.IDENTIFIER(0).GetText()
 			typeName := qCtx.IDENTIFIER(1).GetText()
-			
 			if ns, ok := v.ctx.NamespaceRegistry[nsName]; ok {
 				if typ, ok := ns.Types[typeName]; ok {
 					if st, ok := typ.(*types.StructType); ok {
@@ -883,71 +725,52 @@ func (v *IRVisitor) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 			}
 		}
 	}
-
 	if structType == nil {
 		v.ctx.Logger.Error("Unknown struct/class type: %s", ctx.GetText())
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
-
 	irName := structType.Name
-	v.logger.Debug("Creating struct literal for type: %s", irName)
-
 	if v.ctx.IsClassType(irName) {
 		ptrToClass := v.ctx.Builder.CreateAlloca(structType, irName+".instance")
-		
 		for i := 0; i < len(structType.Fields); i++ {
 			gep := v.ctx.Builder.CreateStructGEP(structType, ptrToClass, i, "")
 			zero := v.getZeroValue(structType.Fields[i])
 			v.ctx.Builder.CreateStore(zero, gep)
 		}
-		
 		for _, field := range ctx.AllFieldInit() {
 			fieldName := field.IDENTIFIER().GetText()
 			fieldVal := v.Visit(field.Expression()).(ir.Value)
-			
 			var idx int = -1
 			if idxVal, ok := v.ctx.ClassFieldIndices[irName][fieldName]; ok {
 				idx = idxVal
 			}
-			
 			if idx < 0 {
-				v.ctx.Logger.Error("Class %s has no field %s", irName, fieldName)
 				continue
 			}
-			
-			// Cast field value to match field type
 			expectedType := structType.Fields[idx]
 			if !fieldVal.Type().Equal(expectedType) {
 				fieldVal = v.castValue(fieldVal, expectedType)
 			}
-			
 			gep := v.ctx.Builder.CreateStructGEP(structType, ptrToClass, idx, "")
 			v.ctx.Builder.CreateStore(fieldVal, gep)
 		}
 		return ptrToClass
 	}
-
 	var agg ir.Value = v.ctx.Builder.ConstZero(structType)
 	for _, field := range ctx.AllFieldInit() {
 		fieldName := field.IDENTIFIER().GetText()
 		fieldVal := v.Visit(field.Expression()).(ir.Value)
-		
 		var idx int = -1
 		if idxVal, ok := v.ctx.StructFieldIndices[irName][fieldName]; ok {
 			idx = idxVal
 		}
-		
 		if idx < 0 {
-			v.ctx.Logger.Error("Struct %s has no field %s", irName, fieldName)
 			continue
 		}
-		
-		// Cast field value to match field type
 		expectedType := structType.Fields[idx]
 		if !fieldVal.Type().Equal(expectedType) {
 			fieldVal = v.castValue(fieldVal, expectedType)
 		}
-		
 		agg = v.ctx.Builder.CreateInsertValue(agg, fieldVal, []int{idx}, "")
 	}
 	return agg
@@ -975,36 +798,25 @@ func (v *IRVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	}
 	if ctx.CHAR_LITERAL() != nil {
 		text := ctx.CHAR_LITERAL().GetText()
-		// Remove single quotes
 		if len(text) >= 2 {
 			text = text[1 : len(text)-1]
 		}
-		
 		var charValue rune
 		if len(text) > 0 && text[0] == '\\' {
-			// Escape sequence
 			if len(text) >= 2 {
 				switch text[1] {
-				case 'n':
-					charValue = '\n'
-				case 't':
-					charValue = '\t'
-				case 'r':
-					charValue = '\r'
-				case '\\':
-					charValue = '\\'
-				case '\'':
-					charValue = '\''
-				case '0':
-					charValue = '\000'
-				default:
-					charValue = rune(text[1])
+				case 'n': charValue = '\n'
+				case 't': charValue = '\t'
+				case 'r': charValue = '\r'
+				case '\\': charValue = '\\'
+				case '\'': charValue = '\''
+				case '0': charValue = '\000'
+				default: charValue = rune(text[1])
 				}
 			}
 		} else if len(text) > 0 {
 			charValue = rune(text[0])
 		}
-		
 		return v.ctx.Builder.ConstInt(types.U32, int64(charValue))
 	}
 	if ctx.NULL() != nil {
@@ -1025,51 +837,38 @@ func (v *IRVisitor) visitStringLiteral(rawText string) ir.Value {
 			content = rawText
 		}
 	}
-	
-	// Check for string interpolation \(expr)
-	if containsInterpolation(content) {
-		v.ctx.Logger.Warning("String interpolation not yet implemented, treating as raw string")
-	}
-	
 	bytes := append([]byte(content), 0)
 	elements := make([]ir.Constant, len(bytes))
 	for i, b := range bytes {
 		elements[i] = v.ctx.Builder.ConstInt(types.I8, int64(b))
 	}
-	
 	arrType := types.NewArray(types.I8, int64(len(bytes)))
 	constArr := &ir.ConstantArray{
 		BaseValue: ir.BaseValue{ValType: arrType},
 		Elements:  elements,
 	}
-	
 	strName := fmt.Sprintf(".str.%d", len(v.ctx.Module.Globals))
 	global := v.ctx.Builder.CreateGlobalConstant(strName, constArr)
 	zero := v.ctx.Builder.ConstInt(types.I32, 0)
-	
 	return v.ctx.Builder.CreateInBoundsGEP(arrType, global, []ir.Value{zero, zero}, "")
 }
 
 func (v *IRVisitor) visitInitializerList(ctx parser.IInitializerListContext) ir.Value {
 	initCtx := ctx.(*parser.InitializerListContext)
 	exprs := initCtx.AllExpression()
-	
 	if len(exprs) == 0 {
 		return &ir.ConstantArray{
 			BaseValue: ir.BaseValue{ValType: types.NewArray(types.I32, 0)},
 			Elements:  []ir.Constant{},
 		}
 	}
-	
 	elements := make([]ir.Constant, len(exprs))
 	var elemType types.Type
-	
 	for i, expr := range exprs {
 		val := v.Visit(expr).(ir.Value)
 		if i == 0 { 
 			elemType = val.Type() 
 		}
-		
 		if constVal, ok := val.(ir.Constant); ok {
 			elements[i] = constVal
 		} else {
@@ -1079,7 +878,6 @@ func (v *IRVisitor) visitInitializerList(ctx parser.IInitializerListContext) ir.
 			}
 		}
 	}
-	
 	arrType := types.NewArray(elemType, int64(len(elements)))
 	return &ir.ConstantArray{
 		BaseValue: ir.BaseValue{ValType: arrType},
@@ -1157,7 +955,6 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 		typ := v.resolveType(ctx.Type_())
 		return v.ctx.Builder.CreateAlignOf(typ, "")
 	}
-	
 	if ctx.VA_START() != nil {
 		vaListType := v.ctx.namedTypes["va_list"]
 		if vaListType == nil {
@@ -1168,14 +965,12 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 		v.ctx.Builder.CreateVaStart(vaListPtr)
 		return vaListPtr
 	}
-	
 	var args []ir.Value
 	for _, expr := range ctx.AllExpression() {
 		if val, ok := v.Visit(expr).(ir.Value); ok {
 			args = append(args, val)
 		}
 	}
-	
 	if ctx.MEMSET() != nil && len(args) == 3 {
 		return v.ctx.Builder.CreateMemSet(args[0], args[1], args[2])
 	}
@@ -1203,29 +998,15 @@ func (v *IRVisitor) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 	}
 	if ctx.RAISE() != nil && len(args) == 1 {
 		v.ctx.Builder.CreateRaise(args[0])
-		// Removed: v.ctx.Builder.CreateUnreachable() - backend doesn't support it
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
 	if ctx.BIT_CAST() != nil && len(args) == 1 {
 		targetType := v.resolveType(ctx.Type_())
-		// Bit cast reinterprets bits without conversion
 		return v.ctx.Builder.CreateBitCast(args[0], targetType, "")
 	}
 	if ctx.SLICE() != nil && len(args) >= 1 {
 		v.ctx.Logger.Warning("slice() intrinsic not fully implemented")
-		// Would return (ptr, len) tuple
 		return v.ctx.Builder.ConstInt(types.I64, 0)
 	}
-	
 	return v.ctx.Builder.ConstInt(types.I64, 0)
-}
-
-// Helper function to check if string contains interpolation pattern
-func containsInterpolation(s string) bool {
-	for i := 0; i < len(s)-1; i++ {
-		if s[i] == '\\' && s[i+1] == '(' {
-			return true
-		}
-	}
-	return false
 }

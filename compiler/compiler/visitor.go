@@ -1,3 +1,4 @@
+// --- START OF FILE compiler/visitor.go ---
 package compiler
 
 import (
@@ -17,6 +18,10 @@ type IRVisitor struct {
 	
 	// Method call tracking
 	pendingMethodSelf ir.Value
+
+	// Generics Instantiation Overrides
+	overrideFunctionName string
+	overrideStructName   string
 }
 
 // NewIRVisitor creates a new IR visitor
@@ -239,6 +244,193 @@ func (v *IRVisitor) VisitNamespaceDecl(ctx *parser.NamespaceDeclContext) interfa
 }
 
 // ============================================================================
+// GENERICS INSTANTIATION
+// ============================================================================
+
+func (v *IRVisitor) instantiateFunction(name string, genericArgs parser.IGenericArgsContext) *ir.Function {
+	// 1. Resolve Type Arguments
+	if genericArgs == nil {
+		return nil
+	}
+	
+	typeList := genericArgs.TypeList()
+	if typeList == nil {
+		return nil
+	}
+	
+	typeArgs := []types.Type{}
+	for _, typeCtx := range typeList.AllType_() {
+		typeArgs = append(typeArgs, v.resolveType(typeCtx))
+	}
+	
+	// 2. Mangle Name
+	mangledName := name + "<"
+	for i, t := range typeArgs {
+		if i > 0 {
+			mangledName += ","
+		}
+		mangledName += t.String()
+	}
+	mangledName += ">"
+	
+	// 3. Check Cache or Module
+	if fn, ok := v.ctx.InstantiatedFunctions[mangledName]; ok {
+		return fn
+	}
+	if fn := v.ctx.Module.GetFunction(mangledName); fn != nil {
+		return fn
+	}
+	
+	// 4. Find AST
+	ast, ok := v.ctx.GenericFunctionDecls[name]
+	if !ok {
+		// It might be a method of a generic struct, but we typically handle that via struct member access
+		v.ctx.Logger.Debug("Generic function declaration '%s' not found (may be method or not registered)", name)
+		return nil
+	}
+	
+	v.logger.Info("Instantiating function %s as %s", name, mangledName)
+	
+	// 5. Setup Type Parameters
+	gp := ast.GenericParams()
+	if gp == nil {
+		return nil
+	}
+	gpl := gp.GenericParamList()
+	params := gpl.AllIDENTIFIER()
+	
+	if len(params) != len(typeArgs) {
+		v.ctx.Logger.Error("Generic argument count mismatch for %s: expected %d, got %d", name, len(params), len(typeArgs))
+		return nil
+	}
+	
+	// Save old type params
+	oldParams := make(map[string]types.Type)
+	for k, v := range v.ctx.CurrentTypeParams {
+		oldParams[k] = v
+	}
+	
+	// Set new type params
+	for i, param := range params {
+		paramName := param.GetText()
+		v.ctx.CurrentTypeParams[paramName] = typeArgs[i]
+	}
+	
+	// 6. Visit AST with override name
+	v.overrideFunctionName = mangledName
+	v.Visit(ast)
+	v.overrideFunctionName = ""
+	
+	// Restore type params
+	v.ctx.CurrentTypeParams = oldParams
+	
+	// 7. Return Result
+	fn := v.ctx.Module.GetFunction(mangledName)
+	if fn != nil {
+		v.ctx.InstantiatedFunctions[mangledName] = fn
+	}
+	return fn
+}
+
+func (v *IRVisitor) instantiateStruct(name string, genericArgs parser.IGenericArgsContext) types.Type {
+	// 1. Resolve Type Args
+	if genericArgs == nil { return types.I64 }
+	typeList := genericArgs.TypeList()
+	typeArgs := []types.Type{}
+	for _, typeCtx := range typeList.AllType_() {
+		typeArgs = append(typeArgs, v.resolveType(typeCtx))
+	}
+	
+	// 2. Mangle Name
+	mangledName := name + "<"
+	for i, t := range typeArgs {
+		if i > 0 { mangledName += "," }
+		mangledName += t.String()
+	}
+	mangledName += ">"
+	
+	// 3. Check Cache
+	if st, ok := v.ctx.InstantiatedStructs[mangledName]; ok {
+		return st
+	}
+	if t, ok := v.ctx.GetType(mangledName); ok {
+		return t
+	}
+	
+	// 4. Find AST
+	ast, ok := v.ctx.GenericStructDecls[name]
+	if !ok {
+		v.ctx.Logger.Error("Unknown generic struct: %s", name)
+		return types.I64
+	}
+	
+	v.logger.Info("Instantiating struct %s as %s", name, mangledName)
+	
+	// 5. Setup Type Parameters
+	gp := ast.GenericParams()
+	params := gp.GenericParamList().AllIDENTIFIER()
+	
+	if len(params) != len(typeArgs) {
+		v.ctx.Logger.Error("Generic argument count mismatch for %s", name)
+		return types.I64
+	}
+	
+	oldParams := make(map[string]types.Type)
+	for k, v := range v.ctx.CurrentTypeParams {
+		oldParams[k] = v
+	}
+	for i, param := range params {
+		v.ctx.CurrentTypeParams[param.GetText()] = typeArgs[i]
+	}
+	
+	// 6. Create Struct Type
+	// Create field map
+	fieldMap := make(map[string]int)
+	fieldTypes := make([]types.Type, 0)
+	
+	fieldIndex := 0
+	for _, member := range ast.AllStructMember() {
+		if member.StructField() != nil {
+			field := member.StructField()
+			fieldName := field.IDENTIFIER().GetText()
+			// This resolveType will use v.ctx.CurrentTypeParams
+			fieldType := v.resolveType(field.Type_())
+			
+			fieldTypes = append(fieldTypes, fieldType)
+			fieldMap[fieldName] = fieldIndex
+			fieldIndex++
+		}
+	}
+	
+	// Register mapping using IR name
+	v.ctx.StructFieldIndices[mangledName] = fieldMap
+
+	// Create struct type with IR name
+	structType := types.NewStruct(mangledName, fieldTypes, false)
+	
+	// Register in symbol table
+	v.ctx.RegisterType(mangledName, structType)
+	v.ctx.Module.Types[mangledName] = structType
+	v.ctx.InstantiatedStructs[mangledName] = structType
+	
+	// 7. Visit Members (Methods)
+	// We set overrideStructName so VisitFunctionDecl knows which parent struct it belongs to
+	// and creates mangled method names like vector<int32>_push
+	v.overrideStructName = mangledName
+	
+	for _, member := range ast.AllStructMember() {
+		if member.FunctionDecl() != nil {
+			v.Visit(member.FunctionDecl())
+		}
+	}
+	
+	v.overrideStructName = ""
+	v.ctx.CurrentTypeParams = oldParams
+	
+	return structType
+}
+
+// ============================================================================
 // HELPERS
 // ============================================================================
 
@@ -325,9 +517,21 @@ func (v *IRVisitor) resolveType(ctx parser.ITypeContext) types.Type {
 	
 	if typeCtx.IDENTIFIER() != nil {
 		name := typeCtx.IDENTIFIER().GetText()
+		
+		// 1. Check Current Type Parameters (Generic T, U, etc.)
+		if typ, ok := v.ctx.CurrentTypeParams[name]; ok {
+			return typ
+		}
+		
+		// 2. Check for Generic Instantiation (Vector<int>)
+		if typeCtx.GenericArgs() != nil {
+			return v.instantiateStruct(name, typeCtx.GenericArgs())
+		}
+		
 		if typ, ok := v.ctx.GetType(name); ok {
 			return typ
 		}
+		
 		v.ctx.Logger.Error("Unknown type: %s", name)
 		return types.I64
 	}

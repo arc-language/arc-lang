@@ -1,3 +1,4 @@
+// --- START OF FILE compiler/visitor_types.go ---
 package compiler
 
 import (
@@ -18,6 +19,13 @@ func (v *IRVisitor) getNamespacedName(name string) string {
 func (v *IRVisitor) registerStructType(ctx *parser.StructDeclContext) {
 	name := ctx.IDENTIFIER().GetText()
 	
+	// Check for Generic Definition
+	if ctx.GenericParams() != nil {
+		v.ctx.GenericStructDecls[name] = ctx
+		v.logger.Info("Registered generic struct definition: %s", name)
+		return
+	}
+
 	// Register simple name in scope first to check duplicates
 	if _, ok := v.ctx.GetType(name); ok {
 		v.logger.Debug("Struct type '%s' already registered", name)
@@ -62,6 +70,11 @@ func (v *IRVisitor) registerStructType(ctx *parser.StructDeclContext) {
 func (v *IRVisitor) registerClassType(ctx *parser.ClassDeclContext) {
 	name := ctx.IDENTIFIER().GetText()
 	
+	if ctx.GenericParams() != nil {
+		v.ctx.GenericClassDecls[name] = ctx
+		return
+	}
+
 	v.logger.Info("Registering class type: %s", name)
 	
 	if _, ok := v.ctx.GetType(name); ok {
@@ -107,6 +120,10 @@ func (v *IRVisitor) registerClassType(ctx *parser.ClassDeclContext) {
 }
 
 func (v *IRVisitor) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
+    if ctx.GenericParams() != nil && v.overrideStructName == "" {
+        return nil
+    }
+
 	name := ctx.IDENTIFIER().GetText()
 	v.logger.Debug("Processing struct declaration: %s", name)
 	
@@ -120,6 +137,10 @@ func (v *IRVisitor) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 }
 
 func (v *IRVisitor) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
+	if ctx.GenericParams() != nil {
+		return nil
+	}
+
 	name := ctx.IDENTIFIER().GetText()
 	v.logger.Info("Processing class declaration: %s", name)
 	
