@@ -1,3 +1,4 @@
+// --- START OF FILE codegen/arch/amd64/compiler.go ---
 package amd64
 
 import (
@@ -339,37 +340,60 @@ func (c *compiler) emitPrologue() {
 }
 
 func (c *compiler) emitArgSave(fn *ir.Function) {
-	// System V AMD64 ABI: RDI, RSI, RDX, RCX, R8, R9
-	argRegs := []int{RDI, RSI, RDX, RCX, R8, R9}
+	gpRegs := []int{RDI, RSI, RDX, RCX, R8, R9}
+	// XMM0..XMM7
+	
+	gpIdx := 0
+	fpIdx := 0
+	
+	// Track stack args count for offsets
+	stackArgIdx := 0
 
-	for i, arg := range fn.Arguments {
+	for _, arg := range fn.Arguments {
 		offset := c.stackMap[arg]
 		size := SizeOf(arg.Type())
+		
+		isFloat := types.IsFloat(arg.Type())
+		
+		passedInReg := false
+		var reg int
+		var isXMM bool
+		
+		if isFloat {
+			if fpIdx < 8 {
+				reg = fpIdx // 0..7
+				fpIdx++
+				isXMM = true
+				passedInReg = true
+			}
+		} else {
+			if gpIdx < 6 {
+				reg = gpRegs[gpIdx]
+				gpIdx++
+				passedInReg = true
+			}
+		}
 
-		if i < len(argRegs) {
-			// Load from register and store to stack
-			reg := argRegs[i]
-			if size <= 8 {
+		if passedInReg {
+			if isXMM {
+				// Store XMM reg to stack
+				c.emitFpStoreToStack(reg, offset, size > 4) // simple check for float vs double
+			} else {
+				// Store GP reg to stack
 				c.emitStoreReg(reg, offset, size)
 			}
 		} else {
-			// Arguments beyond 6 are on the caller's stack
-			// Stack layout after prologue: [rbp+0]=old rbp, [rbp+8]=return addr
-			// The caller may have added alignment padding before the call
-			// With 1 stack arg (8 bytes), alignment adds 8 bytes
-			// So: [rbp+16]=padding, [rbp+24]=first stack arg, [rbp+32]=second stack arg, etc.
+			// Stack argument
+			// [rbp + 16 + stackArgIdx*8]
+			// Simplified stack alignment logic
+			// In prologue, RBP pushed (8 bytes), then RBP=RSP.
+			// Return addr is at RBP+8.
+			// First stack arg is at RBP+16.
+			srcOffset := 16 + stackArgIdx*8
+			stackArgIdx++
+			// Align stackArgIdx if arg > 8 bytes (not implemented here, assuming 8 byte slots)
 			
-			// Calculate number of stack args to determine if there's padding
-			numStackArgs := len(fn.Arguments) - len(argRegs)
-			stackBytesBeforeAlign := numStackArgs * 8
-			alignmentPadding := 0
-			if stackBytesBeforeAlign%16 != 0 {
-				alignmentPadding = 8
-			}
-			
-			srcOffset := 16 + alignmentPadding + (i-len(argRegs))*8
-
-			// Load with appropriate size
+			// Copy from srcOffset to offset
 			if size == 4 {
 				// mov eax, [rbp + srcOffset]
 				c.emitBytes(0x8B, 0x85)
@@ -388,6 +412,7 @@ func (c *compiler) emitArgSave(fn *ir.Function) {
 				c.emitInt32(int32(offset))
 			} else {
 				// For other sizes, use RAX as intermediate
+				// Note: emitLoadFromStack uses correct size
 				c.emitLoadFromStack(RAX, srcOffset, size)
 				c.emitStoreToStack(RAX, offset, size)
 			}

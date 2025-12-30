@@ -949,18 +949,52 @@ func (c *compiler) vaStartOp(inst *ir.VaStartInst) error {
 	vaList := inst.Operands()[0]
 	c.loadToReg(RAX, vaList) // Get va_list pointer
 
-	// Initialize gp_offset to 0
-	c.emitBytes(0xC7, 0x00, 0x00, 0x00, 0x00, 0x00)
+	// Calculate initial offsets based on fixed arguments
+	gpOffset := 0
+	fpOffset := 48
+	stackOffset := 16 // Stack args start after RBP (8) + ReturnAddr (8)
 
-	// Initialize fp_offset to 48
-	c.emitBytes(0xC7, 0x40, 0x04, 0x30, 0x00, 0x00, 0x00)
+	for _, arg := range c.currentFunc.Arguments {
+		if types.IsFloat(arg.Type()) {
+			if fpOffset < 176 {
+				fpOffset += 16
+			} else {
+				// Passed on stack
+				size := SizeOf(arg.Type())
+				// Align to 8 bytes
+				if size < 8 { size = 8 }
+				if size%8 != 0 { size += (8 - size%8) }
+				stackOffset += size
+			}
+		} else {
+			// Integer/Pointer type
+			// Assuming large structs are handled by reference or simplified logic
+			if gpOffset < 48 {
+				gpOffset += 8
+			} else {
+				// Passed on stack
+				size := SizeOf(arg.Type())
+				if size < 8 { size = 8 }
+				if size%8 != 0 { size += (8 - size%8) }
+				stackOffset += size
+			}
+		}
+	}
 
-	// Set overflow_arg_area to first stack arg [rbp + 16]
-	c.emitBytes(0x48, 0x8D, 0x8D, 0x10, 0x00, 0x00, 0x00) // lea rcx, [rbp + 16]
-	c.emitBytes(0x48, 0x89, 0x48, 0x08)                   // mov [rax + 8], rcx
+	// Initialize gp_offset
+	c.emitBytes(0xC7, 0x00) // mov dword ptr [rax], imm32
+	c.emitInt32(int32(gpOffset))
+
+	// Initialize fp_offset
+	c.emitBytes(0xC7, 0x40, 0x04) // mov dword ptr [rax+4], imm32
+	c.emitInt32(int32(fpOffset))
+
+	// Set overflow_arg_area
+	c.emitBytes(0x48, 0x8D, 0x8D) // lea rcx, [rbp + stackOffset]
+	c.emitInt32(int32(stackOffset))
+	c.emitBytes(0x48, 0x89, 0x48, 0x08) // mov [rax + 8], rcx
 
 	// Set reg_save_area to point to saved registers at bottom of frame
-	// The register save area is at offset -c.currentFrame
 	regSaveOffset := -c.currentFrame
 	c.emitBytes(0x48, 0x8D, 0x8D)  // lea rcx, [rbp + offset]
 	c.emitInt32(int32(regSaveOffset))
@@ -1041,7 +1075,8 @@ func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 			c.emitBytes(0xF2, 0x0F, 0x10, 0x01) // movsd xmm0, [rcx]
 		}
 		
-		// Advance overflow_arg_area by 8
+		// Advance overflow_arg_area by 8 (or aligned size)
+		// For simple types, 8 bytes
 		c.emitBytes(0x48, 0x83, 0xC1, 0x08)
 		c.emitBytes(0x49, 0x89, 0x4A, 0x08) // mov [r10 + 8], rcx  *** FIXED ***
 		
@@ -1351,5 +1386,56 @@ func (c *compiler) raiseOp(inst *ir.RaiseInst) error {
 	
 	// Don't exit - just return normally
 	// The caller will check the exception state
+	return nil
+}
+
+// Coroutine Operations
+// These map to LLVM coroutine intrinsics and implement async/await
+
+// coroIdOp - Initialize coroutine (llvm.coro.id)
+func (c *compiler) coroIdOp(inst *ir.CoroIdInst) error {
+	// Store a unique ID (use instruction address)
+	c.loadConstInt(RAX, int64(c.text.Len()))
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+// coroBeginOp - Begin coroutine execution (llvm.coro.begin)
+func (c *compiler) coroBeginOp(inst *ir.CoroBeginInst) error {
+	frameSize := 256
+	// mmap(NULL, frameSize, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0)
+	c.emitXorReg(RDI, RDI)                    // addr = NULL
+	c.loadConstInt(RSI, int64(frameSize))     // length
+	c.loadConstInt(RDX, 3)                     // prot = PROT_READ | PROT_WRITE
+	c.loadConstInt(R10, 0x22)                  // flags = MAP_PRIVATE | MAP_ANONYMOUS
+	c.loadConstInt(R8, -1)                     // fd = -1
+	c.emitXorReg(R9, R9)                       // offset = 0
+	c.loadConstInt(RAX, 9)                     // syscall number for mmap
+	c.emitBytes(0x0F, 0x05)                    // syscall
+	
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+// coroSuspendOp - Suspend coroutine execution (llvm.coro.suspend)
+func (c *compiler) coroSuspendOp(inst *ir.CoroSuspendInst) error {
+	c.loadConstInt(RAX, 0)
+	c.storeFromReg(RAX, inst)
+	return nil
+}
+
+// coroEndOp - End coroutine scope (llvm.coro.end)
+func (c *compiler) coroEndOp(inst *ir.CoroEndInst) error {
+	handle := inst.Operands()[0]
+	c.loadToReg(RAX, handle)
+	c.loadConstInt(RAX, 1)
+	return nil
+}
+
+// coroFreeOp - Get memory to free for coroutine (llvm.coro.free)
+func (c *compiler) coroFreeOp(inst *ir.CoroFreeInst) error {
+	handle := inst.Operands()[1]
+	c.loadToReg(RAX, handle)
+	c.storeFromReg(RAX, inst)
 	return nil
 }
