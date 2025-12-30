@@ -186,6 +186,9 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 	c.fixups = nil
 	c.nextTemp = 0
 
+	// Check if function is variadic
+	isVariadic := fn.IsVarArg
+
 	// 1. Analyze and allocate stack space
 	offset := 0
 	alloc := func(v ir.Value, sz int) {
@@ -243,6 +246,12 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 		}
 	}
 
+	// NEW: Add register save area for variadic functions
+	// 176 bytes = 6 GP regs * 8 bytes + 8 FP regs * 16 bytes
+	if isVariadic {
+		allocaOffset += 176
+	}
+
 	// Align stack frame to 16 bytes (required by System V ABI)
 	if allocaOffset%16 != 0 {
 		allocaOffset += (16 - (allocaOffset % 16))
@@ -254,6 +263,11 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 
 	// 3. Save register arguments to stack
 	c.emitArgSave(fn)
+
+	// NEW: Save variadic register arguments to register save area
+	if isVariadic {
+		c.emitVarArgRegSave(fn)
+	}
 
 	// 4. Compile basic blocks
 	for _, block := range fn.Blocks {
@@ -269,6 +283,40 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 	c.applyFixups()
 
 	return nil
+}
+
+// emitVarArgRegSave saves all argument registers to the register save area
+// This is required for variadic functions following System V AMD64 ABI
+func (c *compiler) emitVarArgRegSave(fn *ir.Function) {
+	// The register save area is at the bottom of our stack frame
+	// Layout: [regular locals] [allocas] [176-byte reg save area]
+	// The area starts at -(c.currentFrame - 176) and goes to -c.currentFrame
+	
+	// GP register save area: 6 registers * 8 bytes = 48 bytes
+	// FP register save area: 8 registers * 16 bytes = 128 bytes
+	// Total: 176 bytes
+	
+	baseOffset := -c.currentFrame
+	
+	// Save GP registers: RDI, RSI, RDX, RCX, R8, R9
+	// They go at offsets 0, 8, 16, 24, 32, 40 from baseOffset
+	gpRegs := []int{RDI, RSI, RDX, RCX, R8, R9}
+	for i, reg := range gpRegs {
+		offset := baseOffset + (i * 8)
+		c.emitStoreReg(reg, offset, 8)
+	}
+	
+	// Save FP registers: XMM0-XMM7
+	// They go at offsets 48, 64, 80, 96, 112, 128, 144, 160 from baseOffset
+	for i := 0; i < 8; i++ {
+		offset := baseOffset + 48 + (i * 16)
+		// Save full 16 bytes of each XMM register
+		c.emitFpStoreToStack(i, offset, true) // true = use movsd (8 bytes)
+		
+		// For full XMM register save (16 bytes), we'd need movdqa
+		// But for variadic args, we only need the lower 8 bytes (double precision)
+		// So movsd is sufficient
+	}
 }
 
 func (c *compiler) emitPrologue() {

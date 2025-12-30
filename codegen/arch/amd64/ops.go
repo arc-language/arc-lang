@@ -943,81 +943,180 @@ func (c *compiler) bitcastOp(inst *ir.CastInst) error {
 // Variadic Operations
 // ============================================================================
 
-// va_start - initialize va_list
+// va_start - initialize va_list with register save area
 func (c *compiler) vaStartOp(inst *ir.VaStartInst) error {
 	// System V AMD64 ABI va_list structure:
 	// struct {
-	//   uint32 gp_offset;     // offset to next GP register arg (0-48)
-	//   uint32 fp_offset;     // offset to next FP register arg (48-176)
-	//   void*  overflow_arg_area;  // pointer to stack args
-	//   void*  reg_save_area;      // pointer to register save area
+	//   uint32 gp_offset;              // 0-48 (6 GP regs * 8 bytes)
+	//   uint32 fp_offset;              // 48-176 (8 FP regs * 16 bytes)
+	//   void*  overflow_arg_area;      // pointer to stack args
+	//   void*  reg_save_area;          // pointer to saved registers
 	// }
 	
 	vaList := inst.Operands()[0]
 	c.loadToReg(RAX, vaList) // Get va_list pointer
 
-	// Initialize gp_offset to 0 (no GP registers consumed yet)
-	// mov dword ptr [rax], 0
+	// Initialize gp_offset to 0
 	c.emitBytes(0xC7, 0x00, 0x00, 0x00, 0x00, 0x00)
 
-	// Initialize fp_offset to 48 (FP registers start after 6 GP regs * 8 bytes)
-	// mov dword ptr [rax + 4], 48
+	// Initialize fp_offset to 48
 	c.emitBytes(0xC7, 0x40, 0x04, 0x30, 0x00, 0x00, 0x00)
 
-	// Set overflow_arg_area to point to stack args (after return address and saved RBP)
-	// lea rcx, [rbp + 16]
-	c.emitBytes(0x48, 0x8D, 0x8D, 0x10, 0x00, 0x00, 0x00)
-	// mov [rax + 8], rcx
-	c.emitBytes(0x48, 0x89, 0x48, 0x08)
+	// Set overflow_arg_area to first stack arg
+	// Stack layout: [rbp+0]=old rbp, [rbp+8]=ret addr, [rbp+16]=arg7, [rbp+24]=arg8...
+	c.emitBytes(0x48, 0x8D, 0x8D, 0x10, 0x00, 0x00, 0x00) // lea rcx, [rbp + 16]
+	c.emitBytes(0x48, 0x89, 0x48, 0x08)                   // mov [rax + 8], rcx
 
-	// Set reg_save_area to point to the register save area (typically allocated by caller)
-	// For simplicity, we'll point to a stack location where we saved registers
-	// This would need proper implementation based on calling convention
-	// For now, set to NULL as a placeholder
-	// mov qword ptr [rax + 16], 0
-	c.emitBytes(0x48, 0xC7, 0x40, 0x10, 0x00, 0x00, 0x00, 0x00)
+	// Set reg_save_area to our register save area in the stack frame
+	// The register save area should have been allocated and populated by the prologue
+	// For variadic functions, we need a special area at a known offset
+	// Let's use [rbp - (framesize + 176)] where 176 = 6*8 (GP) + 8*16 (FP)
+	
+	// FIX: Calculate address of register save area
+	regSaveOffset := -(c.currentFrame + 176) // Below normal frame
+	c.emitBytes(0x48, 0x8D, 0x8D)             // lea rcx, [rbp + offset]
+	c.emitInt32(int32(regSaveOffset))
+	c.emitBytes(0x48, 0x89, 0x48, 0x10)       // mov [rax + 16], rcx
 
 	return nil
 }
 
-// va_arg - retrieve next argument
+// va_arg - retrieve next argument (FIXED)
 func (c *compiler) vaArgOp(inst *ir.VaArgInst) error {
 	vaList := inst.Operands()[0]
 	argType := inst.ArgType
 
 	c.loadToReg(RAX, vaList) // Get va_list pointer
 
-	// Simplified implementation: assume all args come from overflow area
-	// A full implementation would check gp_offset/fp_offset and use reg_save_area
-
-	// Load overflow_arg_area pointer: mov rcx, [rax + 8]
-	c.emitBytes(0x48, 0x8B, 0x48, 0x08)
-
-	// Load the argument from [rcx]
+	// Determine if this is a GP or FP argument
+	isFloat := types.IsFloat(argType)
 	size := SizeOf(argType)
-	switch size {
-	case 1:
-		c.emitBytes(0x48, 0x0F, 0xB6, 0x09) // movzx rax, byte ptr [rcx]
-	case 2:
-		c.emitBytes(0x48, 0x0F, 0xB7, 0x09) // movzx rax, word ptr [rcx]
-	case 4:
-		c.emitBytes(0x8B, 0x01) // mov eax, [rcx]
-		// Move to rax for consistency
-		c.emitBytes(0x48, 0x89, 0xC0)
-	case 8:
-		c.emitBytes(0x48, 0x8B, 0x09) // mov rax, [rcx]
+
+	if isFloat {
+		// FP argument - check fp_offset
+		// Load fp_offset: mov ecx, [rax + 4]
+		c.emitBytes(0x8B, 0x48, 0x04)
+		
+		// Check if FP registers exhausted (fp_offset >= 176)
+		// cmp ecx, 176
+		c.emitBytes(0x81, 0xF9, 0xB0, 0x00, 0x00, 0x00)
+		
+		// jae use_stack (jump if >= 176)
+		c.emitBytes(0x0F, 0x83) // Long conditional jump
+		stackPathOffset := c.text.Len()
+		c.emitUint32(0) // Will be fixed up
+		
+		// Register path: load from reg_save_area + fp_offset
+		// mov rdx, [rax + 16] (reg_save_area)
+		c.emitBytes(0x48, 0x8B, 0x50, 0x10)
+		
+		// Add fp_offset: add rdx, rcx
+		c.emitBytes(0x48, 0x01, 0xCA)
+		
+		// Load from register save area
+		if size == 4 {
+			c.emitBytes(0xF3, 0x0F, 0x10, 0x02) // movss xmm0, [rdx]
+		} else {
+			c.emitBytes(0xF2, 0x0F, 0x10, 0x02) // movsd xmm0, [rdx]
+		}
+		
+		// Advance fp_offset by 16
+		c.emitBytes(0x83, 0xC1, 0x10)           // add ecx, 16
+		c.emitBytes(0x89, 0x48, 0x04)           // mov [rax + 4], ecx
+		
+		// Store result and jump to end
+		c.storeFromFpReg(0, inst)
+		
+		c.emitBytes(0xEB) // Short jump to end
+		endJumpOffset := c.text.Len()
+		c.emitBytes(0) // Will be fixed up
+		
+		// Stack path starts here
+		stackPathStart := c.text.Len()
+		
+	} else {
+		// Integer/pointer argument - check gp_offset
+		// Load gp_offset: mov ecx, [rax]
+		c.emitBytes(0x8B, 0x08)
+		
+		// Check if GP registers exhausted (gp_offset >= 48)
+		// cmp ecx, 48
+		c.emitBytes(0x83, 0xF9, 0x30)
+		
+		// jae use_stack
+		c.emitBytes(0x0F, 0x83)
+		stackPathOffset := c.text.Len()
+		c.emitUint32(0)
+		
+		// Register path: load from reg_save_area + gp_offset
+		// mov rdx, [rax + 16]
+		c.emitBytes(0x48, 0x8B, 0x50, 0x10)
+		
+		// Add gp_offset: add rdx, rcx
+		c.emitBytes(0x48, 0x01, 0xCA)
+		
+		// Load from register save area based on size
+		switch size {
+		case 1:
+			c.emitBytes(0x48, 0x0F, 0xB6, 0x02) // movzx rax, byte [rdx]
+		case 2:
+			c.emitBytes(0x48, 0x0F, 0xB7, 0x02) // movzx rax, word [rdx]
+		case 4:
+			c.emitBytes(0x8B, 0x02)             // mov eax, [rdx]
+		case 8:
+			c.emitBytes(0x48, 0x8B, 0x02)       // mov rax, [rdx]
+		}
+		
+		// Advance gp_offset by 8
+		c.emitBytes(0x83, 0xC1, 0x08)  // add ecx, 8
+		c.emitBytes(0x89, 0x08)        // mov [rax], ecx
+		
+		c.storeFromReg(RAX, inst)
+		
+		c.emitBytes(0xEB)
+		endJumpOffset := c.text.Len()
+		c.emitBytes(0)
+		
+		stackPathStart := c.text.Len()
+		
+		// Fix up jump to stack path
+		stackRel := stackPathStart - (stackPathOffset + 4)
+		text := c.text.Bytes()
+		binary.LittleEndian.PutUint32(text[stackPathOffset:], uint32(stackRel))
 	}
 
-	// Advance overflow_arg_area pointer
-	// add rcx, 8 (arguments are 8-byte aligned)
-	c.emitBytes(0x48, 0x83, 0xC1, 0x08)
+	// Stack path (common for both GP and FP after registers exhausted)
+	// Load overflow_arg_area: mov rcx, [rax + 8]
+	c.emitBytes(0x48, 0x8B, 0x48, 0x08)
 	
-	// Store updated pointer back: mov [rax + 8], rcx (rax still has va_list ptr)
-	c.loadToReg(RDX, vaList) // Reload va_list pointer to RDX
-	c.emitBytes(0x48, 0x89, 0x4A, 0x08)
-
-	// Store result
-	c.storeFromReg(RAX, inst)
+	// Load argument from stack
+	switch size {
+	case 1:
+		c.emitBytes(0x48, 0x0F, 0xB6, 0x01)
+	case 2:
+		c.emitBytes(0x48, 0x0F, 0xB7, 0x01)
+	case 4:
+		c.emitBytes(0x8B, 0x01)
+		c.emitBytes(0x48, 0x89, 0xC0)
+	case 8:
+		c.emitBytes(0x48, 0x8B, 0x01)
+	}
+	
+	// Advance overflow_arg_area by 8
+	c.emitBytes(0x48, 0x83, 0xC1, 0x08)
+	c.emitBytes(0x48, 0x89, 0x48, 0x08)
+	
+	if !isFloat {
+		c.storeFromReg(RAX, inst)
+	} else {
+		c.storeFromFpReg(0, inst)
+	}
+	
+	// Fix up end jump
+	endPos := c.text.Len()
+	endRel := endPos - (endJumpOffset + 1)
+	c.text.Bytes()[endJumpOffset] = byte(endRel)
+	
 	return nil
 }
 
