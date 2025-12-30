@@ -47,10 +47,12 @@ func handleBuild(args []string) {
 		}
 	}
 
+	// Default output filename if not specified
 	if outputFile == "" {
-		fmt.Fprintf(os.Stderr, "Error: Output file not specified (use -o)\n\n")
-		printUsage()
-		os.Exit(1)
+		base := filepath.Base(inputFile)
+		ext := filepath.Ext(base)
+		outputFile = strings.TrimSuffix(base, ext)
+		// On Windows, maybe add .exe? For now assuming Linux as per previous context
 	}
 
 	// Check if input file exists
@@ -61,17 +63,13 @@ func handleBuild(args []string) {
 
 	// Determine output format from extension
 	ext := strings.ToLower(filepath.Ext(outputFile))
-	if ext != ".o" && ext != ".ir" {
-		fmt.Fprintf(os.Stderr, "Error: Output file must have .o or .ir extension\n")
-		os.Exit(1)
-	}
-
+	
 	// Extract module name from input file
 	moduleName := strings.TrimSuffix(filepath.Base(inputFile), filepath.Ext(inputFile))
 
 	fmt.Printf("Compiling %s...\n", inputFile)
 
-	// Create compiler - Now passing moduleName AND inputFile
+	// Create compiler
 	comp := compiler.NewCompiler(moduleName, inputFile)
 
 	// Compile source file
@@ -84,25 +82,36 @@ func handleBuild(args []string) {
 	fmt.Printf("Module has %d functions, %d globals\n", len(module.Functions), len(module.Globals))
 
 	// Generate output based on extension
-	if ext == ".o" {
+	switch ext {
+	case ".o":
 		err = comp.CompileToObject(outputFile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Object generation failed: %v\n", err)
 			os.Exit(1)
 		}
 		fmt.Printf("✓ Object file written to %s\n", outputFile)
-
-		// Print linking hint
+		
+		// Print linking hint for object files
 		exeName := strings.TrimSuffix(filepath.Base(outputFile), ".o")
-		fmt.Printf("\nTo create executable:\n")
+		fmt.Printf("\nTo create executable (using GCC as linker):\n")
 		fmt.Printf("  gcc %s -o %s && ./%s\n", outputFile, exeName, exeName)
-	} else {
+
+	case ".ir":
 		err = comp.CompileToIR(outputFile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "IR generation failed: %v\n", err)
 			os.Exit(1)
 		}
 		fmt.Printf("✓ IR written to %s\n", outputFile)
+
+	default:
+		// Default: Compile to Executable
+		err = comp.CompileToExecutable(outputFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Executable generation failed: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("✓ Executable written to %s\n", outputFile)
 	}
 }
 
@@ -110,7 +119,7 @@ func printUsage() {
 	fmt.Println("Arc Language Compiler")
 	fmt.Println()
 	fmt.Println("Usage:")
-	fmt.Println("  arc build <source-file> -o <output-file>")
+	fmt.Println("  arc build <source-file> [-o <output-file>]")
 	fmt.Println("  arc help")
 	fmt.Println()
 	fmt.Println("Commands:")
@@ -118,10 +127,14 @@ func printUsage() {
 	fmt.Println("  help     Show this help message")
 	fmt.Println()
 	fmt.Println("Options:")
-	fmt.Println("  -o <file>    Output file (.o for object, .ir for IR)")
+	fmt.Println("  -o <file>    Output file (defaults to input filename without extension)")
+	fmt.Println("               .o  -> Object file")
+	fmt.Println("               .ir -> Textual IR")
+	fmt.Println("               (no extension) -> Executable binary")
 	fmt.Println()
 	fmt.Println("Examples:")
-	fmt.Println("  arc build program.arc -o output.o     # Compile to object file")
-	fmt.Println("  arc build program.arc -o output.ir    # Compile to IR")
-	fmt.Println("  arc help                              # Show help")
+	fmt.Println("  arc build main.arc                    # Compiles to './main' executable")
+	fmt.Println("  arc build main.arc -o app             # Compiles to './app' executable")
+	fmt.Println("  arc build program.arc -o output.o     # Compiles to object file")
+	fmt.Println("  arc build program.arc -o output.ir    # Compiles to IR")
 }

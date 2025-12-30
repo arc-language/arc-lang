@@ -52,6 +52,20 @@ const (
 	SHF_STRINGS   = 0x20
 	SHF_INFO_LINK = 0x40
 
+	// Segment Types (Program Header)
+	PT_NULL    = 0
+	PT_LOAD    = 1
+	PT_DYNAMIC = 2
+	PT_INTERP  = 3
+	PT_NOTE    = 4
+	PT_SHLIB   = 5
+	PT_PHDR    = 6
+
+	// Segment Flags
+	PF_X = 0x1 // Execute
+	PF_W = 0x2 // Write
+	PF_R = 0x4 // Read
+
 	// Symbol binding
 	STB_LOCAL  = 0
 	STB_GLOBAL = 1
@@ -77,30 +91,33 @@ const (
 	SHN_ABS   = 0xfff1
 
 	// Relocation types for x86-64
-	R_X86_64_NONE   = 0
-	R_X86_64_64     = 1
-	R_X86_64_PC32   = 2
-	R_X86_64_GOT32  = 3
-	R_X86_64_PLT32  = 4
-	R_X86_64_COPY   = 5
-	R_X86_64_32     = 10
-	R_X86_64_32S    = 11
-	R_X86_64_16     = 12
-	R_X86_64_PC16   = 13
-	R_X86_64_8      = 14
-	R_X86_64_PC8    = 15
-	R_X86_64_PC64   = 24
+	R_X86_64_NONE  = 0
+	R_X86_64_64    = 1
+	R_X86_64_PC32  = 2
+	R_X86_64_GOT32 = 3
+	R_X86_64_PLT32 = 4
+	R_X86_64_COPY  = 5
+	R_X86_64_32    = 10
+	R_X86_64_32S   = 11
+	R_X86_64_16    = 12
+	R_X86_64_PC16  = 13
+	R_X86_64_8     = 14
+	R_X86_64_PC8   = 15
+	R_X86_64_PC64  = 24
 )
 
 // File represents an ELF object file
 type File struct {
-	Sections     []*Section
-	Symbols      []*Symbol
-	StrTab       *StringTable
-	ShStrTab     *StringTable
-	DataLayout   string
-	Machine      uint16
-	RelaSections []*Section // Track rela sections for link fixup
+	Type           uint16
+	Sections       []*Section
+	Symbols        []*Symbol
+	ProgramHeaders []*ProgramHeader
+	StrTab         *StringTable
+	ShStrTab       *StringTable
+	DataLayout     string
+	Machine        uint16
+	Entry          uint64 // Entry point virtual address
+	RelaSections   []*Section
 }
 
 // Section represents an ELF section
@@ -116,10 +133,22 @@ type Section struct {
 	Content   []byte
 
 	// Internal
-	Index    uint16
-	nameIdx  uint32
-	offset   uint64
-	size     uint64
+	Index   uint16
+	nameIdx uint32
+	offset  uint64
+	size    uint64
+}
+
+// ProgramHeader represents an ELF segment
+type ProgramHeader struct {
+	Type   uint32
+	Flags  uint32
+	Off    uint64
+	Vaddr  uint64
+	Paddr  uint64
+	Filesz uint64
+	Memsz  uint64
+	Align  uint64
 }
 
 // Symbol represents an ELF symbol
@@ -177,6 +206,7 @@ func (st *StringTable) Add(s string) uint32 {
 // NewFile creates a new ELF object file
 func NewFile() *File {
 	f := &File{
+		Type:     ET_REL, // Default to relocatable
 		StrTab:   NewStringTable(),
 		ShStrTab: NewStringTable(),
 		Machine:  EM_X86_64,
@@ -205,6 +235,22 @@ func (f *File) AddSection(name string, typ uint32, flags uint64, content []byte)
 	return s
 }
 
+// AddProgramHeader adds a new segment
+func (f *File) AddProgramHeader(typ, flags uint32, off, vaddr, filesz, memsz, align uint64) *ProgramHeader {
+	ph := &ProgramHeader{
+		Type:   typ,
+		Flags:  flags,
+		Off:    off,
+		Vaddr:  vaddr,
+		Paddr:  vaddr, // Usually same as Vaddr on modern systems
+		Filesz: filesz,
+		Memsz:  memsz,
+		Align:  align,
+	}
+	f.ProgramHeaders = append(f.ProgramHeaders, ph)
+	return ph
+}
+
 // AddSymbol adds a new symbol
 func (f *File) AddSymbol(name string, info byte, section *Section, value, size uint64) *Symbol {
 	sym := &Symbol{
@@ -221,21 +267,14 @@ func (f *File) AddSymbol(name string, info byte, section *Section, value, size u
 	return sym
 }
 
-// AddRelocation adds a relocation for a section
-func (f *File) AddRelocation(section *Section, offset uint64, symbol *Symbol, relType uint32, addend int64) {
-	// Relocations are stored with the section they apply to
-	// We'll need to track them separately and create .rela sections later
-}
-
 // WriteTo writes the complete ELF file
 func (f *File) WriteTo(w io.Writer) error {
 	// 1. Add string table sections FIRST (before building string tables)
-	// We need to know their indices before we can reference them
-	shstrtabSec := f.AddSection(".shstrtab", SHT_STRTAB, 0, nil) // Content will be set later
-	strTabSec := f.AddSection(".strtab", SHT_STRTAB, 0, nil)     // Content will be set later
+	shstrtabSec := f.AddSection(".shstrtab", SHT_STRTAB, 0, nil)
+	strTabSec := f.AddSection(".strtab", SHT_STRTAB, 0, nil)
 	strTabSec.Addralign = 1
 
-	// 2. Build string tables for symbols FIRST
+	// 2. Build string tables for symbols
 	for _, sym := range f.Symbols {
 		sym.nameIdx = f.StrTab.Add(sym.Name)
 	}
@@ -276,11 +315,11 @@ func (f *File) WriteTo(w io.Writer) error {
 
 	symTabSec := f.AddSection(".symtab", SHT_SYMTAB, 0, symBuf.Bytes())
 	symTabSec.Link = uint32(strTabSec.Index)
-	symTabSec.Info = uint32(firstGlobal) // Index of first global symbol
+	symTabSec.Info = uint32(firstGlobal)
 	symTabSec.Addralign = 8
-	symTabSec.Entsize = 24 // sizeof(Elf64_Sym)
+	symTabSec.Entsize = 24
 
-	// 4. Fix up relocation section links to point to symtab
+	// 4. Fix up relocation section links
 	for _, relaSec := range f.RelaSections {
 		relaSec.Link = uint32(symTabSec.Index)
 	}
@@ -290,25 +329,42 @@ func (f *File) WriteTo(w io.Writer) error {
 		sec.nameIdx = f.ShStrTab.Add(sec.Name)
 	}
 
-	// Set the actual content for string table sections
+	// Set content for string tables
 	shstrtabSec.Content = f.ShStrTab.Data
 	shstrtabSec.size = uint64(len(f.ShStrTab.Data))
 	strTabSec.Content = f.StrTab.Data
 	strTabSec.size = uint64(len(f.StrTab.Data))
 
-	// 6. Calculate section offsets
+	// 6. Calculate ELF Header and Program Header sizes
 	headerSize := uint64(64) // sizeof(Elf64_Ehdr)
+	phdrSize := uint64(56)   // sizeof(Elf64_Phdr)
+	phOff := headerSize
+	
+	if len(f.ProgramHeaders) > 0 {
+		// Program headers follow ELF header
+		headerSize += uint64(len(f.ProgramHeaders)) * phdrSize
+	}
+
+	// 7. Calculate section offsets
+	// If ET_EXEC, sections might be placed at specific addresses controlled by ProgramHeaders
+	// For now, we assume sections are packed after headers unless manually addressed.
 	currentOffset := headerSize
 
 	for _, sec := range f.Sections {
-		// Align section
-		if sec.Addralign > 0 {
-			if currentOffset%sec.Addralign != 0 {
-				currentOffset += sec.Addralign - (currentOffset % sec.Addralign)
+		// If section has a fixed offset (from static linking), use it if valid
+		// Otherwise calculate linear layout
+		if sec.offset == 0 {
+			if sec.Addralign > 0 {
+				if currentOffset%sec.Addralign != 0 {
+					currentOffset += sec.Addralign - (currentOffset % sec.Addralign)
+				}
 			}
+			sec.offset = currentOffset
+		} else {
+			// Section offset already set (e.g. by linker)
+			currentOffset = sec.offset
 		}
 
-		sec.offset = currentOffset
 		if sec.size == 0 {
 			sec.size = uint64(len(sec.Content))
 		}
@@ -317,15 +373,31 @@ func (f *File) WriteTo(w io.Writer) error {
 
 	shdrOffset := currentOffset
 
-	// 7. Write ELF header (with correct shstrndx)
-	if err := f.writeElfHeader(w, shdrOffset, shstrtabSec.Index); err != nil {
+	// 8. Write ELF header
+	if err := f.writeElfHeader(w, shdrOffset, phOff, shstrtabSec.Index); err != nil {
 		return err
 	}
 
-	// 8. Write section contents
+	// 9. Write Program Headers
+	for _, ph := range f.ProgramHeaders {
+		if err := f.writeProgramHeader(w, ph); err != nil {
+			return err
+		}
+	}
+
+	// 10. Write section contents
 	written := headerSize
+	
+	// Sort sections by offset to write sequentially? 
+	// For simplicity, we assume Sections array order mostly matches offset order or we fill gaps.
+	// A robust writer would sort. Here we assume simple append order.
+	
 	for _, sec := range f.Sections {
-		// Add padding if needed
+		if sec.Type == SHT_NULL || sec.Type == SHT_NOBITS {
+			continue
+		}
+
+		// Add padding
 		if sec.offset > written {
 			padding := make([]byte, sec.offset-written)
 			if _, err := w.Write(padding); err != nil {
@@ -340,7 +412,13 @@ func (f *File) WriteTo(w io.Writer) error {
 		written += sec.size
 	}
 
-	// 9. Write section headers
+	// Pad to Section Header Table
+	if shdrOffset > written {
+		padding := make([]byte, shdrOffset-written)
+		w.Write(padding)
+	}
+
+	// 11. Write section headers
 	for _, sec := range f.Sections {
 		if err := f.writeSectionHeader(w, sec); err != nil {
 			return err
@@ -350,10 +428,9 @@ func (f *File) WriteTo(w io.Writer) error {
 	return nil
 }
 
-func (f *File) writeElfHeader(w io.Writer, shoff uint64, shstrndx uint16) error {
+func (f *File) writeElfHeader(w io.Writer, shoff, phoff uint64, shstrndx uint16) error {
 	var hdr elfHeader
 
-	// Magic number
 	hdr.Ident[EI_MAG0] = ELFMAG0
 	hdr.Ident[1] = ELFMAG1
 	hdr.Ident[2] = ELFMAG2
@@ -361,18 +438,42 @@ func (f *File) writeElfHeader(w io.Writer, shoff uint64, shstrndx uint16) error 
 	hdr.Ident[EI_CLASS] = ELFCLASS64
 	hdr.Ident[EI_DATA] = ELFDATA2LSB
 	hdr.Ident[EI_VERSION] = EV_CURRENT
-	// Rest of e_ident is zero
+	hdr.Ident[7] = 0 // ABI (System V)
 
-	hdr.Type = ET_REL      // Relocatable object file
+	hdr.Type = f.Type
 	hdr.Machine = f.Machine
 	hdr.Version = EV_CURRENT
+	hdr.Entry = f.Entry
+	hdr.Phoff = 0
+	hdr.Phnum = 0
+	
+	if len(f.ProgramHeaders) > 0 {
+		hdr.Phoff = phoff
+		hdr.Phnum = uint16(len(f.ProgramHeaders))
+	}
+
 	hdr.Shoff = shoff
-	hdr.Ehsize = 64                        // sizeof(Elf64_Ehdr)
-	hdr.Shentsize = 64                     // sizeof(Elf64_Shdr)
+	hdr.Flags = 0
+	hdr.Ehsize = 64
+	hdr.Phentsize = 56
+	hdr.Shentsize = 64
 	hdr.Shnum = uint16(len(f.Sections))
 	hdr.Shstrndx = shstrndx
 
 	return binary.Write(w, binary.LittleEndian, hdr)
+}
+
+func (f *File) writeProgramHeader(w io.Writer, ph *ProgramHeader) error {
+	var p elfProgramHeader
+	p.Type = ph.Type
+	p.Flags = ph.Flags
+	p.Off = ph.Off
+	p.Vaddr = ph.Vaddr
+	p.Paddr = ph.Paddr
+	p.Filesz = ph.Filesz
+	p.Memsz = ph.Memsz
+	p.Align = ph.Align
+	return binary.Write(w, binary.LittleEndian, p)
 }
 
 func (f *File) writeSectionHeader(w io.Writer, sec *Section) error {
@@ -398,18 +499,16 @@ func (f *File) writeSymbol(w io.Writer, sym *Symbol) error {
 		shndx = sym.Section.Index
 	}
 
-	// Write in correct order for Elf64_Sym
-	binary.Write(w, binary.LittleEndian, sym.nameIdx)  // st_name
-	w.Write([]byte{sym.Info})                          // st_info
-	w.Write([]byte{sym.Other})                         // st_other
-	binary.Write(w, binary.LittleEndian, shndx)        // st_shndx
-	binary.Write(w, binary.LittleEndian, sym.Value)    // st_value
-	binary.Write(w, binary.LittleEndian, sym.Size)     // st_size
+	binary.Write(w, binary.LittleEndian, sym.nameIdx)
+	w.Write([]byte{sym.Info})
+	w.Write([]byte{sym.Other})
+	binary.Write(w, binary.LittleEndian, shndx)
+	binary.Write(w, binary.LittleEndian, sym.Value)
+	binary.Write(w, binary.LittleEndian, sym.Size)
 
 	return nil
 }
 
-// MakeSymbolInfo creates the info byte for a symbol
 func MakeSymbolInfo(binding, typ byte) byte {
 	return (binding << 4) | (typ & 0xf)
 }
@@ -430,6 +529,17 @@ type elfHeader struct {
 	Shentsize uint16
 	Shnum     uint16
 	Shstrndx  uint16
+}
+
+type elfProgramHeader struct {
+	Type   uint32
+	Flags  uint32
+	Off    uint64
+	Vaddr  uint64
+	Paddr  uint64
+	Filesz uint64
+	Memsz  uint64
+	Align  uint64
 }
 
 type elfSectionHeader struct {
