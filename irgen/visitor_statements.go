@@ -8,7 +8,6 @@ import (
 )
 
 func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
-	// If semantics mapped a scope to this block, enter it
 	if _, isMapped := g.analysis.Scopes[ctx]; isMapped {
 		g.enterScope(ctx)
 		defer g.exitScope()
@@ -16,7 +15,6 @@ func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
 
 	for _, stmt := range ctx.AllStatement() {
 		g.Visit(stmt)
-		// Stop generation if block is terminated (dead code)
 		if g.ctx.Builder.GetInsertBlock().Terminator() != nil {
 			break
 		}
@@ -25,22 +23,17 @@ func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
 }
 
 func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
-	// 1. Emit deferred statements (LIFO)
 	g.deferStack.Emit(g)
 
-	// 2. Handle Return Value
 	var val ir.Value
 	if ctx.Expression() != nil {
 		val = g.Visit(ctx.Expression()).(ir.Value)
-		
-		// Implicit casting to return type
 		if g.ctx.CurrentFunction != nil {
 			expectedType := g.ctx.CurrentFunction.FuncType.ReturnType
 			val = g.emitCast(val, expectedType)
 		}
 	}
 
-	// 3. Create instruction
 	if val != nil {
 		g.ctx.Builder.CreateRet(val)
 	} else {
@@ -53,9 +46,10 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 	lhsCtx := ctx.LeftHandSide()
 	var destPtr ir.Value
 
-	// --- L-Value Resolution ---
-	
-	// Case A: Simple Identifier (x = ...)
+	// Use getLValue-like logic or resolving for specific assignment structures
+	// Note: lhsCtx is a LeftHandSideContext, which is separate from Expression.
+	// We handle it manually here matching the parser rules.
+
 	if lhsCtx.IDENTIFIER() != nil && lhsCtx.DOT() == nil && lhsCtx.STAR() == nil && lhsCtx.LBRACKET() == nil {
 		name := lhsCtx.IDENTIFIER().GetText()
 		sym, ok := g.currentScope.Resolve(name)
@@ -63,28 +57,21 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 				destPtr = alloca
 			} else {
-				// Globals or arguments
 				destPtr = sym.IRValue
 			}
 		}
 	} else if lhsCtx.STAR() != nil {
-		// Case B: Dereference (*ptr = ...)
-		// Visit the inner expression to get the pointer value
 		destPtr = g.Visit(lhsCtx.PostfixExpression()).(ir.Value)
 	} else if lhsCtx.LBRACKET() != nil {
-		// Case C: Array Indexing (arr[i] = ...)
 		base := g.Visit(lhsCtx.PostfixExpression()).(ir.Value)
 		index := g.Visit(lhsCtx.Expression()).(ir.Value)
-		
 		if ptrType, ok := base.Type().(*types.PointerType); ok {
 			destPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, base, []ir.Value{index}, "")
 		}
 	} else if lhsCtx.DOT() != nil {
-		// Case D: Member Access (obj.field = ...)
 		base := g.Visit(lhsCtx.PostfixExpression()).(ir.Value)
 		fieldName := lhsCtx.IDENTIFIER().GetText()
-
-		// Auto-dereference if base is a pointer
+		
 		var structType *types.StructType
 		if ptr, ok := base.Type().(*types.PointerType); ok {
 			if st, ok := ptr.ElementType.(*types.StructType); ok {
@@ -103,13 +90,10 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 		return nil
 	}
 
-	// --- RHS Evaluation ---
 	rhs := g.Visit(ctx.Expression()).(ir.Value)
 	
-	// --- Compound Assignment Handling (+=, -=, etc) ---
 	finalVal := rhs
 	if ctx.AssignmentOp().ASSIGN() == nil {
-		// Load current value
 		ptrType := destPtr.Type().(*types.PointerType)
 		currVal := g.ctx.Builder.CreateLoad(ptrType.ElementType, destPtr, "")
 		
@@ -141,7 +125,6 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 		}
 	}
 
-	// Ensure type match (Cast RHS to LHS type)
 	ptrType := destPtr.Type().(*types.PointerType)
 	finalVal = g.emitCast(finalVal, ptrType.ElementType)
 
@@ -152,7 +135,6 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 	cond := g.Visit(ctx.Expression(0)).(ir.Value)
 	
-	// Ensure boolean (i1)
 	if cond.Type().BitSize() > 1 {
 		cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
 	}
@@ -167,14 +149,12 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 
 	g.ctx.Builder.CreateCondBr(cond, thenBlock, elseBlock)
 
-	// Generate Then
 	g.ctx.SetInsertBlock(thenBlock)
 	g.Visit(ctx.Block(0))
 	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 		g.ctx.Builder.CreateBr(mergeBlock)
 	}
 
-	// Generate Else
 	if elseBlock != mergeBlock {
 		g.ctx.SetInsertBlock(elseBlock)
 		g.Visit(ctx.Block(1))
@@ -188,52 +168,41 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 }
 
 func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
-	// Handle 'for var in ...' loops
 	if ctx.IN() != nil {
 		return g.visitForInLoop(ctx)
 	}
 
-	// Standard C-Style For Loop: for (init; cond; step)
 	condBlock := g.ctx.Builder.CreateBlock("loop.cond")
 	bodyBlock := g.ctx.Builder.CreateBlock("loop.body")
 	postBlock := g.ctx.Builder.CreateBlock("loop.post")
 	endBlock := g.ctx.Builder.CreateBlock("loop.end")
 
-	// Init
-	// Usually parsed outside or as first child if defined in grammar
 	if ctx.VariableDecl() != nil {
 		g.Visit(ctx.VariableDecl())
 	} else if len(ctx.AllAssignmentStmt()) > 0 && len(ctx.AllSEMICOLON()) > 0 {
-		// Heuristic: First assignment is init if followed by semicolons
 		g.Visit(ctx.AssignmentStmt(0))
 	}
 
 	g.ctx.Builder.CreateBr(condBlock)
 	g.ctx.SetInsertBlock(condBlock)
 
-	// Condition
-	var cond ir.Value = g.ctx.Builder.ConstInt(types.I1, 1) // Default true
+	var cond ir.Value = g.ctx.Builder.ConstInt(types.I1, 1)
 	if len(ctx.AllExpression()) > 0 {
 		cond = g.Visit(ctx.Expression(0)).(ir.Value)
 	}
 	g.ctx.Builder.CreateCondBr(cond, bodyBlock, endBlock)
 
-	// Body
 	g.ctx.SetInsertBlock(bodyBlock)
 	g.loopStack = append(g.loopStack, loopInfo{breakBlock: endBlock, continueBlock: postBlock})
 	g.Visit(ctx.Block())
-	g.loopStack = g.loopStack[:len(g.loopStack)-1] // Pop
+	g.loopStack = g.loopStack[:len(g.loopStack)-1]
 
 	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 		g.ctx.Builder.CreateBr(postBlock)
 	}
 
-	// Post (Step)
 	g.ctx.SetInsertBlock(postBlock)
-	// Visit last assignment if it looks like a step
 	if len(ctx.AllAssignmentStmt()) > 0 {
-		// Logic depends on exact grammar structure
-		// Assuming last assignment is the step
 		g.Visit(ctx.AssignmentStmt(len(ctx.AllAssignmentStmt()) - 1))
 	}
 	g.ctx.Builder.CreateBr(condBlock)
@@ -246,32 +215,33 @@ func (g *Generator) visitForInLoop(ctx *parser.ForStmtContext) interface{} {
 	varName := ctx.IDENTIFIER(0).GetText()
 	iterableExpr := ctx.Expression(0)
 
-	// Evaluate Iterable
 	collection := g.Visit(iterableExpr).(ir.Value)
 	colType := collection.Type()
 
-	// Check for Array or Pointer to Array
-	if types.IsArray(colType) || (types.IsPointer(colType) && types.IsArray(colType.(*types.PointerType).ElementType)) {
+	// Replaced undefined types.IsArray with explicit checks
+	_, isArray := colType.(*types.ArrayType)
+	isPtrToArray := false
+	if ptr, ok := colType.(*types.PointerType); ok {
+		_, isPtrToArray = ptr.ElementType.(*types.ArrayType)
+	}
+
+	if isArray || isPtrToArray {
 		return g.visitForInArray(ctx, varName, collection)
 	}
 	
-	// TODO: Add support for Range Expression (0..10) here
 	return nil
 }
 
 func (g *Generator) visitForInArray(ctx *parser.ForStmtContext, varName string, collection ir.Value) interface{} {
-	// 1. Setup Index
 	idxPtr := g.ctx.Builder.CreateAlloca(types.I64, "idx")
 	g.ctx.Builder.CreateStore(g.ctx.Builder.ConstInt(types.I64, 0), idxPtr)
 
-	// 2. Determine Length and Base Pointer
 	var length int64
 	var arrType *types.ArrayType
 	
 	if ptr, ok := collection.Type().(*types.PointerType); ok {
 		arrType = ptr.ElementType.(*types.ArrayType)
 	} else {
-		// If it's a value, spill to stack to iterate via GEP
 		arrType = collection.Type().(*types.ArrayType)
 		temp := g.ctx.Builder.CreateAlloca(arrType, "arr.temp")
 		g.ctx.Builder.CreateStore(collection, temp)
@@ -279,7 +249,6 @@ func (g *Generator) visitForInArray(ctx *parser.ForStmtContext, varName string, 
 	}
 	length = arrType.Length
 
-	// 3. Blocks
 	condBlock := g.ctx.Builder.CreateBlock("for.cond")
 	bodyBlock := g.ctx.Builder.CreateBlock("for.body")
 	stepBlock := g.ctx.Builder.CreateBlock("for.step")
@@ -287,20 +256,16 @@ func (g *Generator) visitForInArray(ctx *parser.ForStmtContext, varName string, 
 
 	g.ctx.Builder.CreateBr(condBlock)
 	
-	// 4. Condition
 	g.ctx.SetInsertBlock(condBlock)
 	currIdx := g.ctx.Builder.CreateLoad(types.I64, idxPtr, "")
 	cmp := g.ctx.Builder.CreateICmpSLT(currIdx, g.ctx.Builder.ConstInt(types.I64, length), "")
 	g.ctx.Builder.CreateCondBr(cmp, bodyBlock, endBlock)
 
-	// 5. Body
 	g.ctx.SetInsertBlock(bodyBlock)
 	
-	// Load Element: arr[idx]
 	elemPtr := g.ctx.Builder.CreateInBoundsGEP(arrType, collection, []ir.Value{g.getZeroValue(types.I32), currIdx}, "")
 	elemVal := g.ctx.Builder.CreateLoad(arrType.ElementType, elemPtr, "")
 
-	// Loop Variable
 	if sym, ok := g.currentScope.Resolve(varName); ok {
 		loopVarAlloca := g.ctx.Builder.CreateAlloca(sym.Type, varName+".addr")
 		g.ctx.Builder.CreateStore(elemVal, loopVarAlloca)
@@ -315,7 +280,6 @@ func (g *Generator) visitForInArray(ctx *parser.ForStmtContext, varName string, 
 		g.ctx.Builder.CreateBr(stepBlock)
 	}
 
-	// 6. Step
 	g.ctx.SetInsertBlock(stepBlock)
 	currIdx = g.ctx.Builder.CreateLoad(types.I64, idxPtr, "")
 	nextIdx := g.ctx.Builder.CreateAdd(currIdx, g.ctx.Builder.ConstInt(types.I64, 1), "")
@@ -368,7 +332,6 @@ func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 		cmp := g.ctx.Builder.CreateICmpEQ(cond, caseVal, "")
 		g.ctx.Builder.CreateCondBr(cmp, caseBlock, nextCheckBlock)
 		
-		// Case Body
 		g.ctx.SetInsertBlock(caseBlock)
 		for _, s := range c.AllStatement() {
 			g.Visit(s)
@@ -381,7 +344,6 @@ func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 		prevBlock = nextCheckBlock
 	}
 	
-	// Default Case
 	g.ctx.SetInsertBlock(prevBlock)
 	if ctx.DefaultCase() != nil {
 		for _, s := range ctx.DefaultCase().AllStatement() {
@@ -409,12 +371,7 @@ func (g *Generator) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 	g.ctx.Builder.CreateBr(tryBlock)
 	g.ctx.SetInsertBlock(tryBlock)
 
-	// Execute Try Body
-	// Placeholder for EH checking after calls
 	g.Visit(ctx.Block())
-	
-	// Check exception state here in full impl
-	
 	g.ctx.Builder.CreateBr(endBlock)
 
 	if catchBlock != nil {
@@ -430,16 +387,12 @@ func (g *Generator) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
 func (g *Generator) VisitThrowStmt(ctx *parser.ThrowStmtContext) interface{} {
 	val := g.Visit(ctx.Expression()).(ir.Value)
 	
-	// Get global exception state or create it
 	excGlobal := g.ctx.Module.GetGlobal("__exception_state")
 	if excGlobal == nil {
 		st := types.NewStruct("ExceptionState", []types.Type{types.I1, types.NewPointer(types.I8)}, false)
 		excGlobal = g.ctx.Builder.CreateGlobalVariable("__exception_state", st, nil)
 	}
 
-	// Logic to store 'val' into exception state would go here (GEP + Store)
-	
-	// Return error code to unwind stack
 	g.ctx.Builder.CreateRet(g.ctx.Builder.ConstInt(types.I32, -1))
 	return val
 }

@@ -1,21 +1,77 @@
 package irgen
 
 import (
+	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
 )
 
 // getLValue returns the memory address (pointer) of an expression.
-// Returns nil if the expression is not an L-Value (e.g. a literal).
-func (g *Generator) getLValue(ctx parser.IExpressionContext) ir.Value {
-	// 1. Unary Unwrapping (ignore parens, etc)
-	if p, ok := ctx.(*parser.PrimaryExpressionContext); ok {
-		if p.Expression() != nil {
-			return g.getLValue(p.Expression())
+// Returns nil if the expression is not an L-Value (e.g. a literal or binary operation).
+func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
+	switch ctx := tree.(type) {
+	
+	// --- Drill-down layers ---
+	// Handles: (expr), or the chain Expression -> LogicalOr -> ... -> Unary
+	
+	case *parser.ExpressionContext:
+		return g.getLValue(ctx.LogicalOrExpression())
+	
+	case *parser.LogicalOrExpressionContext:
+		if len(ctx.AllLogicalAndExpression()) == 1 {
+			return g.getLValue(ctx.LogicalAndExpression(0))
 		}
-		if p.IDENTIFIER() != nil {
-			name := p.IDENTIFIER().GetText()
+	case *parser.LogicalAndExpressionContext:
+		if len(ctx.AllBitOrExpression()) == 1 {
+			return g.getLValue(ctx.BitOrExpression(0))
+		}
+	case *parser.BitOrExpressionContext:
+		if len(ctx.AllBitXorExpression()) == 1 {
+			return g.getLValue(ctx.BitXorExpression(0))
+		}
+	case *parser.BitXorExpressionContext:
+		if len(ctx.AllBitAndExpression()) == 1 {
+			return g.getLValue(ctx.BitAndExpression(0))
+		}
+	case *parser.BitAndExpressionContext:
+		if len(ctx.AllEqualityExpression()) == 1 {
+			return g.getLValue(ctx.EqualityExpression(0))
+		}
+	case *parser.EqualityExpressionContext:
+		if len(ctx.AllRelationalExpression()) == 1 {
+			return g.getLValue(ctx.RelationalExpression(0))
+		}
+	case *parser.RelationalExpressionContext:
+		if len(ctx.AllShiftExpression()) == 1 {
+			return g.getLValue(ctx.ShiftExpression(0))
+		}
+	case *parser.ShiftExpressionContext:
+		if len(ctx.AllRangeExpression()) == 1 {
+			return g.getLValue(ctx.RangeExpression(0))
+		}
+	case *parser.RangeExpressionContext:
+		if len(ctx.AllAdditiveExpression()) == 1 {
+			return g.getLValue(ctx.AdditiveExpression(0))
+		}
+	case *parser.AdditiveExpressionContext:
+		if len(ctx.AllMultiplicativeExpression()) == 1 {
+			return g.getLValue(ctx.MultiplicativeExpression(0))
+		}
+	case *parser.MultiplicativeExpressionContext:
+		if len(ctx.AllUnaryExpression()) == 1 {
+			return g.getLValue(ctx.UnaryExpression(0))
+		}
+
+	// --- Actual L-Value Logic ---
+
+	case *parser.PrimaryExpressionContext:
+		if ctx.Expression() != nil {
+			// Parenthesized expression: (x)
+			return g.getLValue(ctx.Expression())
+		}
+		if ctx.IDENTIFIER() != nil {
+			name := ctx.IDENTIFIER().GetText()
 			if sym, ok := g.currentScope.Resolve(name); ok {
 				// If it's an alloca (variable), that IS the address.
 				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
@@ -25,45 +81,33 @@ func (g *Generator) getLValue(ctx parser.IExpressionContext) ir.Value {
 				if glob := g.ctx.Module.GetGlobal(name); glob != nil {
 					return glob
 				}
-				// Function arguments are usually loaded into allocas in VisitFunctionDecl,
-				// so resolving the symbol usually returns that alloca.
+				// Arguments or other pointers
 				return sym.IRValue
 			}
 		}
-	}
 
-	// 2. Dereference (*ptr)
-	if u, ok := ctx.(*parser.UnaryExpressionContext); ok {
-		if u.STAR() != nil {
-			// The value of the sub-expression IS the address we want
-			// e.g. *ptr = 5; -> we want the value of 'ptr'
-			return g.Visit(u.UnaryExpression()).(ir.Value)
+	case *parser.UnaryExpressionContext:
+		if ctx.STAR() != nil {
+			// Dereference *ptr -> value of ptr is the address
+			return g.Visit(ctx.UnaryExpression()).(ir.Value)
 		}
-		if u.PostfixExpression() != nil {
-			return g.getLValue(u.PostfixExpression())
+		if ctx.PostfixExpression() != nil {
+			return g.getLValue(ctx.PostfixExpression())
 		}
-	}
 
-	// 3. Postfix Operations (Member access, Indexing)
-	if post, ok := ctx.(*parser.PostfixExpressionContext); ok {
-		// We need to manually walk the postfix chain to generate GEPs 
-		// instead of Loads. This repeats some logic from VisitPostfixExpression
-		// but stops short of the final Load.
-		
-		baseExpr := post.PrimaryExpression()
+	case *parser.PostfixExpressionContext:
+		baseExpr := ctx.PrimaryExpression()
 		addr := g.getLValue(baseExpr)
+		
 		if addr == nil {
-			// If base isn't an LValue (e.g. function return), we can't assign to fields
-			// unless we store it in a temp alloca (not implemented here)
 			return nil
 		}
 
-		for _, op := range post.AllPostfixOp() {
+		for _, op := range ctx.AllPostfixOp() {
 			// .Field
 			if op.DOT() != nil {
 				fieldName := op.IDENTIFIER().GetText()
 				
-				// Resolve type of the pointer
 				ptrType, isPtr := addr.Type().(*types.PointerType)
 				if !isPtr { return nil }
 
@@ -83,12 +127,10 @@ func (g *Generator) getLValue(ctx parser.IExpressionContext) ir.Value {
 				ptrType, isPtr := addr.Type().(*types.PointerType)
 				if !isPtr { return nil }
 
-				// If it's a pointer to an Array (e.g. [10 x i32]*), we need 0, i
 				if _, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
 					zero := g.ctx.Builder.ConstInt(types.I32, 0)
 					addr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, addr, []ir.Value{zero, idxVal}, "")
 				} else {
-					// Standard pointer indexing
 					addr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, addr, []ir.Value{idxVal}, "")
 				}
 			}
