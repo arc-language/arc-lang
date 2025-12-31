@@ -16,10 +16,14 @@ func (g *Generator) resolveType(ctx parser.ITypeContext) types.Type {
 		case "int16": return types.I16
 		case "int32": return types.I32
 		case "int64": return types.I64
+		case "isize": return types.I64 // Platform specific usually
+		
 		case "uint8", "byte": return types.U8
 		case "uint16": return types.U16
 		case "uint32": return types.U32
 		case "uint64": return types.U64
+		case "usize": return types.U64 // Platform specific usually
+		
 		case "float": return types.F64
 		case "float32": return types.F32
 		case "float64": return types.F64
