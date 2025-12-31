@@ -1,11 +1,13 @@
 package irgen
 
+import (
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/context"
 	"github.com/arc-language/arc-lang/parser"
 	"github.com/arc-language/arc-lang/semantics"
 	"github.com/arc-language/arc-lang/symbol"
+)
 
 type Generator struct {
 	*parser.BaseArcParserVisitor
