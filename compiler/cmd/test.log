@@ -9,8 +9,8 @@ Object file: /tmp/arc_tests/test_alloca.o
 Executable: /tmp/arc_tests/test_alloca
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_alloca.arc...
 [Compiler:test_alloca] [INFO] Creating compiler for module 'test_alloca' with entry file 'tests/test_alloca.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -41,44 +41,25 @@ Compiling tests/test_alloca.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_alloca] [INFO] Generating object file to: /tmp/arc_tests/test_alloca.o
 [Compiler:test_alloca] [DEBUG] Calling code generator for module 'test_alloca'
-[Compiler:test_alloca] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_alloca] [DEBUG] Generated 824 bytes of object code
+[Compiler:test_alloca] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_alloca.o
+✓ Object file written to /tmp/arc_tests/test_alloca.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_alloca.arc...
-      [Compiler:test_alloca] [INFO] Creating compiler for module 'test_alloca' with entry file 'tests/test_alloca.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_alloca'
-      [Compiler:test_alloca] [INFO] Compiling file: tests/test_alloca.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: ptr
-      [Visitor] [DEBUG] Declaring variable: val
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_alloca] [INFO] Generating object file to: /tmp/arc_tests/test_alloca.o
-      [Compiler:test_alloca] [DEBUG] Calling code generator for module 'test_alloca'
-      [Compiler:test_alloca] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_alloca.o -o test_alloca && ./test_alloca
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_alloca.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (1.11s)
 [2/39] test_arithmetic                               
 --- Testing: test_arithmetic ---
 Source file: tests/test_arithmetic.arc
@@ -86,8 +67,8 @@ Object file: /tmp/arc_tests/test_arithmetic.o
 Executable: /tmp/arc_tests/test_arithmetic
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_arithmetic.arc...
 [Compiler:test_arithmetic] [INFO] Creating compiler for module 'test_arithmetic' with entry file 'tests/test_arithmetic.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -124,50 +105,25 @@ Compiling tests/test_arithmetic.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_arithmetic] [INFO] Generating object file to: /tmp/arc_tests/test_arithmetic.o
 [Compiler:test_arithmetic] [DEBUG] Calling code generator for module 'test_arithmetic'
-[Compiler:test_arithmetic] [ERROR] Code generation failed: unknown opcode: srem
-Object generation failed: code generation failed: unknown opcode: srem
+[Compiler:test_arithmetic] [DEBUG] Generated 1456 bytes of object code
+[Compiler:test_arithmetic] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_arithmetic.o
+✓ Object file written to /tmp/arc_tests/test_arithmetic.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_arithmetic.arc...
-      [Compiler:test_arithmetic] [INFO] Creating compiler for module 'test_arithmetic' with entry file 'tests/test_arithmetic.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_arithmetic'
-      [Compiler:test_arithmetic] [INFO] Compiling file: tests/test_arithmetic.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: a
-      [Visitor] [DEBUG] Declaring variable: b
-      [Visitor] [DEBUG] Declaring variable: sum
-      [Visitor] [DEBUG] Declaring variable: diff
-      [Visitor] [DEBUG] Declaring variable: prod
-      [Visitor] [DEBUG] Declaring variable: quot
-      [Visitor] [DEBUG] Declaring variable: rem
-      [Visitor] [DEBUG] Declaring variable: total
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 9 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_arithmetic] [INFO] Generating object file to: /tmp/arc_tests/test_arithmetic.o
-      [Compiler:test_arithmetic] [DEBUG] Calling code generator for module 'test_arithmetic'
-      [Compiler:test_arithmetic] [ERROR] Code generation failed: unknown opcode: srem
-      Object generation failed: code generation failed: unknown opcode: srem
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_arithmetic.o -o test_arithmetic && ./test_arithmetic
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_arithmetic.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.09s)
 [3/39] test_array                                    
 --- Testing: test_array ---
 Source file: tests/test_array.arc
@@ -175,8 +131,8 @@ Object file: /tmp/arc_tests/test_array.o
 Executable: /tmp/arc_tests/test_array
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_array.arc...
 [Compiler:test_array] [INFO] Creating compiler for module 'test_array' with entry file 'tests/test_array.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -208,45 +164,26 @@ Compiling tests/test_array.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_array] [INFO] Generating object file to: /tmp/arc_tests/test_array.o
 [Compiler:test_array] [DEBUG] Calling code generator for module 'test_array'
-[Compiler:test_array] [ERROR] Code generation failed: unknown opcode: getelementptr
-Object generation failed: code generation failed: unknown opcode: getelementptr
+[Compiler:test_array] [DEBUG] Generated 952 bytes of object code
+[Compiler:test_array] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_array.o
+✓ Object file written to /tmp/arc_tests/test_array.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_array.arc...
-      [Compiler:test_array] [INFO] Creating compiler for module 'test_array' with entry file 'tests/test_array.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_array'
-      [Compiler:test_array] [INFO] Compiling file: tests/test_array.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: arr
-      [Visitor] [DEBUG] Expanding array initialization for arr into 5 stores
-      [Visitor] [DEBUG] Declaring variable: val
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_array] [INFO] Generating object file to: /tmp/arc_tests/test_array.o
-      [Compiler:test_array] [DEBUG] Calling code generator for module 'test_array'
-      [Compiler:test_array] [ERROR] Code generation failed: unknown opcode: getelementptr
-      Object generation failed: code generation failed: unknown opcode: getelementptr
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_array.o -o test_array && ./test_array
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_array.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 255
+❌ Test FAILED: expected exit=0, got exit=255
+❌ FAIL (0.12s)
+    Expected exit=0, got exit=255
 [4/39] test_array_for_loop                           
 --- Testing: test_array_for_loop ---
 Source file: tests/test_array_for_loop.arc
@@ -254,8 +191,8 @@ Object file: /tmp/arc_tests/test_array_for_loop.o
 Executable: /tmp/arc_tests/test_array_for_loop
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_array_for_loop.arc...
 [Compiler:test_array_for_loop] [INFO] Creating compiler for module 'test_array_for_loop' with entry file 'tests/test_array_for_loop.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -294,52 +231,26 @@ Compiling tests/test_array_for_loop.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_array_for_loop] [INFO] Generating object file to: /tmp/arc_tests/test_array_for_loop.o
 [Compiler:test_array_for_loop] [DEBUG] Calling code generator for module 'test_array_for_loop'
-[Compiler:test_array_for_loop] [ERROR] Code generation failed: unknown opcode: getelementptr
-Object generation failed: code generation failed: unknown opcode: getelementptr
+[Compiler:test_array_for_loop] [DEBUG] Generated 1256 bytes of object code
+[Compiler:test_array_for_loop] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_array_for_loop.o
+✓ Object file written to /tmp/arc_tests/test_array_for_loop.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_array_for_loop.arc...
-      [Compiler:test_array_for_loop] [INFO] Creating compiler for module 'test_array_for_loop' with entry file 'tests/test_array_for_loop.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_array_for_loop'
-      [Compiler:test_array_for_loop] [INFO] Compiling file: tests/test_array_for_loop.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: arr
-      [Visitor] [DEBUG] Expanding array initialization for arr into 5 stores
-      [Visitor] [DEBUG] Declaring variable: sum
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling for-in loop over array of length 5
-      [Context] [DEBUG] Pushed loop context
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Popped loop context
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_array_for_loop] [INFO] Generating object file to: /tmp/arc_tests/test_array_for_loop.o
-      [Compiler:test_array_for_loop] [DEBUG] Calling code generator for module 'test_array_for_loop'
-      [Compiler:test_array_for_loop] [ERROR] Code generation failed: unknown opcode: getelementptr
-      Object generation failed: code generation failed: unknown opcode: getelementptr
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_array_for_loop.o -o test_array_for_loop && ./test_array_for_loop
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_array_for_loop.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 1
+❌ Test FAILED: expected exit=0, got exit=1
+❌ FAIL (0.08s)
+    Expected exit=0, got exit=1
 [5/39] test_bitwise                                  
 --- Testing: test_bitwise ---
 Source file: tests/test_bitwise.arc
@@ -347,8 +258,8 @@ Object file: /tmp/arc_tests/test_bitwise.o
 Executable: /tmp/arc_tests/test_bitwise
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_bitwise.arc...
 [Compiler:test_bitwise] [INFO] Creating compiler for module 'test_bitwise' with entry file 'tests/test_bitwise.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -385,50 +296,25 @@ Compiling tests/test_bitwise.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_bitwise] [INFO] Generating object file to: /tmp/arc_tests/test_bitwise.o
 [Compiler:test_bitwise] [DEBUG] Calling code generator for module 'test_bitwise'
-[Compiler:test_bitwise] [ERROR] Code generation failed: unknown opcode: or
-Object generation failed: code generation failed: unknown opcode: or
+[Compiler:test_bitwise] [DEBUG] Generated 1256 bytes of object code
+[Compiler:test_bitwise] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_bitwise.o
+✓ Object file written to /tmp/arc_tests/test_bitwise.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_bitwise.arc...
-      [Compiler:test_bitwise] [INFO] Creating compiler for module 'test_bitwise' with entry file 'tests/test_bitwise.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_bitwise'
-      [Compiler:test_bitwise] [INFO] Compiling file: tests/test_bitwise.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: a
-      [Visitor] [DEBUG] Declaring variable: b
-      [Visitor] [DEBUG] Declaring variable: b_or
-      [Visitor] [DEBUG] Declaring variable: b_and
-      [Visitor] [DEBUG] Declaring variable: b_xor
-      [Visitor] [DEBUG] Declaring variable: shl
-      [Visitor] [DEBUG] Declaring variable: shr
-      [Visitor] [DEBUG] Declaring variable: b_not
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 9 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_bitwise] [INFO] Generating object file to: /tmp/arc_tests/test_bitwise.o
-      [Compiler:test_bitwise] [DEBUG] Calling code generator for module 'test_bitwise'
-      [Compiler:test_bitwise] [ERROR] Code generation failed: unknown opcode: or
-      Object generation failed: code generation failed: unknown opcode: or
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_bitwise.o -o test_bitwise && ./test_bitwise
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_bitwise.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.06s)
 [6/39] test_cast                                     
 --- Testing: test_cast ---
 Source file: tests/test_cast.arc
@@ -436,8 +322,8 @@ Object file: /tmp/arc_tests/test_cast.o
 Executable: /tmp/arc_tests/test_cast
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_cast.arc...
 [Compiler:test_cast] [INFO] Creating compiler for module 'test_cast' with entry file 'tests/test_cast.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -468,44 +354,25 @@ Compiling tests/test_cast.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_cast] [INFO] Generating object file to: /tmp/arc_tests/test_cast.o
 [Compiler:test_cast] [DEBUG] Calling code generator for module 'test_cast'
-[Compiler:test_cast] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_cast] [DEBUG] Generated 768 bytes of object code
+[Compiler:test_cast] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_cast.o
+✓ Object file written to /tmp/arc_tests/test_cast.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_cast.arc...
-      [Compiler:test_cast] [INFO] Creating compiler for module 'test_cast' with entry file 'tests/test_cast.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_cast'
-      [Compiler:test_cast] [INFO] Compiling file: tests/test_cast.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: x
-      [Visitor] [DEBUG] Declaring variable: y
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_cast] [INFO] Generating object file to: /tmp/arc_tests/test_cast.o
-      [Compiler:test_cast] [DEBUG] Calling code generator for module 'test_cast'
-      [Compiler:test_cast] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_cast.o -o test_cast && ./test_cast
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_cast.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [7/39] test_char_literal                             
 --- Testing: test_char_literal ---
 Source file: tests/test_char_literal.arc
@@ -513,8 +380,8 @@ Object file: /tmp/arc_tests/test_char_literal.o
 Executable: /tmp/arc_tests/test_char_literal
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_char_literal.arc...
 [Compiler:test_char_literal] [INFO] Creating compiler for module 'test_char_literal' with entry file 'tests/test_char_literal.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -541,40 +408,25 @@ Compiling tests/test_char_literal.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_char_literal] [INFO] Generating object file to: /tmp/arc_tests/test_char_literal.o
 [Compiler:test_char_literal] [DEBUG] Calling code generator for module 'test_char_literal'
-[Compiler:test_char_literal] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_char_literal] [DEBUG] Generated 632 bytes of object code
+[Compiler:test_char_literal] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_char_literal.o
+✓ Object file written to /tmp/arc_tests/test_char_literal.o
 
-❌ FAIL (0.02s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_char_literal.arc...
-      [Compiler:test_char_literal] [INFO] Creating compiler for module 'test_char_literal' with entry file 'tests/test_char_literal.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_char_literal'
-      [Compiler:test_char_literal] [INFO] Compiling file: tests/test_char_literal.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: newline
-      [Visitor] [DEBUG] Declaring variable: tab
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_char_literal] [INFO] Generating object file to: /tmp/arc_tests/test_char_literal.o
-      [Compiler:test_char_literal] [DEBUG] Calling code generator for module 'test_char_literal'
-      [Compiler:test_char_literal] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_char_literal.o -o test_char_literal && ./test_char_literal
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_char_literal.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [8/39] test_class                                    
 --- Testing: test_class ---
 Source file: tests/test_class.arc
@@ -582,8 +434,8 @@ Object file: /tmp/arc_tests/test_class.o
 Executable: /tmp/arc_tests/test_class
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_class.arc...
 [Compiler:test_class] [INFO] Creating compiler for module 'test_class' with entry file 'tests/test_class.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -633,63 +485,25 @@ Compiling tests/test_class.arc...
 Module has 2 functions, 1 globals
 [Compiler:test_class] [INFO] Generating object file to: /tmp/arc_tests/test_class.o
 [Compiler:test_class] [DEBUG] Calling code generator for module 'test_class'
-[Compiler:test_class] [ERROR] Code generation failed: unknown opcode: getelementptr
-Object generation failed: code generation failed: unknown opcode: getelementptr
+[Compiler:test_class] [DEBUG] Generated 1264 bytes of object code
+[Compiler:test_class] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_class.o
+✓ Object file written to /tmp/arc_tests/test_class.o
 
-❌ FAIL (0.05s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_class.arc...
-      [Compiler:test_class] [INFO] Creating compiler for module 'test_class' with entry file 'tests/test_class.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_class'
-      [Compiler:test_class] [INFO] Compiling file: tests/test_class.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [INFO] Registering class type: Client
-      [Context] [DEBUG] Registered type 'Client'
-      [Visitor] [DEBUG] Registered class 'Client' (IR: Client) with 2 fields
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [INFO] Processing class declaration: Client
-      [Visitor] [DEBUG] Processing class member 1/4
-      [Visitor] [DEBUG] Processing class member 2/4
-      [Visitor] [DEBUG] Processing class member 3/4
-      [Visitor] [DEBUG] Declaring function: Client_get_port (IR: Client_get_port)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'Client_get_port'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'Client_get_port'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Processing class member 4/4
-      [Context] [WARN] deinit is not yet implemented
-      [Visitor] [INFO] Completed class declaration: Client
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: c
-      [Visitor] [DEBUG] Declaring variable: port
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-      Module has 2 functions, 1 globals
-      [Compiler:test_class] [INFO] Generating object file to: /tmp/arc_tests/test_class.o
-      [Compiler:test_class] [DEBUG] Calling code generator for module 'test_class'
-      [Compiler:test_class] [ERROR] Code generation failed: unknown opcode: getelementptr
-      Object generation failed: code generation failed: unknown opcode: getelementptr
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_class.o -o test_class && ./test_class
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_class.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.07s)
 [9/39] test_comparison                               
 --- Testing: test_comparison ---
 Source file: tests/test_comparison.arc
@@ -697,8 +511,8 @@ Object file: /tmp/arc_tests/test_comparison.o
 Executable: /tmp/arc_tests/test_comparison
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_comparison.arc...
 [Compiler:test_comparison] [INFO] Creating compiler for module 'test_comparison' with entry file 'tests/test_comparison.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -729,44 +543,25 @@ Compiling tests/test_comparison.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_comparison] [INFO] Generating object file to: /tmp/arc_tests/test_comparison.o
 [Compiler:test_comparison] [DEBUG] Calling code generator for module 'test_comparison'
-[Compiler:test_comparison] [ERROR] Code generation failed: unknown opcode: and
-Object generation failed: code generation failed: unknown opcode: and
+[Compiler:test_comparison] [DEBUG] Generated 960 bytes of object code
+[Compiler:test_comparison] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_comparison.o
+✓ Object file written to /tmp/arc_tests/test_comparison.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_comparison.arc...
-      [Compiler:test_comparison] [INFO] Creating compiler for module 'test_comparison' with entry file 'tests/test_comparison.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_comparison'
-      [Compiler:test_comparison] [INFO] Compiling file: tests/test_comparison.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: a
-      [Visitor] [DEBUG] Declaring variable: b
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_comparison] [INFO] Generating object file to: /tmp/arc_tests/test_comparison.o
-      [Compiler:test_comparison] [DEBUG] Calling code generator for module 'test_comparison'
-      [Compiler:test_comparison] [ERROR] Code generation failed: unknown opcode: and
-      Object generation failed: code generation failed: unknown opcode: and
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_comparison.o -o test_comparison && ./test_comparison
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_comparison.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [10/39] test_compound_assignment                      
 --- Testing: test_compound_assignment ---
 Source file: tests/test_compound_assignment.arc
@@ -774,8 +569,8 @@ Object file: /tmp/arc_tests/test_compound_assignment.o
 Executable: /tmp/arc_tests/test_compound_assignment
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_compound_assignment.arc...
 [Compiler:test_compound_assignment] [INFO] Creating compiler for module 'test_compound_assignment' with entry file 'tests/test_compound_assignment.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -805,43 +600,25 @@ Compiling tests/test_compound_assignment.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_compound_assignment] [INFO] Generating object file to: /tmp/arc_tests/test_compound_assignment.o
 [Compiler:test_compound_assignment] [DEBUG] Calling code generator for module 'test_compound_assignment'
-[Compiler:test_compound_assignment] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_compound_assignment] [DEBUG] Generated 992 bytes of object code
+[Compiler:test_compound_assignment] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_compound_assignment.o
+✓ Object file written to /tmp/arc_tests/test_compound_assignment.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_compound_assignment.arc...
-      [Compiler:test_compound_assignment] [INFO] Creating compiler for module 'test_compound_assignment' with entry file 'tests/test_compound_assignment.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_compound_assignment'
-      [Compiler:test_compound_assignment] [INFO] Compiling file: tests/test_compound_assignment.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: x
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 6 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_compound_assignment] [INFO] Generating object file to: /tmp/arc_tests/test_compound_assignment.o
-      [Compiler:test_compound_assignment] [DEBUG] Calling code generator for module 'test_compound_assignment'
-      [Compiler:test_compound_assignment] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_compound_assignment.o -o test_compound_assignment && ./test_compound_assignment
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_compound_assignment.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [11/39] test_constant                                 
 --- Testing: test_constant ---
 Source file: tests/test_constant.arc
@@ -849,8 +626,8 @@ Object file: /tmp/arc_tests/test_constant.o
 Executable: /tmp/arc_tests/test_constant
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 2
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_constant.arc...
 [Compiler:test_constant] [INFO] Creating compiler for module 'test_constant' with entry file 'tests/test_constant.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -883,84 +660,25 @@ Compiling tests/test_constant.arc...
 Module has 1 functions, 1 globals
 [Compiler:test_constant] [INFO] Generating object file to: /tmp/arc_tests/test_constant.o
 [Compiler:test_constant] [DEBUG] Calling code generator for module 'test_constant'
-panic: Value @main_MAX = external constant i64 100 not allocated
+[Compiler:test_constant] [DEBUG] Generated 824 bytes of object code
+[Compiler:test_constant] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_constant.o
+✓ Object file written to /tmp/arc_tests/test_constant.o
 
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf00c0003775c0?, {0x69b0b0, 0xc00021dc70})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0003779d0, 0x1, {0x69b0b0?, 0xc00021dc70?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0003779d0, {0x6a1670, 0xc0004ec660})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:148 +0x947
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0003779d0, 0xc00057b180)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b6070)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00008c0c0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc0000a6078, {0x7ffc087d5501, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
-main.main()
-	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_constant.o -o test_constant && ./test_constant
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_constant.arc...
-      [Compiler:test_constant] [INFO] Creating compiler for module 'test_constant' with entry file 'tests/test_constant.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_constant'
-      [Compiler:test_constant] [INFO] Compiling file: tests/test_constant.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [INFO] Setting current namespace to 'main'
-      [Context] [DEBUG] Created new namespace 'main'
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring constant: MAX
-      [Visitor] [INFO] Declared global constant 'MAX' (IR: main_MAX)
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-      Module has 1 functions, 1 globals
-      [Compiler:test_constant] [INFO] Generating object file to: /tmp/arc_tests/test_constant.o
-      [Compiler:test_constant] [DEBUG] Calling code generator for module 'test_constant'
-      panic: Value @main_MAX = external constant i64 100 not allocated
-      
-      goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf00c0003775c0?, {0x69b0b0, 0xc00021dc70})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0003779d0, 0x1, {0x69b0b0?, 0xc00021dc70?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0003779d0, {0x6a1670, 0xc0004ec660})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:148 +0x947
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0003779d0, 0xc00057b180)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
-      github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b6070)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
-      github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00008c0c0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc0000a6078, {0x7ffc087d5501, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
-      main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-      	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
-      main.main()
-      	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_constant.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [12/39] test_defer                                    
 --- Testing: test_defer ---
 Source file: tests/test_defer.arc
@@ -968,8 +686,8 @@ Object file: /tmp/arc_tests/test_defer.o
 Executable: /tmp/arc_tests/test_defer
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 2
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_defer.arc...
 [Compiler:test_defer] [INFO] Creating compiler for module 'test_defer' with entry file 'tests/test_defer.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -1002,84 +720,25 @@ Compiling tests/test_defer.arc...
 Module has 2 functions, 0 globals
 [Compiler:test_defer] [INFO] Generating object file to: /tmp/arc_tests/test_defer.o
 [Compiler:test_defer] [DEBUG] Calling code generator for module 'test_defer'
-panic: Value call void @cleanup() not allocated
+[Compiler:test_defer] [DEBUG] Generated 728 bytes of object code
+[Compiler:test_defer] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_defer.o
+✓ Object file written to /tmp/arc_tests/test_defer.o
 
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e63e0?, {0x69b3f8, 0xc00009d6c0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc00046b9d0, 0x0, {0x69b3f8?, 0xc00009d6c0?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:184 +0x34
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00046b9d0, {0x6a13d0, 0xc00009d6c0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:75 +0x1085
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00046b9d0, 0xc0002c0000)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffe8159e504, 0x1b})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
-main.main()
-	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_defer.o -o test_defer && ./test_defer
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_defer.arc...
-      [Compiler:test_defer] [INFO] Creating compiler for module 'test_defer' with entry file 'tests/test_defer.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_defer'
-      [Compiler:test_defer] [INFO] Compiling file: tests/test_defer.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: cleanup (IR: cleanup)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'cleanup'
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'cleanup'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Context] [WARN] defer statement is not fully implemented yet
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-      Module has 2 functions, 0 globals
-      [Compiler:test_defer] [INFO] Generating object file to: /tmp/arc_tests/test_defer.o
-      [Compiler:test_defer] [DEBUG] Calling code generator for module 'test_defer'
-      panic: Value call void @cleanup() not allocated
-      
-      goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e63e0?, {0x69b3f8, 0xc00009d6c0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc00046b9d0, 0x0, {0x69b3f8?, 0xc00009d6c0?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:184 +0x34
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00046b9d0, {0x6a13d0, 0xc00009d6c0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:75 +0x1085
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00046b9d0, 0xc0002c0000)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
-      github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
-      github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffe8159e504, 0x1b})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
-      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-      	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
-      main.main()
-      	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_defer.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.06s)
 [13/39] test_enum                                     
 --- Testing: test_enum ---
 Source file: tests/test_enum.arc
@@ -1087,8 +746,8 @@ Object file: /tmp/arc_tests/test_enum.o
 Executable: /tmp/arc_tests/test_enum
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 2
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_enum.arc...
 [Compiler:test_enum] [INFO] Creating compiler for module 'test_enum' with entry file 'tests/test_enum.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -1120,83 +779,25 @@ Compiling tests/test_enum.arc...
 Module has 1 functions, 3 globals
 [Compiler:test_enum] [INFO] Generating object file to: /tmp/arc_tests/test_enum.o
 [Compiler:test_enum] [DEBUG] Calling code generator for module 'test_enum'
-panic: Value @Status_OK = external constant i32 0 not allocated
+[Compiler:test_enum] [DEBUG] Generated 864 bytes of object code
+[Compiler:test_enum] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_enum.o
+✓ Object file written to /tmp/arc_tests/test_enum.o
 
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf000000000011?, {0x69b0b0, 0xc0003b0f00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004c99d0, 0x1, {0x69b0b0?, 0xc0003b0f00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004c99d0, {0x6a1670, 0xc000302000})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:148 +0x947
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004c99d0, 0xc0001dce00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffc7b9c0505, 0x1a})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
-main.main()
-	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_enum.o -o test_enum && ./test_enum
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_enum.arc...
-      [Compiler:test_enum] [INFO] Creating compiler for module 'test_enum' with entry file 'tests/test_enum.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_enum'
-      [Compiler:test_enum] [INFO] Compiling file: tests/test_enum.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [INFO] Processing enum declaration: Status
-      [Context] [DEBUG] Registered type 'Status'
-      [Visitor] [DEBUG] Registered enum member: Status.OK = 0
-      [Visitor] [DEBUG] Registered enum member: Status.ERROR = 1
-      [Visitor] [DEBUG] Registered enum member: Status.PENDING = 2
-      [Visitor] [INFO] Completed enum declaration: Status with underlying type i32
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: s
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-      Module has 1 functions, 3 globals
-      [Compiler:test_enum] [INFO] Generating object file to: /tmp/arc_tests/test_enum.o
-      [Compiler:test_enum] [DEBUG] Calling code generator for module 'test_enum'
-      panic: Value @Status_OK = external constant i32 0 not allocated
-      
-      goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf000000000011?, {0x69b0b0, 0xc0003b0f00})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004c99d0, 0x1, {0x69b0b0?, 0xc0003b0f00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004c99d0, {0x6a1670, 0xc000302000})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:148 +0x947
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004c99d0, 0xc0001dce00)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
-      github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
-      github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffc7b9c0505, 0x1a})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
-      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-      	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
-      main.main()
-      	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_enum.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [14/39] test_extern                                   
 --- Testing: test_extern ---
 Source file: tests/test_extern.arc
@@ -1204,8 +805,8 @@ Object file: /tmp/arc_tests/test_extern.o
 Executable: /tmp/arc_tests/test_extern
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_extern.arc...
 [Compiler:test_extern] [INFO] Creating compiler for module 'test_extern' with entry file 'tests/test_extern.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -1238,46 +839,25 @@ Compiling tests/test_extern.arc...
 Module has 2 functions, 0 globals
 [Compiler:test_extern] [INFO] Generating object file to: /tmp/arc_tests/test_extern.o
 [Compiler:test_extern] [DEBUG] Calling code generator for module 'test_extern'
-[Compiler:test_extern] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_extern] [DEBUG] Generated 888 bytes of object code
+[Compiler:test_extern] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_extern.o
+✓ Object file written to /tmp/arc_tests/test_extern.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_extern.arc...
-      [Compiler:test_extern] [INFO] Creating compiler for module 'test_extern' with entry file 'tests/test_extern.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_extern'
-      [Compiler:test_extern] [INFO] Compiling file: tests/test_extern.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Processing extern namespace: libc
-      [Context] [DEBUG] Created new namespace 'libc'
-      [Visitor] [DEBUG] Declared extern function 'abs' (external: 'abs') in namespace 'libc'
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: result
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-      Module has 2 functions, 0 globals
-      [Compiler:test_extern] [INFO] Generating object file to: /tmp/arc_tests/test_extern.o
-      [Compiler:test_extern] [DEBUG] Calling code generator for module 'test_extern'
-      [Compiler:test_extern] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_extern.o -o test_extern && ./test_extern
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_extern.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [15/39] test_for_in_range                             
 --- Testing: test_for_in_range ---
 Source file: tests/test_for_in_range.arc
@@ -1285,8 +865,8 @@ Object file: /tmp/arc_tests/test_for_in_range.o
 Executable: /tmp/arc_tests/test_for_in_range
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_for_in_range.arc...
 [Compiler:test_for_in_range] [INFO] Creating compiler for module 'test_for_in_range' with entry file 'tests/test_for_in_range.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -1322,49 +902,25 @@ Compiling tests/test_for_in_range.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_for_in_range] [INFO] Generating object file to: /tmp/arc_tests/test_for_in_range.o
 [Compiler:test_for_in_range] [DEBUG] Calling code generator for module 'test_for_in_range'
-[Compiler:test_for_in_range] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_for_in_range] [DEBUG] Generated 984 bytes of object code
+[Compiler:test_for_in_range] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_for_in_range.o
+✓ Object file written to /tmp/arc_tests/test_for_in_range.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_for_in_range.arc...
-      [Compiler:test_for_in_range] [INFO] Creating compiler for module 'test_for_in_range' with entry file 'tests/test_for_in_range.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_for_in_range'
-      [Compiler:test_for_in_range] [INFO] Compiling file: tests/test_for_in_range.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: sum
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Pushed loop context
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Popped loop context
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_for_in_range] [INFO] Generating object file to: /tmp/arc_tests/test_for_in_range.o
-      [Compiler:test_for_in_range] [DEBUG] Calling code generator for module 'test_for_in_range'
-      [Compiler:test_for_in_range] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_for_in_range.o -o test_for_in_range && ./test_for_in_range
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_for_in_range.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [16/39] test_for_loop                                 
 --- Testing: test_for_loop ---
 Source file: tests/test_for_loop.arc
@@ -1372,8 +928,8 @@ Object file: /tmp/arc_tests/test_for_loop.o
 Executable: /tmp/arc_tests/test_for_loop
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_for_loop.arc...
 [Compiler:test_for_loop] [INFO] Creating compiler for module 'test_for_loop' with entry file 'tests/test_for_loop.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -1410,50 +966,25 @@ Compiling tests/test_for_loop.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_for_loop] [INFO] Generating object file to: /tmp/arc_tests/test_for_loop.o
 [Compiler:test_for_loop] [DEBUG] Calling code generator for module 'test_for_loop'
-[Compiler:test_for_loop] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_for_loop] [DEBUG] Generated 984 bytes of object code
+[Compiler:test_for_loop] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_for_loop.o
+✓ Object file written to /tmp/arc_tests/test_for_loop.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_for_loop.arc...
-      [Compiler:test_for_loop] [INFO] Creating compiler for module 'test_for_loop' with entry file 'tests/test_for_loop.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_for_loop'
-      [Compiler:test_for_loop] [INFO] Compiling file: tests/test_for_loop.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: sum
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: i
-      [Context] [DEBUG] Pushed loop context
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Popped loop context
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_for_loop] [INFO] Generating object file to: /tmp/arc_tests/test_for_loop.o
-      [Compiler:test_for_loop] [DEBUG] Calling code generator for module 'test_for_loop'
-      [Compiler:test_for_loop] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_for_loop.o -o test_for_loop && ./test_for_loop
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_for_loop.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.07s)
 [17/39] test_function_basic                           
 --- Testing: test_function_basic ---
 Source file: tests/test_function_basic.arc
@@ -1461,8 +992,8 @@ Object file: /tmp/arc_tests/test_function_basic.o
 Executable: /tmp/arc_tests/test_function_basic
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_function_basic.arc...
 [Compiler:test_function_basic] [INFO] Creating compiler for module 'test_function_basic' with entry file 'tests/test_function_basic.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -1501,52 +1032,25 @@ Compiling tests/test_function_basic.arc...
 Module has 2 functions, 0 globals
 [Compiler:test_function_basic] [INFO] Generating object file to: /tmp/arc_tests/test_function_basic.o
 [Compiler:test_function_basic] [DEBUG] Calling code generator for module 'test_function_basic'
-[Compiler:test_function_basic] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_function_basic] [DEBUG] Generated 1032 bytes of object code
+[Compiler:test_function_basic] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_function_basic.o
+✓ Object file written to /tmp/arc_tests/test_function_basic.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_function_basic.arc...
-      [Compiler:test_function_basic] [INFO] Creating compiler for module 'test_function_basic' with entry file 'tests/test_function_basic.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_function_basic'
-      [Compiler:test_function_basic] [INFO] Compiling file: tests/test_function_basic.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: add (IR: add)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'add'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'add'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: result
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-      Module has 2 functions, 0 globals
-      [Compiler:test_function_basic] [INFO] Generating object file to: /tmp/arc_tests/test_function_basic.o
-      [Compiler:test_function_basic] [DEBUG] Calling code generator for module 'test_function_basic'
-      [Compiler:test_function_basic] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_function_basic.o -o test_function_basic && ./test_function_basic
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_function_basic.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.07s)
 [18/39] test_generics                                 
 --- Testing: test_generics ---
 Source file: tests/test_generics.arc
@@ -1554,8 +1058,8 @@ Object file: /tmp/arc_tests/test_generics.o
 Executable: /tmp/arc_tests/test_generics
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 2
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_generics.arc...
 [Compiler:test_generics] [INFO] Creating compiler for module 'test_generics' with entry file 'tests/test_generics.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -1596,92 +1100,25 @@ Compiling tests/test_generics.arc...
 Module has 2 functions, 0 globals
 [Compiler:test_generics] [INFO] Generating object file to: /tmp/arc_tests/test_generics.o
 [Compiler:test_generics] [DEBUG] Calling code generator for module 'test_generics'
-panic: Value call void @swap<i32>(ptr<i64> %x.addr, ptr<i64> %y.addr) not allocated
+[Compiler:test_generics] [DEBUG] Generated 1200 bytes of object code
+[Compiler:test_generics] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_generics.o
+✓ Object file written to /tmp/arc_tests/test_generics.o
 
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e63e0?, {0x69b3f8, 0xc00009d8f0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc0005499d0, 0x0, {0x69b3f8?, 0xc00009d8f0?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:184 +0x34
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005499d0, {0x6a13d0, 0xc00009d8f0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:75 +0x1085
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005499d0, 0xc0001f7900)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7fff0c001501, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
-main.main()
-	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_generics.o -o test_generics && ./test_generics
 
-❌ FAIL (0.04s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_generics.arc...
-      [Compiler:test_generics] [INFO] Creating compiler for module 'test_generics' with entry file 'tests/test_generics.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_generics'
-      [Compiler:test_generics] [INFO] Compiling file: tests/test_generics.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [INFO] Registered generic function definition: swap
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: x
-      [Visitor] [DEBUG] Declaring variable: y
-      [Visitor] [INFO] Instantiating function swap as swap<i32>
-      [Visitor] [DEBUG] Declaring function: swap (IR: swap<i32>)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'swap<i32>'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: tmp
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'swap<i32>'
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      Module has 2 functions, 0 globals
-      [Compiler:test_generics] [INFO] Generating object file to: /tmp/arc_tests/test_generics.o
-      [Compiler:test_generics] [DEBUG] Calling code generator for module 'test_generics'
-      panic: Value call void @swap<i32>(ptr<i64> %x.addr, ptr<i64> %y.addr) not allocated
-      
-      goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e63e0?, {0x69b3f8, 0xc00009d8f0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc0005499d0, 0x0, {0x69b3f8?, 0xc00009d8f0?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:184 +0x34
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005499d0, {0x6a13d0, 0xc00009d8f0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:75 +0x1085
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005499d0, 0xc0001f7900)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
-      github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
-      github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7fff0c001501, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
-      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-      	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
-      main.main()
-      	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_generics.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.06s)
 [19/39] test_generics_structs                         
 --- Testing: test_generics_structs ---
 Source file: tests/test_generics_structs.arc
@@ -1704,7 +1141,7 @@ Compiling tests/test_generics_structs.arc...
   Errors: 2
 Compilation failed: syntax errors in /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
 
-❌ FAIL (0.11s)
+❌ FAIL (0.07s)
     Compilation failed
     Compile output:
       Compiling tests/test_generics_structs.arc...
@@ -1726,8 +1163,8 @@ Object file: /tmp/arc_tests/test_if_else.o
 Executable: /tmp/arc_tests/test_if_else
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_if_else.arc...
 [Compiler:test_if_else] [INFO] Creating compiler for module 'test_if_else' with entry file 'tests/test_if_else.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -1759,45 +1196,25 @@ Compiling tests/test_if_else.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_if_else] [INFO] Generating object file to: /tmp/arc_tests/test_if_else.o
 [Compiler:test_if_else] [DEBUG] Calling code generator for module 'test_if_else'
-[Compiler:test_if_else] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_if_else] [DEBUG] Generated 720 bytes of object code
+[Compiler:test_if_else] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_if_else.o
+✓ Object file written to /tmp/arc_tests/test_if_else.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_if_else.arc...
-      [Compiler:test_if_else] [INFO] Creating compiler for module 'test_if_else' with entry file 'tests/test_if_else.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_if_else'
-      [Compiler:test_if_else] [INFO] Compiling file: tests/test_if_else.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: x
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_if_else] [INFO] Generating object file to: /tmp/arc_tests/test_if_else.o
-      [Compiler:test_if_else] [DEBUG] Calling code generator for module 'test_if_else'
-      [Compiler:test_if_else] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_if_else.o -o test_if_else && ./test_if_else
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_if_else.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [21/39] test_if_statement                             
 --- Testing: test_if_statement ---
 Source file: tests/test_if_statement.arc
@@ -1805,8 +1222,8 @@ Object file: /tmp/arc_tests/test_if_statement.o
 Executable: /tmp/arc_tests/test_if_statement
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_if_statement.arc...
 [Compiler:test_if_statement] [INFO] Creating compiler for module 'test_if_statement' with entry file 'tests/test_if_statement.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -1836,43 +1253,25 @@ Compiling tests/test_if_statement.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_if_statement] [INFO] Generating object file to: /tmp/arc_tests/test_if_statement.o
 [Compiler:test_if_statement] [DEBUG] Calling code generator for module 'test_if_statement'
-[Compiler:test_if_statement] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_if_statement] [DEBUG] Generated 712 bytes of object code
+[Compiler:test_if_statement] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_if_statement.o
+✓ Object file written to /tmp/arc_tests/test_if_statement.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_if_statement.arc...
-      [Compiler:test_if_statement] [INFO] Creating compiler for module 'test_if_statement' with entry file 'tests/test_if_statement.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_if_statement'
-      [Compiler:test_if_statement] [INFO] Compiling file: tests/test_if_statement.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: x
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_if_statement] [INFO] Generating object file to: /tmp/arc_tests/test_if_statement.o
-      [Compiler:test_if_statement] [DEBUG] Calling code generator for module 'test_if_statement'
-      [Compiler:test_if_statement] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_if_statement.o -o test_if_statement && ./test_if_statement
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_if_statement.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [22/39] test_import_multiple                          
 --- Testing: test_import_multiple ---
 Source file: tests/test_import_multiple.arc
@@ -1892,27 +1291,27 @@ Compiling tests/test_import_multiple.arc...
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
 panic: runtime error: invalid memory address or nil pointer dereference
-[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59bc6b]
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59db4b]
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0004b1200, 0x63a1c0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor_declarations.go:18 +0x2b
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69cc28?, 0xc0000dec00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:55 +0x757
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0004b1200, 0xc0000dea80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:169 +0x1fa
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69caf0?, 0xc0000dea80?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:49 +0x266
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc000010090, {0xc00002a400, 0x40}, 0x1)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/compiler.go:194 +0x445
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010090, {0x7fffe9a8f4d8, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/compiler.go:60 +0x18b
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0003b4300, 0x63bf80?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/visitor_declarations.go:18 +0x2b
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8364b0?, {0x69ece8?, 0xc00010ac00?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/visitor.go:55 +0x757
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0003b4300, 0xc00010aa80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/visitor.go:169 +0x1fa
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x836430?, {0x69ebb0?, 0xc00010aa80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/visitor.go:49 +0x266
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a6078, {0xc0000c6080, 0x40}, 0x1)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/compiler.go:194 +0x445
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a6078, {0x7ffe3385f4d8, 0x1e})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/compiler.go:60 +0x18b
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:76 +0x451
 main.main()
 	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
 
-❌ FAIL (0.03s)
+❌ FAIL (0.02s)
     Compilation failed
     Compile output:
       Compiling tests/test_import_multiple.arc...
@@ -1925,22 +1324,22 @@ main.main()
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
       panic: runtime error: invalid memory address or nil pointer dereference
-      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59bc6b]
+      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59db4b]
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0004b1200, 0x63a1c0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor_declarations.go:18 +0x2b
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69cc28?, 0xc0000dec00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:55 +0x757
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0004b1200, 0xc0000dea80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:169 +0x1fa
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69caf0?, 0xc0000dea80?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:49 +0x266
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc000010090, {0xc00002a400, 0x40}, 0x1)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/compiler.go:194 +0x445
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010090, {0x7fffe9a8f4d8, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/compiler.go:60 +0x18b
-      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0003b4300, 0x63bf80?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/visitor_declarations.go:18 +0x2b
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8364b0?, {0x69ece8?, 0xc00010ac00?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/visitor.go:55 +0x757
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0003b4300, 0xc00010aa80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/visitor.go:169 +0x1fa
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x836430?, {0x69ebb0?, 0xc00010aa80?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/visitor.go:49 +0x266
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a6078, {0xc0000c6080, 0x40}, 0x1)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/compiler.go:194 +0x445
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a6078, {0x7ffe3385f4d8, 0x1e})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231035446-ee261ed08a26/compiler/compiler/compiler.go:60 +0x18b
+      main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:76 +0x451
       main.main()
       	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
@@ -1989,7 +1388,7 @@ Compiling tests/test_import_single.arc...
   Errors: 1
 Compilation failed: compilation failed
 
-❌ FAIL (0.03s)
+❌ FAIL (0.02s)
     Compilation failed
     Compile output:
       Compiling tests/test_import_single.arc...
@@ -2034,8 +1433,8 @@ Object file: /tmp/arc_tests/test_increment.o
 Executable: /tmp/arc_tests/test_increment
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_increment.arc...
 [Compiler:test_increment] [INFO] Creating compiler for module 'test_increment' with entry file 'tests/test_increment.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -2065,43 +1464,25 @@ Compiling tests/test_increment.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_increment] [INFO] Generating object file to: /tmp/arc_tests/test_increment.o
 [Compiler:test_increment] [DEBUG] Calling code generator for module 'test_increment'
-[Compiler:test_increment] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_increment] [DEBUG] Generated 848 bytes of object code
+[Compiler:test_increment] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_increment.o
+✓ Object file written to /tmp/arc_tests/test_increment.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_increment.arc...
-      [Compiler:test_increment] [INFO] Creating compiler for module 'test_increment' with entry file 'tests/test_increment.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_increment'
-      [Compiler:test_increment] [INFO] Compiling file: tests/test_increment.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: i
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_increment] [INFO] Generating object file to: /tmp/arc_tests/test_increment.o
-      [Compiler:test_increment] [DEBUG] Calling code generator for module 'test_increment'
-      [Compiler:test_increment] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_increment.o -o test_increment && ./test_increment
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_increment.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [25/39] test_namespace                                
 --- Testing: test_namespace ---
 Source file: tests/test_namespace.arc
@@ -2109,8 +1490,8 @@ Object file: /tmp/arc_tests/test_namespace.o
 Executable: /tmp/arc_tests/test_namespace
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_namespace.arc...
 [Compiler:test_namespace] [INFO] Creating compiler for module 'test_namespace' with entry file 'tests/test_namespace.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -2137,40 +1518,25 @@ Compiling tests/test_namespace.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_namespace] [INFO] Generating object file to: /tmp/arc_tests/test_namespace.o
 [Compiler:test_namespace] [DEBUG] Calling code generator for module 'test_namespace'
-[Compiler:test_namespace] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_namespace] [DEBUG] Generated 576 bytes of object code
+[Compiler:test_namespace] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_namespace.o
+✓ Object file written to /tmp/arc_tests/test_namespace.o
 
-❌ FAIL (0.02s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_namespace.arc...
-      [Compiler:test_namespace] [INFO] Creating compiler for module 'test_namespace' with entry file 'tests/test_namespace.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_namespace'
-      [Compiler:test_namespace] [INFO] Compiling file: tests/test_namespace.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [INFO] Setting current namespace to 'main'
-      [Context] [DEBUG] Created new namespace 'main'
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_namespace] [INFO] Generating object file to: /tmp/arc_tests/test_namespace.o
-      [Compiler:test_namespace] [DEBUG] Calling code generator for module 'test_namespace'
-      [Compiler:test_namespace] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_namespace.o -o test_namespace && ./test_namespace
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_namespace.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.04s)
 [26/39] test_null_check                               
 --- Testing: test_null_check ---
 Source file: tests/test_null_check.arc
@@ -2178,8 +1544,8 @@ Object file: /tmp/arc_tests/test_null_check.o
 Executable: /tmp/arc_tests/test_null_check
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 2
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_null_check.arc...
 [Compiler:test_null_check] [INFO] Creating compiler for module 'test_null_check' with entry file 'tests/test_null_check.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -2209,81 +1575,25 @@ Compiling tests/test_null_check.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_null_check] [INFO] Generating object file to: /tmp/arc_tests/test_null_check.o
 [Compiler:test_null_check] [DEBUG] Calling code generator for module 'test_null_check'
-panic: Value ptr<void> null not allocated
+[Compiler:test_null_check] [DEBUG] Generated 704 bytes of object code
+[Compiler:test_null_check] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_null_check.o
+✓ Object file written to /tmp/arc_tests/test_null_check.o
 
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003cc500?, {0x69b5b8, 0xc0003cc400})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00029d9d0, 0x0, {0x69b5b8?, 0xc0003cc400?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00029d9d0, {0x6a1600, 0xc000275800})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:153 +0xa45
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00029d9d0, 0xc00043fc80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffe539ac4ff, 0x20})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
-main.main()
-	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_null_check.o -o test_null_check && ./test_null_check
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_null_check.arc...
-      [Compiler:test_null_check] [INFO] Creating compiler for module 'test_null_check' with entry file 'tests/test_null_check.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_null_check'
-      [Compiler:test_null_check] [INFO] Compiling file: tests/test_null_check.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: ptr
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_null_check] [INFO] Generating object file to: /tmp/arc_tests/test_null_check.o
-      [Compiler:test_null_check] [DEBUG] Calling code generator for module 'test_null_check'
-      panic: Value ptr<void> null not allocated
-      
-      goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003cc500?, {0x69b5b8, 0xc0003cc400})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00029d9d0, 0x0, {0x69b5b8?, 0xc0003cc400?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00029d9d0, {0x6a1600, 0xc000275800})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:153 +0xa45
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00029d9d0, 0xc00043fc80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
-      github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
-      github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffe539ac4ff, 0x20})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
-      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-      	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
-      main.main()
-      	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_null_check.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.04s)
 [27/39] test_pointer                                  
 --- Testing: test_pointer ---
 Source file: tests/test_pointer.arc
@@ -2291,8 +1601,8 @@ Object file: /tmp/arc_tests/test_pointer.o
 Executable: /tmp/arc_tests/test_pointer
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_pointer.arc...
 [Compiler:test_pointer] [INFO] Creating compiler for module 'test_pointer' with entry file 'tests/test_pointer.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -2324,45 +1634,25 @@ Compiling tests/test_pointer.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_pointer] [INFO] Generating object file to: /tmp/arc_tests/test_pointer.o
 [Compiler:test_pointer] [DEBUG] Calling code generator for module 'test_pointer'
-[Compiler:test_pointer] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_pointer] [DEBUG] Generated 808 bytes of object code
+[Compiler:test_pointer] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_pointer.o
+✓ Object file written to /tmp/arc_tests/test_pointer.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_pointer.arc...
-      [Compiler:test_pointer] [INFO] Creating compiler for module 'test_pointer' with entry file 'tests/test_pointer.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_pointer'
-      [Compiler:test_pointer] [INFO] Compiling file: tests/test_pointer.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: x
-      [Visitor] [DEBUG] Declaring variable: ptr
-      [Visitor] [DEBUG] Declaring variable: val
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_pointer] [INFO] Generating object file to: /tmp/arc_tests/test_pointer.o
-      [Compiler:test_pointer] [DEBUG] Calling code generator for module 'test_pointer'
-      [Compiler:test_pointer] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_pointer.o -o test_pointer && ./test_pointer
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_pointer.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [28/39] test_sizeof                                   
 --- Testing: test_sizeof ---
 Source file: tests/test_sizeof.arc
@@ -2402,10 +1692,10 @@ Compiling tests/test_sizeof.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_sizeof] [INFO] Generating object file to: /tmp/arc_tests/test_sizeof.o
 [Compiler:test_sizeof] [DEBUG] Calling code generator for module 'test_sizeof'
-[Compiler:test_sizeof] [ERROR] Code generation failed: unknown opcode: sizeof
-Object generation failed: code generation failed: unknown opcode: sizeof
+[Compiler:test_sizeof] [ERROR] Code generation failed: in function main: unknown opcode: sizeof
+Object generation failed: code generation failed: in function main: unknown opcode: sizeof
 
-❌ FAIL (0.05s)
+❌ FAIL (0.03s)
     Compilation failed
     Compile output:
       Compiling tests/test_sizeof.arc...
@@ -2438,8 +1728,8 @@ Object generation failed: code generation failed: unknown opcode: sizeof
       Module has 1 functions, 0 globals
       [Compiler:test_sizeof] [INFO] Generating object file to: /tmp/arc_tests/test_sizeof.o
       [Compiler:test_sizeof] [DEBUG] Calling code generator for module 'test_sizeof'
-      [Compiler:test_sizeof] [ERROR] Code generation failed: unknown opcode: sizeof
-      Object generation failed: code generation failed: unknown opcode: sizeof
+      [Compiler:test_sizeof] [ERROR] Code generation failed: in function main: unknown opcode: sizeof
+      Object generation failed: code generation failed: in function main: unknown opcode: sizeof
 [29/39] test_string_interpolation                     
 --- Testing: test_string_interpolation ---
 Source file: tests/test_string_interpolation.arc
@@ -2447,8 +1737,8 @@ Object file: /tmp/arc_tests/test_string_interpolation.o
 Executable: /tmp/arc_tests/test_string_interpolation
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_string_interpolation.arc...
 [Compiler:test_string_interpolation] [INFO] Creating compiler for module 'test_string_interpolation' with entry file 'tests/test_string_interpolation.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -2476,41 +1766,25 @@ Compiling tests/test_string_interpolation.arc...
 Module has 1 functions, 2 globals
 [Compiler:test_string_interpolation] [INFO] Generating object file to: /tmp/arc_tests/test_string_interpolation.o
 [Compiler:test_string_interpolation] [DEBUG] Calling code generator for module 'test_string_interpolation'
-[Compiler:test_string_interpolation] [ERROR] Code generation failed: unknown opcode: getelementptr
-Object generation failed: code generation failed: unknown opcode: getelementptr
+[Compiler:test_string_interpolation] [DEBUG] Generated 920 bytes of object code
+[Compiler:test_string_interpolation] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_string_interpolation.o
+✓ Object file written to /tmp/arc_tests/test_string_interpolation.o
 
-❌ FAIL (0.02s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_string_interpolation.arc...
-      [Compiler:test_string_interpolation] [INFO] Creating compiler for module 'test_string_interpolation' with entry file 'tests/test_string_interpolation.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_string_interpolation'
-      [Compiler:test_string_interpolation] [INFO] Compiling file: tests/test_string_interpolation.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: name
-      [Visitor] [DEBUG] Declaring variable: age
-      [Visitor] [DEBUG] Declaring variable: msg
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-      Module has 1 functions, 2 globals
-      [Compiler:test_string_interpolation] [INFO] Generating object file to: /tmp/arc_tests/test_string_interpolation.o
-      [Compiler:test_string_interpolation] [DEBUG] Calling code generator for module 'test_string_interpolation'
-      [Compiler:test_string_interpolation] [ERROR] Code generation failed: unknown opcode: getelementptr
-      Object generation failed: code generation failed: unknown opcode: getelementptr
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_string_interpolation.o -o test_string_interpolation && ./test_string_interpolation
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_string_interpolation.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.04s)
 [30/39] test_struct_basic                             
 --- Testing: test_struct_basic ---
 Source file: tests/test_struct_basic.arc
@@ -2553,8 +1827,8 @@ Compiling tests/test_struct_basic.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_struct_basic] [INFO] Generating object file to: /tmp/arc_tests/test_struct_basic.o
 [Compiler:test_struct_basic] [DEBUG] Calling code generator for module 'test_struct_basic'
-[Compiler:test_struct_basic] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_struct_basic] [ERROR] Code generation failed: in function main: unknown opcode: insertvalue
+Object generation failed: code generation failed: in function main: unknown opcode: insertvalue
 
 ❌ FAIL (0.04s)
     Compilation failed
@@ -2592,8 +1866,8 @@ Object generation failed: code generation failed: unknown opcode: trunc
       Module has 1 functions, 0 globals
       [Compiler:test_struct_basic] [INFO] Generating object file to: /tmp/arc_tests/test_struct_basic.o
       [Compiler:test_struct_basic] [DEBUG] Calling code generator for module 'test_struct_basic'
-      [Compiler:test_struct_basic] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+      [Compiler:test_struct_basic] [ERROR] Code generation failed: in function main: unknown opcode: insertvalue
+      Object generation failed: code generation failed: in function main: unknown opcode: insertvalue
 [31/39] test_struct_method                            
 --- Testing: test_struct_method ---
 Source file: tests/test_struct_method.arc
@@ -2645,10 +1919,10 @@ Compiling tests/test_struct_method.arc...
 Module has 2 functions, 0 globals
 [Compiler:test_struct_method] [INFO] Generating object file to: /tmp/arc_tests/test_struct_method.o
 [Compiler:test_struct_method] [DEBUG] Calling code generator for module 'test_struct_method'
-[Compiler:test_struct_method] [ERROR] Code generation failed: unknown opcode: getelementptr
-Object generation failed: code generation failed: unknown opcode: getelementptr
+[Compiler:test_struct_method] [ERROR] Code generation failed: in function main: unknown opcode: insertvalue
+Object generation failed: code generation failed: in function main: unknown opcode: insertvalue
 
-❌ FAIL (0.06s)
+❌ FAIL (0.05s)
     Compilation failed
     Compile output:
       Compiling tests/test_struct_method.arc...
@@ -2693,8 +1967,8 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       Module has 2 functions, 0 globals
       [Compiler:test_struct_method] [INFO] Generating object file to: /tmp/arc_tests/test_struct_method.o
       [Compiler:test_struct_method] [DEBUG] Calling code generator for module 'test_struct_method'
-      [Compiler:test_struct_method] [ERROR] Code generation failed: unknown opcode: getelementptr
-      Object generation failed: code generation failed: unknown opcode: getelementptr
+      [Compiler:test_struct_method] [ERROR] Code generation failed: in function main: unknown opcode: insertvalue
+      Object generation failed: code generation failed: in function main: unknown opcode: insertvalue
 [32/39] test_switch                                   
 --- Testing: test_switch ---
 Source file: tests/test_switch.arc
@@ -2702,8 +1976,8 @@ Object file: /tmp/arc_tests/test_switch.o
 Executable: /tmp/arc_tests/test_switch
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_switch.arc...
 [Compiler:test_switch] [INFO] Creating compiler for module 'test_switch' with entry file 'tests/test_switch.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -2734,44 +2008,25 @@ Compiling tests/test_switch.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_switch] [INFO] Generating object file to: /tmp/arc_tests/test_switch.o
 [Compiler:test_switch] [DEBUG] Calling code generator for module 'test_switch'
-[Compiler:test_switch] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_switch] [DEBUG] Generated 1032 bytes of object code
+[Compiler:test_switch] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_switch.o
+✓ Object file written to /tmp/arc_tests/test_switch.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_switch.arc...
-      [Compiler:test_switch] [INFO] Creating compiler for module 'test_switch' with entry file 'tests/test_switch.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_switch'
-      [Compiler:test_switch] [INFO] Compiling file: tests/test_switch.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: status
-      [Visitor] [DEBUG] Declaring variable: result
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_switch] [INFO] Generating object file to: /tmp/arc_tests/test_switch.o
-      [Compiler:test_switch] [DEBUG] Calling code generator for module 'test_switch'
-      [Compiler:test_switch] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_switch.o -o test_switch && ./test_switch
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_switch.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [33/39] test_try_except_raise                         
 --- Testing: test_try_except_raise ---
 Source file: tests/test_try_except_raise.arc
@@ -2823,10 +2078,10 @@ Compiling tests/test_try_except_raise.arc...
 Module has 2 functions, 1 globals
 [Compiler:test_try_except_raise] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise.o
 [Compiler:test_try_except_raise] [DEBUG] Calling code generator for module 'test_try_except_raise'
-[Compiler:test_try_except_raise] [ERROR] Code generation failed: unknown opcode: getelementptr
-Object generation failed: code generation failed: unknown opcode: getelementptr
+[Compiler:test_try_except_raise] [ERROR] Code generation failed: in function divide: unknown opcode: raise
+Object generation failed: code generation failed: in function divide: unknown opcode: raise
 
-❌ FAIL (0.05s)
+❌ FAIL (0.04s)
     Compilation failed
     Compile output:
       Compiling tests/test_try_except_raise.arc...
@@ -2871,8 +2126,8 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       Module has 2 functions, 1 globals
       [Compiler:test_try_except_raise] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise.o
       [Compiler:test_try_except_raise] [DEBUG] Calling code generator for module 'test_try_except_raise'
-      [Compiler:test_try_except_raise] [ERROR] Code generation failed: unknown opcode: getelementptr
-      Object generation failed: code generation failed: unknown opcode: getelementptr
+      [Compiler:test_try_except_raise] [ERROR] Code generation failed: in function divide: unknown opcode: raise
+      Object generation failed: code generation failed: in function divide: unknown opcode: raise
 [34/39] test_try_except_raise_err                     
 --- Testing: test_try_except_raise_err ---
 Source file: tests/test_try_except_raise_err.arc
@@ -2926,10 +2181,10 @@ Compiling tests/test_try_except_raise_err.arc...
 Module has 2 functions, 1 globals
 [Compiler:test_try_except_raise_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise_err.o
 [Compiler:test_try_except_raise_err] [DEBUG] Calling code generator for module 'test_try_except_raise_err'
-[Compiler:test_try_except_raise_err] [ERROR] Code generation failed: unknown opcode: getelementptr
-Object generation failed: code generation failed: unknown opcode: getelementptr
+[Compiler:test_try_except_raise_err] [ERROR] Code generation failed: in function divide: unknown opcode: raise
+Object generation failed: code generation failed: in function divide: unknown opcode: raise
 
-❌ FAIL (0.06s)
+❌ FAIL (0.04s)
     Compilation failed
     Compile output:
       Compiling tests/test_try_except_raise_err.arc...
@@ -2976,8 +2231,8 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       Module has 2 functions, 1 globals
       [Compiler:test_try_except_raise_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise_err.o
       [Compiler:test_try_except_raise_err] [DEBUG] Calling code generator for module 'test_try_except_raise_err'
-      [Compiler:test_try_except_raise_err] [ERROR] Code generation failed: unknown opcode: getelementptr
-      Object generation failed: code generation failed: unknown opcode: getelementptr
+      [Compiler:test_try_except_raise_err] [ERROR] Code generation failed: in function divide: unknown opcode: raise
+      Object generation failed: code generation failed: in function divide: unknown opcode: raise
 [35/39] test_try_except_throw                         
 --- Testing: test_try_except_throw ---
 Source file: tests/test_try_except_throw.arc
@@ -2985,8 +2240,8 @@ Object file: /tmp/arc_tests/test_try_except_throw.o
 Executable: /tmp/arc_tests/test_try_except_throw
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_try_except_throw.arc...
 [Compiler:test_try_except_throw] [INFO] Creating compiler for module 'test_try_except_throw' with entry file 'tests/test_try_except_throw.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -3031,58 +2286,25 @@ Compiling tests/test_try_except_throw.arc...
 Module has 2 functions, 2 globals
 [Compiler:test_try_except_throw] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw.o
 [Compiler:test_try_except_throw] [DEBUG] Calling code generator for module 'test_try_except_throw'
-[Compiler:test_try_except_throw] [ERROR] Code generation failed: unknown opcode: getelementptr
-Object generation failed: code generation failed: unknown opcode: getelementptr
+[Compiler:test_try_except_throw] [DEBUG] Generated 1576 bytes of object code
+[Compiler:test_try_except_throw] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_try_except_throw.o
+✓ Object file written to /tmp/arc_tests/test_try_except_throw.o
 
-❌ FAIL (0.04s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_try_except_throw.arc...
-      [Compiler:test_try_except_throw] [INFO] Creating compiler for module 'test_try_except_throw' with entry file 'tests/test_try_except_throw.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_try_except_throw'
-      [Compiler:test_try_except_throw] [INFO] Compiling file: tests/test_try_except_throw.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: divide (IR: divide)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'divide'
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Processing throw statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'divide'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Processing try-except-finally block
-      [Visitor] [DEBUG] Declaring variable: result
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Processing except clause 1
-      [Visitor] [DEBUG] Binding exception to variable: err
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-      Module has 2 functions, 2 globals
-      [Compiler:test_try_except_throw] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw.o
-      [Compiler:test_try_except_throw] [DEBUG] Calling code generator for module 'test_try_except_throw'
-      [Compiler:test_try_except_throw] [ERROR] Code generation failed: unknown opcode: getelementptr
-      Object generation failed: code generation failed: unknown opcode: getelementptr
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_try_except_throw.o -o test_try_except_throw && ./test_try_except_throw
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_try_except_throw.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.06s)
 [36/39] test_try_except_throw_err                     
 --- Testing: test_try_except_throw_err ---
 Source file: tests/test_try_except_throw_err.arc
@@ -3090,8 +2312,8 @@ Object file: /tmp/arc_tests/test_try_except_throw_err.o
 Executable: /tmp/arc_tests/test_try_except_throw_err
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_try_except_throw_err.arc...
 [Compiler:test_try_except_throw_err] [INFO] Creating compiler for module 'test_try_except_throw_err' with entry file 'tests/test_try_except_throw_err.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -3136,58 +2358,25 @@ Compiling tests/test_try_except_throw_err.arc...
 Module has 2 functions, 2 globals
 [Compiler:test_try_except_throw_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw_err.o
 [Compiler:test_try_except_throw_err] [DEBUG] Calling code generator for module 'test_try_except_throw_err'
-[Compiler:test_try_except_throw_err] [ERROR] Code generation failed: unknown opcode: getelementptr
-Object generation failed: code generation failed: unknown opcode: getelementptr
+[Compiler:test_try_except_throw_err] [DEBUG] Generated 1568 bytes of object code
+[Compiler:test_try_except_throw_err] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_try_except_throw_err.o
+✓ Object file written to /tmp/arc_tests/test_try_except_throw_err.o
 
-❌ FAIL (0.05s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_try_except_throw_err.arc...
-      [Compiler:test_try_except_throw_err] [INFO] Creating compiler for module 'test_try_except_throw_err' with entry file 'tests/test_try_except_throw_err.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_try_except_throw_err'
-      [Compiler:test_try_except_throw_err] [INFO] Compiling file: tests/test_try_except_throw_err.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: divide (IR: divide)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'divide'
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Processing throw statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'divide'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Processing try-except-finally block
-      [Visitor] [DEBUG] Declaring variable: result
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Processing except clause 1
-      [Visitor] [DEBUG] Binding exception to variable: err
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-      Module has 2 functions, 2 globals
-      [Compiler:test_try_except_throw_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw_err.o
-      [Compiler:test_try_except_throw_err] [DEBUG] Calling code generator for module 'test_try_except_throw_err'
-      [Compiler:test_try_except_throw_err] [ERROR] Code generation failed: unknown opcode: getelementptr
-      Object generation failed: code generation failed: unknown opcode: getelementptr
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_try_except_throw_err.o -o test_try_except_throw_err && ./test_try_except_throw_err
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_try_except_throw_err.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.09s)
 [37/39] test_tuple_return                             
 --- Testing: test_tuple_return ---
 Source file: tests/test_tuple_return.arc
@@ -3247,10 +2436,10 @@ Compiling tests/test_tuple_return.arc...
 Module has 2 functions, 0 globals
 [Compiler:test_tuple_return] [INFO] Generating object file to: /tmp/arc_tests/test_tuple_return.o
 [Compiler:test_tuple_return] [DEBUG] Calling code generator for module 'test_tuple_return'
-[Compiler:test_tuple_return] [ERROR] Code generation failed: unknown opcode: insertvalue
-Object generation failed: code generation failed: unknown opcode: insertvalue
+[Compiler:test_tuple_return] [ERROR] Code generation failed: in function divide: unknown opcode: insertvalue
+Object generation failed: code generation failed: in function divide: unknown opcode: insertvalue
 
-❌ FAIL (0.04s)
+❌ FAIL (0.05s)
     Compilation failed
     Compile output:
       Compiling tests/test_tuple_return.arc...
@@ -3303,8 +2492,8 @@ Object generation failed: code generation failed: unknown opcode: insertvalue
       Module has 2 functions, 0 globals
       [Compiler:test_tuple_return] [INFO] Generating object file to: /tmp/arc_tests/test_tuple_return.o
       [Compiler:test_tuple_return] [DEBUG] Calling code generator for module 'test_tuple_return'
-      [Compiler:test_tuple_return] [ERROR] Code generation failed: unknown opcode: insertvalue
-      Object generation failed: code generation failed: unknown opcode: insertvalue
+      [Compiler:test_tuple_return] [ERROR] Code generation failed: in function divide: unknown opcode: insertvalue
+      Object generation failed: code generation failed: in function divide: unknown opcode: insertvalue
 [38/39] test_variable_inferred                        
 --- Testing: test_variable_inferred ---
 Source file: tests/test_variable_inferred.arc
@@ -3312,8 +2501,8 @@ Object file: /tmp/arc_tests/test_variable_inferred.o
 Executable: /tmp/arc_tests/test_variable_inferred
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_variable_inferred.arc...
 [Compiler:test_variable_inferred] [INFO] Creating compiler for module 'test_variable_inferred' with entry file 'tests/test_variable_inferred.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -3343,43 +2532,25 @@ Compiling tests/test_variable_inferred.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_variable_inferred] [INFO] Generating object file to: /tmp/arc_tests/test_variable_inferred.o
 [Compiler:test_variable_inferred] [DEBUG] Calling code generator for module 'test_variable_inferred'
-[Compiler:test_variable_inferred] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_variable_inferred] [DEBUG] Generated 712 bytes of object code
+[Compiler:test_variable_inferred] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_variable_inferred.o
+✓ Object file written to /tmp/arc_tests/test_variable_inferred.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_variable_inferred.arc...
-      [Compiler:test_variable_inferred] [INFO] Creating compiler for module 'test_variable_inferred' with entry file 'tests/test_variable_inferred.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_variable_inferred'
-      [Compiler:test_variable_inferred] [INFO] Compiling file: tests/test_variable_inferred.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: x
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_variable_inferred] [INFO] Generating object file to: /tmp/arc_tests/test_variable_inferred.o
-      [Compiler:test_variable_inferred] [DEBUG] Calling code generator for module 'test_variable_inferred'
-      [Compiler:test_variable_inferred] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_variable_inferred.o -o test_variable_inferred && ./test_variable_inferred
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_variable_inferred.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [39/39] test_variable_typed                           
 --- Testing: test_variable_typed ---
 Source file: tests/test_variable_typed.arc
@@ -3387,8 +2558,8 @@ Object file: /tmp/arc_tests/test_variable_typed.o
 Executable: /tmp/arc_tests/test_variable_typed
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_variable_typed.arc...
 [Compiler:test_variable_typed] [INFO] Creating compiler for module 'test_variable_typed' with entry file 'tests/test_variable_typed.arc'
 [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
@@ -3418,91 +2589,45 @@ Compiling tests/test_variable_typed.arc...
 Module has 1 functions, 0 globals
 [Compiler:test_variable_typed] [INFO] Generating object file to: /tmp/arc_tests/test_variable_typed.o
 [Compiler:test_variable_typed] [DEBUG] Calling code generator for module 'test_variable_typed'
-[Compiler:test_variable_typed] [ERROR] Code generation failed: unknown opcode: trunc
-Object generation failed: code generation failed: unknown opcode: trunc
+[Compiler:test_variable_typed] [DEBUG] Generated 720 bytes of object code
+[Compiler:test_variable_typed] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_variable_typed.o
+✓ Object file written to /tmp/arc_tests/test_variable_typed.o
 
-❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_variable_typed.arc...
-      [Compiler:test_variable_typed] [INFO] Creating compiler for module 'test_variable_typed' with entry file 'tests/test_variable_typed.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_variable_typed'
-      [Compiler:test_variable_typed] [INFO] Compiling file: tests/test_variable_typed.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Declaring variable: x
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-      Module has 1 functions, 0 globals
-      [Compiler:test_variable_typed] [INFO] Generating object file to: /tmp/arc_tests/test_variable_typed.o
-      [Compiler:test_variable_typed] [DEBUG] Calling code generator for module 'test_variable_typed'
-      [Compiler:test_variable_typed] [ERROR] Code generation failed: unknown opcode: trunc
-      Object generation failed: code generation failed: unknown opcode: trunc
+To create executable (using GCC as linker):
+  gcc /tmp/arc_tests/test_variable_typed.o -o test_variable_typed && ./test_variable_typed
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_variable_typed.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.06s)
 
 ======================================================================
 Total Tests:      39
-Passed:           0 (0.0%)
-Failed:           39
-  Compile errors: 39
+Passed:           28 (71.8%)
+Failed:           11
+  Compile errors: 9
   Link errors:    0
-  Runtime errors: 0
-Total Duration:   1.40s
+  Runtime errors: 2
+Total Duration:   3.20s
 
 Failed Tests:
-  ❌ test_alloca                              (compile)
-  ❌ test_arithmetic                          (compile)
-  ❌ test_array                               (compile)
-  ❌ test_array_for_loop                      (compile)
-  ❌ test_bitwise                             (compile)
-  ❌ test_cast                                (compile)
-  ❌ test_char_literal                        (compile)
-  ❌ test_class                               (compile)
-  ❌ test_comparison                          (compile)
-  ❌ test_compound_assignment                 (compile)
-  ❌ test_constant                            (compile)
-  ❌ test_defer                               (compile)
-  ❌ test_enum                                (compile)
-  ❌ test_extern                              (compile)
-  ❌ test_for_in_range                        (compile)
-  ❌ test_for_loop                            (compile)
-  ❌ test_function_basic                      (compile)
-  ❌ test_generics                            (compile)
+  ❌ test_array                               (runtime)
+  ❌ test_array_for_loop                      (runtime)
   ❌ test_generics_structs                    (compile)
-  ❌ test_if_else                             (compile)
-  ❌ test_if_statement                        (compile)
   ❌ test_import_multiple                     (compile)
   ❌ test_import_single                       (compile)
-  ❌ test_increment                           (compile)
-  ❌ test_namespace                           (compile)
-  ❌ test_null_check                          (compile)
-  ❌ test_pointer                             (compile)
   ❌ test_sizeof                              (compile)
-  ❌ test_string_interpolation                (compile)
   ❌ test_struct_basic                        (compile)
   ❌ test_struct_method                       (compile)
-  ❌ test_switch                              (compile)
   ❌ test_try_except_raise                    (compile)
   ❌ test_try_except_raise_err                (compile)
-  ❌ test_try_except_throw                    (compile)
-  ❌ test_try_except_throw_err                (compile)
   ❌ test_tuple_return                        (compile)
-  ❌ test_variable_inferred                   (compile)
-  ❌ test_variable_typed                      (compile)
 
