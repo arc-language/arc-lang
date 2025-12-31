@@ -1,6 +1,7 @@
 package irgen
 
 import (
+	"fmt"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
@@ -17,9 +18,6 @@ func (g *Generator) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface
 	if ctx.FunctionDecl() != nil { return g.Visit(ctx.FunctionDecl()) }
 	if ctx.VariableDecl() != nil { return g.Visit(ctx.VariableDecl()) }
 	if ctx.ExternDecl() != nil { return g.Visit(ctx.ExternDecl()) }
-	if ctx.StructDecl() != nil { return g.Visit(ctx.StructDecl()) }
-	if ctx.ClassDecl() != nil { return g.Visit(ctx.ClassDecl()) }
-	if ctx.EnumDecl() != nil { return g.Visit(ctx.EnumDecl()) }
 	return nil
 }
 
@@ -47,121 +45,118 @@ func (g *Generator) visitExternFunctionDecl(ctx *parser.ExternFunctionDeclContex
 		raw := ctx.STRING_LITERAL().GetText()
 		if len(raw) >= 2 { externalName = raw[1 : len(raw)-1] }
 	}
+	
 	var retType types.Type = types.Void
 	if ctx.Type_() != nil { retType = g.resolveType(ctx.Type_()) }
+	
 	var paramTypes []types.Type
 	variadic := false
 	if ctx.ExternParameterList() != nil {
 		if ctx.ExternParameterList().ELLIPSIS() != nil { variadic = true }
-		for _, t := range ctx.ExternParameterList().AllType_() { paramTypes = append(paramTypes, g.resolveType(t)) }
+		for _, t := range ctx.ExternParameterList().AllType_() {
+			paramTypes = append(paramTypes, g.resolveType(t))
+		}
 	}
+	
 	fn := g.ctx.Builder.DeclareFunction(externalName, retType, paramTypes, variadic)
 	
-	if sym, ok := g.currentScope.Resolve(name); ok { sym.IRValue = fn }
+	// Register IRValue in the symbol table
+	if sym, ok := g.currentScope.Resolve(name); ok {
+		sym.IRValue = fn
+	}
+	
+	// Also register under namespace if applicable
 	if g.currentNamespace != "" {
 		fullName := g.currentNamespace + "." + name
-		if sym, ok := g.currentScope.Resolve(fullName); ok { sym.IRValue = fn }
-	}
-}
-
-func (g *Generator) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
-	for _, member := range ctx.AllStructMember() {
-		if member.FunctionDecl() != nil { g.Visit(member.FunctionDecl()) }
-	}
-	return nil
-}
-
-func (g *Generator) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
-	for _, member := range ctx.AllClassMember() {
-		if member.FunctionDecl() != nil { g.Visit(member.FunctionDecl()) }
-	}
-	return nil
-}
-
-func (g *Generator) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
-	enumName := ctx.IDENTIFIER().GetText()
-	val := int64(0)
-	for _, member := range ctx.AllEnumMember() {
-		memName := member.IDENTIFIER().GetText()
-		if member.Expression() != nil {
-			exprVal := g.Visit(member.Expression())
-			if irVal, ok := exprVal.(ir.Value); ok {
-				if constInt, ok := irVal.(*ir.ConstantInt); ok { val = constInt.Value }
-			}
+		if sym, ok := g.currentScope.Resolve(fullName); ok {
+			sym.IRValue = fn
 		}
-		constVal := g.ctx.Builder.ConstInt(types.I32, val)
-		fullName := enumName + "_" + memName
-		global := g.ctx.Builder.CreateGlobalConstant(fullName, constVal)
-		if sym, ok := g.currentScope.Resolve(enumName + "." + memName); ok { sym.IRValue = global; sym.Kind = symbol.SymConst }
-		val++
 	}
-	return nil
 }
 
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
-	if ctx.GenericParams() != nil { return nil }
 	name := ctx.IDENTIFIER().GetText()
+	
+	// Handle main vs namespaced functions
 	irName := name
-	var parentName string
-	isMethod := false
-	if parent := ctx.GetParent(); parent != nil {
-		if _, ok := parent.(*parser.ClassMemberContext); ok {
-			if classDecl, ok := parent.GetParent().(*parser.ClassDeclContext); ok { parentName = classDecl.IDENTIFIER().GetText(); isMethod = true }
-		} else if _, ok := parent.(*parser.StructMemberContext); ok {
-			if structDecl, ok := parent.GetParent().(*parser.StructDeclContext); ok { parentName = structDecl.IDENTIFIER().GetText(); isMethod = true }
-		}
+	if g.currentNamespace != "" && name != "main" {
+		irName = g.currentNamespace + "_" + name
 	}
-	if isMethod { irName = parentName + "_" + name } else if g.currentNamespace != "" && name != "main" { irName = g.currentNamespace + "_" + name }
+	
 	sym, _ := g.currentScope.Resolve(name)
+	
 	var paramTypes []types.Type
 	var paramNames []string
 	if ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
-			if param.SELF() != nil {
-				paramTypes = append(paramTypes, types.NewPointer(types.I8))
-				paramNames = append(paramNames, "self")
-				continue
-			}
 			paramTypes = append(paramTypes, g.resolveType(param.Type_()))
 			paramNames = append(paramNames, param.IDENTIFIER().GetText())
 		}
 	}
+	
 	var retType types.Type = types.Void
 	if ctx.ReturnType() != nil { retType = g.resolveType(ctx.ReturnType().Type_()) }
+	
 	fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
-	g.ctx.EnterFunction(fn)
+	
+	// Update symbol with IR function
 	if sym != nil { sym.IRValue = fn }
-	g.enterScope(ctx)
+	
+	g.ctx.EnterFunction(fn)
+	g.enterScope(ctx) // Enters function scope
 	defer g.exitScope()
+	
+	// Create allocas for arguments
 	for i, arg := range fn.Arguments {
 		arg.SetName(paramNames[i])
 		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
 		g.ctx.Builder.CreateStore(arg, alloca)
-		if s, ok := g.currentScope.Resolve(paramNames[i]); ok { s.IRValue = alloca }
+		
+		if s, ok := g.currentScope.Resolve(paramNames[i]); ok {
+			s.IRValue = alloca
+		}
 	}
+	
 	if ctx.Block() != nil {
 		g.deferStack = NewDeferStack()
 		g.Visit(ctx.Block())
 	}
+	
+	// Implicit return
 	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
-		if retType == types.Void { g.ctx.Builder.CreateRetVoid() } else { g.ctx.Builder.CreateRet(g.getZeroValue(retType)) }
+		if retType == types.Void {
+			g.ctx.Builder.CreateRetVoid()
+		} else {
+			g.ctx.Builder.CreateRet(g.getZeroValue(retType))
+		}
 	}
+	
 	g.ctx.ExitFunction()
 	return nil
 }
 
 func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
+	
+	// Resolve logic must succeed, or we log error
 	sym, ok := g.currentScope.Resolve(name)
-	if !ok { return nil }
+	if !ok {
+		fmt.Printf("[IRGen] Error: Variable symbol '%s' not found in scope\n", name)
+		return nil
+	}
+	
+	// Create stack slot
 	alloca := g.ctx.Builder.CreateAlloca(sym.Type, name+".addr")
 	sym.IRValue = alloca
+	
+	// Initialize
 	if ctx.Expression() != nil {
 		val := g.Visit(ctx.Expression())
 		if irVal, ok := val.(ir.Value); ok {
 			irVal = g.emitCast(irVal, sym.Type)
 			g.ctx.Builder.CreateStore(irVal, alloca)
 		} else {
+			fmt.Printf("[IRGen] Error: Initializer for '%s' did not produce a value\n", name)
 			g.ctx.Builder.CreateStore(g.getZeroValue(sym.Type), alloca)
 		}
 	} else {
