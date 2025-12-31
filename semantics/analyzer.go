@@ -32,7 +32,7 @@ type Analyzer struct {
 
 func Analyze(tree parser.ICompilationUnitContext, filename string, bag *diagnostic.Bag) (*AnalysisResult, error) {
 	global := symbol.NewScope(nil)
-	initGlobalScope(global)
+	symbol.InitGlobalScope(global)
 
 	a := &Analyzer{
 		BaseArcParserVisitor: &parser.BaseArcParserVisitor{},
@@ -45,6 +45,7 @@ func Analyze(tree parser.ICompilationUnitContext, filename string, bag *diagnost
 		structIndices:        make(map[string]map[string]int),
 	}
 
+	// Start visitation
 	a.Visit(tree)
 
 	return &AnalysisResult{
@@ -55,17 +56,13 @@ func Analyze(tree parser.ICompilationUnitContext, filename string, bag *diagnost
 	}, nil
 }
 
-func initGlobalScope(s *symbol.Scope) {
-	s.Define("int", symbol.SymType, types.I64)
-	s.Define("int32", symbol.SymType, types.I32)
-	s.Define("float", symbol.SymType, types.F64)
-	s.Define("bool", symbol.SymType, types.I1)
-	s.Define("void", symbol.SymType, types.Void)
-	s.Define("string", symbol.SymType, types.NewPointer(types.I8))
-}
-
 func (a *Analyzer) pushScope(ctx antlr.ParserRuleContext) {
 	s := symbol.NewScope(a.currentScope)
+	if a.currentScope.Parent == nil {
+		s.DebugName = "FunctionScope"
+	} else {
+		s.DebugName = "BlockScope"
+	}
 	a.scopes[ctx] = s
 	a.currentScope = s
 }
@@ -76,8 +73,9 @@ func (a *Analyzer) popScope() {
 	}
 }
 
-// Visit implements manual dispatch.
-// FIX: We must use tree.Accept(a) for default cases to preserve the receiver.
+// Visit implements manual dispatch to ensure our methods are called.
+// CRITICAL FIX: We must use tree.Accept(a) so that 'a' (the Analyzer) 
+// is passed as the visitor, not the embedded BaseArcParserVisitor.
 func (a *Analyzer) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil { return nil }
 
@@ -92,16 +90,17 @@ func (a *Analyzer) Visit(tree antlr.ParseTree) interface{} {
 		return a.VisitVariableDecl(ctx)
 	case *parser.StructDeclContext:
 		return a.VisitStructDecl(ctx)
+	case *parser.ClassDeclContext:
+		return a.VisitClassDecl(ctx)
 	case *parser.BlockContext:
 		return a.VisitBlock(ctx)
-		
-	// Statements - We must dispatch these or they fall to Base and disappear
-	case *parser.StatementContext:
-		return ctx.Accept(a) 
 	case *parser.ReturnStmtContext:
 		return a.VisitReturnStmt(ctx)
 	case *parser.IfStmtContext:
 		return a.VisitIfStmt(ctx)
+	case *parser.ForStmtContext:
+		// Add specific visit method if you implemented it, otherwise fallthrough
+		return ctx.Accept(a)
 		
 	// Expressions
 	case *parser.ExpressionContext:
@@ -120,7 +119,9 @@ func (a *Analyzer) Visit(tree antlr.ParseTree) interface{} {
 		return a.VisitLiteral(ctx)
 		
 	default:
-		// Correct dispatch:
+		// Universal fallback: call Accept on the node passing 'a' as the visitor.
+		// This ensures that if ctx is a StatementContext, it calls a.VisitStatement(ctx),
+		// which delegates to children using 'a'.
 		return tree.Accept(a)
 	}
 }

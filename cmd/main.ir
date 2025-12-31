@@ -8,8 +8,9 @@ entry:
   br i1 %0, label %if.then, label %if.end
 if.then:
   %1 = getelementptr inbounds [5 x i8], ptr<[5 x i8]> @.str.0, i32 0, i32 0
+  %2 = call i32 @printf(ptr<[5 x i8]> %1, i64 0)
   br label %if.end
 if.end:
-  %2 = trunc i64 0 to i32
-  ret i32 %2
+  %3 = trunc i64 0 to i32
+  ret i32 %3
 }
