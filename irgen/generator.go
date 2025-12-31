@@ -3,8 +3,8 @@ package irgen
 import (
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
+	"github.com/arc-language/arc-lang/context"
 	"github.com/arc-language/arc-lang/parser"
-	"github.com/arc-language/arc-lang/compiler" // For Context
 	"github.com/arc-language/arc-lang/semantics"
 	"github.com/arc-language/arc-lang/symbol"
 )
@@ -13,22 +13,21 @@ import (
 type Generator struct {
 	*parser.BaseArcParserVisitor
 	
-	// State
-	ctx      *compiler.Context
+	// State holding the LLVM Builder and Module
+	ctx *context.Context
+	
+	// Results from Pass 1 (Types and Scopes)
 	analysis *semantics.AnalysisResult
 	
-	// Scoping (Traversing Pass 1 scopes)
+	// Current traversal state
 	currentScope *symbol.Scope
-	
-	// Function Context
-	deferStack *DeferStack
+	deferStack   *DeferStack
 }
 
 // Generate is the entry point for Pass 2
 func Generate(tree parser.ICompilationUnitContext, moduleName string, analysis *semantics.AnalysisResult) *ir.Module {
-	// Initialize the Builder Context
-	// Note: We create a fresh Context just for building
-	ctx := compiler.NewContext("", moduleName) 
+	// Initialize the Builder Context using the new package
+	ctx := context.NewContext(moduleName) 
 	
 	gen := &Generator{
 		BaseArcParserVisitor: &parser.BaseArcParserVisitor{},
@@ -45,7 +44,7 @@ func Generate(tree parser.ICompilationUnitContext, moduleName string, analysis *
 // --- Scope Management ---
 
 func (g *Generator) enterScope(ctx antlr.ParserRuleContext) {
-	// We retrieve the specific scope created during Pass 1 for this node
+	// Retrieve the specific scope created during Pass 1 for this node
 	if scope, ok := g.analysis.Scopes[ctx]; ok {
 		g.currentScope = scope
 	}

@@ -6,7 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/arc-language/arc-lang/builder/ir"
-	"github.com/arc-language/arc-lang/codegen/codegen" // Assumes your codegen logic is here
+	"github.com/arc-language/arc-lang/codegen/codegen"
+	"github.com/arc-language/arc-lang/context"
 	"github.com/arc-language/arc-lang/diagnostic"
 	"github.com/arc-language/arc-lang/irgen"
 	"github.com/arc-language/arc-lang/semantics"
@@ -14,13 +15,13 @@ import (
 
 // Compiler coordinates the compilation pipeline
 type Compiler struct {
-	logger   *Logger   // Internal debug logger (Info/Debug)
-	Importer *Importer // Handles file resolution
+	logger   *context.Logger
+	Importer *Importer
 }
 
 func NewCompiler() *Compiler {
 	return &Compiler{
-		logger:   NewLogger("[Driver]"),
+		logger:   context.NewLogger("[Driver]"),
 		Importer: NewImporter(),
 	}
 }
@@ -36,7 +37,6 @@ func (c *Compiler) CompileFile(path string) (*ir.Module, error) {
 
 	// --- PHASE 1: PARSING ---
 	// Converts source text -> AST
-	// Catches: Missing semicolons, bad keywords, syntax errors
 	c.logger.Debug("Phase 1: Parsing")
 	tree, syntaxErrors := Parse(absPath)
 	
@@ -47,10 +47,8 @@ func (c *Compiler) CompileFile(path string) (*ir.Module, error) {
 
 	// --- PHASE 2: SEMANTIC ANALYSIS ---
 	// Validates logic, types, and scopes
-	// Catches: Undefined vars, type mismatches, const re-assignment
 	c.logger.Debug("Phase 2: Semantic Analysis")
 	
-	// We create a new bag for semantic errors
 	semanticErrors := diagnostic.NewBag()
 	
 	// Analyze returns an AnalysisResult containing the GlobalScope and TypeMaps
@@ -62,11 +60,11 @@ func (c *Compiler) CompileFile(path string) (*ir.Module, error) {
 
 	// --- PHASE 3: IR GENERATION ---
 	// Translates validated AST -> LLVM IR
-	// Should not produce user errors if Phase 2 worked correctly
 	c.logger.Debug("Phase 3: IR Generation")
 	
-	// We pass the module name (usually filename) and the analysis data
 	moduleName := filepath.Base(absPath)
+	
+	// Pass the analysis results to the generator
 	module := irgen.Generate(tree, moduleName, analysis)
 
 	c.logger.Info("Compilation successful. Module '%s' created.", module.Name)
@@ -99,7 +97,6 @@ func (c *Compiler) CompileToExecutable(sourcePath, outputPath string) error {
 // printDiagnostics formats and prints errors to stderr
 func (c *Compiler) printDiagnostics(bag *diagnostic.Bag) {
 	for _, err := range bag.Errors {
-		// In the future, add color codes here (Red for Error, Yellow for Warn)
 		fmt.Fprintf(os.Stderr, "%s\n", err.String())
 	}
 }
