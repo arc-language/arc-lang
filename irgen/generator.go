@@ -12,16 +12,13 @@ import (
 // Generator implements Pass 2 (IR Generation)
 type Generator struct {
 	*parser.BaseArcParserVisitor
-	
-	// State holding the LLVM Builder and Module
-	ctx *context.Context
-	
-	// Results from Pass 1 (Types and Scopes)
+	ctx      *context.Context
 	analysis *semantics.AnalysisResult
-	
-	// Current traversal state
 	currentScope *symbol.Scope
 	deferStack   *DeferStack
+	
+	// Added loop stack
+	loopStack []loopInfo
 }
 
 // Generate is the entry point for Pass 2

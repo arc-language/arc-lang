@@ -12,55 +12,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_alloca.arc...
-[Compiler:test_alloca] [INFO] Creating compiler for module 'test_alloca' with entry file 'tests/test_alloca.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_alloca'
-[Compiler:test_alloca] [INFO] Compiling file: tests/test_alloca.arc
-[Compiler:test_alloca] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc (isEntry=true)
-[Compiler:test_alloca] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-[Compiler:test_alloca] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-[Compiler:test_alloca] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: ptr
-[Visitor] [DEBUG] Declaring variable: val
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-[Compiler:test_alloca] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-Module has 1 functions, 0 globals
-[Compiler:test_alloca] [INFO] Generating object file to: /tmp/arc_tests/test_alloca.o
-[Compiler:test_alloca] [DEBUG] Calling code generator for module 'test_alloca'
-[Compiler:test_alloca] [DEBUG] Generated 880 bytes of object code
-[Compiler:test_alloca] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_alloca.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_alloca.arc
+[Driver] [INFO] Compilation successful. Module 'test_alloca.arc' created.
+✓ Module 'test_alloca.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_alloca.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_alloca.o -o test_alloca && ./test_alloca
+To link manually:
+  gcc /tmp/arc_tests/test_alloca.o -o test_alloca -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_alloca.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_alloca.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_alloca.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_alloca.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [2/39] test_arithmetic                               
 --- Testing: test_arithmetic ---
 Source file: tests/test_arithmetic.arc
@@ -71,61 +44,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_arithmetic.arc...
-[Compiler:test_arithmetic] [INFO] Creating compiler for module 'test_arithmetic' with entry file 'tests/test_arithmetic.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_arithmetic'
-[Compiler:test_arithmetic] [INFO] Compiling file: tests/test_arithmetic.arc
-[Compiler:test_arithmetic] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc (isEntry=true)
-[Compiler:test_arithmetic] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-[Compiler:test_arithmetic] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-[Compiler:test_arithmetic] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: a
-[Visitor] [DEBUG] Declaring variable: b
-[Visitor] [DEBUG] Declaring variable: sum
-[Visitor] [DEBUG] Declaring variable: diff
-[Visitor] [DEBUG] Declaring variable: prod
-[Visitor] [DEBUG] Declaring variable: quot
-[Visitor] [DEBUG] Declaring variable: rem
-[Visitor] [DEBUG] Declaring variable: total
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 9 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-[Compiler:test_arithmetic] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-Module has 1 functions, 0 globals
-[Compiler:test_arithmetic] [INFO] Generating object file to: /tmp/arc_tests/test_arithmetic.o
-[Compiler:test_arithmetic] [DEBUG] Calling code generator for module 'test_arithmetic'
-[Compiler:test_arithmetic] [DEBUG] Generated 1480 bytes of object code
-[Compiler:test_arithmetic] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_arithmetic.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_arithmetic.arc
+[Driver] [INFO] Compilation successful. Module 'test_arithmetic.arc' created.
+✓ Module 'test_arithmetic.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_arithmetic.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_arithmetic.o -o test_arithmetic && ./test_arithmetic
+To link manually:
+  gcc /tmp/arc_tests/test_arithmetic.o -o test_arithmetic -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_arithmetic.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_arithmetic.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_arithmetic.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_arithmetic.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [3/39] test_array                                    
 --- Testing: test_array ---
 Source file: tests/test_array.arc
@@ -136,56 +76,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_array.arc...
-[Compiler:test_array] [INFO] Creating compiler for module 'test_array' with entry file 'tests/test_array.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_array'
-[Compiler:test_array] [INFO] Compiling file: tests/test_array.arc
-[Compiler:test_array] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc (isEntry=true)
-[Compiler:test_array] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-[Compiler:test_array] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-[Compiler:test_array] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: arr
-[Visitor] [DEBUG] Expanding array initialization for arr into 5 stores
-[Visitor] [DEBUG] Declaring variable: val
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-[Compiler:test_array] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-Module has 1 functions, 0 globals
-[Compiler:test_array] [INFO] Generating object file to: /tmp/arc_tests/test_array.o
-[Compiler:test_array] [DEBUG] Calling code generator for module 'test_array'
-[Compiler:test_array] [DEBUG] Generated 1000 bytes of object code
-[Compiler:test_array] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_array.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_array.arc
+[Driver] [INFO] Compilation successful. Module 'test_array.arc' created.
+✓ Module 'test_array.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_array.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_array.o -o test_array && ./test_array
+To link manually:
+  gcc /tmp/arc_tests/test_array.o -o test_array -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_array.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_array.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_array.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_array.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [4/39] test_array_for_loop                           
 --- Testing: test_array_for_loop ---
 Source file: tests/test_array_for_loop.arc
@@ -196,63 +108,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_array_for_loop.arc...
-[Compiler:test_array_for_loop] [INFO] Creating compiler for module 'test_array_for_loop' with entry file 'tests/test_array_for_loop.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_array_for_loop'
-[Compiler:test_array_for_loop] [INFO] Compiling file: tests/test_array_for_loop.arc
-[Compiler:test_array_for_loop] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc (isEntry=true)
-[Compiler:test_array_for_loop] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-[Compiler:test_array_for_loop] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-[Compiler:test_array_for_loop] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: arr
-[Visitor] [DEBUG] Expanding array initialization for arr into 5 stores
-[Visitor] [DEBUG] Declaring variable: sum
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling for-in loop over array of length 5
-[Context] [DEBUG] Pushed loop context
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Popped loop context
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-[Compiler:test_array_for_loop] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-Module has 1 functions, 0 globals
-[Compiler:test_array_for_loop] [INFO] Generating object file to: /tmp/arc_tests/test_array_for_loop.o
-[Compiler:test_array_for_loop] [DEBUG] Calling code generator for module 'test_array_for_loop'
-[Compiler:test_array_for_loop] [DEBUG] Generated 1304 bytes of object code
-[Compiler:test_array_for_loop] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_array_for_loop.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_array_for_loop.arc
+[Driver] [INFO] Compilation successful. Module 'test_array_for_loop.arc' created.
+✓ Module 'test_array_for_loop.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_array_for_loop.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_array_for_loop.o -o test_array_for_loop && ./test_array_for_loop
+To link manually:
+  gcc /tmp/arc_tests/test_array_for_loop.o -o test_array_for_loop -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_array_for_loop.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_array_for_loop.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_array_for_loop.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_array_for_loop.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [5/39] test_bitwise                                  
 --- Testing: test_bitwise ---
 Source file: tests/test_bitwise.arc
@@ -263,61 +140,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_bitwise.arc...
-[Compiler:test_bitwise] [INFO] Creating compiler for module 'test_bitwise' with entry file 'tests/test_bitwise.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_bitwise'
-[Compiler:test_bitwise] [INFO] Compiling file: tests/test_bitwise.arc
-[Compiler:test_bitwise] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc (isEntry=true)
-[Compiler:test_bitwise] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-[Compiler:test_bitwise] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-[Compiler:test_bitwise] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: a
-[Visitor] [DEBUG] Declaring variable: b
-[Visitor] [DEBUG] Declaring variable: b_or
-[Visitor] [DEBUG] Declaring variable: b_and
-[Visitor] [DEBUG] Declaring variable: b_xor
-[Visitor] [DEBUG] Declaring variable: shl
-[Visitor] [DEBUG] Declaring variable: shr
-[Visitor] [DEBUG] Declaring variable: b_not
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 9 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-[Compiler:test_bitwise] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-Module has 1 functions, 0 globals
-[Compiler:test_bitwise] [INFO] Generating object file to: /tmp/arc_tests/test_bitwise.o
-[Compiler:test_bitwise] [DEBUG] Calling code generator for module 'test_bitwise'
-[Compiler:test_bitwise] [DEBUG] Generated 1272 bytes of object code
-[Compiler:test_bitwise] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_bitwise.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_bitwise.arc
+[Driver] [INFO] Compilation successful. Module 'test_bitwise.arc' created.
+✓ Module 'test_bitwise.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_bitwise.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_bitwise.o -o test_bitwise && ./test_bitwise
+To link manually:
+  gcc /tmp/arc_tests/test_bitwise.o -o test_bitwise -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_bitwise.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_bitwise.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_bitwise.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_bitwise.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [6/39] test_cast                                     
 --- Testing: test_cast ---
 Source file: tests/test_cast.arc
@@ -328,55 +172,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_cast.arc...
-[Compiler:test_cast] [INFO] Creating compiler for module 'test_cast' with entry file 'tests/test_cast.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_cast'
-[Compiler:test_cast] [INFO] Compiling file: tests/test_cast.arc
-[Compiler:test_cast] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc (isEntry=true)
-[Compiler:test_cast] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-[Compiler:test_cast] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-[Compiler:test_cast] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: x
-[Visitor] [DEBUG] Declaring variable: y
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-[Compiler:test_cast] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-Module has 1 functions, 0 globals
-[Compiler:test_cast] [INFO] Generating object file to: /tmp/arc_tests/test_cast.o
-[Compiler:test_cast] [DEBUG] Calling code generator for module 'test_cast'
-[Compiler:test_cast] [DEBUG] Generated 824 bytes of object code
-[Compiler:test_cast] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_cast.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_cast.arc
+[Driver] [INFO] Compilation successful. Module 'test_cast.arc' created.
+✓ Module 'test_cast.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_cast.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_cast.o -o test_cast && ./test_cast
+To link manually:
+  gcc /tmp/arc_tests/test_cast.o -o test_cast -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_cast.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_cast.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.04s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_cast.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_cast.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [7/39] test_char_literal                             
 --- Testing: test_char_literal ---
 Source file: tests/test_char_literal.arc
@@ -387,51 +204,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_char_literal.arc...
-[Compiler:test_char_literal] [INFO] Creating compiler for module 'test_char_literal' with entry file 'tests/test_char_literal.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_char_literal'
-[Compiler:test_char_literal] [INFO] Compiling file: tests/test_char_literal.arc
-[Compiler:test_char_literal] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc (isEntry=true)
-[Compiler:test_char_literal] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-[Compiler:test_char_literal] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-[Compiler:test_char_literal] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: newline
-[Visitor] [DEBUG] Declaring variable: tab
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-[Compiler:test_char_literal] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-Module has 1 functions, 0 globals
-[Compiler:test_char_literal] [INFO] Generating object file to: /tmp/arc_tests/test_char_literal.o
-[Compiler:test_char_literal] [DEBUG] Calling code generator for module 'test_char_literal'
-[Compiler:test_char_literal] [DEBUG] Generated 712 bytes of object code
-[Compiler:test_char_literal] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_char_literal.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_char_literal.arc
+[Driver] [INFO] Compilation successful. Module 'test_char_literal.arc' created.
+✓ Module 'test_char_literal.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_char_literal.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_char_literal.o -o test_char_literal && ./test_char_literal
+To link manually:
+  gcc /tmp/arc_tests/test_char_literal.o -o test_char_literal -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_char_literal.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_char_literal.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_char_literal.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_char_literal.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [8/39] test_class                                    
 --- Testing: test_class ---
 Source file: tests/test_class.arc
@@ -442,77 +236,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_class.arc...
-[Compiler:test_class] [INFO] Creating compiler for module 'test_class' with entry file 'tests/test_class.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_class'
-[Compiler:test_class] [INFO] Compiling file: tests/test_class.arc
-[Compiler:test_class] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc (isEntry=true)
-[Compiler:test_class] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-[Compiler:test_class] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-[Compiler:test_class] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [INFO] Registering class type: Client
-[Context] [DEBUG] Registered type 'Client'
-[Visitor] [DEBUG] Registered class 'Client' (IR: Client) with 2 fields
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [INFO] Processing class declaration: Client
-[Visitor] [DEBUG] Processing class member 1/4
-[Visitor] [DEBUG] Processing class member 2/4
-[Visitor] [DEBUG] Processing class member 3/4
-[Visitor] [DEBUG] Declaring function: Client_get_port (IR: Client_get_port)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'Client_get_port'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'Client_get_port'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Processing class member 4/4
-[Context] [WARN] deinit is not yet implemented
-[Visitor] [INFO] Completed class declaration: Client
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: c
-[Visitor] [DEBUG] Declaring variable: port
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-
-[Context] Compilation Summary:
-  Warnings: 1
-[Compiler:test_class] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-Module has 2 functions, 1 globals
-[Compiler:test_class] [INFO] Generating object file to: /tmp/arc_tests/test_class.o
-[Compiler:test_class] [DEBUG] Calling code generator for module 'test_class'
-[Compiler:test_class] [DEBUG] Generated 1416 bytes of object code
-[Compiler:test_class] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_class.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_class.arc
+[Driver] [INFO] Compilation successful. Module 'test_class.arc' created.
+✓ Module 'test_class.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_class.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_class.o -o test_class && ./test_class
+To link manually:
+  gcc /tmp/arc_tests/test_class.o -o test_class -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_class.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_class.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.07s)
+❌ FAIL (0.05s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_class.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_class.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [9/39] test_comparison                               
 --- Testing: test_comparison ---
 Source file: tests/test_comparison.arc
@@ -523,55 +268,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_comparison.arc...
-[Compiler:test_comparison] [INFO] Creating compiler for module 'test_comparison' with entry file 'tests/test_comparison.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_comparison'
-[Compiler:test_comparison] [INFO] Compiling file: tests/test_comparison.arc
-[Compiler:test_comparison] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc (isEntry=true)
-[Compiler:test_comparison] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-[Compiler:test_comparison] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-[Compiler:test_comparison] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: a
-[Visitor] [DEBUG] Declaring variable: b
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-[Compiler:test_comparison] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-Module has 1 functions, 0 globals
-[Compiler:test_comparison] [INFO] Generating object file to: /tmp/arc_tests/test_comparison.o
-[Compiler:test_comparison] [DEBUG] Calling code generator for module 'test_comparison'
-[Compiler:test_comparison] [DEBUG] Generated 1000 bytes of object code
-[Compiler:test_comparison] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_comparison.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_comparison.arc
+[Driver] [INFO] Compilation successful. Module 'test_comparison.arc' created.
+✓ Module 'test_comparison.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_comparison.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_comparison.o -o test_comparison && ./test_comparison
+To link manually:
+  gcc /tmp/arc_tests/test_comparison.o -o test_comparison -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_comparison.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_comparison.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_comparison.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_comparison.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [10/39] test_compound_assignment                      
 --- Testing: test_compound_assignment ---
 Source file: tests/test_compound_assignment.arc
@@ -582,54 +300,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_compound_assignment.arc...
-[Compiler:test_compound_assignment] [INFO] Creating compiler for module 'test_compound_assignment' with entry file 'tests/test_compound_assignment.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_compound_assignment'
-[Compiler:test_compound_assignment] [INFO] Compiling file: tests/test_compound_assignment.arc
-[Compiler:test_compound_assignment] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc (isEntry=true)
-[Compiler:test_compound_assignment] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-[Compiler:test_compound_assignment] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-[Compiler:test_compound_assignment] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: x
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 6 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-[Compiler:test_compound_assignment] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-Module has 1 functions, 0 globals
-[Compiler:test_compound_assignment] [INFO] Generating object file to: /tmp/arc_tests/test_compound_assignment.o
-[Compiler:test_compound_assignment] [DEBUG] Calling code generator for module 'test_compound_assignment'
-[Compiler:test_compound_assignment] [DEBUG] Generated 1016 bytes of object code
-[Compiler:test_compound_assignment] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_compound_assignment.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_compound_assignment.arc
+[Driver] [INFO] Compilation successful. Module 'test_compound_assignment.arc' created.
+✓ Module 'test_compound_assignment.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_compound_assignment.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_compound_assignment.o -o test_compound_assignment && ./test_compound_assignment
+To link manually:
+  gcc /tmp/arc_tests/test_compound_assignment.o -o test_compound_assignment -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_compound_assignment.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_compound_assignment.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_compound_assignment.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_compound_assignment.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [11/39] test_constant                                 
 --- Testing: test_constant ---
 Source file: tests/test_constant.arc
@@ -640,57 +332,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_constant.arc...
-[Compiler:test_constant] [INFO] Creating compiler for module 'test_constant' with entry file 'tests/test_constant.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_constant'
-[Compiler:test_constant] [INFO] Compiling file: tests/test_constant.arc
-[Compiler:test_constant] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc (isEntry=true)
-[Compiler:test_constant] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-[Compiler:test_constant] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-[Compiler:test_constant] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [INFO] Setting current namespace to 'main'
-[Context] [DEBUG] Created new namespace 'main'
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring constant: MAX
-[Visitor] [INFO] Declared global constant 'MAX' (IR: main_MAX)
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-[Compiler:test_constant] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-Module has 1 functions, 1 globals
-[Compiler:test_constant] [INFO] Generating object file to: /tmp/arc_tests/test_constant.o
-[Compiler:test_constant] [DEBUG] Calling code generator for module 'test_constant'
-[Compiler:test_constant] [DEBUG] Generated 976 bytes of object code
-[Compiler:test_constant] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_constant.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_constant.arc
+[Driver] [INFO] Compilation successful. Module 'test_constant.arc' created.
+✓ Module 'test_constant.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_constant.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_constant.o -o test_constant && ./test_constant
+To link manually:
+  gcc /tmp/arc_tests/test_constant.o -o test_constant -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_constant.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_constant.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_constant.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_constant.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [12/39] test_defer                                    
 --- Testing: test_defer ---
 Source file: tests/test_defer.arc
@@ -701,60 +364,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_defer.arc...
-[Compiler:test_defer] [INFO] Creating compiler for module 'test_defer' with entry file 'tests/test_defer.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_defer'
-[Compiler:test_defer] [INFO] Compiling file: tests/test_defer.arc
-[Compiler:test_defer] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc (isEntry=true)
-[Compiler:test_defer] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-[Compiler:test_defer] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-[Compiler:test_defer] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: cleanup (IR: cleanup)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'cleanup'
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'cleanup'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Context] [WARN] defer statement is not fully implemented yet
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-
-[Context] Compilation Summary:
-  Warnings: 1
-[Compiler:test_defer] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-Module has 2 functions, 0 globals
-[Compiler:test_defer] [INFO] Generating object file to: /tmp/arc_tests/test_defer.o
-[Compiler:test_defer] [DEBUG] Calling code generator for module 'test_defer'
-[Compiler:test_defer] [DEBUG] Generated 784 bytes of object code
-[Compiler:test_defer] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_defer.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_defer.arc
+[Driver] [INFO] Compilation successful. Module 'test_defer.arc' created.
+✓ Module 'test_defer.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_defer.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_defer.o -o test_defer && ./test_defer
+To link manually:
+  gcc /tmp/arc_tests/test_defer.o -o test_defer -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_defer.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_defer.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.07s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_defer.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_defer.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [13/39] test_enum                                     
 --- Testing: test_enum ---
 Source file: tests/test_enum.arc
@@ -765,56 +396,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_enum.arc...
-[Compiler:test_enum] [INFO] Creating compiler for module 'test_enum' with entry file 'tests/test_enum.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_enum'
-[Compiler:test_enum] [INFO] Compiling file: tests/test_enum.arc
-[Compiler:test_enum] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc (isEntry=true)
-[Compiler:test_enum] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-[Compiler:test_enum] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-[Compiler:test_enum] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [INFO] Processing enum declaration: Status
-[Context] [DEBUG] Registered type 'Status'
-[Visitor] [DEBUG] Registered enum member: Status.OK = 0
-[Visitor] [DEBUG] Registered enum member: Status.ERROR = 1
-[Visitor] [DEBUG] Registered enum member: Status.PENDING = 2
-[Visitor] [INFO] Completed enum declaration: Status with underlying type i32
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: s
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-[Compiler:test_enum] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-Module has 1 functions, 3 globals
-[Compiler:test_enum] [INFO] Generating object file to: /tmp/arc_tests/test_enum.o
-[Compiler:test_enum] [DEBUG] Calling code generator for module 'test_enum'
-[Compiler:test_enum] [DEBUG] Generated 1016 bytes of object code
-[Compiler:test_enum] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_enum.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_enum.arc
+[Driver] [INFO] Compilation successful. Module 'test_enum.arc' created.
+✓ Module 'test_enum.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_enum.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_enum.o -o test_enum && ./test_enum
+To link manually:
+  gcc /tmp/arc_tests/test_enum.o -o test_enum -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_enum.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_enum.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_enum.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_enum.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [14/39] test_extern                                   
 --- Testing: test_extern ---
 Source file: tests/test_extern.arc
@@ -825,57 +428,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_extern.arc...
-[Compiler:test_extern] [INFO] Creating compiler for module 'test_extern' with entry file 'tests/test_extern.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_extern'
-[Compiler:test_extern] [INFO] Compiling file: tests/test_extern.arc
-[Compiler:test_extern] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc (isEntry=true)
-[Compiler:test_extern] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-[Compiler:test_extern] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-[Compiler:test_extern] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Processing extern namespace: libc
-[Context] [DEBUG] Created new namespace 'libc'
-[Visitor] [DEBUG] Declared extern function 'abs' (external: 'abs') in namespace 'libc'
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: result
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-[Compiler:test_extern] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-Module has 2 functions, 0 globals
-[Compiler:test_extern] [INFO] Generating object file to: /tmp/arc_tests/test_extern.o
-[Compiler:test_extern] [DEBUG] Calling code generator for module 'test_extern'
-[Compiler:test_extern] [DEBUG] Generated 944 bytes of object code
-[Compiler:test_extern] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_extern.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_extern.arc
+[Driver] [INFO] Compilation successful. Module 'test_extern.arc' created.
+✓ Module 'test_extern.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_extern.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_extern.o -o test_extern && ./test_extern
+To link manually:
+  gcc /tmp/arc_tests/test_extern.o -o test_extern -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_extern.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_extern.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.06s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_extern.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_extern.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [15/39] test_for_in_range                             
 --- Testing: test_for_in_range ---
 Source file: tests/test_for_in_range.arc
@@ -886,60 +460,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_for_in_range.arc...
-[Compiler:test_for_in_range] [INFO] Creating compiler for module 'test_for_in_range' with entry file 'tests/test_for_in_range.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_for_in_range'
-[Compiler:test_for_in_range] [INFO] Compiling file: tests/test_for_in_range.arc
-[Compiler:test_for_in_range] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc (isEntry=true)
-[Compiler:test_for_in_range] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-[Compiler:test_for_in_range] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-[Compiler:test_for_in_range] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: sum
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Pushed loop context
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Popped loop context
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-[Compiler:test_for_in_range] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-Module has 1 functions, 0 globals
-[Compiler:test_for_in_range] [INFO] Generating object file to: /tmp/arc_tests/test_for_in_range.o
-[Compiler:test_for_in_range] [DEBUG] Calling code generator for module 'test_for_in_range'
-[Compiler:test_for_in_range] [DEBUG] Generated 1016 bytes of object code
-[Compiler:test_for_in_range] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_for_in_range.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_for_in_range.arc
+[Driver] [INFO] Compilation successful. Module 'test_for_in_range.arc' created.
+✓ Module 'test_for_in_range.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_for_in_range.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_for_in_range.o -o test_for_in_range && ./test_for_in_range
+To link manually:
+  gcc /tmp/arc_tests/test_for_in_range.o -o test_for_in_range -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_for_in_range.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_for_in_range.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.05s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_for_in_range.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_for_in_range.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [16/39] test_for_loop                                 
 --- Testing: test_for_loop ---
 Source file: tests/test_for_loop.arc
@@ -950,61 +492,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_for_loop.arc...
-[Compiler:test_for_loop] [INFO] Creating compiler for module 'test_for_loop' with entry file 'tests/test_for_loop.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_for_loop'
-[Compiler:test_for_loop] [INFO] Compiling file: tests/test_for_loop.arc
-[Compiler:test_for_loop] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc (isEntry=true)
-[Compiler:test_for_loop] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-[Compiler:test_for_loop] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-[Compiler:test_for_loop] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: sum
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: i
-[Context] [DEBUG] Pushed loop context
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Popped loop context
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-[Compiler:test_for_loop] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-Module has 1 functions, 0 globals
-[Compiler:test_for_loop] [INFO] Generating object file to: /tmp/arc_tests/test_for_loop.o
-[Compiler:test_for_loop] [DEBUG] Calling code generator for module 'test_for_loop'
-[Compiler:test_for_loop] [DEBUG] Generated 1008 bytes of object code
-[Compiler:test_for_loop] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_for_loop.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_for_loop.arc
+[Driver] [INFO] Compilation successful. Module 'test_for_loop.arc' created.
+✓ Module 'test_for_loop.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_for_loop.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_for_loop.o -o test_for_loop && ./test_for_loop
+To link manually:
+  gcc /tmp/arc_tests/test_for_loop.o -o test_for_loop -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_for_loop.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_for_loop.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.06s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_for_loop.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_for_loop.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [17/39] test_function_basic                           
 --- Testing: test_function_basic ---
 Source file: tests/test_function_basic.arc
@@ -1015,63 +524,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_function_basic.arc...
-[Compiler:test_function_basic] [INFO] Creating compiler for module 'test_function_basic' with entry file 'tests/test_function_basic.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_function_basic'
-[Compiler:test_function_basic] [INFO] Compiling file: tests/test_function_basic.arc
-[Compiler:test_function_basic] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc (isEntry=true)
-[Compiler:test_function_basic] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-[Compiler:test_function_basic] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-[Compiler:test_function_basic] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: add (IR: add)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'add'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'add'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: result
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-[Compiler:test_function_basic] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-Module has 2 functions, 0 globals
-[Compiler:test_function_basic] [INFO] Generating object file to: /tmp/arc_tests/test_function_basic.o
-[Compiler:test_function_basic] [DEBUG] Calling code generator for module 'test_function_basic'
-[Compiler:test_function_basic] [DEBUG] Generated 1096 bytes of object code
-[Compiler:test_function_basic] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_function_basic.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_function_basic.arc
+[Driver] [INFO] Compilation successful. Module 'test_function_basic.arc' created.
+✓ Module 'test_function_basic.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_function_basic.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_function_basic.o -o test_function_basic && ./test_function_basic
+To link manually:
+  gcc /tmp/arc_tests/test_function_basic.o -o test_function_basic -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_function_basic.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_function_basic.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.07s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_function_basic.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_function_basic.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [18/39] test_generics                                 
 --- Testing: test_generics ---
 Source file: tests/test_generics.arc
@@ -1082,65 +556,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_generics.arc...
-[Compiler:test_generics] [INFO] Creating compiler for module 'test_generics' with entry file 'tests/test_generics.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_generics'
-[Compiler:test_generics] [INFO] Compiling file: tests/test_generics.arc
-[Compiler:test_generics] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc (isEntry=true)
-[Compiler:test_generics] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-[Compiler:test_generics] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-[Compiler:test_generics] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [INFO] Registered generic function definition: swap
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: x
-[Visitor] [DEBUG] Declaring variable: y
-[Visitor] [INFO] Instantiating function swap as swap<i32>
-[Visitor] [DEBUG] Declaring function: swap (IR: swap<i32>)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'swap<i32>'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: tmp
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'swap<i32>'
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-[Compiler:test_generics] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-Module has 2 functions, 0 globals
-[Compiler:test_generics] [INFO] Generating object file to: /tmp/arc_tests/test_generics.o
-[Compiler:test_generics] [DEBUG] Calling code generator for module 'test_generics'
-[Compiler:test_generics] [DEBUG] Generated 1232 bytes of object code
-[Compiler:test_generics] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_generics.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_generics.arc
+[Driver] [INFO] Compilation successful. Module 'test_generics.arc' created.
+✓ Module 'test_generics.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_generics.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_generics.o -o test_generics && ./test_generics
+To link manually:
+  gcc /tmp/arc_tests/test_generics.o -o test_generics -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_generics.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_generics.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.08s)
+❌ FAIL (0.05s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_generics.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_generics.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [19/39] test_generics_structs                         
 --- Testing: test_generics_structs ---
 Source file: tests/test_generics_structs.arc
@@ -1148,153 +585,20 @@ Object file: /tmp/arc_tests/test_generics_structs.o
 Executable: /tmp/arc_tests/test_generics_structs
 
 Step 1: Compiling to object file...
-Compilation successful
-Compile output:
+Compilation failed: exit status 1
+Output:
 Compiling tests/test_generics_structs.arc...
-[Compiler:test_generics_structs] [INFO] Creating compiler for module 'test_generics_structs' with entry file 'tests/test_generics_structs.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_generics_structs'
-[Compiler:test_generics_structs] [INFO] Compiling file: tests/test_generics_structs.arc
-[Compiler:test_generics_structs] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc (isEntry=true)
-[Compiler:test_generics_structs] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
-[Compiler:test_generics_structs] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
-line 26:4 missing '=' at 'p1'
-line 44:4 missing '=' at 'p2'
-[Compiler:test_generics_structs] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [INFO] Registered generic struct definition: Pair
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: p1
-[Visitor] [INFO] Instantiating struct Pair as Pair<i32,i32>
-[Context] [DEBUG] Registered type 'Pair<i32,i32>'
-[Visitor] [DEBUG] Declaring function: Pair<i32,i32>_set_first (IR: Pair<i32,i32>_set_first)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'Pair<i32,i32>_set_first'
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'Pair<i32,i32>_set_first'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: Pair<i32,i32>_get_first (IR: Pair<i32,i32>_get_first)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'Pair<i32,i32>_get_first'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'Pair<i32,i32>_get_first'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: Pair<i32,i32>_set_second (IR: Pair<i32,i32>_set_second)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'Pair<i32,i32>_set_second'
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'Pair<i32,i32>_set_second'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: Pair<i32,i32>_get_second (IR: Pair<i32,i32>_get_second)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'Pair<i32,i32>_get_second'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'Pair<i32,i32>_get_second'
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring variable: p2
-[Visitor] [INFO] Instantiating struct Pair as Pair<i32,i1>
-[Context] [DEBUG] Registered type 'Pair<i32,i1>'
-[Visitor] [DEBUG] Declaring function: Pair<i32,i1>_set_first (IR: Pair<i32,i1>_set_first)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'Pair<i32,i1>_set_first'
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'Pair<i32,i1>_set_first'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: Pair<i32,i1>_get_first (IR: Pair<i32,i1>_get_first)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'Pair<i32,i1>_get_first'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'Pair<i32,i1>_get_first'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: Pair<i32,i1>_set_second (IR: Pair<i32,i1>_set_second)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'Pair<i32,i1>_set_second'
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'Pair<i32,i1>_set_second'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: Pair<i32,i1>_get_second (IR: Pair<i32,i1>_get_second)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'Pair<i32,i1>_get_second'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'Pair<i32,i1>_get_second'
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 15 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
-[Compiler:test_generics_structs] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
-Module has 9 functions, 0 globals
-[Compiler:test_generics_structs] [INFO] Generating object file to: /tmp/arc_tests/test_generics_structs.o
-[Compiler:test_generics_structs] [DEBUG] Calling code generator for module 'test_generics_structs'
-[Compiler:test_generics_structs] [DEBUG] Generated 3456 bytes of object code
-[Compiler:test_generics_structs] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_generics_structs.o
-✓ Object file written to /tmp/arc_tests/test_generics_structs.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_generics_structs.arc
+/workspaces/arc-lang/cmd/tests/test_generics_structs.arc:26:4: Syntax Error: missing '=' at 'p1'
+/workspaces/arc-lang/cmd/tests/test_generics_structs.arc:44:4: Syntax Error: missing '=' at 'p2'
 
-To create executable:
-  gcc /tmp/arc_tests/test_generics_structs.o -o test_generics_structs && ./test_generics_structs
-
-
-Step 2: Linking with gcc...
-Linking successful
-
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.09s)
+❌ FAIL (0.07s)
+    Compilation failed
+    Compile output:
+      Compiling tests/test_generics_structs.arc...
+      [Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_generics_structs.arc
+      /workspaces/arc-lang/cmd/tests/test_generics_structs.arc:26:4: Syntax Error: missing '=' at 'p1'
+      /workspaces/arc-lang/cmd/tests/test_generics_structs.arc:44:4: Syntax Error: missing '=' at 'p2'
 [20/39] test_if_else                                  
 --- Testing: test_if_else ---
 Source file: tests/test_if_else.arc
@@ -1305,56 +609,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_if_else.arc...
-[Compiler:test_if_else] [INFO] Creating compiler for module 'test_if_else' with entry file 'tests/test_if_else.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_if_else'
-[Compiler:test_if_else] [INFO] Compiling file: tests/test_if_else.arc
-[Compiler:test_if_else] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc (isEntry=true)
-[Compiler:test_if_else] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-[Compiler:test_if_else] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-[Compiler:test_if_else] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: x
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-[Compiler:test_if_else] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-Module has 1 functions, 0 globals
-[Compiler:test_if_else] [INFO] Generating object file to: /tmp/arc_tests/test_if_else.o
-[Compiler:test_if_else] [DEBUG] Calling code generator for module 'test_if_else'
-[Compiler:test_if_else] [DEBUG] Generated 776 bytes of object code
-[Compiler:test_if_else] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_if_else.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_if_else.arc
+[Driver] [INFO] Compilation successful. Module 'test_if_else.arc' created.
+✓ Module 'test_if_else.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_if_else.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_if_else.o -o test_if_else && ./test_if_else
+To link manually:
+  gcc /tmp/arc_tests/test_if_else.o -o test_if_else -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_if_else.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_if_else.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_if_else.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_if_else.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [21/39] test_if_statement                             
 --- Testing: test_if_statement ---
 Source file: tests/test_if_statement.arc
@@ -1365,54 +641,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_if_statement.arc...
-[Compiler:test_if_statement] [INFO] Creating compiler for module 'test_if_statement' with entry file 'tests/test_if_statement.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_if_statement'
-[Compiler:test_if_statement] [INFO] Compiling file: tests/test_if_statement.arc
-[Compiler:test_if_statement] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc (isEntry=true)
-[Compiler:test_if_statement] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-[Compiler:test_if_statement] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-[Compiler:test_if_statement] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: x
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-[Compiler:test_if_statement] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-Module has 1 functions, 0 globals
-[Compiler:test_if_statement] [INFO] Generating object file to: /tmp/arc_tests/test_if_statement.o
-[Compiler:test_if_statement] [DEBUG] Calling code generator for module 'test_if_statement'
-[Compiler:test_if_statement] [DEBUG] Generated 776 bytes of object code
-[Compiler:test_if_statement] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_if_statement.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_if_statement.arc
+[Driver] [INFO] Compilation successful. Module 'test_if_statement.arc' created.
+✓ Module 'test_if_statement.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_if_statement.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_if_statement.o -o test_if_statement && ./test_if_statement
+To link manually:
+  gcc /tmp/arc_tests/test_if_statement.o -o test_if_statement -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_if_statement.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_if_statement.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.06s)
+❌ FAIL (0.07s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_if_statement.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_if_statement.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [22/39] test_import_multiple                          
 --- Testing: test_import_multiple ---
 Source file: tests/test_import_multiple.arc
@@ -1420,78 +670,31 @@ Object file: /tmp/arc_tests/test_import_multiple.o
 Executable: /tmp/arc_tests/test_import_multiple
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 2
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_import_multiple.arc...
-[Compiler:test_import_multiple] [INFO] Creating compiler for module 'test_import_multiple' with entry file 'tests/test_import_multiple.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_import_multiple'
-[Compiler:test_import_multiple] [INFO] Compiling file: tests/test_import_multiple.arc
-[Compiler:test_import_multiple] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc (isEntry=true)
-[Compiler:test_import_multiple] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-[Compiler:test_import_multiple] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-[Compiler:test_import_multiple] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-panic: runtime error: invalid memory address or nil pointer dereference
-[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x5a07eb]
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_import_multiple.arc
+[Driver] [INFO] Compilation successful. Module 'test_import_multiple.arc' created.
+✓ Module 'test_import_multiple.arc' compiled (0 functions)
+✓ Object file written to /tmp/arc_tests/test_import_multiple.o
 
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0004d7aa0, 0x63df00?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/visitor_declarations.go:18 +0x2b
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x83a4b0?, {0x6a1468?, 0xc000176c00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/visitor.go:56 +0x757
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0004d7aa0, 0xc000176a80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/visitor.go:170 +0x1fa
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x83a430?, {0x6a1330?, 0xc000176a80?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/visitor.go:50 +0x266
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc00013a030, {0xc00012a080, 0x40}, 0x1)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/compiler.go:147 +0x432
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc00013a030, {0x7ffeef109693, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/compiler.go:41 +0x18b
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
-main.main()
-	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+To link manually:
+  gcc /tmp/arc_tests/test_import_multiple.o -o test_import_multiple -no-pie
+
+
+Step 2: Linking with gcc...
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_import_multiple.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_import_multiple.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
 ❌ FAIL (0.03s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_import_multiple.arc...
-      [Compiler:test_import_multiple] [INFO] Creating compiler for module 'test_import_multiple' with entry file 'tests/test_import_multiple.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_import_multiple'
-      [Compiler:test_import_multiple] [INFO] Compiling file: tests/test_import_multiple.arc
-      [Compiler:test_import_multiple] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc (isEntry=true)
-      [Compiler:test_import_multiple] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-      [Compiler:test_import_multiple] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-      [Compiler:test_import_multiple] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      panic: runtime error: invalid memory address or nil pointer dereference
-      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x5a07eb]
-      
-      goroutine 1 [running]:
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0004d7aa0, 0x63df00?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/visitor_declarations.go:18 +0x2b
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x83a4b0?, {0x6a1468?, 0xc000176c00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/visitor.go:56 +0x757
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0004d7aa0, 0xc000176a80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/visitor.go:170 +0x1fa
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x83a430?, {0x6a1330?, 0xc000176a80?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/visitor.go:50 +0x266
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc00013a030, {0xc00012a080, 0x40}, 0x1)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/compiler.go:147 +0x432
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc00013a030, {0x7ffeef109693, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251230011002-48a8ad3d4f10/compiler/compiler/compiler.go:41 +0x18b
-      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-      	/workspaces/arc-lang/compiler/cmd/main.go:78 +0x40b
-      main.main()
-      	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_import_multiple.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_import_multiple.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [23/39] test_import_single                            
 --- Testing: test_import_single ---
 Source file: tests/test_import_single.arc
@@ -1499,90 +702,31 @@ Object file: /tmp/arc_tests/test_import_single.o
 Executable: /tmp/arc_tests/test_import_single
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_import_single.arc...
-[Compiler:test_import_single] [INFO] Creating compiler for module 'test_import_single' with entry file 'tests/test_import_single.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_import_single'
-[Compiler:test_import_single] [INFO] Compiling file: tests/test_import_single.arc
-[Compiler:test_import_single] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc (isEntry=true)
-[Compiler:test_import_single] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-[Compiler:test_import_single] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-[Compiler:test_import_single] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [INFO] Processing import: std/io from /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-[Importer] [DEBUG] Resolving import path 'std/io' from directory '/workspaces/arc-lang/compiler/cmd/tests'
-[Importer] [DEBUG] Resolved import to: /workspaces/arc-lang/compiler/cmd/tests/std/io
-[Compiler:test_import_single] [DEBUG] Starting package compilation for directory: /workspaces/arc-lang/compiler/cmd/tests/std/io
-[Importer] [DEBUG] Cached package at path: /workspaces/arc-lang/compiler/cmd/tests/std/io
-[Compiler:test_import_single] [DEBUG] Marked package '/workspaces/arc-lang/compiler/cmd/tests/std/io' as processing
-[Importer] [DEBUG] Scanning directory for source files: /workspaces/arc-lang/compiler/cmd/tests/std/io
-[Importer] [ERROR] Failed to read directory '/workspaces/arc-lang/compiler/cmd/tests/std/io': open /workspaces/arc-lang/compiler/cmd/tests/std/io: no such file or directory
-[Compiler:test_import_single] [ERROR] Failed to find source files in '/workspaces/arc-lang/compiler/cmd/tests/std/io': open /workspaces/arc-lang/compiler/cmd/tests/std/io: no such file or directory
-[Context] [ERROR] Failed to compile package 'std/io': open /workspaces/arc-lang/compiler/cmd/tests/std/io: no such file or directory
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_import_single.arc
+[Driver] [INFO] Compilation successful. Module 'test_import_single.arc' created.
+✓ Module 'test_import_single.arc' compiled (0 functions)
+✓ Object file written to /tmp/arc_tests/test_import_single.o
 
-[Context] Compilation Summary:
-  Errors: 1
-Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
+To link manually:
+  gcc /tmp/arc_tests/test_import_single.o -o test_import_single -no-pie
 
-❌ FAIL (0.02s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_import_single.arc...
-      [Compiler:test_import_single] [INFO] Creating compiler for module 'test_import_single' with entry file 'tests/test_import_single.arc'
-      [Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-      [Context] [DEBUG] Registered 35 builtin types
-      [Context] [DEBUG] Context initialized for module 'test_import_single'
-      [Compiler:test_import_single] [INFO] Compiling file: tests/test_import_single.arc
-      [Compiler:test_import_single] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc (isEntry=true)
-      [Compiler:test_import_single] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-      [Compiler:test_import_single] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-      [Compiler:test_import_single] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-      [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-      [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-      [Visitor] [DEBUG] Pass 0 - Processing imports
-      [Visitor] [INFO] Processing import: std/io from /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-      [Importer] [DEBUG] Resolving import path 'std/io' from directory '/workspaces/arc-lang/compiler/cmd/tests'
-      [Importer] [DEBUG] Resolved import to: /workspaces/arc-lang/compiler/cmd/tests/std/io
-      [Compiler:test_import_single] [DEBUG] Starting package compilation for directory: /workspaces/arc-lang/compiler/cmd/tests/std/io
-      [Importer] [DEBUG] Cached package at path: /workspaces/arc-lang/compiler/cmd/tests/std/io
-      [Compiler:test_import_single] [DEBUG] Marked package '/workspaces/arc-lang/compiler/cmd/tests/std/io' as processing
-      [Importer] [DEBUG] Scanning directory for source files: /workspaces/arc-lang/compiler/cmd/tests/std/io
-      [Importer] [ERROR] Failed to read directory '/workspaces/arc-lang/compiler/cmd/tests/std/io': open /workspaces/arc-lang/compiler/cmd/tests/std/io: no such file or directory
-      [Compiler:test_import_single] [ERROR] Failed to find source files in '/workspaces/arc-lang/compiler/cmd/tests/std/io': open /workspaces/arc-lang/compiler/cmd/tests/std/io: no such file or directory
-      [Context] [ERROR] Failed to compile package 'std/io': open /workspaces/arc-lang/compiler/cmd/tests/std/io: no such file or directory
-      [Visitor] [DEBUG] Pass 1 - Registering types
-      [Visitor] [DEBUG] Pass 2 - Processing declarations
-      [Visitor] [DEBUG] Declaring function: main (IR: main)
-      [Context] [DEBUG] Pushed new scope
-      [Context] [DEBUG] Entered function 'main'
-      [Context] [DEBUG] Pushed new scope
-      [Visitor] [DEBUG] Compiling return statement
-      [Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-      [Context] [DEBUG] Popped scope
-      [Context] [DEBUG] Exited function 'main'
-      [Context] [DEBUG] Popped scope
-      [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-      
-      [Context] Compilation Summary:
-        Errors: 1
-      Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
+
+Step 2: Linking with gcc...
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_import_single.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_import_single.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
+
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_import_single.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_import_single.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [24/39] test_increment                                
 --- Testing: test_increment ---
 Source file: tests/test_increment.arc
@@ -1593,54 +737,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_increment.arc...
-[Compiler:test_increment] [INFO] Creating compiler for module 'test_increment' with entry file 'tests/test_increment.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_increment'
-[Compiler:test_increment] [INFO] Compiling file: tests/test_increment.arc
-[Compiler:test_increment] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc (isEntry=true)
-[Compiler:test_increment] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-[Compiler:test_increment] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-[Compiler:test_increment] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: i
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-[Compiler:test_increment] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-Module has 1 functions, 0 globals
-[Compiler:test_increment] [INFO] Generating object file to: /tmp/arc_tests/test_increment.o
-[Compiler:test_increment] [DEBUG] Calling code generator for module 'test_increment'
-[Compiler:test_increment] [DEBUG] Generated 872 bytes of object code
-[Compiler:test_increment] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_increment.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_increment.arc
+[Driver] [INFO] Compilation successful. Module 'test_increment.arc' created.
+✓ Module 'test_increment.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_increment.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_increment.o -o test_increment && ./test_increment
+To link manually:
+  gcc /tmp/arc_tests/test_increment.o -o test_increment -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_increment.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_increment.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_increment.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_increment.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [25/39] test_namespace                                
 --- Testing: test_namespace ---
 Source file: tests/test_namespace.arc
@@ -1651,51 +769,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_namespace.arc...
-[Compiler:test_namespace] [INFO] Creating compiler for module 'test_namespace' with entry file 'tests/test_namespace.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_namespace'
-[Compiler:test_namespace] [INFO] Compiling file: tests/test_namespace.arc
-[Compiler:test_namespace] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc (isEntry=true)
-[Compiler:test_namespace] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-[Compiler:test_namespace] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-[Compiler:test_namespace] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [INFO] Setting current namespace to 'main'
-[Context] [DEBUG] Created new namespace 'main'
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-[Compiler:test_namespace] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-Module has 1 functions, 0 globals
-[Compiler:test_namespace] [INFO] Generating object file to: /tmp/arc_tests/test_namespace.o
-[Compiler:test_namespace] [DEBUG] Calling code generator for module 'test_namespace'
-[Compiler:test_namespace] [DEBUG] Generated 640 bytes of object code
-[Compiler:test_namespace] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_namespace.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_namespace.arc
+[Driver] [INFO] Compilation successful. Module 'test_namespace.arc' created.
+✓ Module 'test_namespace.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_namespace.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_namespace.o -o test_namespace && ./test_namespace
+To link manually:
+  gcc /tmp/arc_tests/test_namespace.o -o test_namespace -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_namespace.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_namespace.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_namespace.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_namespace.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [26/39] test_null_check                               
 --- Testing: test_null_check ---
 Source file: tests/test_null_check.arc
@@ -1706,54 +801,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_null_check.arc...
-[Compiler:test_null_check] [INFO] Creating compiler for module 'test_null_check' with entry file 'tests/test_null_check.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_null_check'
-[Compiler:test_null_check] [INFO] Compiling file: tests/test_null_check.arc
-[Compiler:test_null_check] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc (isEntry=true)
-[Compiler:test_null_check] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-[Compiler:test_null_check] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-[Compiler:test_null_check] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: ptr
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-[Compiler:test_null_check] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-Module has 1 functions, 0 globals
-[Compiler:test_null_check] [INFO] Generating object file to: /tmp/arc_tests/test_null_check.o
-[Compiler:test_null_check] [DEBUG] Calling code generator for module 'test_null_check'
-[Compiler:test_null_check] [DEBUG] Generated 760 bytes of object code
-[Compiler:test_null_check] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_null_check.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_null_check.arc
+[Driver] [INFO] Compilation successful. Module 'test_null_check.arc' created.
+✓ Module 'test_null_check.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_null_check.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_null_check.o -o test_null_check && ./test_null_check
+To link manually:
+  gcc /tmp/arc_tests/test_null_check.o -o test_null_check -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_null_check.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_null_check.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_null_check.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_null_check.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [27/39] test_pointer                                  
 --- Testing: test_pointer ---
 Source file: tests/test_pointer.arc
@@ -1764,56 +833,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_pointer.arc...
-[Compiler:test_pointer] [INFO] Creating compiler for module 'test_pointer' with entry file 'tests/test_pointer.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_pointer'
-[Compiler:test_pointer] [INFO] Compiling file: tests/test_pointer.arc
-[Compiler:test_pointer] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc (isEntry=true)
-[Compiler:test_pointer] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-[Compiler:test_pointer] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-[Compiler:test_pointer] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: x
-[Visitor] [DEBUG] Declaring variable: ptr
-[Visitor] [DEBUG] Declaring variable: val
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-[Compiler:test_pointer] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-Module has 1 functions, 0 globals
-[Compiler:test_pointer] [INFO] Generating object file to: /tmp/arc_tests/test_pointer.o
-[Compiler:test_pointer] [DEBUG] Calling code generator for module 'test_pointer'
-[Compiler:test_pointer] [DEBUG] Generated 864 bytes of object code
-[Compiler:test_pointer] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_pointer.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_pointer.arc
+[Driver] [INFO] Compilation successful. Module 'test_pointer.arc' created.
+✓ Module 'test_pointer.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_pointer.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_pointer.o -o test_pointer && ./test_pointer
+To link manually:
+  gcc /tmp/arc_tests/test_pointer.o -o test_pointer -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_pointer.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_pointer.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_pointer.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_pointer.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [28/39] test_sizeof                                   
 --- Testing: test_sizeof ---
 Source file: tests/test_sizeof.arc
@@ -1824,55 +865,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_sizeof.arc...
-[Compiler:test_sizeof] [INFO] Creating compiler for module 'test_sizeof' with entry file 'tests/test_sizeof.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_sizeof'
-[Compiler:test_sizeof] [INFO] Compiling file: tests/test_sizeof.arc
-[Compiler:test_sizeof] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc (isEntry=true)
-[Compiler:test_sizeof] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-[Compiler:test_sizeof] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-[Compiler:test_sizeof] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: sz
-[Visitor] [DEBUG] Declaring variable: size_val
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-[Compiler:test_sizeof] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-Module has 1 functions, 0 globals
-[Compiler:test_sizeof] [INFO] Generating object file to: /tmp/arc_tests/test_sizeof.o
-[Compiler:test_sizeof] [DEBUG] Calling code generator for module 'test_sizeof'
-[Compiler:test_sizeof] [DEBUG] Generated 840 bytes of object code
-[Compiler:test_sizeof] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_sizeof.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_sizeof.arc
+[Driver] [INFO] Compilation successful. Module 'test_sizeof.arc' created.
+✓ Module 'test_sizeof.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_sizeof.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_sizeof.o -o test_sizeof && ./test_sizeof
+To link manually:
+  gcc /tmp/arc_tests/test_sizeof.o -o test_sizeof -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_sizeof.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_sizeof.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_sizeof.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_sizeof.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [29/39] test_string_interpolation                     
 --- Testing: test_string_interpolation ---
 Source file: tests/test_string_interpolation.arc
@@ -1883,52 +897,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_string_interpolation.arc...
-[Compiler:test_string_interpolation] [INFO] Creating compiler for module 'test_string_interpolation' with entry file 'tests/test_string_interpolation.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_string_interpolation'
-[Compiler:test_string_interpolation] [INFO] Compiling file: tests/test_string_interpolation.arc
-[Compiler:test_string_interpolation] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc (isEntry=true)
-[Compiler:test_string_interpolation] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-[Compiler:test_string_interpolation] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-[Compiler:test_string_interpolation] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: name
-[Visitor] [DEBUG] Declaring variable: age
-[Visitor] [DEBUG] Declaring variable: msg
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-[Compiler:test_string_interpolation] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-Module has 1 functions, 2 globals
-[Compiler:test_string_interpolation] [INFO] Generating object file to: /tmp/arc_tests/test_string_interpolation.o
-[Compiler:test_string_interpolation] [DEBUG] Calling code generator for module 'test_string_interpolation'
-[Compiler:test_string_interpolation] [DEBUG] Generated 1112 bytes of object code
-[Compiler:test_string_interpolation] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_string_interpolation.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_string_interpolation.arc
+[Driver] [INFO] Compilation successful. Module 'test_string_interpolation.arc' created.
+✓ Module 'test_string_interpolation.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_string_interpolation.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_string_interpolation.o -o test_string_interpolation && ./test_string_interpolation
+To link manually:
+  gcc /tmp/arc_tests/test_string_interpolation.o -o test_string_interpolation -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_string_interpolation.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_string_interpolation.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.04s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_string_interpolation.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_string_interpolation.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [30/39] test_struct_basic                             
 --- Testing: test_struct_basic ---
 Source file: tests/test_struct_basic.arc
@@ -1939,58 +929,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_struct_basic.arc...
-[Compiler:test_struct_basic] [INFO] Creating compiler for module 'test_struct_basic' with entry file 'tests/test_struct_basic.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_struct_basic'
-[Compiler:test_struct_basic] [INFO] Compiling file: tests/test_struct_basic.arc
-[Compiler:test_struct_basic] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc (isEntry=true)
-[Compiler:test_struct_basic] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-[Compiler:test_struct_basic] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-[Compiler:test_struct_basic] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Registering struct type: Point
-[Context] [DEBUG] Registered type 'Point'
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Processing struct declaration: Point
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: p
-[Visitor] [DEBUG] Declaring variable: sum
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-[Compiler:test_struct_basic] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-Module has 1 functions, 0 globals
-[Compiler:test_struct_basic] [INFO] Generating object file to: /tmp/arc_tests/test_struct_basic.o
-[Compiler:test_struct_basic] [DEBUG] Calling code generator for module 'test_struct_basic'
-[Compiler:test_struct_basic] [DEBUG] Generated 1000 bytes of object code
-[Compiler:test_struct_basic] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_struct_basic.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_struct_basic.arc
+[Driver] [INFO] Compilation successful. Module 'test_struct_basic.arc' created.
+✓ Module 'test_struct_basic.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_struct_basic.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_struct_basic.o -o test_struct_basic && ./test_struct_basic
+To link manually:
+  gcc /tmp/arc_tests/test_struct_basic.o -o test_struct_basic -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_struct_basic.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_struct_basic.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.08s)
+❌ FAIL (0.05s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_struct_basic.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_struct_basic.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [31/39] test_struct_method                            
 --- Testing: test_struct_method ---
 Source file: tests/test_struct_method.arc
@@ -2001,67 +961,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_struct_method.arc...
-[Compiler:test_struct_method] [INFO] Creating compiler for module 'test_struct_method' with entry file 'tests/test_struct_method.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_struct_method'
-[Compiler:test_struct_method] [INFO] Compiling file: tests/test_struct_method.arc
-[Compiler:test_struct_method] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc (isEntry=true)
-[Compiler:test_struct_method] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-[Compiler:test_struct_method] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-[Compiler:test_struct_method] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Registering struct type: Point
-[Context] [DEBUG] Registered type 'Point'
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Processing struct declaration: Point
-[Visitor] [DEBUG] Declaring function: Point_sum (IR: Point_sum)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'Point_sum'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'Point_sum'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: p
-[Visitor] [DEBUG] Declaring variable: s
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 3 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-[Compiler:test_struct_method] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-Module has 2 functions, 0 globals
-[Compiler:test_struct_method] [INFO] Generating object file to: /tmp/arc_tests/test_struct_method.o
-[Compiler:test_struct_method] [DEBUG] Calling code generator for module 'test_struct_method'
-[Compiler:test_struct_method] [DEBUG] Generated 1216 bytes of object code
-[Compiler:test_struct_method] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_struct_method.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_struct_method.arc
+[Driver] [INFO] Compilation successful. Module 'test_struct_method.arc' created.
+✓ Module 'test_struct_method.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_struct_method.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_struct_method.o -o test_struct_method && ./test_struct_method
+To link manually:
+  gcc /tmp/arc_tests/test_struct_method.o -o test_struct_method -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_struct_method.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_struct_method.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.07s)
+❌ FAIL (0.08s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_struct_method.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_struct_method.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [32/39] test_switch                                   
 --- Testing: test_switch ---
 Source file: tests/test_switch.arc
@@ -2072,55 +993,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_switch.arc...
-[Compiler:test_switch] [INFO] Creating compiler for module 'test_switch' with entry file 'tests/test_switch.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_switch'
-[Compiler:test_switch] [INFO] Compiling file: tests/test_switch.arc
-[Compiler:test_switch] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc (isEntry=true)
-[Compiler:test_switch] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-[Compiler:test_switch] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-[Compiler:test_switch] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: status
-[Visitor] [DEBUG] Declaring variable: result
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 4 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-[Compiler:test_switch] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-Module has 1 functions, 0 globals
-[Compiler:test_switch] [INFO] Generating object file to: /tmp/arc_tests/test_switch.o
-[Compiler:test_switch] [DEBUG] Calling code generator for module 'test_switch'
-[Compiler:test_switch] [DEBUG] Generated 1072 bytes of object code
-[Compiler:test_switch] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_switch.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_switch.arc
+[Driver] [INFO] Compilation successful. Module 'test_switch.arc' created.
+✓ Module 'test_switch.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_switch.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_switch.o -o test_switch && ./test_switch
+To link manually:
+  gcc /tmp/arc_tests/test_switch.o -o test_switch -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_switch.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_switch.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_switch.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_switch.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [33/39] test_try_except_raise                         
 --- Testing: test_try_except_raise ---
 Source file: tests/test_try_except_raise.arc
@@ -2131,76 +1025,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_try_except_raise.arc...
-[Compiler:test_try_except_raise] [INFO] Creating compiler for module 'test_try_except_raise' with entry file 'tests/test_try_except_raise.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_try_except_raise'
-[Compiler:test_try_except_raise] [INFO] Compiling file: tests/test_try_except_raise.arc
-[Compiler:test_try_except_raise] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc (isEntry=true)
-[Compiler:test_try_except_raise] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-[Compiler:test_try_except_raise] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-[Compiler:test_try_except_raise] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: divide (IR: divide)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'divide'
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'divide'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Processing try-except-finally block
-[Visitor] [DEBUG] Declaring variable: result
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Processing except clause 1
-[Visitor] [DEBUG] Binding exception to variable: err
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-[Compiler:test_try_except_raise] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-Module has 2 functions, 1 globals
-[Compiler:test_try_except_raise] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise.o
-[Compiler:test_try_except_raise] [DEBUG] Calling code generator for module 'test_try_except_raise'
-[Compiler:test_try_except_raise] [DEBUG] Generated 1392 bytes of object code
-[Compiler:test_try_except_raise] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_try_except_raise.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_try_except_raise.arc
+[Driver] [INFO] Compilation successful. Module 'test_try_except_raise.arc' created.
+✓ Module 'test_try_except_raise.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_try_except_raise.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_try_except_raise.o -o test_try_except_raise && ./test_try_except_raise
+To link manually:
+  gcc /tmp/arc_tests/test_try_except_raise.o -o test_try_except_raise -no-pie
 
 
 Step 2: Linking with gcc...
 Linking failed: exit status 1
 Output:
-/usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: in function `divide':
-test_try_except_raise:(.text+0xe0): undefined reference to `__exception_state'
+/usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.06s)
+❌ FAIL (0.05s)
     Linking failed
     Link output:
-      /usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: in function `divide':
-      test_try_except_raise:(.text+0xe0): undefined reference to `__exception_state'
+      /usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: error adding symbols: bad value
       collect2: error: ld returned 1 exit status
-    /usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: in function `divide':
-test_try_except_raise:(.text+0xe0): undefined reference to `__exception_state'
-collect2: error: ld returned 1 exit status
 [34/39] test_try_except_raise_err                     
 --- Testing: test_try_except_raise_err ---
 Source file: tests/test_try_except_raise_err.arc
@@ -2211,74 +1057,27 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_try_except_raise_err.arc...
-[Compiler:test_try_except_raise_err] [INFO] Creating compiler for module 'test_try_except_raise_err' with entry file 'tests/test_try_except_raise_err.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_try_except_raise_err'
-[Compiler:test_try_except_raise_err] [INFO] Compiling file: tests/test_try_except_raise_err.arc
-[Compiler:test_try_except_raise_err] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc (isEntry=true)
-[Compiler:test_try_except_raise_err] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-[Compiler:test_try_except_raise_err] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-[Compiler:test_try_except_raise_err] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: divide (IR: divide)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'divide'
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'divide'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Processing try-except-finally block
-[Visitor] [DEBUG] Declaring variable: result
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Processing except clause 1
-[Visitor] [DEBUG] Binding exception to variable: err
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-[Compiler:test_try_except_raise_err] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-Module has 2 functions, 1 globals
-[Compiler:test_try_except_raise_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise_err.o
-[Compiler:test_try_except_raise_err] [DEBUG] Calling code generator for module 'test_try_except_raise_err'
-[Compiler:test_try_except_raise_err] [DEBUG] Generated 1440 bytes of object code
-[Compiler:test_try_except_raise_err] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_try_except_raise_err.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_try_except_raise_err.arc
+[Driver] [INFO] Compilation successful. Module 'test_try_except_raise_err.arc' created.
+✓ Module 'test_try_except_raise_err.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_try_except_raise_err.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_try_except_raise_err.o -o test_try_except_raise_err && ./test_try_except_raise_err
+To link manually:
+  gcc /tmp/arc_tests/test_try_except_raise_err.o -o test_try_except_raise_err -no-pie
 
 
 Step 2: Linking with gcc...
 Linking failed: exit status 1
 Output:
-/usr/bin/ld: /tmp/arc_tests/test_try_except_raise_err.o: in function `divide':
-test_try_except_raise_err:(.text+0xe0): undefined reference to `__exception_state'
+/usr/bin/ld: /tmp/arc_tests/test_try_except_raise_err.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_try_except_raise_err.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.07s)
+❌ FAIL (0.04s)
     Linking failed
     Link output:
-      /usr/bin/ld: /tmp/arc_tests/test_try_except_raise_err.o: in function `divide':
-      test_try_except_raise_err:(.text+0xe0): undefined reference to `__exception_state'
+      /usr/bin/ld: /tmp/arc_tests/test_try_except_raise_err.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_try_except_raise_err.o: error adding symbols: bad value
       collect2: error: ld returned 1 exit status
 [35/39] test_try_except_throw                         
 --- Testing: test_try_except_throw ---
@@ -2290,69 +1089,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_try_except_throw.arc...
-[Compiler:test_try_except_throw] [INFO] Creating compiler for module 'test_try_except_throw' with entry file 'tests/test_try_except_throw.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_try_except_throw'
-[Compiler:test_try_except_throw] [INFO] Compiling file: tests/test_try_except_throw.arc
-[Compiler:test_try_except_throw] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc (isEntry=true)
-[Compiler:test_try_except_throw] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-[Compiler:test_try_except_throw] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-[Compiler:test_try_except_throw] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: divide (IR: divide)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'divide'
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Processing throw statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'divide'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Processing try-except-finally block
-[Visitor] [DEBUG] Declaring variable: result
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Processing except clause 1
-[Visitor] [DEBUG] Binding exception to variable: err
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-[Compiler:test_try_except_throw] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-Module has 2 functions, 2 globals
-[Compiler:test_try_except_throw] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw.o
-[Compiler:test_try_except_throw] [DEBUG] Calling code generator for module 'test_try_except_throw'
-[Compiler:test_try_except_throw] [DEBUG] Generated 1720 bytes of object code
-[Compiler:test_try_except_throw] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_try_except_throw.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_try_except_throw.arc
+[Driver] [INFO] Compilation successful. Module 'test_try_except_throw.arc' created.
+✓ Module 'test_try_except_throw.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_try_except_throw.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_try_except_throw.o -o test_try_except_throw && ./test_try_except_throw
+To link manually:
+  gcc /tmp/arc_tests/test_try_except_throw.o -o test_try_except_throw -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_try_except_throw.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_try_except_throw.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.07s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_try_except_throw.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_try_except_throw.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [36/39] test_try_except_throw_err                     
 --- Testing: test_try_except_throw_err ---
 Source file: tests/test_try_except_throw_err.arc
@@ -2363,69 +1121,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_try_except_throw_err.arc...
-[Compiler:test_try_except_throw_err] [INFO] Creating compiler for module 'test_try_except_throw_err' with entry file 'tests/test_try_except_throw_err.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_try_except_throw_err'
-[Compiler:test_try_except_throw_err] [INFO] Compiling file: tests/test_try_except_throw_err.arc
-[Compiler:test_try_except_throw_err] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc (isEntry=true)
-[Compiler:test_try_except_throw_err] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-[Compiler:test_try_except_throw_err] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-[Compiler:test_try_except_throw_err] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: divide (IR: divide)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'divide'
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Processing throw statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'divide'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Processing try-except-finally block
-[Visitor] [DEBUG] Declaring variable: result
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Processing except clause 1
-[Visitor] [DEBUG] Binding exception to variable: err
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-[Compiler:test_try_except_throw_err] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-Module has 2 functions, 2 globals
-[Compiler:test_try_except_throw_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw_err.o
-[Compiler:test_try_except_throw_err] [DEBUG] Calling code generator for module 'test_try_except_throw_err'
-[Compiler:test_try_except_throw_err] [DEBUG] Generated 1720 bytes of object code
-[Compiler:test_try_except_throw_err] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_try_except_throw_err.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_try_except_throw_err.arc
+[Driver] [INFO] Compilation successful. Module 'test_try_except_throw_err.arc' created.
+✓ Module 'test_try_except_throw_err.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_try_except_throw_err.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_try_except_throw_err.o -o test_try_except_throw_err && ./test_try_except_throw_err
+To link manually:
+  gcc /tmp/arc_tests/test_try_except_throw_err.o -o test_try_except_throw_err -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_try_except_throw_err.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_try_except_throw_err.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.07s)
+❌ FAIL (0.05s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_try_except_throw_err.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_try_except_throw_err.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [37/39] test_tuple_return                             
 --- Testing: test_tuple_return ---
 Source file: tests/test_tuple_return.arc
@@ -2436,75 +1153,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_tuple_return.arc...
-[Compiler:test_tuple_return] [INFO] Creating compiler for module 'test_tuple_return' with entry file 'tests/test_tuple_return.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_tuple_return'
-[Compiler:test_tuple_return] [INFO] Compiling file: tests/test_tuple_return.arc
-[Compiler:test_tuple_return] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc (isEntry=true)
-[Compiler:test_tuple_return] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-[Compiler:test_tuple_return] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-[Compiler:test_tuple_return] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: divide (IR: divide)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'divide'
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Processing tuple expression return
-[Visitor] [DEBUG] Building tuple return value with 2 fields
-[Visitor] [DEBUG] Casting tuple element 0 from i64 to i32
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Processing tuple expression return
-[Visitor] [DEBUG] Building tuple return value with 2 fields
-[Visitor] [DEBUG] Hit terminator at statement 1 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'divide'
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Tuple destructure: result = field 0 (type: i32)
-[Visitor] [DEBUG] Tuple destructure: ok = field 1 (type: i1)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-[Compiler:test_tuple_return] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-Module has 2 functions, 0 globals
-[Compiler:test_tuple_return] [INFO] Generating object file to: /tmp/arc_tests/test_tuple_return.o
-[Compiler:test_tuple_return] [DEBUG] Calling code generator for module 'test_tuple_return'
-[Compiler:test_tuple_return] [DEBUG] Generated 1520 bytes of object code
-[Compiler:test_tuple_return] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_tuple_return.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_tuple_return.arc
+[Driver] [INFO] Compilation successful. Module 'test_tuple_return.arc' created.
+✓ Module 'test_tuple_return.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_tuple_return.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_tuple_return.o -o test_tuple_return && ./test_tuple_return
+To link manually:
+  gcc /tmp/arc_tests/test_tuple_return.o -o test_tuple_return -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_tuple_return.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_tuple_return.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.10s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_tuple_return.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_tuple_return.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [38/39] test_variable_inferred                        
 --- Testing: test_variable_inferred ---
 Source file: tests/test_variable_inferred.arc
@@ -2515,54 +1185,28 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_variable_inferred.arc...
-[Compiler:test_variable_inferred] [INFO] Creating compiler for module 'test_variable_inferred' with entry file 'tests/test_variable_inferred.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_variable_inferred'
-[Compiler:test_variable_inferred] [INFO] Compiling file: tests/test_variable_inferred.arc
-[Compiler:test_variable_inferred] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc (isEntry=true)
-[Compiler:test_variable_inferred] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-[Compiler:test_variable_inferred] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-[Compiler:test_variable_inferred] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: x
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-[Compiler:test_variable_inferred] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-Module has 1 functions, 0 globals
-[Compiler:test_variable_inferred] [INFO] Generating object file to: /tmp/arc_tests/test_variable_inferred.o
-[Compiler:test_variable_inferred] [DEBUG] Calling code generator for module 'test_variable_inferred'
-[Compiler:test_variable_inferred] [DEBUG] Generated 784 bytes of object code
-[Compiler:test_variable_inferred] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_variable_inferred.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_variable_inferred.arc
+[Driver] [INFO] Compilation successful. Module 'test_variable_inferred.arc' created.
+✓ Module 'test_variable_inferred.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_variable_inferred.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_variable_inferred.o -o test_variable_inferred && ./test_variable_inferred
+To link manually:
+  gcc /tmp/arc_tests/test_variable_inferred.o -o test_variable_inferred -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_variable_inferred.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_variable_inferred.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.03s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_variable_inferred.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_variable_inferred.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 [39/39] test_variable_typed                           
 --- Testing: test_variable_typed ---
 Source file: tests/test_variable_typed.arc
@@ -2573,67 +1217,76 @@ Step 1: Compiling to object file...
 Compilation successful
 Compile output:
 Compiling tests/test_variable_typed.arc...
-[Compiler:test_variable_typed] [INFO] Creating compiler for module 'test_variable_typed' with entry file 'tests/test_variable_typed.arc'
-[Importer] [DEBUG] Created importer with entry directory: /workspaces/arc-lang/compiler/cmd/tests
-[Context] [DEBUG] Registered 35 builtin types
-[Context] [DEBUG] Context initialized for module 'test_variable_typed'
-[Compiler:test_variable_typed] [INFO] Compiling file: tests/test_variable_typed.arc
-[Compiler:test_variable_typed] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc (isEntry=true)
-[Compiler:test_variable_typed] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-[Compiler:test_variable_typed] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-[Compiler:test_variable_typed] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-[Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-[Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-[Visitor] [DEBUG] Pass 0 - Processing imports
-[Visitor] [DEBUG] Pass 1 - Registering types
-[Visitor] [DEBUG] Pass 2 - Processing declarations
-[Visitor] [DEBUG] Declaring function: main (IR: main)
-[Context] [DEBUG] Pushed new scope
-[Context] [DEBUG] Entered function 'main'
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Declaring variable: x
-[Context] [DEBUG] Pushed new scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 0 in block, stopping
-[Context] [DEBUG] Popped scope
-[Visitor] [DEBUG] Compiling return statement
-[Visitor] [DEBUG] Hit terminator at statement 2 in block, stopping
-[Context] [DEBUG] Popped scope
-[Context] [DEBUG] Exited function 'main'
-[Context] [DEBUG] Popped scope
-[Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-[Compiler:test_variable_typed] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-Module has 1 functions, 0 globals
-[Compiler:test_variable_typed] [INFO] Generating object file to: /tmp/arc_tests/test_variable_typed.o
-[Compiler:test_variable_typed] [DEBUG] Calling code generator for module 'test_variable_typed'
-[Compiler:test_variable_typed] [DEBUG] Generated 792 bytes of object code
-[Compiler:test_variable_typed] [INFO] Successfully wrote object file to: /tmp/arc_tests/test_variable_typed.o
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_variable_typed.arc
+[Driver] [INFO] Compilation successful. Module 'test_variable_typed.arc' created.
+✓ Module 'test_variable_typed.arc' compiled (0 functions)
 ✓ Object file written to /tmp/arc_tests/test_variable_typed.o
 
-To create executable:
-  gcc /tmp/arc_tests/test_variable_typed.o -o test_variable_typed && ./test_variable_typed
+To link manually:
+  gcc /tmp/arc_tests/test_variable_typed.o -o test_variable_typed -no-pie
 
 
 Step 2: Linking with gcc...
-Linking successful
+Linking failed: exit status 1
+Output:
+/usr/bin/ld: /tmp/arc_tests/test_variable_typed.o: .symtab local symbol at index 0 (>= sh_info of 0)
+/usr/bin/ld: /tmp/arc_tests/test_variable_typed.o: error adding symbols: bad value
+collect2: error: ld returned 1 exit status
 
-Step 3: Running executable...
-Process exited with code: 0
-✅ Test PASSED
-✅ PASS (0.05s)
+❌ FAIL (0.04s)
+    Linking failed
+    Link output:
+      /usr/bin/ld: /tmp/arc_tests/test_variable_typed.o: .symtab local symbol at index 0 (>= sh_info of 0)
+      /usr/bin/ld: /tmp/arc_tests/test_variable_typed.o: error adding symbols: bad value
+      collect2: error: ld returned 1 exit status
 
 ======================================================================
 Total Tests:      39
-Passed:           35 (89.7%)
-Failed:           4
-  Compile errors: 2
-  Link errors:    2
+Passed:           0 (0.0%)
+Failed:           39
+  Compile errors: 1
+  Link errors:    38
   Runtime errors: 0
-Total Duration:   2.19s
+Total Duration:   1.59s
 
 Failed Tests:
-  ❌ test_import_multiple                     (compile)
-  ❌ test_import_single                       (compile)
+  ❌ test_alloca                              (link)
+  ❌ test_arithmetic                          (link)
+  ❌ test_array                               (link)
+  ❌ test_array_for_loop                      (link)
+  ❌ test_bitwise                             (link)
+  ❌ test_cast                                (link)
+  ❌ test_char_literal                        (link)
+  ❌ test_class                               (link)
+  ❌ test_comparison                          (link)
+  ❌ test_compound_assignment                 (link)
+  ❌ test_constant                            (link)
+  ❌ test_defer                               (link)
+  ❌ test_enum                                (link)
+  ❌ test_extern                              (link)
+  ❌ test_for_in_range                        (link)
+  ❌ test_for_loop                            (link)
+  ❌ test_function_basic                      (link)
+  ❌ test_generics                            (link)
+  ❌ test_generics_structs                    (compile)
+  ❌ test_if_else                             (link)
+  ❌ test_if_statement                        (link)
+  ❌ test_import_multiple                     (link)
+  ❌ test_import_single                       (link)
+  ❌ test_increment                           (link)
+  ❌ test_namespace                           (link)
+  ❌ test_null_check                          (link)
+  ❌ test_pointer                             (link)
+  ❌ test_sizeof                              (link)
+  ❌ test_string_interpolation                (link)
+  ❌ test_struct_basic                        (link)
+  ❌ test_struct_method                       (link)
+  ❌ test_switch                              (link)
   ❌ test_try_except_raise                    (link)
   ❌ test_try_except_raise_err                (link)
+  ❌ test_try_except_throw                    (link)
+  ❌ test_try_except_throw_err                (link)
+  ❌ test_tuple_return                        (link)
+  ❌ test_variable_inferred                   (link)
+  ❌ test_variable_typed                      (link)
 
