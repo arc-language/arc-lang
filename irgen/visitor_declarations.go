@@ -8,15 +8,9 @@ import (
 )
 
 func (g *Generator) VisitCompilationUnit(ctx *parser.CompilationUnitContext) interface{} {
-	// Pass 1 (Semantics) already defined types in the AnalysisResult.
-	// We just need to ensure the LLVM types are created/registered in the Module.
-	
-	// Handle Namespace Declarations
 	for _, ns := range ctx.AllNamespaceDecl() {
 		g.Visit(ns)
 	}
-	
-	// Handle Top Level Declarations
 	for _, decl := range ctx.AllTopLevelDecl() {
 		g.Visit(decl)
 	}
@@ -41,7 +35,6 @@ func (g *Generator) VisitNamespaceDecl(ctx *parser.NamespaceDeclContext) interfa
 }
 
 func (g *Generator) VisitExternDecl(ctx *parser.ExternDeclContext) interface{} {
-	// Temporarily switch namespace if an identifier is provided
 	oldNs := g.currentNamespace
 	if ctx.IDENTIFIER() != nil {
 		g.currentNamespace = ctx.IDENTIFIER().GetText()
@@ -49,7 +42,7 @@ func (g *Generator) VisitExternDecl(ctx *parser.ExternDeclContext) interface{} {
 
 	for _, member := range ctx.AllExternMember() {
 		if fnDecl := member.ExternFunctionDecl(); fnDecl != nil {
-			// CAST: Interface -> Concrete Pointer
+			// CAST FIX: Convert interface to concrete pointer type
 			g.visitExternFunctionDecl(fnDecl.(*parser.ExternFunctionDeclContext))
 		}
 	}
@@ -60,8 +53,6 @@ func (g *Generator) VisitExternDecl(ctx *parser.ExternDeclContext) interface{} {
 
 func (g *Generator) visitExternFunctionDecl(ctx *parser.ExternFunctionDeclContext) {
 	name := ctx.IDENTIFIER().GetText()
-	
-	// Use explicit external name if provided (e.g. func print "printf")
 	externalName := name
 	if ctx.STRING_LITERAL() != nil {
 		raw := ctx.STRING_LITERAL().GetText()
@@ -87,14 +78,11 @@ func (g *Generator) visitExternFunctionDecl(ctx *parser.ExternFunctionDeclContex
 		}
 	}
 
-	// Declare in LLVM
 	fn := g.ctx.Builder.DeclareFunction(externalName, retType, paramTypes, variadic)
 	
-	// Register in Symbol Table so calls to 'name' use this function
 	if sym, ok := g.currentScope.Resolve(name); ok {
 		sym.IRValue = fn
 	} else if g.currentNamespace != "" {
-		// If using namespace, check for qualified symbol
 		if sym, ok := g.currentScope.Resolve(g.currentNamespace + "." + name); ok {
 			sym.IRValue = fn
 		}
@@ -102,7 +90,6 @@ func (g *Generator) visitExternFunctionDecl(ctx *parser.ExternFunctionDeclContex
 }
 
 func (g *Generator) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
-	// Struct types are pre-calculated in analysis, but we might need to process methods here
 	for _, member := range ctx.AllStructMember() {
 		if member.FunctionDecl() != nil {
 			g.Visit(member.FunctionDecl())
@@ -112,7 +99,6 @@ func (g *Generator) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 }
 
 func (g *Generator) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
-	// Similar to struct, process methods
 	for _, member := range ctx.AllClassMember() {
 		if member.FunctionDecl() != nil {
 			g.Visit(member.FunctionDecl())
@@ -122,17 +108,13 @@ func (g *Generator) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 }
 
 func (g *Generator) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
-	// Create constants for enum members
-	// Enums are essentially global integer constants
 	enumName := ctx.IDENTIFIER().GetText()
 	val := int64(0)
 	
 	for _, member := range ctx.AllEnumMember() {
 		memName := member.IDENTIFIER().GetText()
 		
-		// Determine value
 		if member.Expression() != nil {
-			// Visit the expression to evaluate it
 			exprVal := g.Visit(member.Expression())
 			if irVal, ok := exprVal.(ir.Value); ok {
 				if constInt, ok := irVal.(*ir.ConstantInt); ok {
@@ -141,14 +123,10 @@ func (g *Generator) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 			}
 		}
 		
-		// Create IR Constant
 		constVal := g.ctx.Builder.ConstInt(types.I32, val)
-		
-		// Define Global Constant
-		fullName := enumName + "_" + memName // Mangled name
+		fullName := enumName + "_" + memName
 		global := g.ctx.Builder.CreateGlobalConstant(fullName, constVal)
 		
-		// Update Symbol in Scope (Pass 2 update)
 		if sym, ok := g.currentScope.Resolve(enumName + "." + memName); ok {
 			sym.IRValue = global
 			sym.Kind = symbol.SymConst
@@ -165,11 +143,9 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	name := ctx.IDENTIFIER().GetText()
 	irName := name
 	
-	// 1. Determine Context (Method vs Function)
 	var parentName string
 	isMethod := false
 	
-	// Check parent in parse tree to see if we are inside a Class or Struct
 	if parent := ctx.GetParent(); parent != nil {
 		if _, ok := parent.(*parser.ClassMemberContext); ok {
 			if classDecl, ok := parent.GetParent().(*parser.ClassDeclContext); ok {
@@ -184,7 +160,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
-	// 2. Name Mangling
 	if isMethod {
 		irName = parentName + "_" + name
 	} else if g.currentNamespace != "" && name != "main" {
@@ -196,19 +171,14 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	var paramTypes []types.Type
 	var paramNames []string
 
-	// 3. Parameter Parsing
 	if ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
 			if param.SELF() != nil {
-				// Handle 'self'
 				if isMethod && parentName != "" {
-					// Find the type of the parent struct/class
 					if parentSym, ok := g.currentScope.Resolve(parentName); ok {
-						// Pass by pointer
 						structType := parentSym.Type
 						paramTypes = append(paramTypes, types.NewPointer(structType))
 					} else {
-						// Fallback if semantic analysis failed
 						paramTypes = append(paramTypes, types.NewPointer(types.I8))
 					}
 				} else {
@@ -228,10 +198,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		retType = g.resolveType(ctx.ReturnType().Type_())
 	}
 
-	// 4. Create IR Function
 	fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
-	
-	// Handle Async Attribute
 	if ctx.ASYNC() != nil {
 		fn.Attributes = append(fn.Attributes, ir.AttrCoroutine)
 	}
@@ -245,7 +212,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	g.enterScope(ctx)
 	defer g.exitScope()
 
-	// 5. Argument Allocation
 	for i, arg := range fn.Arguments {
 		arg.SetName(paramNames[i])
 		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
@@ -256,7 +222,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
-	// 6. Body Generation
 	if ctx.Block() != nil {
 		g.deferStack = NewDeferStack()
 		for _, stmt := range ctx.Block().AllStatement() {
@@ -264,7 +229,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
-	// 7. Implicit Return
 	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 		if retType == types.Void {
 			g.ctx.Builder.CreateRetVoid()

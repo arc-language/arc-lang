@@ -50,9 +50,6 @@ func (g *Generator) exitScope() {
 	}
 }
 
-// Visit manually dispatches to ensure correct IR generation methods are called.
-// This is critical because the default BaseArcParserVisitor returns nil for unvisited nodes,
-// which causes runtime panics when we expect an ir.Value.
 func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil { return nil }
 
@@ -131,7 +128,6 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.IntrinsicExpressionContext: return g.VisitIntrinsicExpression(ctx)
 		
 	default:
-		// Fallback for nodes that might be wrapped (e.g. ExpressionStmt -> Expression -> LogicalOr -> ... -> Primary)
 		return g.BaseArcParserVisitor.Visit(tree)
 	}
 }
