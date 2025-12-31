@@ -7,7 +7,7 @@ import (
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
-	"github.com/arc-language/arc-lang/symbol" // Added missing import
+	"github.com/arc-language/arc-lang/symbol"
 )
 
 func (g *Generator) VisitExpression(ctx *parser.ExpressionContext) interface{} {
@@ -17,6 +17,8 @@ func (g *Generator) VisitExpression(ctx *parser.ExpressionContext) interface{} {
 // --- Binary Expressions ---
 
 func (g *Generator) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionContext) interface{} {
+	// Eager evaluation for OR (||)
+	// TODO: Implement short-circuiting with basic blocks if required
 	lhs := g.Visit(ctx.LogicalAndExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllLogicalAndExpression()); i++ {
 		rhs := g.Visit(ctx.LogicalAndExpression(i)).(ir.Value)
@@ -26,6 +28,7 @@ func (g *Generator) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionCont
 }
 
 func (g *Generator) VisitLogicalAndExpression(ctx *parser.LogicalAndExpressionContext) interface{} {
+	// Eager evaluation for AND (&&)
 	lhs := g.Visit(ctx.BitOrExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllBitOrExpression()); i++ {
 		rhs := g.Visit(ctx.BitOrExpression(i)).(ir.Value)
@@ -53,6 +56,7 @@ func (g *Generator) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 	lhs := g.Visit(ctx.UnaryExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllUnaryExpression()); i++ {
 		rhs := g.Visit(ctx.UnaryExpression(i)).(ir.Value)
+		// Simplified: assumes operators aren't mixed in a way that breaks precedence in the same rule
 		if types.IsFloat(lhs.Type()) {
 			lhs = g.ctx.Builder.CreateFMul(lhs, rhs, "")
 		} else {
@@ -65,6 +69,50 @@ func (g *Generator) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 // --- Unary Expressions ---
 
 func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
+	// Handle Prefix Increment/Decrement (++i, --i)
+	if ctx.INCREMENT() != nil || ctx.DECREMENT() != nil {
+		// 1. Get Address (L-Value) using helper
+		ptr := g.getLValue(ctx.UnaryExpression())
+		if ptr == nil {
+			return g.getZeroValue(types.I64) // Error recovery
+		}
+
+		// 2. Load current value
+		ptrType := ptr.Type().(*types.PointerType)
+		elemType := ptrType.ElementType
+		curr := g.ctx.Builder.CreateLoad(elemType, ptr, "")
+
+		// 3. Add/Sub 1
+		var next ir.Value
+		
+		if types.IsFloat(elemType) {
+			oneF := g.ctx.Builder.ConstFloat(types.F64, 1.0)
+			if ctx.INCREMENT() != nil {
+				next = g.ctx.Builder.CreateFAdd(curr, oneF, "")
+			} else {
+				next = g.ctx.Builder.CreateFSub(curr, oneF, "")
+			}
+		} else {
+			one := g.ctx.Builder.ConstInt(types.I64, 1)
+			// Cast '1' to specific int type if needed
+			if intTy, ok := elemType.(*types.IntType); ok {
+				one = g.ctx.Builder.ConstInt(intTy, 1)
+			}
+			
+			if ctx.INCREMENT() != nil {
+				next = g.ctx.Builder.CreateAdd(curr, one, "")
+			} else {
+				next = g.ctx.Builder.CreateSub(curr, one, "")
+			}
+		}
+
+		// 4. Store back
+		g.ctx.Builder.CreateStore(next, ptr)
+		
+		// 5. Return new value (Prefix returns new)
+		return next
+	}
+
 	if ctx.PostfixExpression() != nil { return g.Visit(ctx.PostfixExpression()) }
 	
 	val := g.Visit(ctx.UnaryExpression()).(ir.Value)
@@ -85,7 +133,14 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		}
 	}
 	if ctx.AMP() != nil { // Address Of (&var)
-		// Returning 0 for now as placeholder for L-Value logic
+		// To implement '&', we need the address, not the value.
+		// Visit() normally returns the R-Value (Load). 
+		// We use getLValue to retrieve the address instead.
+		if child := ctx.UnaryExpression(); child != nil {
+			if lval := g.getLValue(child); lval != nil {
+				return lval
+			}
+		}
 		return g.getZeroValue(types.I64) 
 	}
 	return val
@@ -94,7 +149,19 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 // --- Postfix Expressions ---
 
 func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
-	curr := g.Visit(ctx.PrimaryExpression()).(ir.Value)
+	// Initialize with the Primary Expression
+	// We attempt to get an L-Value address first to support mutation chains (e.g. arr[i]++)
+	var currPtr ir.Value = g.getLValue(ctx.PrimaryExpression())
+	var curr ir.Value
+
+	if currPtr != nil {
+		// If it's an L-Value, load it to get the R-Value for calculation
+		ptrType := currPtr.Type().(*types.PointerType)
+		curr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
+	} else {
+		// Otherwise, visit normally to get the R-Value (e.g. function call return)
+		curr = g.Visit(ctx.PrimaryExpression()).(ir.Value)
+	}
 
 	for _, op := range ctx.AllPostfixOp() {
 		// 1. Function Call
@@ -107,9 +174,13 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					}
 				}
 			}
+			
 			if fn, ok := curr.(*ir.Function); ok {
 				curr = g.ctx.Builder.CreateCall(fn, args, "")
+				// Result of a function call is an R-Value
+				currPtr = nil 
 			}
+			continue
 		}
 		
 		// 2. Member Access (.field)
@@ -117,28 +188,46 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			fieldName := op.IDENTIFIER().GetText()
 			
 			var structType *types.StructType
-			var basePtr ir.Value
+			var isPtr = false
 			
 			if ptr, ok := curr.Type().(*types.PointerType); ok {
 				if st, ok := ptr.ElementType.(*types.StructType); ok {
 					structType = st
-					basePtr = curr
+					isPtr = true
 				}
 			} else if st, ok := curr.Type().(*types.StructType); ok {
 				structType = st
-				basePtr = nil
 			}
 
 			if structType != nil {
 				if idx, ok := g.analysis.StructIndices[structType.Name][fieldName]; ok {
-					if basePtr != nil {
-						gep := g.ctx.Builder.CreateStructGEP(structType, basePtr, idx, "")
+					if isPtr && currPtr != nil {
+						// L-Value access: GEP + Load
+						// currPtr tracks the address of the struct
+						// We need to GEP from currPtr, not curr (which is the pointer value, confusingly similar in LLVM)
+						// Actually, curr IS the pointer value if isPtr is true.
+						// If we have a pointer to struct, 'curr' holds that pointer.
+						// 'currPtr' holds the address of that pointer variable (e.g. &ptr).
+						// Wait, if 'curr' is a pointer, we GEP 'curr'.
+						
+						gep := g.ctx.Builder.CreateStructGEP(structType, curr, idx, "")
+						currPtr = gep
+						curr = g.ctx.Builder.CreateLoad(structType.Fields[idx], gep, "")
+					} else if isPtr {
+						// R-Value pointer (e.g. from function return)
+						// We can GEP it, but we can't persist L-Valueness for assigning *to* the pointer variable itself
+						// But we CAN assign to the field it points to.
+						gep := g.ctx.Builder.CreateStructGEP(structType, curr, idx, "")
+						currPtr = gep
 						curr = g.ctx.Builder.CreateLoad(structType.Fields[idx], gep, "")
 					} else {
+						// R-Value struct (value)
 						curr = g.ctx.Builder.CreateExtractValue(curr, []int{idx}, "")
+						currPtr = nil
 					}
 				}
 			}
+			continue
 		}
 		
 		// 3. Array Indexing ([i])
@@ -146,9 +235,52 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			idx := g.Visit(op.Expression()).(ir.Value)
 			
 			if ptr, ok := curr.Type().(*types.PointerType); ok {
+				// GEP the pointer
 				gep := g.ctx.Builder.CreateInBoundsGEP(ptr.ElementType, curr, []ir.Value{idx}, "")
+				currPtr = gep
 				curr = g.ctx.Builder.CreateLoad(ptr.ElementType, gep, "")
 			}
+			continue
+		}
+
+		// 4. Increment / Decrement (++, --)
+		if op.INCREMENT() != nil || op.DECREMENT() != nil {
+			if currPtr == nil {
+				// Error: Cannot increment R-Value
+				continue
+			}
+
+			// We have the address in currPtr, and the current value in curr.
+			// 1. Calculate new value
+			var next ir.Value
+			elemType := curr.Type()
+			
+			if types.IsFloat(elemType) {
+				oneF := g.ctx.Builder.ConstFloat(types.F64, 1.0)
+				if op.INCREMENT() != nil {
+					next = g.ctx.Builder.CreateFAdd(curr, oneF, "")
+				} else {
+					next = g.ctx.Builder.CreateFSub(curr, oneF, "")
+				}
+			} else {
+				one := g.ctx.Builder.ConstInt(types.I64, 1)
+				if intTy, ok := elemType.(*types.IntType); ok { 
+					one = g.ctx.Builder.ConstInt(intTy, 1) 
+				}
+				
+				if op.INCREMENT() != nil {
+					next = g.ctx.Builder.CreateAdd(curr, one, "")
+				} else {
+					next = g.ctx.Builder.CreateSub(curr, one, "")
+				}
+			}
+
+			// 2. Store new value
+			g.ctx.Builder.CreateStore(next, currPtr)
+
+			// 3. Postfix returns OLD value. 'curr' is already the old value.
+			// 4. Result is R-Value (cannot be assigned to)
+			currPtr = nil
 		}
 	}
 	return curr
@@ -166,14 +298,19 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
 		
+		// 1. Resolve in Scope
 		if sym, ok := g.currentScope.Resolve(name); ok {
+			// If it's a variable (Alloca), load it
 			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 				return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 			}
+			// If it's a constant or function, return directly
 			return sym.IRValue
 		}
 		
+		// 2. Resolve Global/Extern
 		if glob := g.ctx.Module.GetGlobal(name); glob != nil {
+			// Globals are pointers, load the value
 			return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
 		}
 	}
