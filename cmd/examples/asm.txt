@@ -1,0 +1,105 @@
+
+out.o:     file format elf64-x86-64
+out.o
+architecture: i386:x86-64, flags 0x00000011:
+HAS_RELOC, HAS_SYMS
+start address 0x0000000000000000
+
+Sections:
+Idx Name          Size      VMA               LMA               File off  Algn
+  0 .text         00000163  0000000000000000  0000000000000000  00000040  2**4
+                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, CODE
+  1 .data         00000058  0000000000000000  0000000000000000  000001a8  2**3
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .note.GNU-stack 00000000  0000000000000000  0000000000000000  00000200  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+0000000000000000 l    df *UND*	0000000000000000 test_inc
+0000000000000000 l    d  .text	0000000000000000 .text
+0000000000000000 l    d  .data	0000000000000000 .data
+0000000000000000 g     O .data	000000000000000d .str.0
+0000000000000010 g     O .data	0000000000000019 .str.1
+0000000000000030 g     O .data	0000000000000014 .str.2
+0000000000000048 g     O .data	0000000000000010 .str.3
+0000000000000000 g     F .text	0000000000000163 main
+0000000000000000         *UND*	0000000000000000 printf
+
+
+
+Disassembly of section .text:
+
+0000000000000000 <main>:
+   0:	55                   	push   %rbp
+   1:	48 89 e5             	mov    %rsp,%rbp
+   4:	48 81 ec a0 00 00 00 	sub    $0xa0,%rsp
+   b:	48 31 c0             	xor    %rax,%rax
+   e:	89 85 f8 ff ff ff    	mov    %eax,-0x8(%rbp)
+  14:	48 8d 85 68 ff ff ff 	lea    -0x98(%rbp),%rax
+  1b:	48 89 85 f0 ff ff ff 	mov    %rax,-0x10(%rbp)
+  22:	8b 85 f8 ff ff ff    	mov    -0x8(%rbp),%eax
+  28:	48 8b 8d f0 ff ff ff 	mov    -0x10(%rbp),%rcx
+  2f:	89 01                	mov    %eax,(%rcx)
+  31:	48 8d 05 00 00 00 00 	lea    0x0(%rip),%rax        # 38 <main+0x38>
+			34: R_X86_64_PC32	.str.0-0x4
+  38:	48 89 85 e8 ff ff ff 	mov    %rax,-0x18(%rbp)
+  3f:	48 8b 85 f0 ff ff ff 	mov    -0x10(%rbp),%rax
+  46:	8b 00                	mov    (%rax),%eax
+  48:	89 85 e0 ff ff ff    	mov    %eax,-0x20(%rbp)
+  4e:	48 8b bd e8 ff ff ff 	mov    -0x18(%rbp),%rdi
+  55:	8b b5 e0 ff ff ff    	mov    -0x20(%rbp),%esi
+  5b:	e8 00 00 00 00       	call   60 <main+0x60>
+			5c: R_X86_64_PLT32	printf-0x4
+  60:	89 85 d8 ff ff ff    	mov    %eax,-0x28(%rbp)
+  66:	48 8d 05 00 00 00 00 	lea    0x0(%rip),%rax        # 6d <main+0x6d>
+			69: R_X86_64_PC32	.str.1-0x4
+  6d:	48 89 85 d0 ff ff ff 	mov    %rax,-0x30(%rbp)
+  74:	48 8b 85 f0 ff ff ff 	mov    -0x10(%rbp),%rax
+  7b:	8b 00                	mov    (%rax),%eax
+  7d:	89 85 c8 ff ff ff    	mov    %eax,-0x38(%rbp)
+  83:	8b 85 c8 ff ff ff    	mov    -0x38(%rbp),%eax
+  89:	48 83 c0 01          	add    $0x1,%rax
+  8d:	89 85 c0 ff ff ff    	mov    %eax,-0x40(%rbp)
+  93:	8b 85 c0 ff ff ff    	mov    -0x40(%rbp),%eax
+  99:	48 8b 8d f0 ff ff ff 	mov    -0x10(%rbp),%rcx
+  a0:	89 01                	mov    %eax,(%rcx)
+  a2:	48 8b bd d0 ff ff ff 	mov    -0x30(%rbp),%rdi
+  a9:	8b b5 c8 ff ff ff    	mov    -0x38(%rbp),%esi
+  af:	e8 00 00 00 00       	call   b4 <main+0xb4>
+			b0: R_X86_64_PLT32	printf-0x4
+  b4:	89 85 b8 ff ff ff    	mov    %eax,-0x48(%rbp)
+  ba:	48 8d 05 00 00 00 00 	lea    0x0(%rip),%rax        # c1 <main+0xc1>
+			bd: R_X86_64_PC32	.str.2-0x4
+  c1:	48 89 85 b0 ff ff ff 	mov    %rax,-0x50(%rbp)
+  c8:	48 8b 85 f0 ff ff ff 	mov    -0x10(%rbp),%rax
+  cf:	8b 00                	mov    (%rax),%eax
+  d1:	89 85 a8 ff ff ff    	mov    %eax,-0x58(%rbp)
+  d7:	48 8b bd b0 ff ff ff 	mov    -0x50(%rbp),%rdi
+  de:	8b b5 a8 ff ff ff    	mov    -0x58(%rbp),%esi
+  e4:	e8 00 00 00 00       	call   e9 <main+0xe9>
+			e5: R_X86_64_PLT32	printf-0x4
+  e9:	89 85 a0 ff ff ff    	mov    %eax,-0x60(%rbp)
+  ef:	48 8b 85 f0 ff ff ff 	mov    -0x10(%rbp),%rax
+  f6:	8b 00                	mov    (%rax),%eax
+  f8:	89 85 98 ff ff ff    	mov    %eax,-0x68(%rbp)
+  fe:	8b 85 98 ff ff ff    	mov    -0x68(%rbp),%eax
+ 104:	48 83 c0 01          	add    $0x1,%rax
+ 108:	89 85 90 ff ff ff    	mov    %eax,-0x70(%rbp)
+ 10e:	8b 85 90 ff ff ff    	mov    -0x70(%rbp),%eax
+ 114:	48 8b 8d f0 ff ff ff 	mov    -0x10(%rbp),%rcx
+ 11b:	89 01                	mov    %eax,(%rcx)
+ 11d:	48 8d 05 00 00 00 00 	lea    0x0(%rip),%rax        # 124 <main+0x124>
+			120: R_X86_64_PC32	.str.3-0x4
+ 124:	48 89 85 88 ff ff ff 	mov    %rax,-0x78(%rbp)
+ 12b:	48 8b 85 f0 ff ff ff 	mov    -0x10(%rbp),%rax
+ 132:	8b 00                	mov    (%rax),%eax
+ 134:	89 85 80 ff ff ff    	mov    %eax,-0x80(%rbp)
+ 13a:	48 8b bd 88 ff ff ff 	mov    -0x78(%rbp),%rdi
+ 141:	8b b5 80 ff ff ff    	mov    -0x80(%rbp),%esi
+ 147:	e8 00 00 00 00       	call   14c <main+0x14c>
+			148: R_X86_64_PLT32	printf-0x4
+ 14c:	89 85 78 ff ff ff    	mov    %eax,-0x88(%rbp)
+ 152:	48 31 c0             	xor    %rax,%rax
+ 155:	89 85 70 ff ff ff    	mov    %eax,-0x90(%rbp)
+ 15b:	8b 85 70 ff ff ff    	mov    -0x90(%rbp),%eax
+ 161:	c9                   	leave
+ 162:	c3                   	ret

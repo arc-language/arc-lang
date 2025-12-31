@@ -1,0 +1,1171 @@
+%Socket = type { i32, i1 }
+%net_Socket = type { i32, i1 }
+
+@io_STDIN = external constant i64 0
+@io_STDOUT = external constant i64 1
+@io_STDERR = external constant i64 2
+@io_SYS_READ = external constant i64 0
+@io_SYS_WRITE = external constant i64 1
+@io_NUM_BUFFER_SIZE = external constant i64 32
+@.str.6 = external constant [37 x i8] [i8 48, i8 49, i8 50, i8 51, i8 52, i8 53, i8 54, i8 55, i8 56, i8 57, i8 97, i8 98, i8 99, i8 100, i8 101, i8 102, i8 103, i8 104, i8 105, i8 106, i8 107, i8 108, i8 109, i8 110, i8 111, i8 112, i8 113, i8 114, i8 115, i8 116, i8 117, i8 118, i8 119, i8 120, i8 121, i8 122, i8 0]
+@.str.7 = external constant [37 x i8] [i8 48, i8 49, i8 50, i8 51, i8 52, i8 53, i8 54, i8 55, i8 56, i8 57, i8 97, i8 98, i8 99, i8 100, i8 101, i8 102, i8 103, i8 104, i8 105, i8 106, i8 107, i8 108, i8 109, i8 110, i8 111, i8 112, i8 113, i8 114, i8 115, i8 116, i8 117, i8 118, i8 119, i8 120, i8 121, i8 122, i8 0]
+@net_SYS_READ = external constant i64 0
+@net_SYS_WRITE = external constant i64 1
+@net_SYS_CLOSE = external constant i64 3
+@net_SYS_SOCKET = external constant i64 41
+@net_SYS_CONNECT = external constant i64 42
+@net_AF_INET = external constant i64 2
+@net_SOCK_STREAM = external constant i64 1
+@net_IPPROTO_TCP = external constant i64 6
+@.str.16 = external constant [35 x i8] [i8 45, i8 45, i8 45, i8 32, i8 83, i8 116, i8 97, i8 110, i8 100, i8 97, i8 108, i8 111, i8 110, i8 101, i8 32, i8 84, i8 67, i8 80, i8 32, i8 67, i8 108, i8 105, i8 101, i8 110, i8 116, i8 32, i8 84, i8 101, i8 115, i8 116, i8 32, i8 45, i8 45, i8 45, i8 0]
+@.str.17 = external constant [30 x i8] [i8 69, i8 114, i8 114, i8 111, i8 114, i8 58, i8 32, i8 70, i8 97, i8 105, i8 108, i8 101, i8 100, i8 32, i8 116, i8 111, i8 32, i8 111, i8 112, i8 101, i8 110, i8 32, i8 115, i8 111, i8 99, i8 107, i8 101, i8 116, i8 46, i8 0]
+@.str.18 = external constant [20 x i8] [i8 83, i8 111, i8 99, i8 107, i8 101, i8 116, i8 32, i8 99, i8 114, i8 101, i8 97, i8 116, i8 101, i8 100, i8 32, i8 102, i8 100, i8 58, i8 32, i8 0]
+@.str.19 = external constant [1 x i8] [i8 0]
+@.str.20 = external constant [10 x i8] [i8 49, i8 50, i8 55, i8 46, i8 48, i8 46, i8 48, i8 46, i8 49, i8 0]
+@.str.21 = external constant [15 x i8] [i8 67, i8 111, i8 110, i8 110, i8 101, i8 99, i8 116, i8 105, i8 110, i8 103, i8 32, i8 116, i8 111, i8 32, i8 0]
+@.str.22 = external constant [2 x i8] [i8 58, i8 0]
+@.str.23 = external constant [4 x i8] [i8 46, i8 46, i8 46, i8 0]
+@.str.24 = external constant [35 x i8] [i8 40, i8 69, i8 110, i8 115, i8 117, i8 114, i8 101, i8 32, i8 112, i8 121, i8 116, i8 104, i8 111, i8 110, i8 32, i8 115, i8 101, i8 114, i8 118, i8 101, i8 114, i8 32, i8 105, i8 115, i8 32, i8 114, i8 117, i8 110, i8 110, i8 105, i8 110, i8 103, i8 33, i8 41, i8 0]
+@.str.25 = external constant [11 x i8] [i8 67, i8 111, i8 110, i8 110, i8 101, i8 99, i8 116, i8 101, i8 100, i8 33, i8 0]
+@.str.26 = external constant [17 x i8] [i8 72, i8 101, i8 108, i8 108, i8 111, i8 32, i8 102, i8 114, i8 111, i8 109, i8 32, i8 65, i8 114, i8 99, i8 33, i8 10, i8 0]
+@.str.27 = external constant [13 x i8] [i8 83, i8 101, i8 110, i8 116, i8 32, i8 98, i8 121, i8 116, i8 101, i8 115, i8 58, i8 32, i8 0]
+@.str.28 = external constant [1 x i8] [i8 0]
+@.str.29 = external constant [25 x i8] [i8 87, i8 97, i8 105, i8 116, i8 105, i8 110, i8 103, i8 32, i8 102, i8 111, i8 114, i8 32, i8 114, i8 101, i8 115, i8 112, i8 111, i8 110, i8 115, i8 101, i8 46, i8 46, i8 46, i8 32, i8 0]
+@.str.30 = external constant [11 x i8] [i8 10, i8 82, i8 101, i8 99, i8 101, i8 105, i8 118, i8 101, i8 100, i8 58, i8 0]
+@.str.31 = external constant [34 x i8] [i8 10, i8 67, i8 111, i8 110, i8 110, i8 101, i8 99, i8 116, i8 105, i8 111, i8 110, i8 32, i8 99, i8 108, i8 111, i8 115, i8 101, i8 100, i8 32, i8 111, i8 114, i8 32, i8 101, i8 109, i8 112, i8 116, i8 121, i8 32, i8 114, i8 101, i8 97, i8 100, i8 46, i8 0]
+@.str.32 = external constant [19 x i8] [i8 67, i8 111, i8 110, i8 110, i8 101, i8 99, i8 116, i8 105, i8 111, i8 110, i8 32, i8 102, i8 97, i8 105, i8 108, i8 101, i8 100, i8 46, i8 0]
+
+define external i64 @io_write(i32 %fd, ptr<u8> %data, u64 %len) {
+entry:
+  %fd.addr = alloca i32
+  store i32 %fd, ptr<i32> %fd.addr
+  %data.addr = alloca ptr<u8>
+  store ptr<u8> %data, ptr<ptr<u8>> %data.addr
+  %len.addr = alloca u64
+  store u64 %len, ptr<u64> %len.addr
+  %0 = load i32, ptr<i32> %fd.addr
+  %1 = sext i32 %0 to i64
+  %2 = load ptr<u8>, ptr<ptr<u8>> %data.addr
+  %3 = load u64, ptr<u64> %len.addr
+  %4 = syscall ptr<i64> %io_SYS_WRITE, i64 %1, ptr<u8> %2, u64 %3
+  ret i64 %4
+}
+
+define external i64 @io_write_string(i32 %fd, ptr<i8> %s) {
+entry:
+  %fd.addr = alloca i32
+  store i32 %fd, ptr<i32> %fd.addr
+  %s.addr = alloca ptr<i8>
+  store ptr<i8> %s, ptr<ptr<i8>> %s.addr
+  %5 = load i32, ptr<i32> %fd.addr
+  %6 = load ptr<i8>, ptr<ptr<i8>> %s.addr
+  %7 = load ptr<i8>, ptr<ptr<i8>> %s.addr
+  %8 = strlen ptr<i8> %7
+  %9 = call i64 @io_write(i32 %5, ptr<i8> %6, u64 %8)
+  ret i64 %9
+}
+
+define external i64 @io_write_byte(i32 %fd, u8 %b) {
+entry:
+  %fd.addr = alloca i32
+  store i32 %fd, ptr<i32> %fd.addr
+  %b.addr = alloca u8
+  store u8 %b, ptr<u8> %b.addr
+  %10 = alloca u8, i64 1
+  %buf.addr = alloca ptr<u8>
+  store ptr<u8> %10, ptr<ptr<u8>> %buf.addr
+  %11 = load ptr<u8>, ptr<ptr<u8>> %buf.addr
+  %12 = getelementptr inbounds u8, ptr<u8> %11, i64 0
+  %13 = load u8, ptr<u8> %b.addr
+  store u8 %13, ptr<u8> %12
+  %14 = load i32, ptr<i32> %fd.addr
+  %15 = load ptr<u8>, ptr<ptr<u8>> %buf.addr
+  %16 = call i64 @io_write(i32 %14, ptr<u8> %15, i64 1)
+  ret i64 %16
+}
+
+define external u64 @io_int_to_string(i64 %value, ptr<u8> %buffer, u32 %base) {
+entry:
+  %value.addr = alloca i64
+  store i64 %value, ptr<i64> %value.addr
+  %buffer.addr = alloca ptr<u8>
+  store ptr<u8> %buffer, ptr<ptr<u8>> %buffer.addr
+  %base.addr = alloca u32
+  store u32 %base, ptr<u32> %base.addr
+  %17 = load u32, ptr<u32> %base.addr
+  %18 = icmp slt u32 %17, 2
+  %19 = load u32, ptr<u32> %base.addr
+  %20 = icmp sgt u32 %19, 36
+  %21 = or i1 %18, %20
+  br i1 %21, label %if.then.38_4, label %if.next.38_4
+if.end.38_4:
+  %22 = getelementptr inbounds [37 x i8], ptr<[37 x i8]> %.str.6, i32 0, i32 0
+  %digits.addr = alloca ptr<[37 x i8]>
+  store ptr<[37 x i8]> %22, ptr<ptr<[37 x i8]>> %digits.addr
+  %23 = load i64, ptr<i64> %value.addr
+  %24 = icmp slt i64 %23, 0
+  %is_negative.addr = alloca i1
+  store i1 %24, ptr<i1> %is_negative.addr
+  %abs_value.addr = alloca i64
+  store i64 0, ptr<i64> %abs_value.addr
+  %25 = load i1, ptr<i1> %is_negative.addr
+  br i1 %25, label %if.then.47_4, label %if.next.47_4
+if.then.38_4:
+  ret i64 0
+if.next.38_4:
+  br label %if.end.38_4
+if.end.47_4:
+  %pos.addr = alloca u64
+  store i64 0, ptr<u64> %pos.addr
+  %29 = alloca u8, ptr<i64> %io_NUM_BUFFER_SIZE
+  %temp.addr = alloca ptr<u8>
+  store ptr<u8> %29, ptr<ptr<u8>> %temp.addr
+  %temp_pos.addr = alloca u64
+  store i64 0, ptr<u64> %temp_pos.addr
+  %30 = load i64, ptr<i64> %abs_value.addr
+  %31 = icmp eq i64 %30, 0
+  br i1 %31, label %if.then.59_4, label %if.next.59_4
+if.then.47_4:
+  %26 = load i64, ptr<i64> %value.addr
+  %27 = sub i64 0, %26
+  store i64 %27, ptr<i64> %abs_value.addr
+  br label %if.end.47_4
+if.next.47_4:
+  %28 = load i64, ptr<i64> %value.addr
+  store i64 %28, ptr<i64> %abs_value.addr
+  br label %if.end.47_4
+if.end.59_4:
+  %56 = load i1, ptr<i1> %is_negative.addr
+  br i1 %56, label %if.then.73_4, label %if.next.73_4
+if.then.59_4:
+  %32 = load ptr<u8>, ptr<ptr<u8>> %temp.addr
+  %33 = load u64, ptr<u64> %temp_pos.addr
+  %34 = getelementptr inbounds u8, ptr<u8> %32, u64 %33
+  store i64 0, ptr<u8> %34
+  %35 = load u64, ptr<u64> %temp_pos.addr
+  %36 = add u64 %35, 1
+  store u64 %36, ptr<u64> %temp_pos.addr
+  br label %if.end.59_4
+if.next.59_4:
+  %37 = load i64, ptr<i64> %abs_value.addr
+  %n.addr = alloca i64
+  store i64 %37, ptr<i64> %n.addr
+  %38 = load u32, ptr<u32> %base.addr
+  %39 = sext u32 %38 to u64
+  %base_u64.addr = alloca u64
+  store u64 %39, ptr<u64> %base_u64.addr
+  br label %loop.cond.65_8
+loop.cond.65_8:
+  %40 = load i64, ptr<i64> %n.addr
+  %41 = icmp sgt i64 %40, 0
+  br i1 %41, label %loop.body.65_8, label %loop.end.65_8
+loop.body.65_8:
+  %42 = load ptr<u8>, ptr<ptr<u8>> %temp.addr
+  %43 = load u64, ptr<u64> %temp_pos.addr
+  %44 = getelementptr inbounds u8, ptr<u8> %42, u64 %43
+  %45 = load ptr<[37 x i8]>, ptr<ptr<[37 x i8]>> %digits.addr
+  %46 = load i64, ptr<i64> %n.addr
+  %47 = load u64, ptr<u64> %base_u64.addr
+  %48 = srem i64 %46, %47
+  %49 = getelementptr inbounds [37 x i8], ptr<[37 x i8]> %45, i64 %48
+  %50 = load [37 x i8], ptr<[37 x i8]> %49
+  store [37 x i8] %50, ptr<u8> %44
+  %51 = load u64, ptr<u64> %temp_pos.addr
+  %52 = add u64 %51, 1
+  store u64 %52, ptr<u64> %temp_pos.addr
+  %53 = load u64, ptr<u64> %base_u64.addr
+  %54 = load i64, ptr<i64> %n.addr
+  %55 = sdiv i64 %54, %53
+  store i64 %55, ptr<i64> %n.addr
+  br label %loop.cond.65_8
+loop.post.65_8:
+  br label %loop.cond.65_8
+loop.end.65_8:
+  br label %if.end.59_4
+if.end.73_4:
+  br label %loop.cond.79_4
+if.then.73_4:
+  %57 = load ptr<u8>, ptr<ptr<u8>> %buffer.addr
+  %58 = load u64, ptr<u64> %pos.addr
+  %59 = getelementptr inbounds u8, ptr<u8> %57, u64 %58
+  store i64 0, ptr<u8> %59
+  %60 = load u64, ptr<u64> %pos.addr
+  %61 = add u64 %60, 1
+  store u64 %61, ptr<u64> %pos.addr
+  br label %if.end.73_4
+if.next.73_4:
+  br label %if.end.73_4
+loop.cond.79_4:
+  %62 = load u64, ptr<u64> %temp_pos.addr
+  %63 = icmp sgt u64 %62, 0
+  br i1 %63, label %loop.body.79_4, label %loop.end.79_4
+loop.body.79_4:
+  %64 = load u64, ptr<u64> %temp_pos.addr
+  %65 = sub u64 %64, 1
+  store u64 %65, ptr<u64> %temp_pos.addr
+  %66 = load ptr<u8>, ptr<ptr<u8>> %buffer.addr
+  %67 = load u64, ptr<u64> %pos.addr
+  %68 = getelementptr inbounds u8, ptr<u8> %66, u64 %67
+  %69 = load ptr<u8>, ptr<ptr<u8>> %temp.addr
+  %70 = load u64, ptr<u64> %temp_pos.addr
+  %71 = getelementptr inbounds u8, ptr<u8> %69, u64 %70
+  %72 = load u8, ptr<u8> %71
+  store u8 %72, ptr<u8> %68
+  %73 = load u64, ptr<u64> %pos.addr
+  %74 = add u64 %73, 1
+  store u64 %74, ptr<u64> %pos.addr
+  br label %loop.cond.79_4
+loop.post.79_4:
+  br label %loop.cond.79_4
+loop.end.79_4:
+  %75 = load u64, ptr<u64> %pos.addr
+  ret u64 %75
+}
+
+define external u64 @io_uint_to_string(u64 %value, ptr<u8> %buffer, u32 %base) {
+entry:
+  %value.addr = alloca u64
+  store u64 %value, ptr<u64> %value.addr
+  %buffer.addr = alloca ptr<u8>
+  store ptr<u8> %buffer, ptr<ptr<u8>> %buffer.addr
+  %base.addr = alloca u32
+  store u32 %base, ptr<u32> %base.addr
+  %76 = load u32, ptr<u32> %base.addr
+  %77 = icmp slt u32 %76, 2
+  %78 = load u32, ptr<u32> %base.addr
+  %79 = icmp sgt u32 %78, 36
+  %80 = or i1 %77, %79
+  br i1 %80, label %if.then.89_4, label %if.next.89_4
+if.end.89_4:
+  %81 = getelementptr inbounds [37 x i8], ptr<[37 x i8]> %.str.7, i32 0, i32 0
+  %digits.addr = alloca ptr<[37 x i8]>
+  store ptr<[37 x i8]> %81, ptr<ptr<[37 x i8]>> %digits.addr
+  %pos.addr = alloca u64
+  store i64 0, ptr<u64> %pos.addr
+  %82 = alloca u8, ptr<i64> %io_NUM_BUFFER_SIZE
+  %temp.addr = alloca ptr<u8>
+  store ptr<u8> %82, ptr<ptr<u8>> %temp.addr
+  %temp_pos.addr = alloca u64
+  store i64 0, ptr<u64> %temp_pos.addr
+  %83 = load u64, ptr<u64> %value.addr
+  %84 = icmp eq u64 %83, 0
+  br i1 %84, label %if.then.100_4, label %if.next.100_4
+if.then.89_4:
+  ret i64 0
+if.next.89_4:
+  br label %if.end.89_4
+if.end.100_4:
+  br label %loop.cond.114_4
+if.then.100_4:
+  %85 = load ptr<u8>, ptr<ptr<u8>> %temp.addr
+  %86 = load u64, ptr<u64> %temp_pos.addr
+  %87 = getelementptr inbounds u8, ptr<u8> %85, u64 %86
+  store i64 0, ptr<u8> %87
+  %88 = load u64, ptr<u64> %temp_pos.addr
+  %89 = add u64 %88, 1
+  store u64 %89, ptr<u64> %temp_pos.addr
+  br label %if.end.100_4
+if.next.100_4:
+  %90 = load u64, ptr<u64> %value.addr
+  %n.addr = alloca u64
+  store u64 %90, ptr<u64> %n.addr
+  %91 = load u32, ptr<u32> %base.addr
+  %92 = sext u32 %91 to u64
+  %base_u64.addr = alloca u64
+  store u64 %92, ptr<u64> %base_u64.addr
+  br label %loop.cond.106_8
+loop.cond.106_8:
+  %93 = load u64, ptr<u64> %n.addr
+  %94 = icmp sgt u64 %93, 0
+  br i1 %94, label %loop.body.106_8, label %loop.end.106_8
+loop.body.106_8:
+  %95 = load ptr<u8>, ptr<ptr<u8>> %temp.addr
+  %96 = load u64, ptr<u64> %temp_pos.addr
+  %97 = getelementptr inbounds u8, ptr<u8> %95, u64 %96
+  %98 = load ptr<[37 x i8]>, ptr<ptr<[37 x i8]>> %digits.addr
+  %99 = load u64, ptr<u64> %n.addr
+  %100 = load u64, ptr<u64> %base_u64.addr
+  %101 = srem u64 %99, %100
+  %102 = getelementptr inbounds [37 x i8], ptr<[37 x i8]> %98, u64 %101
+  %103 = load [37 x i8], ptr<[37 x i8]> %102
+  store [37 x i8] %103, ptr<u8> %97
+  %104 = load u64, ptr<u64> %temp_pos.addr
+  %105 = add u64 %104, 1
+  store u64 %105, ptr<u64> %temp_pos.addr
+  %106 = load u64, ptr<u64> %base_u64.addr
+  %107 = load u64, ptr<u64> %n.addr
+  %108 = udiv u64 %107, %106
+  store u64 %108, ptr<u64> %n.addr
+  br label %loop.cond.106_8
+loop.post.106_8:
+  br label %loop.cond.106_8
+loop.end.106_8:
+  br label %if.end.100_4
+loop.cond.114_4:
+  %109 = load u64, ptr<u64> %temp_pos.addr
+  %110 = icmp sgt u64 %109, 0
+  br i1 %110, label %loop.body.114_4, label %loop.end.114_4
+loop.body.114_4:
+  %111 = load u64, ptr<u64> %temp_pos.addr
+  %112 = sub u64 %111, 1
+  store u64 %112, ptr<u64> %temp_pos.addr
+  %113 = load ptr<u8>, ptr<ptr<u8>> %buffer.addr
+  %114 = load u64, ptr<u64> %pos.addr
+  %115 = getelementptr inbounds u8, ptr<u8> %113, u64 %114
+  %116 = load ptr<u8>, ptr<ptr<u8>> %temp.addr
+  %117 = load u64, ptr<u64> %temp_pos.addr
+  %118 = getelementptr inbounds u8, ptr<u8> %116, u64 %117
+  %119 = load u8, ptr<u8> %118
+  store u8 %119, ptr<u8> %115
+  %120 = load u64, ptr<u64> %pos.addr
+  %121 = add u64 %120, 1
+  store u64 %121, ptr<u64> %pos.addr
+  br label %loop.cond.114_4
+loop.post.114_4:
+  br label %loop.cond.114_4
+loop.end.114_4:
+  %122 = load u64, ptr<u64> %pos.addr
+  ret u64 %122
+}
+
+define external u64 @io_ptr_to_string(ptr<void> %ptr, ptr<u8> %buffer) {
+entry:
+  %ptr.addr = alloca ptr<void>
+  store ptr<void> %ptr, ptr<ptr<void>> %ptr.addr
+  %buffer.addr = alloca ptr<u8>
+  store ptr<u8> %buffer, ptr<ptr<u8>> %buffer.addr
+  %123 = load ptr<void>, ptr<ptr<void>> %ptr.addr
+  %addr.addr = alloca ptr<void>
+  store ptr<void> %123, ptr<ptr<void>> %addr.addr
+  %124 = load ptr<u8>, ptr<ptr<u8>> %buffer.addr
+  %125 = getelementptr inbounds u8, ptr<u8> %124, i64 0
+  store i64 0, ptr<u8> %125
+  %126 = load ptr<u8>, ptr<ptr<u8>> %buffer.addr
+  %127 = getelementptr inbounds u8, ptr<u8> %126, i64 1
+  store i64 0, ptr<u8> %127
+  %pos.addr = alloca u64
+  store i64 2, ptr<u64> %pos.addr
+  %128 = load ptr<void>, ptr<ptr<void>> %addr.addr
+  %129 = load ptr<u8>, ptr<ptr<u8>> %buffer.addr
+  %130 = load u64, ptr<u64> %pos.addr
+  %131 = add ptr<u8> %129, %130
+  %132 = call u64 @io_uint_to_string(ptr<void> %128, ptr<u8> %131, i64 16)
+  %len.addr = alloca u64
+  store u64 %132, ptr<u64> %len.addr
+  %133 = load u64, ptr<u64> %pos.addr
+  %134 = load u64, ptr<u64> %len.addr
+  %135 = add u64 %133, %134
+  ret u64 %135
+}
+
+define external i32 @io_printf(ptr<i8> %fmt, ...) {
+entry:
+  %fmt.addr = alloca ptr<i8>
+  store ptr<i8> %fmt, ptr<ptr<i8>> %fmt.addr
+  %va_list = alloca ptr<i8>
+  va_start ptr<ptr<i8>> %va_list
+  %args.addr = alloca ptr<ptr<i8>>
+  store ptr<ptr<i8>> %va_list, ptr<ptr<ptr<i8>>> %args.addr
+  %136 = load ptr<i8>, ptr<ptr<i8>> %fmt.addr
+  %fmt_ptr.addr = alloca ptr<i8>
+  store ptr<i8> %136, ptr<ptr<i8>> %fmt_ptr.addr
+  %137 = load ptr<i8>, ptr<ptr<i8>> %fmt_ptr.addr
+  %138 = strlen ptr<i8> %137
+  %fmt_len.addr = alloca u64
+  store u64 %138, ptr<u64> %fmt_len.addr
+  %i.addr = alloca u64
+  store i64 0, ptr<u64> %i.addr
+  %written.addr = alloca i64
+  store i64 0, ptr<i64> %written.addr
+  %139 = alloca u8, ptr<i64> %io_NUM_BUFFER_SIZE
+  %num_buffer.addr = alloca ptr<u8>
+  store ptr<u8> %139, ptr<ptr<u8>> %num_buffer.addr
+  br label %loop.cond.150_4
+loop.cond.150_4:
+  %140 = load u64, ptr<u64> %i.addr
+  %141 = load u64, ptr<u64> %fmt_len.addr
+  %142 = icmp slt u64 %140, %141
+  br i1 %142, label %loop.body.150_4, label %loop.end.150_4
+loop.body.150_4:
+  %143 = load ptr<i8>, ptr<ptr<i8>> %fmt_ptr.addr
+  %144 = load u64, ptr<u64> %i.addr
+  %145 = getelementptr inbounds i8, ptr<i8> %143, u64 %144
+  %146 = load i8, ptr<i8> %145
+  %147 = icmp eq i8 %146, 0
+  %148 = load u64, ptr<u64> %i.addr
+  %149 = add u64 %148, 1
+  %150 = load u64, ptr<u64> %fmt_len.addr
+  %151 = icmp slt u64 %149, %150
+  %152 = and i1 %147, %151
+  br i1 %152, label %if.then.151_8, label %if.next.151_8
+loop.post.150_4:
+  br label %loop.cond.150_4
+loop.end.150_4:
+  %279 = load ptr<ptr<i8>>, ptr<ptr<ptr<i8>>> %args.addr
+  %280 = load i64, ptr<i64> %written.addr
+  %281 = trunc i64 %280 to i32
+  ret i32 %281
+if.end.151_8:
+  br label %loop.cond.150_4
+if.then.151_8:
+  %153 = load u64, ptr<u64> %i.addr
+  %154 = add u64 %153, 1
+  store u64 %154, ptr<u64> %i.addr
+  %155 = load ptr<i8>, ptr<ptr<i8>> %fmt_ptr.addr
+  %156 = load u64, ptr<u64> %i.addr
+  %157 = getelementptr inbounds i8, ptr<i8> %155, u64 %156
+  %158 = load i8, ptr<i8> %157
+  %specifier.addr = alloca i8
+  store i8 %158, ptr<i8> %specifier.addr
+  %159 = load i8, ptr<i8> %specifier.addr
+  %160 = icmp eq i8 %159, 0
+  br i1 %160, label %if.then.155_12, label %if.next.155_12
+if.next.151_8:
+  %270 = load ptr<i8>, ptr<ptr<i8>> %fmt_ptr.addr
+  %271 = load u64, ptr<u64> %i.addr
+  %272 = getelementptr inbounds i8, ptr<i8> %270, u64 %271
+  %273 = load i8, ptr<i8> %272
+  %274 = call i64 @io_write_byte(ptr<i64> %io_STDOUT, i8 %273)
+  %275 = load i64, ptr<i64> %written.addr
+  %276 = add i64 %275, 1
+  store i64 %276, ptr<i64> %written.addr
+  %277 = load u64, ptr<u64> %i.addr
+  %278 = add u64 %277, 1
+  store u64 %278, ptr<u64> %i.addr
+  br label %if.end.151_8
+if.end.155_12:
+  %268 = load u64, ptr<u64> %i.addr
+  %269 = add u64 %268, 1
+  store u64 %269, ptr<u64> %i.addr
+  br label %if.end.151_8
+if.then.155_12:
+  %161 = load ptr<ptr<i8>>, ptr<ptr<ptr<i8>>> %args.addr
+  %162 = va_arg ptr<ptr<i8>> %161, i32
+  %val.addr = alloca i32
+  store i32 %162, ptr<i32> %val.addr
+  %163 = load i32, ptr<i32> %val.addr
+  %164 = sext i32 %163 to i64
+  %165 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %166 = call u64 @io_int_to_string(i64 %164, ptr<u8> %165, i64 10)
+  %len.addr = alloca u64
+  store u64 %166, ptr<u64> %len.addr
+  %167 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %168 = load u64, ptr<u64> %len.addr
+  %169 = call i64 @io_write(ptr<i64> %io_STDOUT, ptr<u8> %167, u64 %168)
+  %170 = load u64, ptr<u64> %len.addr
+  %171 = load i64, ptr<i64> %written.addr
+  %172 = add i64 %171, %170
+  store i64 %172, ptr<i64> %written.addr
+  br label %if.end.155_12
+if.next.155_12:
+  %173 = load i8, ptr<i8> %specifier.addr
+  %174 = icmp eq i8 %173, 0
+  br i1 %174, label %elseif.then.155_12.1, label %elseif.next.155_12.1
+elseif.then.155_12.1:
+  %175 = load ptr<ptr<i8>>, ptr<ptr<ptr<i8>>> %args.addr
+  %176 = va_arg ptr<ptr<i8>> %175, i32
+  %val.addr = alloca i32
+  store i32 %176, ptr<i32> %val.addr
+  %177 = load i32, ptr<i32> %val.addr
+  %178 = sext i32 %177 to i64
+  %179 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %180 = call u64 @io_int_to_string(i64 %178, ptr<u8> %179, i64 10)
+  %len.addr = alloca u64
+  store u64 %180, ptr<u64> %len.addr
+  %181 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %182 = load u64, ptr<u64> %len.addr
+  %183 = call i64 @io_write(ptr<i64> %io_STDOUT, ptr<u8> %181, u64 %182)
+  %184 = load u64, ptr<u64> %len.addr
+  %185 = load i64, ptr<i64> %written.addr
+  %186 = add i64 %185, %184
+  store i64 %186, ptr<i64> %written.addr
+  br label %if.end.155_12
+elseif.next.155_12.1:
+  %187 = load i8, ptr<i8> %specifier.addr
+  %188 = icmp eq i8 %187, 0
+  br i1 %188, label %elseif.then.155_12.2, label %elseif.next.155_12.2
+elseif.then.155_12.2:
+  %189 = load ptr<ptr<i8>>, ptr<ptr<ptr<i8>>> %args.addr
+  %190 = va_arg ptr<ptr<i8>> %189, u32
+  %val.addr = alloca u32
+  store u32 %190, ptr<u32> %val.addr
+  %191 = load u32, ptr<u32> %val.addr
+  %192 = sext u32 %191 to u64
+  %193 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %194 = call u64 @io_uint_to_string(u64 %192, ptr<u8> %193, i64 10)
+  %len.addr = alloca u64
+  store u64 %194, ptr<u64> %len.addr
+  %195 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %196 = load u64, ptr<u64> %len.addr
+  %197 = call i64 @io_write(ptr<i64> %io_STDOUT, ptr<u8> %195, u64 %196)
+  %198 = load u64, ptr<u64> %len.addr
+  %199 = load i64, ptr<i64> %written.addr
+  %200 = add i64 %199, %198
+  store i64 %200, ptr<i64> %written.addr
+  br label %if.end.155_12
+elseif.next.155_12.2:
+  %201 = load i8, ptr<i8> %specifier.addr
+  %202 = icmp eq i8 %201, 0
+  br i1 %202, label %elseif.then.155_12.3, label %elseif.next.155_12.3
+elseif.then.155_12.3:
+  %203 = load ptr<ptr<i8>>, ptr<ptr<ptr<i8>>> %args.addr
+  %204 = va_arg ptr<ptr<i8>> %203, u32
+  %val.addr = alloca u32
+  store u32 %204, ptr<u32> %val.addr
+  %205 = load u32, ptr<u32> %val.addr
+  %206 = sext u32 %205 to u64
+  %207 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %208 = call u64 @io_uint_to_string(u64 %206, ptr<u8> %207, i64 16)
+  %len.addr = alloca u64
+  store u64 %208, ptr<u64> %len.addr
+  %209 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %210 = load u64, ptr<u64> %len.addr
+  %211 = call i64 @io_write(ptr<i64> %io_STDOUT, ptr<u8> %209, u64 %210)
+  %212 = load u64, ptr<u64> %len.addr
+  %213 = load i64, ptr<i64> %written.addr
+  %214 = add i64 %213, %212
+  store i64 %214, ptr<i64> %written.addr
+  br label %if.end.155_12
+elseif.next.155_12.3:
+  %215 = load i8, ptr<i8> %specifier.addr
+  %216 = icmp eq i8 %215, 0
+  br i1 %216, label %elseif.then.155_12.4, label %elseif.next.155_12.4
+elseif.then.155_12.4:
+  %217 = load ptr<ptr<i8>>, ptr<ptr<ptr<i8>>> %args.addr
+  %218 = va_arg ptr<ptr<i8>> %217, u32
+  %val.addr = alloca u32
+  store u32 %218, ptr<u32> %val.addr
+  %219 = load u32, ptr<u32> %val.addr
+  %220 = sext u32 %219 to u64
+  %221 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %222 = call u64 @io_uint_to_string(u64 %220, ptr<u8> %221, i64 16)
+  %len.addr = alloca u64
+  store u64 %222, ptr<u64> %len.addr
+  %223 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %224 = load u64, ptr<u64> %len.addr
+  %225 = call i64 @io_write(ptr<i64> %io_STDOUT, ptr<u8> %223, u64 %224)
+  %226 = load u64, ptr<u64> %len.addr
+  %227 = load i64, ptr<i64> %written.addr
+  %228 = add i64 %227, %226
+  store i64 %228, ptr<i64> %written.addr
+  br label %if.end.155_12
+elseif.next.155_12.4:
+  %229 = load i8, ptr<i8> %specifier.addr
+  %230 = icmp eq i8 %229, 0
+  br i1 %230, label %elseif.then.155_12.5, label %elseif.next.155_12.5
+elseif.then.155_12.5:
+  %231 = load ptr<ptr<i8>>, ptr<ptr<ptr<i8>>> %args.addr
+  %232 = va_arg ptr<ptr<i8>> %231, ptr<void>
+  %val.addr = alloca ptr<void>
+  store ptr<void> %232, ptr<ptr<void>> %val.addr
+  %233 = load ptr<void>, ptr<ptr<void>> %val.addr
+  %234 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %235 = call u64 @io_ptr_to_string(ptr<void> %233, ptr<u8> %234)
+  %len.addr = alloca u64
+  store u64 %235, ptr<u64> %len.addr
+  %236 = load ptr<u8>, ptr<ptr<u8>> %num_buffer.addr
+  %237 = load u64, ptr<u64> %len.addr
+  %238 = call i64 @io_write(ptr<i64> %io_STDOUT, ptr<u8> %236, u64 %237)
+  %239 = load u64, ptr<u64> %len.addr
+  %240 = load i64, ptr<i64> %written.addr
+  %241 = add i64 %240, %239
+  store i64 %241, ptr<i64> %written.addr
+  br label %if.end.155_12
+elseif.next.155_12.5:
+  %242 = load i8, ptr<i8> %specifier.addr
+  %243 = icmp eq i8 %242, 0
+  br i1 %243, label %elseif.then.155_12.6, label %elseif.next.155_12.6
+elseif.then.155_12.6:
+  %244 = load ptr<ptr<i8>>, ptr<ptr<ptr<i8>>> %args.addr
+  %245 = va_arg ptr<ptr<i8>> %244, ptr<u8>
+  %val.addr = alloca ptr<u8>
+  store ptr<u8> %245, ptr<ptr<u8>> %val.addr
+  %246 = load ptr<u8>, ptr<ptr<u8>> %val.addr
+  %247 = strlen ptr<u8> %246
+  %len.addr = alloca u64
+  store u64 %247, ptr<u64> %len.addr
+  %248 = load ptr<u8>, ptr<ptr<u8>> %val.addr
+  %249 = load u64, ptr<u64> %len.addr
+  %250 = call i64 @io_write(ptr<i64> %io_STDOUT, ptr<u8> %248, u64 %249)
+  %251 = load u64, ptr<u64> %len.addr
+  %252 = load i64, ptr<i64> %written.addr
+  %253 = add i64 %252, %251
+  store i64 %253, ptr<i64> %written.addr
+  br label %if.end.155_12
+elseif.next.155_12.6:
+  %254 = load i8, ptr<i8> %specifier.addr
+  %255 = icmp eq i8 %254, 0
+  br i1 %255, label %elseif.then.155_12.7, label %elseif.next.155_12.7
+elseif.then.155_12.7:
+  %256 = load ptr<ptr<i8>>, ptr<ptr<ptr<i8>>> %args.addr
+  %257 = va_arg ptr<ptr<i8>> %256, i32
+  %val.addr = alloca i32
+  store i32 %257, ptr<i32> %val.addr
+  %258 = load i32, ptr<i32> %val.addr
+  %259 = trunc i32 %258 to u8
+  %260 = call i64 @io_write_byte(ptr<i64> %io_STDOUT, u8 %259)
+  %261 = load i64, ptr<i64> %written.addr
+  %262 = add i64 %261, 1
+  store i64 %262, ptr<i64> %written.addr
+  br label %if.end.155_12
+elseif.next.155_12.7:
+  %263 = load i8, ptr<i8> %specifier.addr
+  %264 = icmp eq i8 %263, 0
+  br i1 %264, label %elseif.then.155_12.8, label %elseif.next.155_12.8
+elseif.then.155_12.8:
+  %265 = call i64 @io_write_byte(ptr<i64> %io_STDOUT, i64 0)
+  %266 = load i64, ptr<i64> %written.addr
+  %267 = add i64 %266, 1
+  store i64 %267, ptr<i64> %written.addr
+  br label %if.end.155_12
+elseif.next.155_12.8:
+  br label %if.end.155_12
+}
+
+define external void @io_print(ptr<i8> %s) {
+entry:
+  %s.addr = alloca ptr<i8>
+  store ptr<i8> %s, ptr<ptr<i8>> %s.addr
+  %282 = load ptr<i8>, ptr<ptr<i8>> %s.addr
+  %283 = call i64 @io_write_string(ptr<i64> %io_STDOUT, ptr<i8> %282)
+  ret void
+}
+
+define external void @io_println(ptr<i8> %s) {
+entry:
+  %s.addr = alloca ptr<i8>
+  store ptr<i8> %s, ptr<ptr<i8>> %s.addr
+  %284 = load ptr<i8>, ptr<ptr<i8>> %s.addr
+  %285 = call i64 @io_write_string(ptr<i64> %io_STDOUT, ptr<i8> %284)
+  %286 = call i64 @io_write_byte(ptr<i64> %io_STDOUT, i64 0)
+  ret void
+}
+
+define external void @io_eprint(ptr<i8> %s) {
+entry:
+  %s.addr = alloca ptr<i8>
+  store ptr<i8> %s, ptr<ptr<i8>> %s.addr
+  %287 = load ptr<i8>, ptr<ptr<i8>> %s.addr
+  %288 = call i64 @io_write_string(ptr<i64> %io_STDERR, ptr<i8> %287)
+  ret void
+}
+
+define external void @io_eprintln(ptr<i8> %s) {
+entry:
+  %s.addr = alloca ptr<i8>
+  store ptr<i8> %s, ptr<ptr<i8>> %s.addr
+  %289 = load ptr<i8>, ptr<ptr<i8>> %s.addr
+  %290 = call i64 @io_write_string(ptr<i64> %io_STDERR, ptr<i8> %289)
+  %291 = call i64 @io_write_byte(ptr<i64> %io_STDERR, i64 0)
+  ret void
+}
+
+define external i64 @io_read(i32 %fd, ptr<u8> %buffer, u64 %count) {
+entry:
+  %fd.addr = alloca i32
+  store i32 %fd, ptr<i32> %fd.addr
+  %buffer.addr = alloca ptr<u8>
+  store ptr<u8> %buffer, ptr<ptr<u8>> %buffer.addr
+  %count.addr = alloca u64
+  store u64 %count, ptr<u64> %count.addr
+  %292 = load i32, ptr<i32> %fd.addr
+  %293 = sext i32 %292 to i64
+  %294 = load ptr<u8>, ptr<ptr<u8>> %buffer.addr
+  %295 = load u64, ptr<u64> %count.addr
+  %296 = syscall ptr<i64> %io_SYS_READ, i64 %293, ptr<u8> %294, u64 %295
+  ret i64 %296
+}
+
+define external i64 @io_read_line(ptr<u8> %buffer, u64 %max_len) {
+entry:
+  %buffer.addr = alloca ptr<u8>
+  store ptr<u8> %buffer, ptr<ptr<u8>> %buffer.addr
+  %max_len.addr = alloca u64
+  store u64 %max_len, ptr<u64> %max_len.addr
+  %total_read.addr = alloca i64
+  store i64 0, ptr<i64> %total_read.addr
+  br label %loop.cond.254_4
+loop.cond.254_4:
+  %297 = load i64, ptr<i64> %total_read.addr
+  %298 = load u64, ptr<u64> %max_len.addr
+  %299 = sub u64 %298, 1
+  %300 = icmp slt i64 %297, %299
+  br i1 %300, label %loop.body.254_4, label %loop.end.254_4
+loop.body.254_4:
+  %301 = alloca u8, i64 1
+  %byte_buf.addr = alloca ptr<u8>
+  store ptr<u8> %301, ptr<ptr<u8>> %byte_buf.addr
+  %302 = load ptr<u8>, ptr<ptr<u8>> %byte_buf.addr
+  %303 = call i64 @io_read(ptr<i64> %io_STDIN, ptr<u8> %302, i64 1)
+  %n.addr = alloca i64
+  store i64 %303, ptr<i64> %n.addr
+  %304 = load i64, ptr<i64> %n.addr
+  %305 = icmp sle i64 %304, 0
+  br i1 %305, label %if.then.258_8, label %if.next.258_8
+loop.post.254_4:
+  br label %loop.cond.254_4
+loop.end.254_4:
+  %318 = load ptr<u8>, ptr<ptr<u8>> %buffer.addr
+  %319 = load i64, ptr<i64> %total_read.addr
+  %320 = getelementptr inbounds u8, ptr<u8> %318, i64 %319
+  store i64 0, ptr<u8> %320
+  %321 = load i64, ptr<i64> %total_read.addr
+  ret i64 %321
+if.end.258_8:
+  %306 = load ptr<u8>, ptr<ptr<u8>> %byte_buf.addr
+  %307 = getelementptr inbounds u8, ptr<u8> %306, i64 0
+  %308 = load u8, ptr<u8> %307
+  %309 = icmp eq u8 %308, 0
+  br i1 %309, label %if.then.262_8, label %if.next.262_8
+if.then.258_8:
+  br label %loop.end.254_4
+if.next.258_8:
+  br label %if.end.258_8
+if.end.262_8:
+  %310 = load ptr<u8>, ptr<ptr<u8>> %buffer.addr
+  %311 = load i64, ptr<i64> %total_read.addr
+  %312 = getelementptr inbounds u8, ptr<u8> %310, i64 %311
+  %313 = load ptr<u8>, ptr<ptr<u8>> %byte_buf.addr
+  %314 = getelementptr inbounds u8, ptr<u8> %313, i64 0
+  %315 = load u8, ptr<u8> %314
+  store u8 %315, ptr<u8> %312
+  %316 = load i64, ptr<i64> %total_read.addr
+  %317 = add i64 %316, 1
+  store i64 %317, ptr<i64> %total_read.addr
+  br label %loop.cond.254_4
+if.then.262_8:
+  br label %loop.end.254_4
+if.next.262_8:
+  br label %if.end.262_8
+}
+
+define external u16 @net_htons(u16 %v) {
+entry:
+  %v.addr = alloca u16
+  store u16 %v, ptr<u16> %v.addr
+  %322 = load u16, ptr<u16> %v.addr
+  %323 = lshr u16 %322, 8
+  %324 = and u16 %323, 255
+  %high.addr = alloca u16
+  store u16 %324, ptr<u16> %high.addr
+  %325 = load u16, ptr<u16> %v.addr
+  %326 = and u16 %325, 255
+  %low.addr = alloca u16
+  store u16 %326, ptr<u16> %low.addr
+  %327 = load u16, ptr<u16> %low.addr
+  %328 = shl u16 %327, 8
+  %329 = load u16, ptr<u16> %high.addr
+  %330 = or u16 %328, %329
+  ret u16 %330
+}
+
+define external u32 @net_inet_addr(ptr<i8> %ip) {
+entry:
+  %ip.addr = alloca ptr<i8>
+  store ptr<i8> %ip, ptr<ptr<i8>> %ip.addr
+  %331 = trunc i64 0 to u32
+  %result.addr = alloca u32
+  store u32 %331, ptr<u32> %result.addr
+  %332 = load ptr<i8>, ptr<ptr<i8>> %ip.addr
+  %ip_ptr.addr = alloca ptr<i8>
+  store ptr<i8> %332, ptr<ptr<i8>> %ip_ptr.addr
+  %333 = load ptr<i8>, ptr<ptr<i8>> %ip_ptr.addr
+  %334 = strlen ptr<i8> %333
+  %len.addr = alloca u64
+  store u64 %334, ptr<u64> %len.addr
+  %335 = trunc i64 0 to u32
+  %current_octet.addr = alloca u32
+  store u32 %335, ptr<u32> %current_octet.addr
+  %336 = trunc i64 0 to i32
+  %shift.addr = alloca i32
+  store i32 %336, ptr<i32> %shift.addr
+  %i.addr = alloca u64
+  store i64 0, ptr<u64> %i.addr
+  br label %loop.cond.40_4
+loop.cond.40_4:
+  %337 = load u64, ptr<u64> %i.addr
+  %338 = load u64, ptr<u64> %len.addr
+  %339 = icmp slt u64 %337, %338
+  br i1 %339, label %loop.body.40_4, label %loop.end.40_4
+loop.body.40_4:
+  %340 = load ptr<i8>, ptr<ptr<i8>> %ip_ptr.addr
+  %341 = load u64, ptr<u64> %i.addr
+  %342 = getelementptr inbounds i8, ptr<i8> %340, u64 %341
+  %343 = load i8, ptr<i8> %342
+  %c.addr = alloca i8
+  store i8 %343, ptr<i8> %c.addr
+  %344 = load i8, ptr<i8> %c.addr
+  %345 = icmp eq i8 %344, 0
+  br i1 %345, label %if.then.42_8, label %if.next.42_8
+loop.post.40_4:
+  br label %loop.cond.40_4
+loop.end.40_4:
+  %362 = load u32, ptr<u32> %result.addr
+  %363 = load u32, ptr<u32> %current_octet.addr
+  %364 = load i32, ptr<i32> %shift.addr
+  %365 = shl u32 %363, %364
+  %366 = or u32 %362, %365
+  store u32 %366, ptr<u32> %result.addr
+  %367 = load u32, ptr<u32> %result.addr
+  ret u32 %367
+if.end.42_8:
+  %360 = load u64, ptr<u64> %i.addr
+  %361 = add u64 %360, 1
+  store u64 %361, ptr<u64> %i.addr
+  br label %loop.cond.40_4
+if.then.42_8:
+  %346 = load u32, ptr<u32> %result.addr
+  %347 = load u32, ptr<u32> %current_octet.addr
+  %348 = load i32, ptr<i32> %shift.addr
+  %349 = shl u32 %347, %348
+  %350 = or u32 %346, %349
+  store u32 %350, ptr<u32> %result.addr
+  %351 = load i32, ptr<i32> %shift.addr
+  %352 = add i32 %351, 8
+  store i32 %352, ptr<i32> %shift.addr
+  store i64 0, ptr<u32> %current_octet.addr
+  br label %if.end.42_8
+if.next.42_8:
+  %353 = load i8, ptr<i8> %c.addr
+  %354 = sext i8 %353 to u32
+  %355 = sub u32 %354, 48
+  %digit.addr = alloca u32
+  store u32 %355, ptr<u32> %digit.addr
+  %356 = load u32, ptr<u32> %current_octet.addr
+  %357 = mul u32 %356, 10
+  %358 = load u32, ptr<u32> %digit.addr
+  %359 = add u32 %357, %358
+  store u32 %359, ptr<u32> %current_octet.addr
+  br label %if.end.42_8
+}
+
+define external i1 @net_Socket_open(ptr<%net_Socket> %s) {
+entry:
+  %s.addr = alloca ptr<%net_Socket>
+  store ptr<%net_Socket> %s, ptr<ptr<%net_Socket>> %s.addr
+  %368 = syscall ptr<i64> %net_SYS_SOCKET, ptr<i64> %net_AF_INET, ptr<i64> %net_SOCK_STREAM, ptr<i64> %net_IPPROTO_TCP
+  %369 = trunc i64 %368 to i32
+  %fd.addr = alloca i32
+  store i32 %369, ptr<i32> %fd.addr
+  %370 = load i32, ptr<i32> %fd.addr
+  %371 = icmp slt i32 %370, 0
+  br i1 %371, label %if.then.71_8, label %if.next.71_8
+if.end.71_8:
+  %372 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %373 = getelementptr %net_Socket, ptr<%net_Socket> %372, i32 0, i32 0
+  %374 = load i32, ptr<i32> %fd.addr
+  store i32 %374, ptr<%net_Socket> %373
+  %375 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %376 = getelementptr %net_Socket, ptr<%net_Socket> %375, i32 0, i32 1
+  store i1 0, ptr<%net_Socket> %376
+  ret i1 1
+if.then.71_8:
+  ret i1 0
+if.next.71_8:
+  br label %if.end.71_8
+}
+
+define external i1 @net_Socket_connect(ptr<%net_Socket> %s, ptr<i8> %ip, u16 %port) {
+entry:
+  %s.addr = alloca ptr<%net_Socket>
+  store ptr<%net_Socket> %s, ptr<ptr<%net_Socket>> %s.addr
+  %ip.addr = alloca ptr<i8>
+  store ptr<i8> %ip, ptr<ptr<i8>> %ip.addr
+  %port.addr = alloca u16
+  store u16 %port, ptr<u16> %port.addr
+  %377 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %378 = getelementptr %net_Socket, ptr<%net_Socket> %377, i32 0, i32 0
+  %379 = load i32, ptr<%net_Socket> %378
+  %380 = icmp slt i32 %379, 0
+  br i1 %380, label %if.then.80_8, label %if.next.80_8
+if.end.80_8:
+  %381 = alloca u8, i64 16
+  %addr_struct.addr = alloca ptr<u8>
+  store ptr<u8> %381, ptr<ptr<u8>> %addr_struct.addr
+  %382 = load ptr<u8>, ptr<ptr<u8>> %addr_struct.addr
+  memset ptr<u8> %382, i64 0, i64 16
+  %383 = load ptr<u8>, ptr<ptr<u8>> %addr_struct.addr
+  %family_ptr.addr = alloca ptr<u8>
+  store ptr<u8> %383, ptr<ptr<u8>> %family_ptr.addr
+  %384 = load ptr<u8>, ptr<ptr<u8>> %family_ptr.addr
+  store ptr<i64> %net_AF_INET, ptr<u8> %384
+  %385 = load u16, ptr<u16> %port.addr
+  %386 = call u16 @net_htons(u16 %385)
+  %port_net.addr = alloca u16
+  store u16 %386, ptr<u16> %port_net.addr
+  %387 = load ptr<u8>, ptr<ptr<u8>> %addr_struct.addr
+  %388 = add ptr<u8> %387, 2
+  %port_ptr.addr = alloca ptr<u8>
+  store ptr<u8> %388, ptr<ptr<u8>> %port_ptr.addr
+  %389 = load ptr<u8>, ptr<ptr<u8>> %port_ptr.addr
+  %390 = load u16, ptr<u16> %port_net.addr
+  store u16 %390, ptr<u8> %389
+  %391 = load ptr<i8>, ptr<ptr<i8>> %ip.addr
+  %392 = call u32 @net_inet_addr(ptr<i8> %391)
+  %ip_net.addr = alloca u32
+  store u32 %392, ptr<u32> %ip_net.addr
+  %393 = load ptr<u8>, ptr<ptr<u8>> %addr_struct.addr
+  %394 = add ptr<u8> %393, 4
+  %ip_ptr.addr = alloca ptr<u8>
+  store ptr<u8> %394, ptr<ptr<u8>> %ip_ptr.addr
+  %395 = load ptr<u8>, ptr<ptr<u8>> %ip_ptr.addr
+  %396 = load u32, ptr<u32> %ip_net.addr
+  store u32 %396, ptr<u8> %395
+  %397 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %398 = getelementptr %net_Socket, ptr<%net_Socket> %397, i32 0, i32 0
+  %399 = load i32, ptr<%net_Socket> %398
+  %400 = sext i32 %399 to i64
+  %401 = load ptr<u8>, ptr<ptr<u8>> %addr_struct.addr
+  %402 = syscall ptr<i64> %net_SYS_CONNECT, i64 %400, ptr<u8> %401, i64 16
+  %403 = trunc i64 %402 to i32
+  %res.addr = alloca i32
+  store i32 %403, ptr<i32> %res.addr
+  %404 = load i32, ptr<i32> %res.addr
+  %405 = icmp slt i32 %404, 0
+  br i1 %405, label %if.then.113_8, label %if.next.113_8
+if.then.80_8:
+  ret i1 0
+if.next.80_8:
+  br label %if.end.80_8
+if.end.113_8:
+  %406 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %407 = getelementptr %net_Socket, ptr<%net_Socket> %406, i32 0, i32 1
+  store i1 1, ptr<%net_Socket> %407
+  ret i1 1
+if.then.113_8:
+  ret i1 0
+if.next.113_8:
+  br label %if.end.113_8
+}
+
+define external i64 @net_Socket_write(ptr<%net_Socket> %s, ptr<i8> %data) {
+entry:
+  %s.addr = alloca ptr<%net_Socket>
+  store ptr<%net_Socket> %s, ptr<ptr<%net_Socket>> %s.addr
+  %data.addr = alloca ptr<i8>
+  store ptr<i8> %data, ptr<ptr<i8>> %data.addr
+  %408 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %409 = getelementptr %net_Socket, ptr<%net_Socket> %408, i32 0, i32 1
+  %410 = load i1, ptr<%net_Socket> %409
+  %411 = xor i1 %410, 1
+  br i1 %411, label %if.then.122_8, label %if.next.122_8
+if.end.122_8:
+  %413 = load ptr<i8>, ptr<ptr<i8>> %data.addr
+  %ptr.addr = alloca ptr<i8>
+  store ptr<i8> %413, ptr<ptr<i8>> %ptr.addr
+  %414 = load ptr<i8>, ptr<ptr<i8>> %ptr.addr
+  %415 = strlen ptr<i8> %414
+  %len.addr = alloca u64
+  store u64 %415, ptr<u64> %len.addr
+  %416 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %417 = getelementptr %net_Socket, ptr<%net_Socket> %416, i32 0, i32 0
+  %418 = load i32, ptr<%net_Socket> %417
+  %419 = sext i32 %418 to i64
+  %420 = load ptr<i8>, ptr<ptr<i8>> %ptr.addr
+  %421 = load u64, ptr<u64> %len.addr
+  %422 = syscall ptr<i64> %net_SYS_WRITE, i64 %419, ptr<i8> %420, u64 %421
+  ret i64 %422
+if.then.122_8:
+  %412 = sub i64 0, 1
+  ret i64 %412
+if.next.122_8:
+  br label %if.end.122_8
+}
+
+define external i64 @net_Socket_read(ptr<%net_Socket> %s, ptr<u8> %buffer, u64 %max) {
+entry:
+  %s.addr = alloca ptr<%net_Socket>
+  store ptr<%net_Socket> %s, ptr<ptr<%net_Socket>> %s.addr
+  %buffer.addr = alloca ptr<u8>
+  store ptr<u8> %buffer, ptr<ptr<u8>> %buffer.addr
+  %max.addr = alloca u64
+  store u64 %max, ptr<u64> %max.addr
+  %423 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %424 = getelementptr %net_Socket, ptr<%net_Socket> %423, i32 0, i32 1
+  %425 = load i1, ptr<%net_Socket> %424
+  %426 = xor i1 %425, 1
+  br i1 %426, label %if.then.132_8, label %if.next.132_8
+if.end.132_8:
+  %428 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %429 = getelementptr %net_Socket, ptr<%net_Socket> %428, i32 0, i32 0
+  %430 = load i32, ptr<%net_Socket> %429
+  %431 = sext i32 %430 to i64
+  %432 = load ptr<u8>, ptr<ptr<u8>> %buffer.addr
+  %433 = load u64, ptr<u64> %max.addr
+  %434 = syscall ptr<i64> %net_SYS_READ, i64 %431, ptr<u8> %432, u64 %433
+  ret i64 %434
+if.then.132_8:
+  %427 = sub i64 0, 1
+  ret i64 %427
+if.next.132_8:
+  br label %if.end.132_8
+}
+
+define external void @net_Socket_close(ptr<%net_Socket> %s) {
+entry:
+  %s.addr = alloca ptr<%net_Socket>
+  store ptr<%net_Socket> %s, ptr<ptr<%net_Socket>> %s.addr
+  %435 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %436 = getelementptr %net_Socket, ptr<%net_Socket> %435, i32 0, i32 0
+  %437 = load i32, ptr<%net_Socket> %436
+  %438 = icmp sge i32 %437, 0
+  br i1 %438, label %if.then.137_8, label %if.next.137_8
+if.end.137_8:
+  ret void
+if.then.137_8:
+  %439 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %440 = getelementptr %net_Socket, ptr<%net_Socket> %439, i32 0, i32 0
+  %441 = load i32, ptr<%net_Socket> %440
+  %442 = sext i32 %441 to i64
+  %443 = syscall ptr<i64> %net_SYS_CLOSE, i64 %442
+  %444 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %445 = getelementptr %net_Socket, ptr<%net_Socket> %444, i32 0, i32 0
+  %446 = sub i64 0, 1
+  store i64 %446, ptr<%net_Socket> %445
+  %447 = load ptr<%net_Socket>, ptr<ptr<%net_Socket>> %s.addr
+  %448 = getelementptr %net_Socket, ptr<%net_Socket> %447, i32 0, i32 1
+  store i1 0, ptr<%net_Socket> %448
+  br label %if.end.137_8
+if.next.137_8:
+  br label %if.end.137_8
+}
+
+define external i32 @main() {
+entry:
+  %449 = getelementptr inbounds [35 x i8], ptr<[35 x i8]> %.str.16, i32 0, i32 0
+  call void @io_println(ptr<[35 x i8]> %449)
+  %net_Socket.instance = alloca %net_Socket
+  %450 = getelementptr %net_Socket, ptr<%net_Socket> %net_Socket.instance, i32 0, i32 0
+  store i32 0, ptr<%net_Socket> %450
+  %451 = getelementptr %net_Socket, ptr<%net_Socket> %net_Socket.instance, i32 0, i32 1
+  store i1 0, ptr<%net_Socket> %451
+  %452 = sub i64 0, 1
+  %453 = getelementptr %net_Socket, ptr<%net_Socket> %net_Socket.instance, i32 0, i32 0
+  store i64 %452, ptr<%net_Socket> %453
+  %454 = getelementptr %net_Socket, ptr<%net_Socket> %net_Socket.instance, i32 0, i32 1
+  store i1 0, ptr<%net_Socket> %454
+  %client.addr = alloca %net_Socket
+  store ptr<%net_Socket> %net_Socket.instance, ptr<%net_Socket> %client.addr
+  %455 = call i1 @net_Socket_open(ptr<%net_Socket> %client.addr)
+  %456 = xor i1 %455, 1
+  br i1 %456, label %if.then.13_4, label %if.next.13_4
+if.end.13_4:
+  %459 = getelementptr inbounds [20 x i8], ptr<[20 x i8]> %.str.18, i32 0, i32 0
+  call void @io_print(ptr<[20 x i8]> %459)
+  %460 = alloca u8, i64 32
+  %num_buf.addr = alloca ptr<u8>
+  store ptr<u8> %460, ptr<ptr<u8>> %num_buf.addr
+  %461 = getelementptr %net_Socket, ptr<%net_Socket> %client.addr, i32 0, i32 0
+  %462 = load i32, ptr<%net_Socket> %461
+  %463 = sext i32 %462 to i64
+  %464 = load ptr<u8>, ptr<ptr<u8>> %num_buf.addr
+  %465 = call u64 @io_int_to_string(i64 %463, ptr<u8> %464, i64 10)
+  %len.addr = alloca u64
+  store u64 %465, ptr<u64> %len.addr
+  %466 = load i64, ptr<i64> %io_STDOUT
+  %467 = load ptr<u8>, ptr<ptr<u8>> %num_buf.addr
+  %468 = load u64, ptr<u64> %len.addr
+  %469 = call i64 @io_write(i64 %466, ptr<u8> %467, u64 %468)
+  %470 = getelementptr inbounds [1 x i8], ptr<[1 x i8]> %.str.19, i32 0, i32 0
+  call void @io_println(ptr<[1 x i8]> %470)
+  %471 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> %.str.20, i32 0, i32 0
+  %ip.addr = alloca ptr<[10 x i8]>
+  store ptr<[10 x i8]> %471, ptr<ptr<[10 x i8]>> %ip.addr
+  %472 = trunc i64 8080 to u16
+  %port.addr = alloca u16
+  store u16 %472, ptr<u16> %port.addr
+  %473 = getelementptr inbounds [15 x i8], ptr<[15 x i8]> %.str.21, i32 0, i32 0
+  call void @io_print(ptr<[15 x i8]> %473)
+  %474 = load ptr<[10 x i8]>, ptr<ptr<[10 x i8]>> %ip.addr
+  call void @io_print(ptr<[10 x i8]> %474)
+  %475 = getelementptr inbounds [2 x i8], ptr<[2 x i8]> %.str.22, i32 0, i32 0
+  call void @io_print(ptr<[2 x i8]> %475)
+  %476 = load u16, ptr<u16> %port.addr
+  %477 = sext u16 %476 to u64
+  %478 = load ptr<u8>, ptr<ptr<u8>> %num_buf.addr
+  %479 = call u64 @io_uint_to_string(u64 %477, ptr<u8> %478, i64 10)
+  store u64 %479, ptr<u64> %len.addr
+  %480 = load i64, ptr<i64> %io_STDOUT
+  %481 = load ptr<u8>, ptr<ptr<u8>> %num_buf.addr
+  %482 = load u64, ptr<u64> %len.addr
+  %483 = call i64 @io_write(i64 %480, ptr<u8> %481, u64 %482)
+  %484 = getelementptr inbounds [4 x i8], ptr<[4 x i8]> %.str.23, i32 0, i32 0
+  call void @io_println(ptr<[4 x i8]> %484)
+  %485 = getelementptr inbounds [35 x i8], ptr<[35 x i8]> %.str.24, i32 0, i32 0
+  call void @io_println(ptr<[35 x i8]> %485)
+  %486 = load ptr<[10 x i8]>, ptr<ptr<[10 x i8]>> %ip.addr
+  %487 = load u16, ptr<u16> %port.addr
+  %488 = call i1 @net_Socket_connect(ptr<%net_Socket> %client.addr, ptr<[10 x i8]> %486, u16 %487)
+  br i1 %488, label %if.then.39_4, label %if.next.39_4
+if.then.13_4:
+  %457 = getelementptr inbounds [30 x i8], ptr<[30 x i8]> %.str.17, i32 0, i32 0
+  call void @io_eprintln(ptr<[30 x i8]> %457)
+  %458 = trunc i64 1 to i32
+  ret i32 %458
+if.next.13_4:
+  br label %if.end.13_4
+if.end.39_4:
+  %516 = trunc i64 0 to i32
+  ret i32 %516
+if.then.39_4:
+  %489 = getelementptr inbounds [11 x i8], ptr<[11 x i8]> %.str.25, i32 0, i32 0
+  call void @io_println(ptr<[11 x i8]> %489)
+  %490 = getelementptr inbounds [17 x i8], ptr<[17 x i8]> %.str.26, i32 0, i32 0
+  %msg.addr = alloca ptr<[17 x i8]>
+  store ptr<[17 x i8]> %490, ptr<ptr<[17 x i8]>> %msg.addr
+  %491 = load ptr<[17 x i8]>, ptr<ptr<[17 x i8]>> %msg.addr
+  %492 = call i64 @net_Socket_write(ptr<%net_Socket> %client.addr, ptr<[17 x i8]> %491)
+  %sent.addr = alloca i64
+  store i64 %492, ptr<i64> %sent.addr
+  %493 = load i64, ptr<i64> %sent.addr
+  %494 = icmp sgt i64 %493, 0
+  br i1 %494, label %if.then.46_8, label %if.next.46_8
+if.next.39_4:
+  %514 = getelementptr inbounds [19 x i8], ptr<[19 x i8]> %.str.32, i32 0, i32 0
+  call void @io_eprintln(ptr<[19 x i8]> %514)
+  %515 = trunc i64 1 to i32
+  ret i32 %515
+if.end.46_8:
+  %504 = getelementptr inbounds [25 x i8], ptr<[25 x i8]> %.str.29, i32 0, i32 0
+  call void @io_print(ptr<[25 x i8]> %504)
+  %505 = alloca u8, i64 64
+  %buf.addr = alloca ptr<u8>
+  store ptr<u8> %505, ptr<ptr<u8>> %buf.addr
+  %506 = load ptr<u8>, ptr<ptr<u8>> %buf.addr
+  memset ptr<u8> %506, i64 0, i64 64
+  %507 = load ptr<u8>, ptr<ptr<u8>> %buf.addr
+  %508 = call i64 @net_Socket_read(ptr<%net_Socket> %client.addr, ptr<u8> %507, i64 63)
+  %n.addr = alloca i64
+  store i64 %508, ptr<i64> %n.addr
+  %509 = load i64, ptr<i64> %n.addr
+  %510 = icmp sgt i64 %509, 0
+  br i1 %510, label %if.then.59_8, label %if.next.59_8
+if.then.46_8:
+  %495 = getelementptr inbounds [13 x i8], ptr<[13 x i8]> %.str.27, i32 0, i32 0
+  call void @io_print(ptr<[13 x i8]> %495)
+  %496 = load i64, ptr<i64> %sent.addr
+  %497 = load ptr<u8>, ptr<ptr<u8>> %num_buf.addr
+  %498 = call u64 @io_int_to_string(i64 %496, ptr<u8> %497, i64 10)
+  store u64 %498, ptr<u64> %len.addr
+  %499 = load i64, ptr<i64> %io_STDOUT
+  %500 = load ptr<u8>, ptr<ptr<u8>> %num_buf.addr
+  %501 = load u64, ptr<u64> %len.addr
+  %502 = call i64 @io_write(i64 %499, ptr<u8> %500, u64 %501)
+  %503 = getelementptr inbounds [1 x i8], ptr<[1 x i8]> %.str.28, i32 0, i32 0
+  call void @io_println(ptr<[1 x i8]> %503)
+  br label %if.end.46_8
+if.next.46_8:
+  br label %if.end.46_8
+if.end.59_8:
+  br label %if.end.39_4
+if.then.59_8:
+  %511 = getelementptr inbounds [11 x i8], ptr<[11 x i8]> %.str.30, i32 0, i32 0
+  call void @io_println(ptr<[11 x i8]> %511)
+  %512 = load ptr<u8>, ptr<ptr<u8>> %buf.addr
+  call void @io_println(ptr<u8> %512)
+  br label %if.end.59_8
+if.next.59_8:
+  %513 = getelementptr inbounds [34 x i8], ptr<[34 x i8]> %.str.31, i32 0, i32 0
+  call void @io_println(ptr<[34 x i8]> %513)
+  br label %if.end.59_8
+}
