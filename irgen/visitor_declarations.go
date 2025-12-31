@@ -55,15 +55,9 @@ func (g *Generator) visitExternFunctionDecl(ctx *parser.ExternFunctionDeclContex
 		if ctx.ExternParameterList().ELLIPSIS() != nil { variadic = true }
 		for _, t := range ctx.ExternParameterList().AllType_() { paramTypes = append(paramTypes, g.resolveType(t)) }
 	}
-	
-	// Declare the function in LLVM
 	fn := g.ctx.Builder.DeclareFunction(externalName, retType, paramTypes, variadic)
 	
-	// Register the function in the symbol table so it can be called
-	// 1. Register simple name "printf"
 	if sym, ok := g.currentScope.Resolve(name); ok { sym.IRValue = fn }
-	
-	// 2. Register qualified name "io.printf" if namespace is active
 	if g.currentNamespace != "" {
 		fullName := g.currentNamespace + "." + name
 		if sym, ok := g.currentScope.Resolve(fullName); ok { sym.IRValue = fn }
@@ -147,7 +141,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	}
 	if ctx.Block() != nil {
 		g.deferStack = NewDeferStack()
-		// Visit the block directly to ensure correct scoping if semantics mapped it
 		g.Visit(ctx.Block())
 	}
 	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
@@ -169,7 +162,6 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 			irVal = g.emitCast(irVal, sym.Type)
 			g.ctx.Builder.CreateStore(irVal, alloca)
 		} else {
-			// Panic fallback: if value is missing, store 0
 			g.ctx.Builder.CreateStore(g.getZeroValue(sym.Type), alloca)
 		}
 	} else {

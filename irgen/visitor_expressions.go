@@ -104,9 +104,11 @@ func (g *Generator) VisitRelationalExpression(ctx *parser.RelationalExpressionCo
 func (g *Generator) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} {
 	children := ctx.GetChildren()
 	if len(children) == 0 { return g.getZeroValue(types.I64) }
+
 	lhs := g.Visit(children[0].(antlr.ParseTree)).(ir.Value)
 	const (OpNone = iota; OpLeft; OpRight)
 	pendingOp := OpNone
+
 	for i := 1; i < len(children); i++ {
 		child := children[i]
 		if term, ok := child.(antlr.TerminalNode); ok {
@@ -156,7 +158,7 @@ func (g *Generator) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 	return lhs
 }
 
-// --- Unary, Postfix, Primary ---
+// --- Unary Expressions ---
 
 func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
 	if ctx.INCREMENT() != nil || ctx.DECREMENT() != nil {
@@ -165,8 +167,10 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		elemType := ptr.Type().(*types.PointerType).ElementType
 		curr := g.ctx.Builder.CreateLoad(elemType, ptr, "")
 		var next ir.Value
+		
 		one := g.ctx.Builder.ConstInt(types.I64, 1)
 		if intTy, ok := elemType.(*types.IntType); ok { one = g.ctx.Builder.ConstInt(intTy, 1) }
+		
 		if ctx.INCREMENT() != nil { next = g.ctx.Builder.CreateAdd(curr, one, "") } else { next = g.ctx.Builder.CreateSub(curr, one, "") }
 		g.ctx.Builder.CreateStore(next, ptr)
 		return next
@@ -185,6 +189,8 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 	}
 	return val
 }
+
+// --- Postfix Expressions ---
 
 func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
 	var currPtr ir.Value = g.getLValue(ctx.PrimaryExpression())
@@ -244,6 +250,8 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	return curr
 }
 
+// --- Primary Expressions ---
+
 func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
 	if ctx.StructLiteral() != nil { return g.Visit(ctx.StructLiteral()) }
 	if ctx.Literal() != nil { return g.Visit(ctx.Literal()) }
@@ -251,7 +259,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	if ctx.SyscallExpression() != nil { return g.Visit(ctx.SyscallExpression()) }
 	if ctx.IntrinsicExpression() != nil { return g.Visit(ctx.IntrinsicExpression()) }
 	
-	// FIX: Handle QualifiedIdentifier (io.printf)
+	// Handle QualifiedIdentifier (io.printf)
 	if ctx.QualifiedIdentifier() != nil {
 		q := ctx.QualifiedIdentifier()
 		ids := q.AllIDENTIFIER()
@@ -261,50 +269,22 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			name += id.GetText()
 		}
 		
-		// 1. Try Resolve in Symbol Table (Best)
 		if sym, ok := g.currentScope.Resolve(name); ok && sym.IRValue != nil {
 			return sym.IRValue
 		}
-		
-		// 2. Try Module Lookup (Fallback for externs/functions)
 		if fn := g.ctx.Module.GetFunction(name); fn != nil {
 			return fn
 		}
-		// 3. Try Mangled Module Lookup if dot notation failed
-		// (e.g. extern was declared as "printf" but called as "io.printf")
-		// Often externs are simple names in LLVM
-		simpleName := ids[len(ids)-1].GetText()
-		if fn := g.ctx.Module.GetFunction(simpleName); fn != nil {
-			return fn
-		}
-		
 		return g.getZeroValue(types.I64)
 	}
 
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
-		
-		// 1. Scope Resolve
 		if sym, ok := g.currentScope.Resolve(name); ok {
-			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
-				// Variable: Load it
-				return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
-			}
-			// Function/Global/Constant: Return the pointer/value directly
-			if sym.IRValue != nil {
-				return sym.IRValue
-			}
+			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok { return g.ctx.Builder.CreateLoad(sym.Type, alloca, "") }
+			if sym.IRValue != nil { return sym.IRValue }
 		}
-		
-		// 2. Global Function Lookup
-		if fn := g.ctx.Module.GetFunction(name); fn != nil {
-			return fn
-		}
-		
-		// 3. Global Variable Lookup
-		if glob := g.ctx.Module.GetGlobal(name); glob != nil {
-			return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
-		}
+		if glob := g.ctx.Module.GetGlobal(name); glob != nil { return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "") }
 	}
 	
 	if ctx.Expression() != nil { return g.Visit(ctx.Expression()) }
