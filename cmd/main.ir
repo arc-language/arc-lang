@@ -1,6 +1,6 @@
 @.str.0 = external constant [5 x i8] [i8 37, i8 100, i8 92, i8 110, i8 0]
 
-declare external i32 @printf(ptr<i64>, ...)
+declare external i32 @printf(ptr<u8>, ...)
 
 define external i32 @main() {
 entry:

@@ -344,5 +344,7 @@ github.com/arc-language/arc-lang v0.0.0-20251231081815-89d705843952 h1:AL7bZTlXM
 github.com/arc-language/arc-lang v0.0.0-20251231081815-89d705843952/go.mod h1:sTFw0uIIwBMXArrj8XXtgIHfvIxgAvb05WS2+qCeuWU=
 github.com/arc-language/arc-lang v0.0.0-20251231082436-f35f94a1cccb h1:G61iU/sEF91cjEEe3Rpzzp5fXE8KT/4TlUXM6TdqCYs=
 github.com/arc-language/arc-lang v0.0.0-20251231082436-f35f94a1cccb/go.mod h1:sTFw0uIIwBMXArrj8XXtgIHfvIxgAvb05WS2+qCeuWU=
+github.com/arc-language/arc-lang v0.0.0-20251231082951-2f6b1e2b768e h1:d/lNC1ViO4eqNgtOHnA1+GFTaxKLWEVeMGG8ezASmT4=
+github.com/arc-language/arc-lang v0.0.0-20251231082951-2f6b1e2b768e/go.mod h1:sTFw0uIIwBMXArrj8XXtgIHfvIxgAvb05WS2+qCeuWU=
 golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 h1:vr/HnozRka3pE4EsMEg1lgkXJkTFJCVUX+S/ZT6wYzM=
 golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842/go.mod h1:XtvwrStGgqGPLc4cjQfWqZHG1YFdYs6swckp8vpsjnc=

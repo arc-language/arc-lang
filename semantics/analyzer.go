@@ -73,7 +73,6 @@ func (a *Analyzer) popScope() {
 }
 
 // Visit implements manual dispatch.
-// FIX: We must use tree.Accept(a) for default cases so 'a' remains the receiver.
 func (a *Analyzer) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil { return nil }
 
@@ -92,10 +91,16 @@ func (a *Analyzer) Visit(tree antlr.ParseTree) interface{} {
 		return a.VisitClassDecl(ctx)
 	case *parser.BlockContext:
 		return a.VisitBlock(ctx)
+		
+	// Statements
+	case *parser.StatementContext:
+		return a.VisitStatement(ctx) // Explicit call to our new method
 	case *parser.ReturnStmtContext:
 		return a.VisitReturnStmt(ctx)
 	case *parser.IfStmtContext:
 		return a.VisitIfStmt(ctx)
+	case *parser.ExpressionStmtContext:
+		return a.VisitExpressionStmt(ctx)
 		
 	// Expressions
 	case *parser.ExpressionContext:
@@ -114,8 +119,7 @@ func (a *Analyzer) Visit(tree antlr.ParseTree) interface{} {
 		return a.VisitLiteral(ctx)
 		
 	default:
-		// CRITICAL: Call Accept passing 'a' (this analyzer) as the visitor.
-		// If we called a.BaseArcParserVisitor.Visit(tree), it would lose our overrides.
+		// Fallback
 		return tree.Accept(a)
 	}
 }
