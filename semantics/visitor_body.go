@@ -3,7 +3,6 @@ package semantics
 import (
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
-	"github.com/arc-language/arc-lang/symbol"
 )
 
 // --- Statements ---
@@ -36,6 +35,7 @@ func (a *Analyzer) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 				a.currentFuncRetType.String(), exprType.String())
 		}
 	} else {
+		// Check if we expected a return value
 		if a.currentFuncRetType != nil && a.currentFuncRetType != types.Void {
 			a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Missing return value")
 		}
@@ -46,14 +46,15 @@ func (a *Analyzer) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 func (a *Analyzer) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 	// Check Condition
 	condType := a.Visit(ctx.Expression(0)).(types.Type)
-	if !condType.Equal(types.I1) { // Assuming I1 is boolean
-		// In C-like languages, int might be allowed, but let's be strict for now
-		// a.bag.Report(...)
+	if !condType.Equal(types.I1) {
+		// Optionally enforce boolean checks here
 	}
 	
 	a.Visit(ctx.Block(0))
 	
-	// Handle Else/ElseIf logic... (omitted for brevity, follows same pattern)
+	if len(ctx.AllBlock()) > 1 {
+		a.Visit(ctx.Block(1))
+	}
 	return nil
 }
 
@@ -82,7 +83,6 @@ func (a *Analyzer) VisitAdditiveExpression(ctx *parser.AdditiveExpressionContext
 				"Operator mismatch: cannot add '%s' and '%s'", lhs.String(), rhs.String())
 			return types.Void // Poison
 		}
-		// In a real compiler, we might promote types here (e.g., int + float = float)
 	}
 	
 	return lhs
@@ -122,9 +122,6 @@ func (a *Analyzer) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	return types.Void
 }
 
-// Note: You need to implement the boilerplate dispatch visitors for 
-// Multiplicative, Relational, etc., similar to VisitAdditiveExpression.
-// Just recursing down without logic is fine if only the leaf nodes define types.
 func (a *Analyzer) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionContext) interface{} {
 	return a.Visit(ctx.LogicalAndExpression(0))
 }
@@ -157,10 +154,8 @@ func (a *Analyzer) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpre
 }
 func (a *Analyzer) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
 	if ctx.PostfixExpression() != nil { return a.Visit(ctx.PostfixExpression()) }
-	// TODO: Handle Unary Ops types (e.g. !bool -> bool, -int -> int)
 	return a.Visit(ctx.UnaryExpression()) 
 }
 func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
-	// TODO: Handle function calls and member access here
 	return a.Visit(ctx.PrimaryExpression())
 }

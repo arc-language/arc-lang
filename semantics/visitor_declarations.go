@@ -3,7 +3,7 @@ package semantics
 import (
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
-	"github.com/arc-language/arc-lang/symbol"
+	"github.com/arc-language/arc-lang/pkg/symbol"
 )
 
 func (a *Analyzer) VisitCompilationUnit(ctx *parser.CompilationUnitContext) interface{} {
@@ -66,17 +66,18 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 	name := ctx.IDENTIFIER().GetText()
 
 	// 1. Resolve Return Type
-	retType := types.Void
+	// FIX: Explicitly define as interface type to avoid mismatch with *types.VoidType
+	var retType types.Type = types.Void
+	
 	if ctx.ReturnType() != nil && ctx.ReturnType().Type_() != nil {
 		retType = a.resolveType(ctx.ReturnType().Type_())
 	}
 
-	// 2. Create Function Symbol (Early definition for recursion)
-	// In a full implementation, we'd build a types.FunctionType here.
-	fnSym := a.currentScope.Define(name, symbol.SymFunc, retType)
+	// 2. Create Function Symbol
+	// FIX: Use underscore to ignore the returned symbol since we don't use it locally
+	_ = a.currentScope.Define(name, symbol.SymFunc, retType)
 	
 	// 3. Enter Scope
-	// We use the FunctionDecl context key for the scope
 	a.currentFuncRetType = retType
 	a.pushScope(ctx)
 	defer a.popScope()
@@ -94,9 +95,7 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 
 	// 5. Visit Body
 	if ctx.Block() != nil {
-		// IMPORTANT: Map the Block to the CURRENT function scope.
-		// We don't want the block to create a new sub-scope immediately 
-		// because params and body vars usually share the same activation record level.
+		// Map the Block to the CURRENT function scope.
 		a.scopes[ctx.Block()] = a.currentScope
 		
 		for _, stmt := range ctx.Block().AllStatement() {
@@ -110,19 +109,9 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
 	
-	// In a real pass, you might do 2 sub-passes: 
-	// 1. Register Struct Name
-	// 2. Define Fields (to handle self-reference pointers)
-	
-	// For now, simple definition:
-	// Note: We don't construct the full StructType here in this snippet, 
-	// but normally you would build types.NewStruct(...)
-	
 	// Placeholder for struct type
 	structType := types.NewStruct(name, nil, false)
 	a.currentScope.Define(name, symbol.SymType, structType)
-	
-	// TODO: Visit fields to populate the structType.Fields
 	
 	return nil
 }

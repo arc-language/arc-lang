@@ -3,15 +3,13 @@ package context
 import (
 	"github.com/arc-language/arc-lang/builder/builder"
 	"github.com/arc-language/arc-lang/builder/ir"
-	"github.com/arc-language/arc-lang/builder/types"
-	"github.com/arc-language/arc-lang/symbol"
 )
 
 // Context holds the state shared during IR generation
 type Context struct {
 	Builder *builder.Builder
 	Module  *ir.Module
-	Logger  *Logger // Logger is defined in logging.go in this folder
+	Logger  *Logger
 	
 	// Helper state for IR generation
 	CurrentFunction *ir.Function
@@ -35,7 +33,7 @@ func (c *Context) EnterFunction(fn *ir.Function) {
 	c.CurrentFunction = fn
 	c.CurrentBlock = nil
 	
-	// Create entry block automatically if preferred, or handle in visitor
+	// Create entry block automatically if preferred
 	entry := c.Builder.CreateBlock("entry")
 	c.SetInsertBlock(entry)
 }
