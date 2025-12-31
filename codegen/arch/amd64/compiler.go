@@ -1,471 +1,192 @@
-// --- START OF FILE codegen/arch/amd64/compiler.go ---
 package amd64
 
 import (
 	"bytes"
-	"encoding/binary"
 	"fmt"
-
 	"github.com/arc-language/arc-lang/builder/ir"
-	"github.com/arc-language/arc-lang/builder/types"
 )
 
 type Artifact struct {
-	TextBuffer  []byte
-	DataBuffer  []byte
-	Symbols     []SymbolDef
-	Relocations []Relocation
+	Text   []byte
+	Data   []byte
+	Relocs []RelocationRecord
+	Symbols []SymbolDef
 }
 
 type SymbolDef struct {
-	Name     string
-	Offset   uint64
-	Size     uint64
-	IsFunc   bool
-	IsGlobal bool
+	Name   string
+	Offset uint64
+	Size   uint64
+	IsFunc bool
 }
-
-type Relocation struct {
-	Offset     uint64
-	SymbolName string
-	Type       RelocationType
-	Addend     int64
-}
-
-type RelocationType int
-
-const (
-	R_X86_64_PC32  RelocationType = 2
-	R_X86_64_PLT32 RelocationType = 4
-)
 
 type compiler struct {
-	text         *bytes.Buffer
+	asm          *Assembler
 	data         *bytes.Buffer
-	currentFunc  *ir.Function
 	stackMap     map[ir.Value]int // Value -> RBP offset (negative)
-	allocaOffsets map[*ir.AllocaInst]int // AllocaInst -> RBP offset (negative)
+	frameSize    int
 	blockOffsets map[*ir.BasicBlock]int
-	fixups       []jumpFixup
-	relocations  []Relocation
-	currentFrame int
-	nextTemp     int
+	jumpsToFix   []jumpFixup
+	
+	// Compilation State
+	currentFunc *ir.Function
 }
 
 type jumpFixup struct {
-	offset int
-	target *ir.BasicBlock
+	asmOffset int
+	target    *ir.BasicBlock
 }
 
 func Compile(m *ir.Module) (*Artifact, error) {
 	c := &compiler{
-		text: new(bytes.Buffer),
-		data: new(bytes.Buffer),
+		asm:      NewAssembler(),
+		data:     new(bytes.Buffer),
+		stackMap: make(map[ir.Value]int),
 	}
 
-	var symbols []SymbolDef
+	var syms []SymbolDef
 
-	// Compile global variables first
+	// 1. Compile Globals (Data Section)
 	for _, g := range m.Globals {
-		// Align to 8 bytes
-		for c.data.Len()%8 != 0 {
-			c.data.WriteByte(0)
-		}
-
+		// Align
+		for c.data.Len()%8 != 0 { c.data.WriteByte(0) }
+		
 		offset := c.data.Len()
-		
-		if err := c.compileGlobal(g); err != nil {
-			return nil, fmt.Errorf("in global %s: %w", g.Name(), err)
-		}
-		
-		size := c.data.Len() - offset
-		symbols = append(symbols, SymbolDef{
-			Name:     g.Name(),
-			Offset:   uint64(offset),
-			Size:     uint64(size),
-			IsGlobal: true,
-			IsFunc:   false,
+		c.emitGlobal(g)
+		syms = append(syms, SymbolDef{
+			Name: g.Name(), Offset: uint64(offset), Size: uint64(c.data.Len() - offset), IsFunc: false,
 		})
 	}
 
-	// Compile functions
+	// 2. Compile Functions (Text Section)
 	for _, fn := range m.Functions {
-		if len(fn.Blocks) == 0 {
-			continue // External declaration
-		}
-
-		startOff := c.text.Len()
-		if err := c.compileFunction(fn); err != nil {
-			return nil, fmt.Errorf("in function %s: %w", fn.Name(), err)
-		}
+		if len(fn.Blocks) == 0 { continue } // External
 		
-		endOff := c.text.Len()
+		start := c.asm.Len()
+		if err := c.compileFunction(fn); err != nil {
+			return nil, err
+		}
+		end := c.asm.Len()
 
-		symbols = append(symbols, SymbolDef{
-			Name:     fn.Name(),
-			Offset:   uint64(startOff),
-			Size:     uint64(endOff - startOff),
-			IsFunc:   true,
-			IsGlobal: false, // Will be determined by linkage
+		syms = append(syms, SymbolDef{
+			Name: fn.Name(), Offset: uint64(start), Size: uint64(end - start), IsFunc: true,
 		})
 	}
 
 	return &Artifact{
-		TextBuffer:  c.text.Bytes(),
-		DataBuffer:  c.data.Bytes(),
-		Symbols:     symbols,
-		Relocations: c.relocations,
+		Text:    c.asm.Bytes(),
+		Data:    c.data.Bytes(),
+		Relocs:  c.asm.Relocs,
+		Symbols: syms,
 	}, nil
-}
-
-func (c *compiler) compileGlobal(g *ir.Global) error {
-	if g.Initializer == nil {
-		// Zero-initialized
-		size := SizeOf(g.Type())
-		c.data.Write(make([]byte, size))
-		return nil
-	}
-
-	return c.emitConstant(g.Initializer)
-}
-
-func (c *compiler) emitConstant(constant ir.Constant) error {
-	switch v := constant.(type) {
-	case *ir.ConstantInt:
-		size := SizeOf(v.Type())
-		switch size {
-		case 1:
-			c.data.WriteByte(byte(v.Value))
-		case 2:
-			binary.Write(c.data, binary.LittleEndian, uint16(v.Value))
-		case 4:
-			binary.Write(c.data, binary.LittleEndian, uint32(v.Value))
-		case 8:
-			binary.Write(c.data, binary.LittleEndian, uint64(v.Value))
-		}
-	case *ir.ConstantFloat:
-		if v.Type().(*types.FloatType).BitWidth == 32 {
-			binary.Write(c.data, binary.LittleEndian, float32(v.Value))
-		} else {
-			binary.Write(c.data, binary.LittleEndian, v.Value)
-		}
-	case *ir.ConstantZero:
-		size := SizeOf(v.Type())
-		c.data.Write(make([]byte, size))
-	case *ir.ConstantArray:
-		for _, elem := range v.Elements {
-			if err := c.emitConstant(elem); err != nil {
-				return err
-			}
-		}
-	case *ir.ConstantStruct:
-		st := v.Type().(*types.StructType)
-		offset := 0
-		for i, field := range v.Fields {
-			// Add padding
-			fieldOffset := GetStructFieldOffset(st, i)
-			for offset < fieldOffset {
-				c.data.WriteByte(0)
-				offset++
-			}
-			if err := c.emitConstant(field); err != nil {
-				return err
-			}
-			offset += SizeOf(field.Type())
-		}
-	default:
-		return fmt.Errorf("unsupported constant type: %T", constant)
-	}
-	return nil
 }
 
 func (c *compiler) compileFunction(fn *ir.Function) error {
 	c.currentFunc = fn
 	c.stackMap = make(map[ir.Value]int)
-	c.allocaOffsets = make(map[*ir.AllocaInst]int)
 	c.blockOffsets = make(map[*ir.BasicBlock]int)
-	c.fixups = nil
-	c.nextTemp = 0
-
-	// Check if function is variadic by checking the function type
-	isVariadic := false
-	if fnType, ok := fn.Type().(*types.FunctionType); ok {
-		isVariadic = fnType.Variadic
-	}
-
-	// 1. Analyze and allocate stack space
+	c.jumpsToFix = nil
+	
+	// 1. Stack Layout
+	// RBP points to saved RBP. Arguments at RBP+16... Locals at RBP-XXX
 	offset := 0
-	alloc := func(v ir.Value, sz int) {
-		if sz < 8 {
-			sz = 8 // Minimum slot size
-		}
-		// Align to natural alignment
-		if offset%sz != 0 {
-			offset += (sz - (offset % sz))
-		}
-		offset += sz
-		c.stackMap[v] = -offset
-	}
-
-	// Allocate space for arguments (they'll be copied from registers/stack)
+	
+	// Map arguments
 	for _, arg := range fn.Arguments {
-		alloc(arg, SizeOf(arg.Type()))
+		// Simple implementation: All args go to stack slots for spill/fill
+		// Ideally: Register allocation
+		size := SizeOf(arg.Type())
+		offset += size
+		if offset % 8 != 0 { offset += 8 - (offset%8) }
+		c.stackMap[arg] = -offset
 	}
 
-	// Allocate space for all instructions that produce values
+	// Map Instructions
 	for _, block := range fn.Blocks {
 		for _, inst := range block.Instructions {
-			if inst.Type() != nil && inst.Type().Kind() != types.VoidKind {
-				// Special handling for alloca - it needs pointer-sized space
-				if _, ok := inst.(*ir.AllocaInst); ok {
-					alloc(inst, 8) // Store the pointer
-				} else {
-					alloc(inst, SizeOf(inst.Type()))
-				}
+			if inst.Type() != nil {
+				size := SizeOf(inst.Type())
+				if size == 0 { continue }
+				offset += size
+				if offset % 8 != 0 { offset += 8 - (offset%8) }
+				c.stackMap[inst] = -offset
+			}
+		}
+	}
+	
+	// Align frame to 16 bytes
+	if offset % 16 != 0 { offset += 16 - (offset%16) }
+	c.frameSize = offset
+
+	// 2. Prologue
+	c.asm.Push(RBP)
+	c.asm.Mov(RegOp(RBP), RegOp(RSP), 64)
+	if c.frameSize > 0 {
+		c.asm.Sub(RegOp(RSP), ImmOp(c.frameSize))
+	}
+
+	// 3. Save Register Args (Spill to stack immediately for simplicity)
+	// System V: RDI, RSI, RDX, RCX, R8, R9
+	regs := []Register{RDI, RSI, RDX, RCX, R8, R9}
+	for i, arg := range fn.Arguments {
+		if i < len(regs) {
+			// Move reg to stack slot
+			slot := c.getStackSlot(arg)
+			c.asm.Mov(slot, RegOp(regs[i]), SizeOf(arg.Type()))
+		}
+	}
+
+	// 4. Body
+	for _, block := range fn.Blocks {
+		c.blockOffsets[block] = c.asm.Len()
+		for _, inst := range block.Instructions {
+			if err := c.compileInst(inst); err != nil {
+				return err
 			}
 		}
 	}
 
-	// Handle alloca instructions - allocate their actual space
-	allocaOffset := offset
-	for _, block := range fn.Blocks {
-		for _, inst := range block.Instructions {
-			if allocaInst, ok := inst.(*ir.AllocaInst); ok {
-				size := SizeOf(allocaInst.AllocatedType)
-				if allocaInst.NumElements != nil {
-					// For array allocas
-					if constInt, ok := allocaInst.NumElements.(*ir.ConstantInt); ok {
-						size *= int(constInt.Value)
-					}
-				}
-				if size < 8 {
-					size = 8
-				}
-				allocaOffset += size
-				// Store the negative offset from RBP
-				// For a block of size N ending at -X, the address is RBP-X
-				// (Assuming stack grows down and we use 'lea' to get the base)
-				c.allocaOffsets[allocaInst] = -allocaOffset
-			}
-		}
+	// 5. Fixup Jumps
+	for _, fix := range c.jumpsToFix {
+		targetOff, ok := c.blockOffsets[fix.target]
+		if !ok { return fmt.Errorf("jump target not found") }
+		// Relative jump: Target - (InstAddr + 4)
+		rel := int32(targetOff - (fix.asmOffset + 4))
+		c.asm.PatchInt32(fix.asmOffset, rel)
 	}
-
-	// NEW: Add register save area for variadic functions
-	// 176 bytes = 6 GP regs * 8 bytes + 8 FP regs * 16 bytes
-	if isVariadic {
-		allocaOffset += 176
-	}
-
-	// Align stack frame to 16 bytes (required by System V ABI)
-	if allocaOffset%16 != 0 {
-		allocaOffset += (16 - (allocaOffset % 16))
-	}
-	c.currentFrame = allocaOffset
-
-	// 2. Function prologue
-	c.emitPrologue()
-
-	// 3. Save register arguments to stack
-	c.emitArgSave(fn)
-
-	// NEW: Save variadic register arguments to register save area
-	if isVariadic {
-		c.emitVarArgRegSave(fn)
-	}
-
-	// 4. Compile basic blocks
-	for _, block := range fn.Blocks {
-		c.blockOffsets[block] = c.text.Len()
-		for _, inst := range block.Instructions {
-			if err := c.compileInstruction(inst); err != nil {
-				return fmt.Errorf("in block %s: %w", block.Name(), err)
-			}
-		}
-	}
-
-	// 5. Apply jump fixups
-	c.applyFixups()
 
 	return nil
 }
 
-// emitVarArgRegSave saves all argument registers to the register save area
-// This is required for variadic functions following System V AMD64 ABI
-func (c *compiler) emitVarArgRegSave(fn *ir.Function) {
-	// The register save area is at the bottom of our stack frame
-	// Layout: [regular locals] [allocas] [176-byte reg save area]
-	// The area starts at -(c.currentFrame - 176) and goes to -c.currentFrame
-	
-	// GP register save area: 6 registers * 8 bytes = 48 bytes
-	// FP register save area: 8 registers * 16 bytes = 128 bytes
-	// Total: 176 bytes
-	
-	baseOffset := -c.currentFrame
-	
-	// Save GP registers: RDI, RSI, RDX, RCX, R8, R9
-	// They go at offsets 0, 8, 16, 24, 32, 40 from baseOffset
-	gpRegs := []int{RDI, RSI, RDX, RCX, R8, R9}
-	for i, reg := range gpRegs {
-		offset := baseOffset + (i * 8)
-		c.emitStoreReg(reg, offset, 8)
+// Helpers
+
+func (c *compiler) getStackSlot(v ir.Value) MemOp {
+	off, ok := c.stackMap[v]
+	if !ok {
+		// Should be constant or global if not in stackMap
+		panic(fmt.Sprintf("Value %v not allocated", v))
 	}
-	
-	// Save FP registers: XMM0-XMM7
-	// They go at offsets 48, 64, 80, 96, 112, 128, 144, 160 from baseOffset
-	for i := 0; i < 8; i++ {
-		offset := baseOffset + 48 + (i * 16)
-		// Save full 16 bytes of each XMM register
-		c.emitFpStoreToStack(i, offset, true) // true = use movsd (8 bytes)
-		
-		// For full XMM register save (16 bytes), we'd need movdqa
-		// But for variadic args, we only need the lower 8 bytes (double precision)
-		// So movsd is sufficient
+	return NewMem(RBP, off)
+}
+
+func (c *compiler) load(dst Register, src ir.Value) {
+	// If constant
+	if cst, ok := src.(*ir.ConstantInt); ok {
+		c.asm.Mov(RegOp(dst), ImmOp(cst.Value), 64)
+		return
 	}
+	// If stack
+	slot := c.getStackSlot(src)
+	c.asm.Mov(RegOp(dst), slot, 64) // Assuming 64-bit ops for now
 }
 
-func (c *compiler) emitPrologue() {
-	// push rbp
-	c.emitBytes(0x55)
-	// mov rbp, rsp
-	c.emitBytes(0x48, 0x89, 0xE5)
-	// sub rsp, frame_size
-	if c.currentFrame > 0 {
-		if c.currentFrame <= 127 {
-			c.emitBytes(0x48, 0x83, 0xEC, byte(c.currentFrame))
-		} else {
-			c.emitBytes(0x48, 0x81, 0xEC)
-			c.emitUint32(uint32(c.currentFrame))
-		}
-	}
+func (c *compiler) store(src Register, dst ir.Value) {
+	slot := c.getStackSlot(dst)
+	c.asm.Mov(slot, RegOp(src), 64)
 }
 
-func (c *compiler) emitArgSave(fn *ir.Function) {
-	gpRegs := []int{RDI, RSI, RDX, RCX, R8, R9}
-	// XMM0..XMM7
-	
-	gpIdx := 0
-	fpIdx := 0
-	
-	// Track stack args count for offsets
-	stackArgIdx := 0
-
-	for _, arg := range fn.Arguments {
-		offset := c.stackMap[arg]
-		size := SizeOf(arg.Type())
-		
-		isFloat := types.IsFloat(arg.Type())
-		
-		passedInReg := false
-		var reg int
-		var isXMM bool
-		
-		if isFloat {
-			if fpIdx < 8 {
-				reg = fpIdx // 0..7
-				fpIdx++
-				isXMM = true
-				passedInReg = true
-			}
-		} else {
-			if gpIdx < 6 {
-				reg = gpRegs[gpIdx]
-				gpIdx++
-				passedInReg = true
-			}
-		}
-
-		if passedInReg {
-			if isXMM {
-				// Store XMM reg to stack
-				c.emitFpStoreToStack(reg, offset, size > 4) // simple check for float vs double
-			} else {
-				// Store GP reg to stack
-				c.emitStoreReg(reg, offset, size)
-			}
-		} else {
-			// Stack argument
-			// [rbp + 16 + stackArgIdx*8]
-			// Simplified stack alignment logic
-			// In prologue, RBP pushed (8 bytes), then RBP=RSP.
-			// Return addr is at RBP+8.
-			// First stack arg is at RBP+16.
-			srcOffset := 16 + stackArgIdx*8
-			stackArgIdx++
-			// Align stackArgIdx if arg > 8 bytes (not implemented here, assuming 8 byte slots)
-			
-			// Copy from srcOffset to offset
-			if size == 4 {
-				// mov eax, [rbp + srcOffset]
-				c.emitBytes(0x8B, 0x85)
-				c.emitInt32(int32(srcOffset))
-				
-				// mov [rbp + dstOffset], eax
-				c.emitBytes(0x89, 0x85)
-				c.emitInt32(int32(offset))
-			} else if size == 8 {
-				// mov rax, [rbp + srcOffset]
-				c.emitBytes(0x48, 0x8B, 0x85)
-				c.emitInt32(int32(srcOffset))
-				
-				// mov [rbp + dstOffset], rax
-				c.emitBytes(0x48, 0x89, 0x85)
-				c.emitInt32(int32(offset))
-			} else {
-				// For other sizes, use RAX as intermediate
-				// Note: emitLoadFromStack uses correct size
-				c.emitLoadFromStack(RAX, srcOffset, size)
-				c.emitStoreToStack(RAX, offset, size)
-			}
-		}
-	}
+func (c *compiler) emitGlobal(g *ir.Global) {
+	// Simple zero init or raw data
+	size := SizeOf(g.Type())
+	c.data.Write(make([]byte, size))
 }
-
-func (c *compiler) applyFixups() {
-	text := c.text.Bytes()
-	for _, fix := range c.fixups {
-		targetOff, ok := c.blockOffsets[fix.target]
-		if !ok {
-			// Should not happen - all blocks should have offsets
-			continue
-		}
-		// Calculate relative offset from end of instruction
-		rel := targetOff - (fix.offset + 4)
-		binary.LittleEndian.PutUint32(text[fix.offset:], uint32(rel))
-	}
-}
-
-func (c *compiler) emitBytes(b ...byte) {
-	c.text.Write(b)
-}
-
-func (c *compiler) emitUint32(v uint32) {
-	binary.Write(c.text, binary.LittleEndian, v)
-}
-
-func (c *compiler) emitInt32(v int32) {
-	binary.Write(c.text, binary.LittleEndian, v)
-}
-
-func (c *compiler) emitUint64(v uint64) {
-	binary.Write(c.text, binary.LittleEndian, v)
-}
-
-// Register constants
-const (
-	RAX = 0
-	RCX = 1
-	RDX = 2
-	RBX = 3
-	RSP = 4
-	RBP = 5
-	RSI = 6
-	RDI = 7
-	R8  = 8
-	R9  = 9
-	R10 = 10
-	R11 = 11
-	R12 = 12
-	R13 = 13
-	R14 = 14
-	R15 = 15
-)

@@ -1,109 +1,55 @@
 package amd64
 
 import (
+	"fmt"
 	"github.com/arc-language/arc-lang/builder/ir"
 )
 
-// ============================================================================
-// Coroutine Operations
-// These map to LLVM coroutine intrinsics and implement async/await
-// ============================================================================
+func (c *compiler) compileCoroInst(inst ir.Instruction) error {
+	switch inst.Opcode() {
+	case ir.OpCoroId:
+		// Placeholder: Return instruction address as ID
+		c.asm.Mov(RegOp(RAX), ImmOp(c.asm.Len()), 64)
+		c.store(RAX, inst)
 
-// coroIdOp - Initialize coroutine (llvm.coro.id)
-func (c *compiler) coroIdOp(inst *ir.CoroIdInst) error {
-	// For now, emit a call to a runtime function that returns a coroutine ID token
-	// In a full implementation, this would:
-	// 1. Allocate a unique coroutine ID
-	// 2. Set up coroutine metadata
-	
-	// Simplified: return a placeholder token (we'll use address of instruction as ID)
-	// In practice, you'd call a runtime function here
-	
-	// For direct compilation without LLVM, we need to implement coroutines manually
-	// This is complex - let's create a simple state machine approach
-	
-	// Store a unique ID (use instruction address)
-	c.loadConstInt(RAX, int64(c.text.Len()))
-	c.storeFromReg(RAX, inst)
-	
-	return nil
-}
+	case ir.OpCoroBegin:
+		// 1. Allocate Frame (simplified malloc/mmap via syscall)
+		// MMAP: rax=9, rdi=0, rsi=size, rdx=3(RW), r10=34(Anon|Priv), r8=-1, r9=0
+		frameSize := 256
+		
+		c.asm.Xor(RegOp(RDI), RegOp(RDI))              // addr = 0
+		c.asm.Mov(RegOp(RSI), ImmOp(frameSize), 64)    // size
+		c.asm.Mov(RegOp(RDX), ImmOp(3), 64)            // prot = RW
+		c.asm.Mov(RegOp(R10), ImmOp(34), 64)           // flags
+		c.asm.Mov(RegOp(R8),  ImmOp(-1), 64)           // fd = -1
+		c.asm.Xor(RegOp(R9),  RegOp(R9))               // off = 0
+		c.asm.Mov(RegOp(RAX), ImmOp(9), 64)            // SYS_mmap
+		c.asm.Syscall()
+		
+		// RAX has pointer, store it
+		c.store(RAX, inst)
 
-// coroBeginOp - Begin coroutine execution (llvm.coro.begin)
-func (c *compiler) coroBeginOp(inst *ir.CoroBeginInst) error {
-	// Allocate coroutine frame on heap
-	// Frame structure:
-	// struct CoroFrame {
-	//   void* resume_fn;      // Function to resume execution
-	//   void* destroy_fn;     // Function to cleanup
-	//   int state;            // Current suspension state
-	//   void* parent_frame;   // For nested coroutines
-	//   // ... saved local variables ...
-	// }
-	
-	// For now, allocate a fixed-size frame (256 bytes)
-	frameSize := 256
-	
-	// Call malloc(frameSize) - this requires linking with libc
-	// Simplified: use a syscall to allocate memory (mmap)
-	
-	// mmap(NULL, frameSize, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0)
-	c.emitXorReg(RDI, RDI)                    // addr = NULL
-	c.loadConstInt(RSI, int64(frameSize))     // length
-	c.loadConstInt(RDX, 3)                     // prot = PROT_READ | PROT_WRITE
-	c.loadConstInt(R10, 0x22)                  // flags = MAP_PRIVATE | MAP_ANONYMOUS
-	c.loadConstInt(R8, -1)                     // fd = -1
-	c.emitXorReg(R9, R9)                       // offset = 0
-	c.loadConstInt(RAX, 9)                     // syscall number for mmap
-	c.emitBytes(0x0F, 0x05)                    // syscall
-	
-	// RAX now contains the frame pointer
-	c.storeFromReg(RAX, inst)
-	
-	return nil
-}
+	case ir.OpCoroSuspend:
+		// Return 0 (Suspended) for now
+		c.asm.Xor(RegOp(RAX), RegOp(RAX))
+		c.store(RAX, inst)
+		
+		// Real implementation needs to save registers to the frame pointer 
+		// generated in CoroBegin, then RET to caller.
 
-// coroSuspendOp - Suspend coroutine execution (llvm.coro.suspend)
-func (c *compiler) coroSuspendOp(inst *ir.CoroSuspendInst) error {
-	// Suspend the coroutine and return control to caller
-	// Returns: 0 = suspended, 1 = resumed, -1 = destroyed
-	
-	// This is the most complex operation - it needs to:
-	// 1. Save all live variables to the coroutine frame
-	// 2. Save the resume point (instruction pointer)
-	// 3. Return to the caller
-	
-	// Simplified implementation for now:
-	// Just return 0 (suspended) - full implementation requires state machine transformation
-	
-	c.loadConstInt(RAX, 0)
-	c.storeFromReg(RAX, inst)
-	
-	return nil
-}
+	case ir.OpCoroEnd:
+		// Just return "should destroy" = 1
+		c.asm.Mov(RegOp(RAX), ImmOp(1), 64)
+		// Logic to jump to cleanup would go here
 
-// coroEndOp - End coroutine scope (llvm.coro.end)
-func (c *compiler) coroEndOp(inst *ir.CoroEndInst) error {
-	// Mark the end of the coroutine
-	// Returns true if the coroutine should be destroyed
-	
-	// Load the handle
-	handle := inst.Operands()[0]
-	c.loadToReg(RAX, handle)
-	
-	// For now, always return true (destroy the coroutine)
-	c.loadConstInt(RAX, 1)
-	
-	return nil
-}
+	case ir.OpCoroFree:
+		// Return the frame pointer handle
+		handle := inst.Operands()[1]
+		c.load(RAX, handle)
+		c.store(RAX, inst)
 
-// coroFreeOp - Get memory to free for coroutine (llvm.coro.free)
-func (c *compiler) coroFreeOp(inst *ir.CoroFreeInst) error {
-	// Returns the pointer to the coroutine frame that should be freed
-	
-	handle := inst.Operands()[1]
-	c.loadToReg(RAX, handle)
-	c.storeFromReg(RAX, inst)
-	
+	default:
+		return fmt.Errorf("unknown coro opcode: %s", inst.Opcode())
+	}
 	return nil
 }

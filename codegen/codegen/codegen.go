@@ -11,43 +11,64 @@ import (
 )
 
 // GenerateObject creates a relocatable ELF object file (.o)
+// This file can be linked with gcc or ld (e.g., `gcc output.o -o main`)
 func GenerateObject(m *ir.Module) ([]byte, error) {
-	// Compile to machine code
+	// 1. Compile IR to Machine Code
 	artifact, err := amd64.Compile(m)
 	if err != nil {
 		return nil, err
 	}
 
-	// Create ELF file
+	// 2. Wrap in ELF container
 	f := elf.NewFile()
 	f.Type = elf.ET_REL
 
 	// Create .text section
-	textSec := f.AddSection(".text", elf.SHT_PROGBITS, elf.SHF_ALLOC|elf.SHF_EXECINSTR, artifact.TextBuffer)
+	textSec := f.AddSection(".text", elf.SHT_PROGBITS, elf.SHF_ALLOC|elf.SHF_EXECINSTR, artifact.Text)
 	textSec.Addralign = 16
 
 	// Create .data section
-	dataSec := f.AddSection(".data", elf.SHT_PROGBITS, elf.SHF_ALLOC|elf.SHF_WRITE, artifact.DataBuffer)
+	dataSec := f.AddSection(".data", elf.SHT_PROGBITS, elf.SHF_ALLOC|elf.SHF_WRITE, artifact.Data)
 	dataSec.Addralign = 8
 
-	// Add symbols
+	// 3. Add Symbols
+	// We need a map to look up ELF symbols by name for relocations later
+	symMap := make(map[string]*elf.Symbol)
+
 	for _, symDef := range artifact.Symbols {
 		var sec *elf.Section
-		if symDef.IsGlobal { // In our IR, globals are variables in .data
-			sec = dataSec
-		} else {
+		if symDef.IsFunc {
 			sec = textSec
+		} else {
+			sec = dataSec
 		}
 
-		info := elf.MakeSymbolInfo(elf.STB_GLOBAL, elf.STT_FUNC)
-		if symDef.IsGlobal {
-			info = elf.MakeSymbolInfo(elf.STB_GLOBAL, elf.STT_OBJECT)
+		info := elf.MakeSymbolInfo(elf.STB_GLOBAL, elf.STT_OBJECT)
+		if symDef.IsFunc {
+			info = elf.MakeSymbolInfo(elf.STB_GLOBAL, elf.STT_FUNC)
 		}
 
-		f.AddSymbol(symDef.Name, info, sec, symDef.Offset, symDef.Size)
+		es := f.AddSymbol(symDef.Name, info, sec, symDef.Offset, symDef.Size)
+		symMap[symDef.Name] = es
 	}
 
-	// Write to buffer
+	// 4. Process Relocations
+	// These tell the linker (ld) where to patch addresses in .text
+	for _, reloc := range artifact.Relocs {
+		sym, ok := symMap[reloc.Symbol]
+		if !ok {
+			// Symbol is external (e.g., printf, malloc), not defined in this module.
+			// We must create an UNDEFINED global symbol for the linker to resolve.
+			sym = f.AddSymbol(reloc.Symbol, elf.MakeSymbolInfo(elf.STB_GLOBAL, elf.STT_NOTYPE), nil, 0, 0)
+			symMap[reloc.Symbol] = sym
+		}
+
+		// Currently, we only support relocations in .text
+		// Cast RelocationType (int) to uint32 for the ELF writer
+		f.AddRelocation(textSec, sym, uint64(reloc.Offset), uint32(reloc.Type), reloc.Addend)
+	}
+
+	// 5. Write to buffer
 	buf := new(bytes.Buffer)
 	if err := f.WriteTo(buf); err != nil {
 		return nil, err
@@ -56,8 +77,8 @@ func GenerateObject(m *ir.Module) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// GenerateExecutable creates a static ELF executable directly
-// It acts as a static linker, resolving relocations internally
+// GenerateExecutable creates a static ELF executable directly.
+// It acts as a static linker, resolving internal relocations and adding an entry point.
 func GenerateExecutable(m *ir.Module) ([]byte, error) {
 	// 1. Compile to machine code
 	artifact, err := amd64.Compile(m)
@@ -65,35 +86,44 @@ func GenerateExecutable(m *ir.Module) ([]byte, error) {
 		return nil, err
 	}
 
-	// 2. Setup Memory Layout (Static Linking)
-	// Base address for standard Linux executable
-	const baseAddr = 0x400000
-	const pageSize = 0x1000
+	// 2. Setup Memory Layout
+	const (
+		BaseAddr = 0x400000
+		PageSize = 0x1000
+	)
 
-	// Entry stub: _start calls main and then exit
-	// We inject this at the beginning of the text section
+	// Entry stub: _start calls main and then exit(0)
+	// We prepend this to the text buffer.
 	// _start:
-	//   call main
-	//   mov rdi, rax  (exit code)
-	//   mov rax, 60   (sys_exit)
-	//   syscall
+	//   call main      (E8 xx xx xx xx)
+	//   xor rdi, rdi   (48 31 FF) - exit code 0
+	//   mov rax, 60    (48 C7 C0 3C 00 00 00) - sys_exit
+	//   syscall        (0F 05)
 	entryStub := []byte{
-		0xE8, 0x00, 0x00, 0x00, 0x00, // call main (placeholder offset)
-		0x48, 0x89, 0xC7,             // mov rdi, rax
-		0xB8, 0x3C, 0x00, 0x00, 0x00, // mov eax, 60
-		0x0F, 0x05,                   // syscall
+		0xE8, 0x00, 0x00, 0x00, 0x00,       // call main (placeholder)
+		0x48, 0x31, 0xFF,                   // xor rdi, rdi
+		0x48, 0xC7, 0xC0, 0x3C, 0x00, 0x00, 0x00, // mov rax, 60
+		0x0F, 0x05,                         // syscall
 	}
-	
-	// Prepend stub to text buffer
-	finalText := append(entryStub, artifact.TextBuffer...)
-	stubSize := uint64(len(entryStub))
 
-	// Find 'main' symbol to resolve the stub call
+	stubSize := len(entryStub)
+	finalText := append(entryStub, artifact.Text...)
+	
+	// Layout addresses
+	textVAddr := uint64(BaseAddr + PageSize) // Text starts at 0x401000
+	dataVAddr := textVAddr + uint64(len(finalText))
+	
+	// Align Data to page boundary
+	if dataVAddr%PageSize != 0 {
+		dataVAddr += PageSize - (dataVAddr % PageSize)
+	}
+
+	// 3. Resolve "main" for the stub
 	var mainOffset uint64
 	foundMain := false
 	for _, sym := range artifact.Symbols {
 		if sym.Name == "main" {
-			mainOffset = sym.Offset
+			mainOffset = sym.Offset // Offset within artifact.Text
 			foundMain = true
 			break
 		}
@@ -103,188 +133,82 @@ func GenerateExecutable(m *ir.Module) ([]byte, error) {
 		return nil, fmt.Errorf("entry point 'main' not found")
 	}
 
-	// Patch the call instruction in the stub
-	// call rel32: target = mainOffset + stubSize (since main is after stub)
-	// rel = target - (PC of next instr) = (stubSize + mainOffset) - 5
-	rel := int32((stubSize + mainOffset) - 5)
+	// Patch stub call to main
+	// Target = (stubSize + mainOffset) relative to (PC + 5)
+	// PC of next instruction is index 5
+	rel := int32((stubSize + int(mainOffset)) - 5)
 	binary.LittleEndian.PutUint32(finalText[1:], uint32(rel))
 
-	// Adjust symbol offsets because we shifted text by stubSize
-	for i := range artifact.Symbols {
-		if !artifact.Symbols[i].IsGlobal { // Functions are in text
-			artifact.Symbols[i].Offset += stubSize
-		}
-	}
-	// Adjust relocations
-	for i := range artifact.Relocations {
-		artifact.Relocations[i].Offset += stubSize
-	}
-
-	// Calculate Virtual Addresses
-	// ELF Header (64) + 2 * Phdr (56) = 176 bytes
-	// We'll align the text section to 0x400000 + 0x1000 to be safe and clean
-	
-	// Text Segment: R-X
-	textVAddr := uint64(baseAddr + pageSize) 
-	textSize := uint64(len(finalText))
-	
-	// Data Segment: RW- (aligned to page boundary after text)
-	dataVAddr := textVAddr + textSize
-	if dataVAddr%pageSize != 0 {
-		dataVAddr += pageSize - (dataVAddr % pageSize)
-	}
-	dataSize := uint64(len(artifact.DataBuffer))
-
-	// 3. Resolve Relocations
-	// We need to patch the binary code based on where symbols ended up
-	for _, reloc := range artifact.Relocations {
-		// Target Symbol Address
-		var symVAddr uint64
+	// 4. Resolve Internal Relocations (Static Linking)
+	for _, reloc := range artifact.Relocs {
+		// Find symbol address
+		var symAddr uint64
 		found := false
-		
+
 		for _, sym := range artifact.Symbols {
-			if sym.Name == reloc.SymbolName {
-				if sym.IsGlobal {
-					symVAddr = dataVAddr + sym.Offset
+			if sym.Name == reloc.Symbol {
+				if sym.IsFunc {
+					// Function in text section (offset shifted by stub)
+					symAddr = textVAddr + uint64(stubSize) + sym.Offset
 				} else {
-					symVAddr = textVAddr + sym.Offset
+					// Global in data section
+					symAddr = dataVAddr + sym.Offset
 				}
 				found = true
 				break
 			}
 		}
-		
+
 		if !found {
-			// It might be a builtin like __exception_state if not explicitly in symbols
-			// But compiler usually emits symbols. If missing, fail.
-			return nil, fmt.Errorf("undefined symbol: %s", reloc.SymbolName)
+			return nil, fmt.Errorf("undefined symbol '%s' (static linking does not support external libs yet)", reloc.Symbol)
 		}
 
-		// Apply relocation
-		// PC = VAddr of the instruction + Offset within text
-		pc := textVAddr + reloc.Offset
+		// Apply Patch
+		// PC = VAddr of the instruction + Offset within text (shifted by stub)
+		pc := textVAddr + uint64(stubSize) + uint64(reloc.Offset)
 		
-		switch reloc.Type {
-		case amd64.R_X86_64_PC32, amd64.R_X86_64_PLT32:
-			// Value = Symbol - PC + Addend
-			val := int32(int64(symVAddr) - int64(pc) + reloc.Addend)
-			
-			// Write back 32-bit value
-			// The relocation offset points to the end of the opcode, where the imm32 starts
-			// Note: amd64.Compile emits placeholder bytes at these offsets
-			binary.LittleEndian.PutUint32(finalText[reloc.Offset:], uint32(val))
-			
-		default:
-			return nil, fmt.Errorf("unsupported relocation type for static link: %d", reloc.Type)
-		}
+		// Calculate Value: Symbol - PC + Addend
+		val := int32(int64(symAddr) - int64(pc) + reloc.Addend)
+
+		// Write to finalText (offset shifted by stub)
+		patchOffset := stubSize + int(reloc.Offset)
+		binary.LittleEndian.PutUint32(finalText[patchOffset:], uint32(val))
 	}
 
-	// 4. Create ELF File
+	// 5. Create ELF Container
 	f := elf.NewFile()
 	f.Type = elf.ET_EXEC
-	f.Entry = textVAddr // Points to _start stub
+	f.Entry = textVAddr // Points to _start (beginning of stub)
 
-	// Create Program Headers (Segments)
-	// 1. Load Text (R E)
-	// We map the ELF header + Text into the first segment usually, but for simplicity
-	// let's just map the sections.
-	// Actually, for a valid executable, the headers usually need to be loaded.
-	
-	// Simplest static binary layout:
-	// File Off 0: Headers
-	// File Off 4096: .text
-	// File Off ... : .data
-	
-	// We need to calculate file offsets first.
-	// Headers Size: 64 + 2*56 = 176.
-	// Let's force .text to file offset 4096.
-	
-	f.AddProgramHeader(elf.PT_LOAD, elf.PF_R|elf.PF_X, 0x1000, textVAddr, textSize, textSize, pageSize)
-	
+	// Add Program Headers (Segments)
+	// Segment 1: Text (Read+Exec)
+	textSize := uint64(len(finalText))
+	f.AddProgramHeader(elf.PT_LOAD, elf.PF_R|elf.PF_X, 0x1000, textVAddr, textSize, textSize, PageSize)
+
+	// Segment 2: Data (Read+Write)
+	dataSize := uint64(len(artifact.Data))
 	if dataSize > 0 {
-		// Calculate file offset for data
-		// Since we write sequentially, we need to know where text ends in file.
-		// Text starts at 0x1000. Ends at 0x1000 + len.
-		// Data starts at dataVAddr - baseAddr in file? No.
-		
-		// In file:
-		// [Headers ... padding ... ] [Text] [padding] [Data]
-		
+		// We calculate the file offset linearly. 
+		// Text is at 0x1000. Data is appended.
+		// NOTE: A robust linker would align file offsets to pages too (0x2000), 
+		// but for small static binaries, packing often works if VAddr aligns.
+		// Let's align file offset for safety.
 		dataFileOff := uint64(0x1000) + textSize
-		// Align file offset to page size? Not strictly necessary for static binary if VAddr is aligned,
-		// but good practice.
-		if dataFileOff%pageSize != 0 {
-			dataFileOff += pageSize - (dataFileOff % pageSize)
+		if dataFileOff%PageSize != 0 {
+			dataFileOff += PageSize - (dataFileOff % PageSize)
 		}
 		
-		f.AddProgramHeader(elf.PT_LOAD, elf.PF_R|elf.PF_W, dataFileOff, dataVAddr, dataSize, dataSize, pageSize)
-		
-		// Create Sections (mapped to these file offsets)
-		t := f.AddSection(".text", elf.SHT_PROGBITS, elf.SHF_ALLOC|elf.SHF_EXECINSTR, finalText)
-		t.Addr = textVAddr
-		// We manually set offset to match Phdr
-		// Note: writer.go calculates offsets linearly. We might need padding.
-		// Since writer.go logic is simple linear append, we must rely on its calculation
-		// or ensure the content we pass includes padding.
-		
-		// To ensure writer.go places .text at 0x1000:
-		// We insert a dummy section or rely on alignment?
-		// writer.go: "currentOffset += sec.Addralign - ..."
-		// If we set t.offset manually, writer respects it.
-		t.Index = 1 // fixup internal index if needed
-		// writer.go uses t.offset = currentOffset if 0.
-		
-		// HACK: To make writer.go produce the exact layout we want without modifying it too much,
-		// we can create a "padding" section before text if needed, OR we just let writer calculate,
-		// and we update Phdr offsets to match what writer WILL produce.
-		
-		// Let's predict writer output:
-		// Header (64) + Phdr (112) = 176.
-		// StrTabs come first. They are small.
-		// Then .text.
-		
-		// Actually, to create a proper executable with fixed addresses using a simple writer,
-		// the simplest way is to NOT use sections for execution, just Segments.
-		// But `writer.go` is section-based.
-		
-		// Let's modify the approach:
-		// We will set the `Addr` on sections.
-		// We will add Phdrs that cover these sections.
-		// We rely on `writer.go` to pack them.
-		// For an executable, VAddr alignment matters.
-		
-		t.Addr = textVAddr
-		t.Addralign = pageSize // Force alignment in file to 4096
-		
-		d := f.AddSection(".data", elf.SHT_PROGBITS, elf.SHF_ALLOC|elf.SHF_WRITE, artifact.DataBuffer)
-		d.Addr = dataVAddr
-		d.Addralign = pageSize
-		
-		// Re-make Phdrs based on section properties
-		// Since we don't know exact file offsets yet, we can't fully fill Phdr.Off.
-		// However, `writer.go` writes Phdrs BEFORE sections. It needs Phdr.Off.
-		// This circular dependency (Phdr needs Section Offset, Section Offset calculated during write)
-		// suggests we need a multi-pass or pre-calculation.
-		
-		// Pre-calculation logic:
-		// Headers: ~200 bytes.
-		// .shstrtab, .strtab, .symtab: ~few hundred bytes.
-		// We can put all metadata at start, align .text to 0x1000.
-		
-		// Let's assume writer will align .text to 0x1000 because we set Addralign=4096.
-		// Text Offset = 0x1000.
-		// Data Offset = Text Offset + TextSize aligned to 4096.
-		
-		// Update Phdrs with these assumptions
-		f.ProgramHeaders[0].Off = 0x1000
-		f.ProgramHeaders[1].Off = dataFileOff
-	} else {
-		// Only text
-		f.AddProgramHeader(elf.PT_LOAD, elf.PF_R|elf.PF_X, 0x1000, textVAddr, textSize, textSize, pageSize)
-		t := f.AddSection(".text", elf.SHT_PROGBITS, elf.SHF_ALLOC|elf.SHF_EXECINSTR, finalText)
-		t.Addr = textVAddr
-		t.Addralign = pageSize
+		f.AddProgramHeader(elf.PT_LOAD, elf.PF_R|elf.PF_W, dataFileOff, dataVAddr, dataSize, dataSize, PageSize)
 	}
+
+	// Add Sections
+	t := f.AddSection(".text", elf.SHT_PROGBITS, elf.SHF_ALLOC|elf.SHF_EXECINSTR, finalText)
+	t.Addr = textVAddr
+	t.Addralign = PageSize
+
+	d := f.AddSection(".data", elf.SHT_PROGBITS, elf.SHF_ALLOC|elf.SHF_WRITE, artifact.Data)
+	d.Addr = dataVAddr
+	d.Addralign = PageSize
 
 	buf := new(bytes.Buffer)
 	if err := f.WriteTo(buf); err != nil {
