@@ -153,11 +153,18 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 	if !ok { return nil }
 	alloca := g.ctx.Builder.CreateAlloca(sym.Type, name+".addr")
 	sym.IRValue = alloca
+	
 	if ctx.Expression() != nil {
+		// Visit expression to get IR value
 		val := g.Visit(ctx.Expression())
+		
+		// Ensure we got a valid IR value
 		if irVal, ok := val.(ir.Value); ok {
 			irVal = g.emitCast(irVal, sym.Type)
 			g.ctx.Builder.CreateStore(irVal, alloca)
+		} else {
+			// Fallback if expression evaluation failed to return ir.Value
+			g.ctx.Builder.CreateStore(g.getZeroValue(sym.Type), alloca)
 		}
 	} else {
 		g.ctx.Builder.CreateStore(g.getZeroValue(sym.Type), alloca)

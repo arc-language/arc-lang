@@ -1,7 +1,6 @@
 package irgen
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/antlr4-go/antlr/v4"
@@ -24,6 +23,8 @@ func getBinaryOp(ctx antlr.ParserRuleContext, index int) int {
 func (g *Generator) VisitExpression(ctx *parser.ExpressionContext) interface{} {
 	return g.Visit(ctx.LogicalOrExpression())
 }
+
+// --- Binary Expressions ---
 
 func (g *Generator) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionContext) interface{} {
 	lhs := g.Visit(ctx.LogicalAndExpression(0)).(ir.Value)
@@ -101,7 +102,7 @@ func (g *Generator) VisitRelationalExpression(ctx *parser.RelationalExpressionCo
 
 func (g *Generator) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} {
 	children := ctx.GetChildren()
-	if len(children) == 0 { return nil }
+	if len(children) == 0 { return g.getZeroValue(types.I64) }
 
 	lhs := g.Visit(children[0].(antlr.ParseTree)).(ir.Value)
 	const (OpNone = iota; OpLeft; OpRight)
@@ -156,6 +157,8 @@ func (g *Generator) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 	return lhs
 }
 
+// --- Unary Expressions ---
+
 func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
 	if ctx.INCREMENT() != nil || ctx.DECREMENT() != nil {
 		ptr := g.getLValue(ctx.UnaryExpression())
@@ -185,6 +188,8 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 	}
 	return val
 }
+
+// --- Postfix Expressions ---
 
 func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
 	var currPtr ir.Value = g.getLValue(ctx.PrimaryExpression())
@@ -239,6 +244,8 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	return curr
 }
 
+// --- Primary Expressions ---
+
 func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
 	if ctx.StructLiteral() != nil { return g.Visit(ctx.StructLiteral()) }
 	if ctx.Literal() != nil { return g.Visit(ctx.Literal()) }
@@ -250,30 +257,36 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		name := ctx.IDENTIFIER().GetText()
 		if sym, ok := g.currentScope.Resolve(name); ok {
 			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok { return g.ctx.Builder.CreateLoad(sym.Type, alloca, "") }
-			return sym.IRValue
+			if sym.IRValue != nil { return sym.IRValue }
 		}
 		if glob := g.ctx.Module.GetGlobal(name); glob != nil { return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "") }
 	}
 	if ctx.Expression() != nil { return g.Visit(ctx.Expression()) }
+	
 	return g.getZeroValue(types.I64)
 }
 
 func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
-	if ctx.INTEGER_LITERAL() != nil {
-		txt := ctx.INTEGER_LITERAL().GetText()
+	// Fallback to text parsing if specific token helpers return nil (parser version mismatch handling)
+	txt := ctx.GetText()
+	
+	if ctx.INTEGER_LITERAL() != nil || (ctx.FLOAT_LITERAL() == nil && ctx.STRING_LITERAL() == nil && ctx.BOOLEAN_LITERAL() == nil && ctx.NULL() == nil) {
+		// Integer (default fallback for numbers)
 		val, _ := strconv.ParseInt(txt, 0, 64)
 		return g.ctx.Builder.ConstInt(types.I64, val)
 	}
 	if ctx.FLOAT_LITERAL() != nil {
-		txt := ctx.FLOAT_LITERAL().GetText()
 		val, _ := strconv.ParseFloat(txt, 64)
 		return g.ctx.Builder.ConstFloat(types.F64, val)
 	}
+	if ctx.BOOLEAN_LITERAL() != nil {
+		if txt == "true" { return g.ctx.Builder.ConstInt(types.I1, 1) }
+		return g.ctx.Builder.ConstInt(types.I1, 0)
+	}
 	if ctx.STRING_LITERAL() != nil {
-		raw := ctx.STRING_LITERAL().GetText()
-		if len(raw) >= 2 { raw = raw[1 : len(raw)-1] }
-		content := raw + "\x00"
-		strName := fmt.Sprintf(".str.%d", len(g.ctx.Module.Globals))
+		if len(txt) >= 2 { txt = txt[1 : len(txt)-1] }
+		content := txt + "\x00"
+		strName := "str"
 		arrType := types.NewArray(types.I8, int64(len(content)))
 		var chars []ir.Constant
 		for _, b := range []byte(content) { chars = append(chars, g.ctx.Builder.ConstInt(types.I8, int64(b))) }
