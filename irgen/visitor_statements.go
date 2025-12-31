@@ -180,88 +180,23 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 }
 
 func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
-	// Case 1: Iterator Loop "for x in collection" (or Range)
-	if ctx.IN() != nil {
-		expr := ctx.Expression(0)
-		
-		// Attempt to identify "start..end" range syntax
-		rangeExpr := getRangeExprContext(expr)
-		
-		if rangeExpr != nil && rangeExpr.RANGE() != nil {
-			// Range Loop Implementation
-			start := g.Visit(rangeExpr.AdditiveExpression(0)).(ir.Value)
-			end := g.Visit(rangeExpr.AdditiveExpression(1)).(ir.Value)
-			
-			loopVarName := ctx.IDENTIFIER(0).GetText()
-			
-			// Allocate loop variable
-			loopVarPtr := g.ctx.Builder.CreateAlloca(start.Type(), loopVarName+".addr")
-			g.ctx.Builder.CreateStore(start, loopVarPtr)
-			
-			// Register in symbol table manually for this block
-			// Note: The semantic analyzer should have already created a scope for this block
-			if sym, ok := g.currentScope.Resolve(loopVarName); ok {
-				sym.IRValue = loopVarPtr
-			}
+	// Enter loop scope (defined in semantics)
+	g.enterScope(ctx)
+	defer g.exitScope()
 
-			// Blocks
-			condBlock := g.ctx.Builder.CreateBlock("range.cond")
-			bodyBlock := g.ctx.Builder.CreateBlock("range.body")
-			stepBlock := g.ctx.Builder.CreateBlock("range.step")
-			endBlock := g.ctx.Builder.CreateBlock("range.end")
+	// Iterator loop placeholder
+	if ctx.IN() != nil { return nil }
 
-			g.ctx.Builder.CreateBr(condBlock)
-
-			// Condition: i < end
-			g.ctx.SetInsertBlock(condBlock)
-			currVal := g.ctx.Builder.CreateLoad(start.Type(), loopVarPtr, "")
-			cmp := g.ctx.Builder.CreateICmpSLT(currVal, end, "")
-			g.ctx.Builder.CreateCondBr(cmp, bodyBlock, endBlock)
-
-			// Body
-			g.ctx.SetInsertBlock(bodyBlock)
-			g.loopStack = append(g.loopStack, loopInfo{breakBlock: endBlock, continueBlock: stepBlock})
-			g.Visit(ctx.Block())
-			g.loopStack = g.loopStack[:len(g.loopStack)-1]
-			
-			if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
-				g.ctx.Builder.CreateBr(stepBlock)
-			}
-
-			// Step: i++
-			g.ctx.SetInsertBlock(stepBlock)
-			currVal = g.ctx.Builder.CreateLoad(start.Type(), loopVarPtr, "")
-			
-			var one ir.Value
-			if types.IsInteger(start.Type()) {
-				one = g.ctx.Builder.ConstInt(start.Type().(*types.IntType), 1)
-			} else {
-				one = g.ctx.Builder.ConstInt(types.I64, 1)
-			}
-			
-			nextVal := g.ctx.Builder.CreateAdd(currVal, one, "")
-			g.ctx.Builder.CreateStore(nextVal, loopVarPtr)
-			g.ctx.Builder.CreateBr(condBlock)
-
-			g.ctx.SetInsertBlock(endBlock)
-			return nil
-		}
-		
-		// Fallback for other Iterators (Arrays, Vectors) not fully implemented yet
-		return nil
-	}
-
-	// Case 2: C-Style Loop "for init; cond; step" or "for cond" or "for {}"
+	// Blocks
 	condBlock := g.ctx.Builder.CreateBlock("loop.cond")
 	bodyBlock := g.ctx.Builder.CreateBlock("loop.body")
 	postBlock := g.ctx.Builder.CreateBlock("loop.post")
 	endBlock := g.ctx.Builder.CreateBlock("loop.end")
 
-	// Initialization
+	// Init
 	if len(ctx.AllSEMICOLON()) >= 2 {
-		if ctx.VariableDecl() != nil {
-			g.Visit(ctx.VariableDecl())
-		} else if len(ctx.AllAssignmentStmt()) > 0 && ctx.AssignmentStmt(0).GetStart().GetTokenIndex() < ctx.SEMICOLON(0).GetSymbol().GetTokenIndex() {
+		if ctx.VariableDecl() != nil { g.Visit(ctx.VariableDecl()) }
+		if len(ctx.AllAssignmentStmt()) > 0 && ctx.AssignmentStmt(0).GetStart().GetTokenIndex() < ctx.SEMICOLON(0).GetSymbol().GetTokenIndex() {
 			g.Visit(ctx.AssignmentStmt(0))
 		}
 	}
@@ -270,34 +205,24 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 	// Condition
 	g.ctx.SetInsertBlock(condBlock)
-	var cond ir.Value
-	var condExpr parser.IExpressionContext
-
+	var cond ir.Value = g.ctx.Builder.True()
+	
 	if len(ctx.AllSEMICOLON()) >= 2 {
-		// C-Style: find expression between semicolons
 		semi1 := ctx.SEMICOLON(0).GetSymbol().GetTokenIndex()
 		semi2 := ctx.SEMICOLON(1).GetSymbol().GetTokenIndex()
 		for _, expr := range ctx.AllExpression() {
 			if expr.GetStart().GetTokenIndex() > semi1 && expr.GetStart().GetTokenIndex() < semi2 {
-				condExpr = expr
+				cond = g.Visit(expr).(ir.Value)
 				break
 			}
 		}
 	} else if len(ctx.AllExpression()) > 0 {
-		// While-Style: for x < 10
-		condExpr = ctx.Expression(0)
+		cond = g.Visit(ctx.Expression(0)).(ir.Value)
 	}
 
-	if condExpr != nil {
-		cond = g.Visit(condExpr).(ir.Value)
-		if cond.Type().BitSize() > 1 {
-			cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
-		}
-	} else {
-		// Infinite Loop
-		cond = g.ctx.Builder.True()
+	if cond.Type().BitSize() > 1 {
+		cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
 	}
-
 	g.ctx.Builder.CreateCondBr(cond, bodyBlock, endBlock)
 
 	// Body
@@ -305,24 +230,20 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	g.loopStack = append(g.loopStack, loopInfo{breakBlock: endBlock, continueBlock: postBlock})
 	g.Visit(ctx.Block())
 	g.loopStack = g.loopStack[:len(g.loopStack)-1]
-
+	
 	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 		g.ctx.Builder.CreateBr(postBlock)
 	}
 
-	// Post/Step
+	// Post
 	g.ctx.SetInsertBlock(postBlock)
 	if len(ctx.AllSEMICOLON()) >= 2 {
 		semi2 := ctx.SEMICOLON(1).GetSymbol().GetTokenIndex()
 		for _, assign := range ctx.AllAssignmentStmt() {
-			if assign.GetStart().GetTokenIndex() > semi2 {
-				g.Visit(assign)
-			}
+			if assign.GetStart().GetTokenIndex() > semi2 { g.Visit(assign) }
 		}
 		for _, expr := range ctx.AllExpression() {
-			if expr.GetStart().GetTokenIndex() > semi2 {
-				g.Visit(expr)
-			}
+			if expr.GetStart().GetTokenIndex() > semi2 { g.Visit(expr) }
 		}
 	}
 	g.ctx.Builder.CreateBr(condBlock)

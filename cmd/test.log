@@ -9,18 +9,30 @@ Object file: /tmp/arc_tests/test_alloca.o
 Executable: /tmp/arc_tests/test_alloca
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_alloca.arc...
 [Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_alloca.arc
-/workspaces/arc-lang/cmd/tests/test_alloca.arc:4:0: Cannot dereference non-pointer type 'void'
+[Driver] [INFO] Compilation successful. Module 'test_alloca.arc' created.
+✓ Module 'test_alloca.arc' compiled (1 functions)
+✓ Object file written to /tmp/arc_tests/test_alloca.o
 
-❌ FAIL (0.04s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_alloca.arc...
-      [Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_alloca.arc
-      /workspaces/arc-lang/cmd/tests/test_alloca.arc:4:0: Cannot dereference non-pointer type 'void'
+To link manually:
+  gcc /tmp/arc_tests/test_alloca.o -o test_alloca -no-pie
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_alloca.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 1
+❌ Test FAILED: expected exit=0, got exit=1
+❌ FAIL (0.06s)
+    Expected exit=0, got exit=1
 [2/39] test_arithmetic                               
 --- Testing: test_arithmetic ---
 Source file: tests/test_arithmetic.arc
@@ -50,7 +62,7 @@ Link output:
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.06s)
+✅ PASS (0.07s)
 [3/39] test_array                                    
 --- Testing: test_array ---
 Source file: tests/test_array.arc
@@ -64,7 +76,7 @@ Compiling tests/test_array.arc...
 [Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_array.arc
 /workspaces/arc-lang/cmd/tests/test_array.arc:2:0: Type mismatch in variable 'arr': expected [5 x i32], got void
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Compilation failed
     Compile output:
       Compiling tests/test_array.arc...
@@ -156,20 +168,29 @@ Object file: /tmp/arc_tests/test_char_literal.o
 Executable: /tmp/arc_tests/test_char_literal
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 1
-Output:
+Compilation successful
+Compile output:
 Compiling tests/test_char_literal.arc...
 [Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_char_literal.arc
-/workspaces/arc-lang/cmd/tests/test_char_literal.arc:2:0: Type mismatch in variable 'newline': expected i32, got void
-/workspaces/arc-lang/cmd/tests/test_char_literal.arc:3:0: Type mismatch in variable 'tab': expected i32, got void
+[Driver] [INFO] Compilation successful. Module 'test_char_literal.arc' created.
+✓ Module 'test_char_literal.arc' compiled (1 functions)
+✓ Object file written to /tmp/arc_tests/test_char_literal.o
 
-❌ FAIL (0.02s)
-    Compilation failed
-    Compile output:
-      Compiling tests/test_char_literal.arc...
-      [Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_char_literal.arc
-      /workspaces/arc-lang/cmd/tests/test_char_literal.arc:2:0: Type mismatch in variable 'newline': expected i32, got void
-      /workspaces/arc-lang/cmd/tests/test_char_literal.arc:3:0: Type mismatch in variable 'tab': expected i32, got void
+To link manually:
+  gcc /tmp/arc_tests/test_char_literal.o -o test_char_literal -no-pie
+
+
+Step 2: Linking with gcc...
+Linking successful
+Link output:
+/usr/bin/ld: warning: /tmp/arc_tests/test_char_literal.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+
+Step 3: Running executable...
+Process exited with code: 0
+✅ Test PASSED
+✅ PASS (0.05s)
 [8/39] test_class                                    
 --- Testing: test_class ---
 Source file: tests/test_class.arc
@@ -218,7 +239,7 @@ Link output:
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.11s)
 [10/39] test_compound_assignment                      
 --- Testing: test_compound_assignment ---
 Source file: tests/test_compound_assignment.arc
@@ -248,7 +269,7 @@ Link output:
 Step 3: Running executable...
 Process exited with code: 0
 ✅ Test PASSED
-✅ PASS (0.05s)
+✅ PASS (0.09s)
 [11/39] test_constant                                 
 --- Testing: test_constant ---
 Source file: tests/test_constant.arc
@@ -256,30 +277,21 @@ Object file: /tmp/arc_tests/test_constant.o
 Executable: /tmp/arc_tests/test_constant
 
 Step 1: Compiling to object file...
-Compilation successful
-Compile output:
+Compilation failed: exit status 1
+Output:
 Compiling tests/test_constant.arc...
 [Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_constant.arc
-[Driver] [INFO] Compilation successful. Module 'test_constant.arc' created.
-✓ Module 'test_constant.arc' compiled (1 functions)
-✓ Object file written to /tmp/arc_tests/test_constant.o
+/workspaces/arc-lang/cmd/tests/test_constant.arc:6:0: Undefined identifier 'MAX'
 
-To link manually:
-  gcc /tmp/arc_tests/test_constant.o -o test_constant -no-pie
-
-
-Step 2: Linking with gcc...
-Linking successful
-Link output:
-/usr/bin/ld: warning: /tmp/arc_tests/test_constant.o: missing .note.GNU-stack section implies executable stack
-/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-
-
-Step 3: Running executable...
-Process exited with code: 1
-❌ Test FAILED: expected exit=0, got exit=1
 ❌ FAIL (0.05s)
-    Expected exit=0, got exit=1
+    Compilation failed
+    Compile output:
+      Compiling tests/test_constant.arc...
+      [Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_constant.arc
+      /workspaces/arc-lang/cmd/tests/test_constant.arc:6:0: Undefined identifier 'MAX'
+    Compiling tests/test_constant.arc...
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_constant.arc
+/workspaces/arc-lang/cmd/tests/test_constant.arc:6:0: Undefined identifier 'MAX'
 [12/39] test_defer                                    
 --- Testing: test_defer ---
 Source file: tests/test_defer.arc
@@ -294,96 +306,96 @@ Compiling tests/test_defer.arc...
 panic: interface conversion: types.Type is *types.FunctionType, not *types.PointerType
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitPostfixExpression(0xc000236550, 0xc0000f9e00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:281 +0x10dc
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8282a0?, {0x688a78?, 0xc0000f9e00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:119 +0x772
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitUnaryExpression(0xc000236550, 0xc0000f9d80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:265 +0x2a8
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827d20?, {0x688a10?, 0xc0000f9d80?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:118 +0x672
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitMultiplicativeExpression(0xc000236550, 0xc0000f9d00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:171 +0xc8
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827b80?, {0x688940?, 0xc0000f9d00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:117 +0x831
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitAdditiveExpression(0xc000236550, 0xc0000f9c80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:149 +0xc8
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827b00?, {0x6888d8?, 0xc0000f9c80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:116 +0x1b1
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitRangeExpression(0xc000236550, 0x0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:145 +0xaa
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827a00?, {0x688870?, 0xc0000f9c00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:115 +0x611
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitShiftExpression(0xc000236550, 0x0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:113 +0xdb
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8278c0?, {0x688808?, 0xc0000f9b80?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:114 +0x99c
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitRelationalExpression(0xc000236550, 0xc0000f9b00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:89 +0xc8
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827720?, {0x6887a0?, 0xc0000f9b00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:113 +0x272
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitEqualityExpression(0xc000236550, 0xc0000f9a80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:75 +0xc8
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827580?, {0x688738?, 0xc0000f9a80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:112 +0x311
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitAndExpression(0xc000236550, 0xc0000f9a00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:66 +0xc8
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8273e0?, {0x6886d0?, 0xc0000f9a00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:111 +0x6e5
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitXorExpression(0xc000236550, 0xc0000f9980)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:57 +0xc8
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827240?, {0x688668?, 0xc0000f9980?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:110 +0x94e
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitOrExpression(0xc000236550, 0xc0000f9900)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:48 +0xc8
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8270a0?, {0x688600?, 0xc0000f9900})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:109 +0x1e5
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitLogicalAndExpression(0xc000236550, 0xc0000f9880)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:39 +0xc8
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x826f00?, {0x688598?, 0xc0000f9880})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:108 +0x2e5
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitLogicalOrExpression(0xc000236550, 0xc0000f9800)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:30 +0xc8
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x826e80?, {0x688530?, 0xc0000f9800})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:107 +0x211
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitExpression(0xc000236550, 0x1?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:24 +0xaa
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x825560?, {0x6884c8?, 0xc0000f9780})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:106 +0x451
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit.(*Generator).VisitDeferStmt.func1(0xc000236550)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_statements.go:276 +0x65
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitPostfixExpression(0xc0000005f0, 0xc0000d3e00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:279 +0xfa5
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8342a0?, {0x691a58?, 0xc0000d3e00?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:119 +0x772
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitUnaryExpression(0xc0000005f0, 0xc0000d3d80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:266 +0x2a8
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833d20?, {0x6919f0?, 0xc0000d3d80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:118 +0x672
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitMultiplicativeExpression(0xc0000005f0, 0xc0000d3d00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:174 +0xc8
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833b80?, {0x691920?, 0xc0000d3d00?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:117 +0x831
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitAdditiveExpression(0xc0000005f0, 0xc0000d3c80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:152 +0xc8
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833b00?, {0x6918b8?, 0xc0000d3c80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:116 +0x1b1
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitRangeExpression(0xc0000005f0, 0xc0000fe370?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:148 +0xaa
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833a00?, {0x691850?, 0xc0000d3c00?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:115 +0x611
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitShiftExpression(0xc0000005f0, 0xc0000ea380?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:116 +0xdb
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8338c0?, {0x6917e8?, 0xc0000d3b80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:114 +0x99c
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitRelationalExpression(0xc0000005f0, 0xc0000d3b00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:92 +0xc8
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833720?, {0x691780?, 0xc0000d3b00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:113 +0x272
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitEqualityExpression(0xc0000005f0, 0xc0000d3a80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:78 +0xc8
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833580?, {0x691718?, 0xc0000d3a80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:112 +0x311
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitAndExpression(0xc0000005f0, 0xc0000d3a00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:69 +0xc8
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8333e0?, {0x6916b0?, 0xc0000d3a00?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:111 +0x6e5
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitXorExpression(0xc0000005f0, 0xc0000d3980)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:60 +0xc8
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833240?, {0x691648?, 0xc0000d3980?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:110 +0x94e
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitOrExpression(0xc0000005f0, 0xc0000d3900)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:51 +0xc8
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8330a0?, {0x6915e0?, 0xc0000d3900})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:109 +0x1e5
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitLogicalAndExpression(0xc0000005f0, 0xc0000d3880)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:42 +0xc8
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x832f00?, {0x691578?, 0xc0000d3880})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:108 +0x2e5
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitLogicalOrExpression(0xc0000005f0, 0xc0000d3800)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:33 +0xc8
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x832e80?, {0x691510?, 0xc0000d3800})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:107 +0x211
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitExpression(0xc0000005f0, 0xc00005c808?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:27 +0xaa
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x831560?, {0x6914a8?, 0xc0000d3780})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:106 +0x451
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit.(*Generator).VisitDeferStmt.func1(0xc0000005f0)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_statements.go:351 +0x65
 github.com/arc-language/arc-lang/irgen.(*DeferStack).Emit(...)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/defer_manager.go:26
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitReturnStmt(0xc000236550, 0xc0004ca100)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_statements.go:35 +0x45
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0xc000236550, {0x688e88?, 0xc0004ca080})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:79 +0x3347
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitBlock(0xc000236550, 0xc0000f9380)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_statements.go:25 +0x305
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x826ce0?, {0x688e20?, 0xc0000f9380?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:74 +0x891
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitFunctionDecl(0xc000236550, 0xc0000f9080)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_declarations.go:121 +0x95d
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x826680?, {0x688bb0?, 0xc0000f9080})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:68 +0x111
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitTopLevelDecl(0xc000236550, 0xc0000f9000)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_declarations.go:17 +0x8b7
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8265a0?, {0x688b48?, 0xc0000f9000?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:67 +0x711
-github.com/arc-language/arc-lang/irgen.(*Generator).VisitCompilationUnit(0xc000236550, 0xc0000f8a80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_declarations.go:12 +0x2d1
-github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x824b20?, {0x688ae0?, 0xc0000f8a80?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:66 +0x745
-github.com/arc-language/arc-lang/irgen.Generate({0x694728, 0xc0000f8a80}, {0xc0000c201f, 0xe}, 0xc0004d8f40)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:38 +0x245
-github.com/arc-language/arc-lang/compiler.(*Compiler).CompileFile(0xc000569ec8, {0x7fffabdf94f2?, 0x63ad2e?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/compiler/compiler.go:68 +0x2ab
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/defer_manager.go:26
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitReturnStmt(0xc0000005f0, 0xc0004e4100)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_statements.go:38 +0x45
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0xc0000005f0, {0x691e68?, 0xc0004e4080})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:79 +0x341a
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitBlock(0xc0000005f0, 0xc0000d3380)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_statements.go:27 +0x305
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x832ce0?, {0x691e00?, 0xc0000d3380?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:74 +0x892
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitFunctionDecl(0xc0000005f0, 0xc0000d3080)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_declarations.go:121 +0x95d
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x832680?, {0x691b90?, 0xc0000d3080})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:68 +0x111
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitTopLevelDecl(0xc0000005f0, 0xc0000d3000)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_declarations.go:17 +0x8b7
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8325a0?, {0x691b28?, 0xc0000d3000?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:67 +0x711
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitCompilationUnit(0xc0000005f0, 0xc0000d2a80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_declarations.go:12 +0x2d1
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x830b20?, {0x691ac0?, 0xc0000d2a80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:66 +0x745
+github.com/arc-language/arc-lang/irgen.Generate({0x69d708, 0xc0000d2a80}, {0xc00002e4cf, 0xe}, 0xc000363c80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:38 +0x245
+github.com/arc-language/arc-lang/compiler.(*Compiler).CompileFile(0xc000451ec8, {0x7ffebc7a34f2?, 0x643055?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/compiler/compiler.go:68 +0x2ab
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:72 +0x329
 main.main()
 	/workspaces/arc-lang/cmd/main.go:24 +0xad
 
-❌ FAIL (0.03s)
+❌ FAIL (0.06s)
     Compilation failed
     Compile output:
       Compiling tests/test_defer.arc...
@@ -391,91 +403,91 @@ main.main()
       panic: interface conversion: types.Type is *types.FunctionType, not *types.PointerType
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitPostfixExpression(0xc000236550, 0xc0000f9e00)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:281 +0x10dc
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8282a0?, {0x688a78?, 0xc0000f9e00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:119 +0x772
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitUnaryExpression(0xc000236550, 0xc0000f9d80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:265 +0x2a8
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827d20?, {0x688a10?, 0xc0000f9d80?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:118 +0x672
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitMultiplicativeExpression(0xc000236550, 0xc0000f9d00)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:171 +0xc8
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827b80?, {0x688940?, 0xc0000f9d00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:117 +0x831
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitAdditiveExpression(0xc000236550, 0xc0000f9c80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:149 +0xc8
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827b00?, {0x6888d8?, 0xc0000f9c80})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:116 +0x1b1
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitRangeExpression(0xc000236550, 0x0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:145 +0xaa
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827a00?, {0x688870?, 0xc0000f9c00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:115 +0x611
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitShiftExpression(0xc000236550, 0x0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:113 +0xdb
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8278c0?, {0x688808?, 0xc0000f9b80?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:114 +0x99c
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitRelationalExpression(0xc000236550, 0xc0000f9b00)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:89 +0xc8
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827720?, {0x6887a0?, 0xc0000f9b00})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:113 +0x272
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitEqualityExpression(0xc000236550, 0xc0000f9a80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:75 +0xc8
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827580?, {0x688738?, 0xc0000f9a80})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:112 +0x311
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitAndExpression(0xc000236550, 0xc0000f9a00)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:66 +0xc8
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8273e0?, {0x6886d0?, 0xc0000f9a00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:111 +0x6e5
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitXorExpression(0xc000236550, 0xc0000f9980)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:57 +0xc8
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x827240?, {0x688668?, 0xc0000f9980?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:110 +0x94e
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitOrExpression(0xc000236550, 0xc0000f9900)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:48 +0xc8
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8270a0?, {0x688600?, 0xc0000f9900})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:109 +0x1e5
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitLogicalAndExpression(0xc000236550, 0xc0000f9880)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:39 +0xc8
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x826f00?, {0x688598?, 0xc0000f9880})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:108 +0x2e5
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitLogicalOrExpression(0xc000236550, 0xc0000f9800)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:30 +0xc8
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x826e80?, {0x688530?, 0xc0000f9800})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:107 +0x211
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitExpression(0xc000236550, 0x1?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_expressions.go:24 +0xaa
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x825560?, {0x6884c8?, 0xc0000f9780})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:106 +0x451
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit.(*Generator).VisitDeferStmt.func1(0xc000236550)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_statements.go:276 +0x65
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitPostfixExpression(0xc0000005f0, 0xc0000d3e00)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:279 +0xfa5
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8342a0?, {0x691a58?, 0xc0000d3e00?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:119 +0x772
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitUnaryExpression(0xc0000005f0, 0xc0000d3d80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:266 +0x2a8
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833d20?, {0x6919f0?, 0xc0000d3d80?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:118 +0x672
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitMultiplicativeExpression(0xc0000005f0, 0xc0000d3d00)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:174 +0xc8
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833b80?, {0x691920?, 0xc0000d3d00?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:117 +0x831
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitAdditiveExpression(0xc0000005f0, 0xc0000d3c80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:152 +0xc8
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833b00?, {0x6918b8?, 0xc0000d3c80})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:116 +0x1b1
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitRangeExpression(0xc0000005f0, 0xc0000fe370?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:148 +0xaa
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833a00?, {0x691850?, 0xc0000d3c00?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:115 +0x611
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitShiftExpression(0xc0000005f0, 0xc0000ea380?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:116 +0xdb
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8338c0?, {0x6917e8?, 0xc0000d3b80?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:114 +0x99c
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitRelationalExpression(0xc0000005f0, 0xc0000d3b00)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:92 +0xc8
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833720?, {0x691780?, 0xc0000d3b00})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:113 +0x272
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitEqualityExpression(0xc0000005f0, 0xc0000d3a80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:78 +0xc8
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833580?, {0x691718?, 0xc0000d3a80})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:112 +0x311
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitAndExpression(0xc0000005f0, 0xc0000d3a00)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:69 +0xc8
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8333e0?, {0x6916b0?, 0xc0000d3a00?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:111 +0x6e5
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitXorExpression(0xc0000005f0, 0xc0000d3980)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:60 +0xc8
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x833240?, {0x691648?, 0xc0000d3980?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:110 +0x94e
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitBitOrExpression(0xc0000005f0, 0xc0000d3900)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:51 +0xc8
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8330a0?, {0x6915e0?, 0xc0000d3900})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:109 +0x1e5
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitLogicalAndExpression(0xc0000005f0, 0xc0000d3880)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:42 +0xc8
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x832f00?, {0x691578?, 0xc0000d3880})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:108 +0x2e5
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitLogicalOrExpression(0xc0000005f0, 0xc0000d3800)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:33 +0xc8
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x832e80?, {0x691510?, 0xc0000d3800})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:107 +0x211
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitExpression(0xc0000005f0, 0xc00005c808?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_expressions.go:27 +0xaa
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x831560?, {0x6914a8?, 0xc0000d3780})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:106 +0x451
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit.(*Generator).VisitDeferStmt.func1(0xc0000005f0)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_statements.go:351 +0x65
       github.com/arc-language/arc-lang/irgen.(*DeferStack).Emit(...)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/defer_manager.go:26
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitReturnStmt(0xc000236550, 0xc0004ca100)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_statements.go:35 +0x45
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0xc000236550, {0x688e88?, 0xc0004ca080})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:79 +0x3347
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitBlock(0xc000236550, 0xc0000f9380)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_statements.go:25 +0x305
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x826ce0?, {0x688e20?, 0xc0000f9380?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:74 +0x891
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitFunctionDecl(0xc000236550, 0xc0000f9080)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_declarations.go:121 +0x95d
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x826680?, {0x688bb0?, 0xc0000f9080})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:68 +0x111
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitTopLevelDecl(0xc000236550, 0xc0000f9000)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_declarations.go:17 +0x8b7
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8265a0?, {0x688b48?, 0xc0000f9000?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:67 +0x711
-      github.com/arc-language/arc-lang/irgen.(*Generator).VisitCompilationUnit(0xc000236550, 0xc0000f8a80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/visitor_declarations.go:12 +0x2d1
-      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x824b20?, {0x688ae0?, 0xc0000f8a80?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:66 +0x745
-      github.com/arc-language/arc-lang/irgen.Generate({0x694728, 0xc0000f8a80}, {0xc0000c201f, 0xe}, 0xc0004d8f40)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/irgen/generator.go:38 +0x245
-      github.com/arc-language/arc-lang/compiler.(*Compiler).CompileFile(0xc000569ec8, {0x7fffabdf94f2?, 0x63ad2e?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/compiler/compiler.go:68 +0x2ab
-      main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/defer_manager.go:26
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitReturnStmt(0xc0000005f0, 0xc0004e4100)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_statements.go:38 +0x45
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0xc0000005f0, {0x691e68?, 0xc0004e4080})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:79 +0x341a
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitBlock(0xc0000005f0, 0xc0000d3380)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_statements.go:27 +0x305
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x832ce0?, {0x691e00?, 0xc0000d3380?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:74 +0x892
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitFunctionDecl(0xc0000005f0, 0xc0000d3080)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_declarations.go:121 +0x95d
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x832680?, {0x691b90?, 0xc0000d3080})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:68 +0x111
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitTopLevelDecl(0xc0000005f0, 0xc0000d3000)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_declarations.go:17 +0x8b7
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x8325a0?, {0x691b28?, 0xc0000d3000?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:67 +0x711
+      github.com/arc-language/arc-lang/irgen.(*Generator).VisitCompilationUnit(0xc0000005f0, 0xc0000d2a80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/visitor_declarations.go:12 +0x2d1
+      github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x830b20?, {0x691ac0?, 0xc0000d2a80?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:66 +0x745
+      github.com/arc-language/arc-lang/irgen.Generate({0x69d708, 0xc0000d2a80}, {0xc00002e4cf, 0xe}, 0xc000363c80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/irgen/generator.go:38 +0x245
+      github.com/arc-language/arc-lang/compiler.(*Compiler).CompileFile(0xc000451ec8, {0x7ffebc7a34f2?, 0x643055?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/compiler/compiler.go:68 +0x2ab
+      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
       	/workspaces/arc-lang/cmd/main.go:72 +0x329
       main.main()
       	/workspaces/arc-lang/cmd/main.go:24 +0xad
@@ -495,24 +507,24 @@ Compiling tests/test_enum.arc...
 panic: Value %0 = load void, ptr<void> %s.addr (0) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x46dd3a?, {0x686fb8, 0xc00013b7a0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc00059fa58, 0x0, {0x686fb8, 0xc00013b7a0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:223 +0x45
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00059fa58, {0x68c9a0, 0xc00013b7a0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/ops.go:151 +0x2e8c
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00059fa58, 0xc00038ad00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffd3c23c523?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x46e07a?, {0x68ffa0, 0xc000169d40})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc000215a58, 0x0, {0x68ffa0, 0xc000169d40})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/arch/amd64/compiler.go:223 +0x45
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000215a58, {0x695980, 0xc000169d40})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/arch/amd64/ops.go:151 +0x2e8c
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000215a58, 0xc000327780)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009d570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffe41f6c523?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
 	/workspaces/arc-lang/cmd/main.go:24 +0xad
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Compilation failed
     Compile output:
       Compiling tests/test_enum.arc...
@@ -522,19 +534,19 @@ main.main()
       panic: Value %0 = load void, ptr<void> %s.addr (0) not allocated in stack map
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x46dd3a?, {0x686fb8, 0xc00013b7a0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:188 +0xd4
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc00059fa58, 0x0, {0x686fb8, 0xc00013b7a0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:223 +0x45
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00059fa58, {0x68c9a0, 0xc00013b7a0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/ops.go:151 +0x2e8c
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00059fa58, 0xc00038ad00)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:166 +0x625
-      github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:72 +0x33b
-      github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffd3c23c523?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/codegen/codegen.go:17 +0x25
-      main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x46e07a?, {0x68ffa0, 0xc000169d40})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/arch/amd64/compiler.go:188 +0xd4
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc000215a58, 0x0, {0x68ffa0, 0xc000169d40})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/arch/amd64/compiler.go:223 +0x45
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000215a58, {0x695980, 0xc000169d40})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/arch/amd64/ops.go:151 +0x2e8c
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000215a58, 0xc000327780)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/arch/amd64/compiler.go:166 +0x625
+      github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009d570)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/arch/amd64/compiler.go:72 +0x33b
+      github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffe41f6c523?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231090328-a48e1eda9219/codegen/codegen/codegen.go:17 +0x25
+      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
       	/workspaces/arc-lang/cmd/main.go:96 +0x465
       main.main()
       	/workspaces/arc-lang/cmd/main.go:24 +0xad
@@ -545,58 +557,21 @@ Object file: /tmp/arc_tests/test_extern.o
 Executable: /tmp/arc_tests/test_extern
 
 Step 1: Compiling to object file...
-Compilation failed: exit status 2
+Compilation failed: exit status 1
 Output:
 Compiling tests/test_extern.arc...
 [Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_extern.arc
-[Driver] [INFO] Compilation successful. Module 'test_extern.arc' created.
-✓ Module 'test_extern.arc' compiled (2 functions)
-panic: Value %2 = load void, ptr<void> %result.addr (2) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x46dd3a?, {0x686fb8, 0xc000429140})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc000331a58, 0x0, {0x686fb8, 0xc000429140})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:223 +0x45
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000331a58, {0x68c9a0, 0xc000429140})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/ops.go:151 +0x2e8c
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000331a58, 0xc000478500)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009d570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffcec330523?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+/workspaces/arc-lang/cmd/tests/test_extern.arc:6:0: Undefined identifier 'abs'
 
 ❌ FAIL (0.03s)
     Compilation failed
     Compile output:
       Compiling tests/test_extern.arc...
       [Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_extern.arc
-      [Driver] [INFO] Compilation successful. Module 'test_extern.arc' created.
-      ✓ Module 'test_extern.arc' compiled (2 functions)
-      panic: Value %2 = load void, ptr<void> %result.addr (2) not allocated in stack map
-      
-      goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x46dd3a?, {0x686fb8, 0xc000429140})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:188 +0xd4
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc000331a58, 0x0, {0x686fb8, 0xc000429140})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:223 +0x45
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000331a58, {0x68c9a0, 0xc000429140})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/ops.go:151 +0x2e8c
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000331a58, 0xc000478500)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:166 +0x625
-      github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009d570)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/arch/amd64/compiler.go:72 +0x33b
-      github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffcec330523?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231085352-d1e7f45df86d/codegen/codegen/codegen.go:17 +0x25
-      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-      	/workspaces/arc-lang/cmd/main.go:96 +0x465
-      main.main()
-      	/workspaces/arc-lang/cmd/main.go:24 +0xad
+      /workspaces/arc-lang/cmd/tests/test_extern.arc:6:0: Undefined identifier 'abs'
+    Compiling tests/test_extern.arc...
+[Driver] [INFO] Compiling file: /workspaces/arc-lang/cmd/tests/test_extern.arc
+/workspaces/arc-lang/cmd/tests/test_extern.arc:6:0: Undefined identifier 'abs'
 [15/39] test_for_in_range                             
 --- Testing: test_for_in_range ---
 Source file: tests/test_for_in_range.arc

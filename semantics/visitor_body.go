@@ -28,20 +28,13 @@ func (a *Analyzer) VisitStatement(ctx *parser.StatementContext) interface{} {
 }
 
 func (a *Analyzer) VisitBlock(ctx *parser.BlockContext) interface{} {
-	// Only push a new scope if this block isn't already mapped (e.g. Function body)
 	shouldPush := true
-	if _, exists := a.scopes[ctx]; exists {
-		shouldPush = false
-	}
-
+	if _, exists := a.scopes[ctx]; exists { shouldPush = false }
 	if shouldPush {
 		a.pushScope(ctx)
 		defer a.popScope()
 	}
-
-	for _, stmt := range ctx.AllStatement() {
-		a.Visit(stmt)
-	}
+	for _, stmt := range ctx.AllStatement() { a.Visit(stmt) }
 	return nil
 }
 
@@ -61,13 +54,27 @@ func (a *Analyzer) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 func (a *Analyzer) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 	a.Visit(ctx.Expression(0))
 	a.Visit(ctx.Block(0))
-	if len(ctx.AllBlock()) > 1 {
-		a.Visit(ctx.Block(1))
-	}
+	if len(ctx.AllBlock()) > 1 { a.Visit(ctx.Block(1)) }
 	return nil
 }
 
 func (a *Analyzer) VisitExpressionStmt(ctx *parser.ExpressionStmtContext) interface{} {
 	a.Visit(ctx.Expression())
+	return nil
+}
+
+func (a *Analyzer) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
+	a.pushScope(ctx)
+	defer a.popScope()
+	
+	if ctx.VariableDecl() != nil { a.Visit(ctx.VariableDecl()) }
+	for _, expr := range ctx.AllExpression() { a.Visit(expr) }
+	for _, assign := range ctx.AllAssignmentStmt() { a.Visit(assign) }
+	
+	if ctx.Block() != nil {
+		// Map block to the loop scope so var 'i' is visible inside
+		a.scopes[ctx.Block()] = a.currentScope
+		for _, s := range ctx.Block().AllStatement() { a.Visit(s) }
+	}
 	return nil
 }

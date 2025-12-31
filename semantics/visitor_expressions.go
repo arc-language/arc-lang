@@ -20,8 +20,6 @@ func (a *Analyzer) VisitAdditiveExpression(ctx *parser.AdditiveExpressionContext
 	lhs := a.Visit(ctx.MultiplicativeExpression(0)).(types.Type)
 	for i := 1; i < len(ctx.AllMultiplicativeExpression()); i++ {
 		rhs := a.Visit(ctx.MultiplicativeExpression(i)).(types.Type)
-		
-		// Basic type compatibility check
 		if !areTypesCompatible(lhs, rhs) {
 			a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, 
 				"Type mismatch in addition: %s and %s", lhs.String(), rhs.String())
@@ -34,7 +32,6 @@ func (a *Analyzer) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpre
 	lhs := a.Visit(ctx.UnaryExpression(0)).(types.Type)
 	for i := 1; i < len(ctx.AllUnaryExpression()); i++ {
 		rhs := a.Visit(ctx.UnaryExpression(i)).(types.Type)
-		
 		if !areTypesCompatible(lhs, rhs) {
 			a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, 
 				"Type mismatch in multiplication: %s and %s", lhs.String(), rhs.String())
@@ -49,116 +46,109 @@ func (a *Analyzer) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) inte
 	if ctx.PostfixExpression() != nil {
 		return a.Visit(ctx.PostfixExpression())
 	}
-	
-	// Handle Recursive Unary Operators
 	if ctx.UnaryExpression() != nil {
 		valType := a.Visit(ctx.UnaryExpression()).(types.Type)
-
-		// Address-of: &T -> *T
-		if ctx.AMP() != nil {
-			return types.NewPointer(valType)
-		}
-		
-		// Dereference: *T -> T
+		if ctx.AMP() != nil { return types.NewPointer(valType) }
 		if ctx.STAR() != nil {
-			if ptr, ok := valType.(*types.PointerType); ok {
-				return ptr.ElementType
-			}
-			a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, 
-				"Cannot dereference non-pointer type '%s'", valType.String())
+			if ptr, ok := valType.(*types.PointerType); ok { return ptr.ElementType }
+			a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Cannot dereference non-pointer type '%s'", valType.String())
 			return types.Void
 		}
-		
 		return valType
 	}
-	
 	return types.Void
 }
 
-// --- Casts ---
-
-func (a *Analyzer) VisitCastExpression(ctx *parser.CastExpressionContext) interface{} {
-	// Visit expression to ensure valid symbol usage / catch errors in the expression
-	a.Visit(ctx.Expression())
-	
-	// Return the explicit target type specified in the cast
-	return a.resolveType(ctx.Type_())
-}
-
-// --- Allocations ---
-
-func (a *Analyzer) VisitAllocaExpression(ctx *parser.AllocaExpressionContext) interface{} {
-	// alloca(Type, [Count]) -> returns *Type
-	t := a.resolveType(ctx.Type_())
-	
-	if ctx.Expression() != nil {
-		countType := a.Visit(ctx.Expression()).(types.Type)
-		if !types.IsInteger(countType) {
-			a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Alloca count must be an integer")
-		}
-	}
-	
-	return types.NewPointer(t)
-}
-
-// --- Intrinsics ---
-
-func (a *Analyzer) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionContext) interface{} {
-	// sizeof<T>, alignof<T> -> returns usize (u64)
-	if ctx.SIZEOF() != nil || ctx.ALIGNOF() != nil {
-		return types.U64
-	}
-	
-	// bit_cast<T>(val) -> returns T
-	if ctx.BIT_CAST() != nil {
-		a.Visit(ctx.Expression(0))
-		return a.resolveType(ctx.Type_())
-	}
-	
-	// Visit arguments for other intrinsics to ensure they are valid
-	for _, expr := range ctx.AllExpression() {
-		a.Visit(expr)
-	}
-	
-	// va_start -> returns va_list (treated as *i8 for now)
-	if ctx.VA_START() != nil {
-		return types.NewPointer(types.I8)
-	}
-	
-	// va_arg(list) -> returns T (specified in template)
-	if ctx.VA_ARG() != nil {
-		return a.resolveType(ctx.Type_())
-	}
-
-	// memset, memcpy, etc. return void
-	return types.Void
-}
-
-// --- Postfix & Primary ---
+// --- Postfix (Members, Calls, Indexing) ---
 
 func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
-	// TODO: Full member access (.field), indexing ([]), and call () validation.
-	// For now, we delegate to Primary to resolve the base type.
-	return a.Visit(ctx.PrimaryExpression())
+	curr := a.Visit(ctx.PrimaryExpression()).(types.Type)
+
+	for _, op := range ctx.AllPostfixOp() {
+		// 1. Member Access: .field or .method
+		if op.DOT() != nil {
+			name := op.IDENTIFIER().GetText()
+			
+			// Auto-dereference pointer to struct
+			if ptr, ok := curr.(*types.PointerType); ok {
+				curr = ptr.ElementType
+			}
+
+			if st, ok := curr.(*types.StructType); ok {
+				// Check fields
+				if indices, ok := a.structIndices[st.Name]; ok {
+					if idx, ok := indices[name]; ok {
+						curr = st.Fields[idx]
+						continue
+					}
+				}
+				
+				// Check methods (Name Mangling: Struct_Method)
+				methodName := st.Name + "_" + name
+				if sym, ok := a.globalScope.Resolve(methodName); ok {
+					// Method found, return function type
+					curr = sym.Type
+					continue
+				}
+			}
+			// Don't report error if it's "void" (already failed previously)
+			if curr != types.Void {
+				a.bag.Report(a.file, op.GetStart().GetLine(), 0, "Type '%s' has no field or method '%s'", curr.String(), name)
+			}
+			return types.Void
+		}
+
+		// 2. Indexing: [expr]
+		if op.LBRACKET() != nil {
+			a.Visit(op.Expression()) // Validate index
+			if ptr, ok := curr.(*types.PointerType); ok {
+				curr = ptr.ElementType
+			} else if arr, ok := curr.(*types.ArrayType); ok {
+				curr = arr.ElementType
+			} else {
+				a.bag.Report(a.file, op.GetStart().GetLine(), 0, "Type '%s' is not indexable", curr.String())
+			}
+		}
+
+		// 3. Function Call: (args)
+		if op.LPAREN() != nil {
+			if op.ArgumentList() != nil {
+				for _, arg := range op.ArgumentList().AllArgument() {
+					a.Visit(arg.Expression())
+				}
+			}
+			if fn, ok := curr.(*types.FunctionType); ok {
+				curr = fn.ReturnType
+			}
+		}
+	}
+	return curr
 }
+
+// --- Primary ---
 
 func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
 	if ctx.Literal() != nil { return a.Visit(ctx.Literal()) }
+	if ctx.StructLiteral() != nil { return a.Visit(ctx.StructLiteral()) }
 	
-	// Variable / Function lookup
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
-		if s, ok := a.currentScope.Resolve(name); ok {
-			return s.Type
-		}
+		if s, ok := a.currentScope.Resolve(name); ok { return s.Type }
 		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Undefined identifier '%s'", name)
 		return types.Void
 	}
 	
-	// Qualified Identifier (Namespace.Name)
+	// Handle Qualified Identifier (e.g. io.print)
 	if ctx.QualifiedIdentifier() != nil {
-		// Simplified: assumes valid if parsed, returns void type fallback
-		// Real impl would look up in namespace map
+		q := ctx.QualifiedIdentifier()
+		ids := q.AllIDENTIFIER()
+		var name string
+		for i, id := range ids {
+			if i > 0 { name += "." }
+			name += id.GetText()
+		}
+		if s, ok := a.currentScope.Resolve(name); ok { return s.Type }
+		// Fallback for externs that might not be fully registered with types yet
 		return types.Void 
 	}
 
@@ -170,46 +160,70 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 	return types.Void
 }
 
+func (a *Analyzer) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {
+	name := ctx.IDENTIFIER().GetText()
+	if s, ok := a.currentScope.Resolve(name); ok {
+		return s.Type
+	}
+	return types.Void
+}
+
 func (a *Analyzer) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	if ctx.INTEGER_LITERAL() != nil { return types.I64 }
 	if ctx.FLOAT_LITERAL() != nil { return types.F64 }
 	if ctx.BOOLEAN_LITERAL() != nil { return types.I1 }
 	if ctx.STRING_LITERAL() != nil { return types.NewPointer(types.I8) }
-	
-	// Char Literal Support
 	if ctx.CHAR_LITERAL() != nil { return types.I32 }
-	
 	if ctx.NULL() != nil { return types.NewPointer(types.Void) }
+	if ctx.InitializerList() != nil { return a.Visit(ctx.InitializerList()) }
 	return types.Void
 }
 
-// --- Passthroughs ---
-// These ensure the visitor traverses down the grammar hierarchy
+func (a *Analyzer) VisitInitializerList(ctx *parser.InitializerListContext) interface{} {
+	if len(ctx.AllExpression()) == 0 { return types.Void }
+	elemType := a.Visit(ctx.Expression(0)).(types.Type)
+	// Validate all elements match
+	for i := 1; i < len(ctx.AllExpression()); i++ {
+		t := a.Visit(ctx.Expression(i)).(types.Type)
+		if !areTypesCompatible(t, elemType) {
+			a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Mixed types in array initializer")
+		}
+	}
+	return types.NewArray(elemType, int64(len(ctx.AllExpression())))
+}
 
-func (a *Analyzer) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionContext) interface{} {
-	return a.Visit(ctx.LogicalAndExpression(0))
+// --- Casts & Intrinsics ---
+
+func (a *Analyzer) VisitCastExpression(ctx *parser.CastExpressionContext) interface{} {
+	a.Visit(ctx.Expression())
+	return a.resolveType(ctx.Type_())
 }
-func (a *Analyzer) VisitLogicalAndExpression(ctx *parser.LogicalAndExpressionContext) interface{} {
-	return a.Visit(ctx.BitOrExpression(0))
+
+func (a *Analyzer) VisitAllocaExpression(ctx *parser.AllocaExpressionContext) interface{} {
+	t := a.resolveType(ctx.Type_())
+	if ctx.Expression() != nil { a.Visit(ctx.Expression()) }
+	return types.NewPointer(t)
 }
-func (a *Analyzer) VisitBitOrExpression(ctx *parser.BitOrExpressionContext) interface{} {
-	return a.Visit(ctx.BitXorExpression(0))
+
+func (a *Analyzer) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionContext) interface{} {
+	if ctx.SIZEOF() != nil || ctx.ALIGNOF() != nil { return types.U64 }
+	if ctx.BIT_CAST() != nil {
+		a.Visit(ctx.Expression(0))
+		return a.resolveType(ctx.Type_())
+	}
+	for _, expr := range ctx.AllExpression() { a.Visit(expr) }
+	if ctx.VA_START() != nil { return types.NewPointer(types.I8) }
+	if ctx.VA_ARG() != nil { return a.resolveType(ctx.Type_()) }
+	return types.Void
 }
-func (a *Analyzer) VisitBitXorExpression(ctx *parser.BitXorExpressionContext) interface{} {
-	return a.Visit(ctx.BitAndExpression(0))
-}
-func (a *Analyzer) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) interface{} {
-	return a.Visit(ctx.EqualityExpression(0))
-}
-func (a *Analyzer) VisitEqualityExpression(ctx *parser.EqualityExpressionContext) interface{} {
-	return a.Visit(ctx.RelationalExpression(0))
-}
-func (a *Analyzer) VisitRelationalExpression(ctx *parser.RelationalExpressionContext) interface{} {
-	return a.Visit(ctx.ShiftExpression(0))
-}
-func (a *Analyzer) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} {
-	return a.Visit(ctx.RangeExpression(0))
-}
-func (a *Analyzer) VisitRangeExpression(ctx *parser.RangeExpressionContext) interface{} {
-	return a.Visit(ctx.AdditiveExpression(0))
-}
+
+// Passthroughs
+func (a *Analyzer) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionContext) interface{} { return a.Visit(ctx.LogicalAndExpression(0)) }
+func (a *Analyzer) VisitLogicalAndExpression(ctx *parser.LogicalAndExpressionContext) interface{} { return a.Visit(ctx.BitOrExpression(0)) }
+func (a *Analyzer) VisitBitOrExpression(ctx *parser.BitOrExpressionContext) interface{} { return a.Visit(ctx.BitXorExpression(0)) }
+func (a *Analyzer) VisitBitXorExpression(ctx *parser.BitXorExpressionContext) interface{} { return a.Visit(ctx.BitAndExpression(0)) }
+func (a *Analyzer) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) interface{} { return a.Visit(ctx.EqualityExpression(0)) }
+func (a *Analyzer) VisitEqualityExpression(ctx *parser.EqualityExpressionContext) interface{} { return a.Visit(ctx.RelationalExpression(0)) }
+func (a *Analyzer) VisitRelationalExpression(ctx *parser.RelationalExpressionContext) interface{} { return a.Visit(ctx.ShiftExpression(0)) }
+func (a *Analyzer) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} { return a.Visit(ctx.RangeExpression(0)) }
+func (a *Analyzer) VisitRangeExpression(ctx *parser.RangeExpressionContext) interface{} { return a.Visit(ctx.AdditiveExpression(0)) }
