@@ -1,18 +1,15 @@
+@str = external constant [5 x i8] [i8 37, i8 100, i8 92, i8 110, i8 0]
+
+declare external i32 @printf(ptr<i64>, ...)
+
 define external i32 @main() {
 entry:
-  br label %loop.cond
-loop.cond:
-  br i1 0, label %loop.body, label %loop.end
-loop.body:
-  %0 = icmp ne i64 0, zeroinitializer
+  %0 = icmp eq i64 0, 1000
   br i1 %0, label %if.then, label %if.end
-loop.post:
-  br label %loop.cond
-loop.end:
-  %1 = trunc i64 0 to i32
-  ret i32 %1
 if.then:
-  br label %loop.end
+  %1 = getelementptr inbounds [5 x i8], ptr<[5 x i8]> @str, i32 0, i32 0
+  br label %if.end
 if.end:
-  br label %loop.post
+  %2 = trunc i64 0 to i32
+  ret i32 %2
 }

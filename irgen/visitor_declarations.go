@@ -56,8 +56,15 @@ func (g *Generator) visitExternFunctionDecl(ctx *parser.ExternFunctionDeclContex
 		for _, t := range ctx.ExternParameterList().AllType_() { paramTypes = append(paramTypes, g.resolveType(t)) }
 	}
 	fn := g.ctx.Builder.DeclareFunction(externalName, retType, paramTypes, variadic)
-	if sym, ok := g.currentScope.Resolve(name); ok { sym.IRValue = fn } else if g.currentNamespace != "" {
-		if sym, ok := g.currentScope.Resolve(g.currentNamespace + "." + name); ok { sym.IRValue = fn }
+	
+	// Register both simple name and namespaced name
+	if sym, ok := g.currentScope.Resolve(name); ok { sym.IRValue = fn }
+	if g.currentNamespace != "" {
+		// e.g. "io.printf"
+		fullName := g.currentNamespace + "." + name
+		// We might need to manually register if semantics pass didn't create a specific node for this path
+		// But usually semantics handles definitions. We just ensure IRValue is set.
+		if sym, ok := g.currentScope.Resolve(fullName); ok { sym.IRValue = fn }
 	}
 }
 
@@ -136,10 +143,13 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		g.ctx.Builder.CreateStore(arg, alloca)
 		if s, ok := g.currentScope.Resolve(paramNames[i]); ok { s.IRValue = alloca }
 	}
+	
+	// FIX: Use g.Visit(ctx.Block()) to ensure block scope is entered correctly
 	if ctx.Block() != nil {
 		g.deferStack = NewDeferStack()
-		for _, stmt := range ctx.Block().AllStatement() { g.Visit(stmt) }
+		g.Visit(ctx.Block())
 	}
+	
 	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 		if retType == types.Void { g.ctx.Builder.CreateRetVoid() } else { g.ctx.Builder.CreateRet(g.getZeroValue(retType)) }
 	}
@@ -150,21 +160,18 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
 	sym, ok := g.currentScope.Resolve(name)
-	if !ok { return nil }
+	if !ok {
+		// Log error or panic in debug mode?
+		// Usually implies semantics failed or scope issue.
+		return nil 
+	}
 	alloca := g.ctx.Builder.CreateAlloca(sym.Type, name+".addr")
 	sym.IRValue = alloca
-	
 	if ctx.Expression() != nil {
-		// Visit expression to get IR value
 		val := g.Visit(ctx.Expression())
-		
-		// Ensure we got a valid IR value
 		if irVal, ok := val.(ir.Value); ok {
 			irVal = g.emitCast(irVal, sym.Type)
 			g.ctx.Builder.CreateStore(irVal, alloca)
-		} else {
-			// Fallback if expression evaluation failed to return ir.Value
-			g.ctx.Builder.CreateStore(g.getZeroValue(sym.Type), alloca)
 		}
 	} else {
 		g.ctx.Builder.CreateStore(g.getZeroValue(sym.Type), alloca)
