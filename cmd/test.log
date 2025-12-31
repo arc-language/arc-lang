@@ -28,7 +28,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_alloca.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_alloca.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -124,7 +124,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_array_for_loop.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_array_for_loop.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -156,7 +156,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_bitwise.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.04s)
+❌ FAIL (0.03s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_bitwise.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -188,7 +188,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_cast.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_cast.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -220,7 +220,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_char_literal.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_char_literal.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -252,7 +252,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_class.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.08s)
+❌ FAIL (0.05s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_class.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -284,7 +284,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_comparison.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.04s)
+❌ FAIL (0.03s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_comparison.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -316,7 +316,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_compound_assignment.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.04s)
+❌ FAIL (0.03s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_compound_assignment.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -380,7 +380,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_defer.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.04s)
+❌ FAIL (0.03s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_defer.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -412,7 +412,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_enum.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.04s)
+❌ FAIL (0.03s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_enum.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -476,7 +476,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_for_in_range.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.05s)
+❌ FAIL (0.03s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_for_in_range.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -592,7 +592,7 @@ Compiling tests/test_generics_structs.arc...
 /workspaces/arc-lang/cmd/tests/test_generics_structs.arc:26:4: Syntax Error: missing '=' at 'p1'
 /workspaces/arc-lang/cmd/tests/test_generics_structs.arc:44:4: Syntax Error: missing '=' at 'p2'
 
-❌ FAIL (0.10s)
+❌ FAIL (0.08s)
     Compilation failed
     Compile output:
       Compiling tests/test_generics_structs.arc...
@@ -625,7 +625,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_if_else.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_if_else.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -657,7 +657,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_if_statement.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_if_statement.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -881,7 +881,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_sizeof.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_sizeof.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -1009,7 +1009,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_switch.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.03s)
+❌ FAIL (0.04s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_switch.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -1041,7 +1041,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.04s)
+❌ FAIL (0.06s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_try_except_raise.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -1201,7 +1201,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_variable_inferred.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.03s)
+❌ FAIL (0.05s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_variable_inferred.o: .symtab local symbol at index 0 (>= sh_info of 0)
@@ -1233,7 +1233,7 @@ Output:
 /usr/bin/ld: /tmp/arc_tests/test_variable_typed.o: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 
-❌ FAIL (0.04s)
+❌ FAIL (0.03s)
     Linking failed
     Link output:
       /usr/bin/ld: /tmp/arc_tests/test_variable_typed.o: .symtab local symbol at index 0 (>= sh_info of 0)

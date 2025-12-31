@@ -42,6 +42,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
+	// FIX: Use explicit interface type to match resolveType return
 	var retType types.Type = types.Void
 	if ctx.ReturnType() != nil {
 		retType = g.resolveType(ctx.ReturnType().Type_())
@@ -51,7 +52,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	fn := g.ctx.Builder.CreateFunction(name, retType, paramTypes, false)
 	g.ctx.EnterFunction(fn)
 	
-	// Update symbol so calls inside body can find this function
 	if sym != nil {
 		sym.IRValue = fn
 	}
@@ -62,6 +62,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	entry := g.ctx.Builder.GetInsertBlock()
 	g.ctx.SetInsertBlock(entry)
 
+	// Args
 	for i, arg := range fn.Arguments {
 		arg.SetName(paramNames[i])
 		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
@@ -104,9 +105,8 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 	if ctx.Expression() != nil {
 		val := g.Visit(ctx.Expression())
 		
-		// FIX: Assert strictly to ir.Value
+		// FIX: Correct type assertion for IR Value
 		if irVal, ok := val.(ir.Value); ok {
-			// Now safe to pass to emitCast and CreateStore
 			irVal = g.emitCast(irVal, sym.Type)
 			g.ctx.Builder.CreateStore(irVal, alloca)
 		}

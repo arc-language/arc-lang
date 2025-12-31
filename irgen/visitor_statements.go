@@ -14,7 +14,9 @@ func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
 	}
 	for _, stmt := range ctx.AllStatement() {
 		g.Visit(stmt)
-		if g.ctx.Builder.GetInsertBlock().Terminator() != nil { break }
+		if g.ctx.Builder.GetInsertBlock().Terminator() != nil {
+			break
+		}
 	}
 	return nil
 }
@@ -38,7 +40,6 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 
 func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 	cond := g.Visit(ctx.Expression(0)).(ir.Value)
-	// Ensure bool
 	if cond.Type().BitSize() > 1 {
 		cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
 	}
@@ -54,12 +55,16 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 
 	g.ctx.SetInsertBlock(thenBlock)
 	g.Visit(ctx.Block(0))
-	if g.ctx.Builder.GetInsertBlock().Terminator() == nil { g.ctx.Builder.CreateBr(mergeBlock) }
+	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
+		g.ctx.Builder.CreateBr(mergeBlock)
+	}
 
 	if elseBlock != mergeBlock {
 		g.ctx.SetInsertBlock(elseBlock)
 		g.Visit(ctx.Block(1))
-		if g.ctx.Builder.GetInsertBlock().Terminator() == nil { g.ctx.Builder.CreateBr(mergeBlock) }
+		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
+			g.ctx.Builder.CreateBr(mergeBlock)
+		}
 	}
 
 	g.ctx.SetInsertBlock(mergeBlock)
@@ -67,7 +72,6 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 }
 
 func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
-	// Simple For Loop (while style or C style)
 	condBlock := g.ctx.Builder.CreateBlock("loop.cond")
 	bodyBlock := g.ctx.Builder.CreateBlock("loop.body")
 	postBlock := g.ctx.Builder.CreateBlock("loop.post")
@@ -76,7 +80,6 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	g.ctx.Builder.CreateBr(condBlock)
 	g.ctx.SetInsertBlock(condBlock)
 
-	// Condition (default true)
 	var cond ir.Value = g.ctx.Builder.ConstInt(types.I1, 1)
 	if len(ctx.AllExpression()) > 0 {
 		cond = g.Visit(ctx.Expression(0)).(ir.Value)
@@ -93,7 +96,6 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	}
 
 	g.ctx.SetInsertBlock(postBlock)
-	// Post increment assignment
 	if len(ctx.AllAssignmentStmt()) > 0 {
 		g.Visit(ctx.AssignmentStmt(0))
 	}
@@ -121,7 +123,6 @@ func (g *Generator) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
 	g.deferStack.Add(func(gen *Generator) {
 		if ctx.Expression() != nil { gen.Visit(ctx.Expression()) }
 		if ctx.AssignmentStmt() != nil { gen.Visit(ctx.AssignmentStmt()) }
-		// Block not supported in syntax usually
 	})
 	return nil
 }
@@ -129,7 +130,6 @@ func (g *Generator) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
 func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 	cond := g.Visit(ctx.Expression()).(ir.Value)
 	endBlock := g.ctx.Builder.CreateBlock("switch.end")
-	
 	prevBlock := g.ctx.Builder.GetInsertBlock()
 	
 	for i, c := range ctx.AllSwitchCase() {

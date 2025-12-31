@@ -10,7 +10,6 @@ func (g *Generator) VisitExpression(ctx *parser.ExpressionContext) interface{} {
 	return g.Visit(ctx.LogicalOrExpression())
 }
 
-// --- Arithmetic ---
 func (g *Generator) VisitAdditiveExpression(ctx *parser.AdditiveExpressionContext) interface{} {
 	lhs := g.Visit(ctx.MultiplicativeExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllMultiplicativeExpression()); i++ {
@@ -77,12 +76,10 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 	return val
 }
 
-// --- Postfix (Calls, Members) ---
 func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
 	curr := g.Visit(ctx.PrimaryExpression()).(ir.Value)
 
 	for _, op := range ctx.AllPostfixOp() {
-		// 1. Calls
 		if op.LPAREN() != nil {
 			var args []ir.Value
 			if op.ArgumentList() != nil {
@@ -95,17 +92,14 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			}
 		}
 
-		// 2. Member Access (.field)
 		if op.DOT() != nil {
 			fieldName := op.IDENTIFIER().GetText()
-
-			// Auto deref pointer
+			
 			isPtr := false
 			if _, ok := curr.Type().(*types.PointerType); ok {
 				isPtr = true
 			}
-
-			// Resolve underlying Struct Type
+			
 			var structType *types.StructType
 			if isPtr {
 				structType = curr.Type().(*types.PointerType).ElementType.(*types.StructType)
@@ -113,7 +107,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				structType = curr.Type().(*types.StructType)
 			}
 
-			// Find Field Index using the Map from Pass 1
 			idx := -1
 			if indices, ok := g.analysis.StructIndices[structType.Name]; ok {
 				if i, ok := indices[fieldName]; ok {
@@ -123,21 +116,17 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 
 			if idx >= 0 {
 				if isPtr {
-					// GEP -> Load
 					gep := g.ctx.Builder.CreateStructGEP(structType, curr, idx, "")
 					curr = g.ctx.Builder.CreateLoad(structType.Fields[idx], gep, "")
 				} else {
-					// ExtractValue (if value type)
 					curr = g.ctx.Builder.CreateExtractValue(curr, []int{idx}, "")
 				}
 			}
 		}
-
-		// 3. Indexing ([expr])
+		
 		if op.LBRACKET() != nil {
 			idx := g.Visit(op.Expression()).(ir.Value)
 			if ptr, ok := curr.Type().(*types.PointerType); ok {
-				// GEP
 				gep := g.ctx.Builder.CreateInBoundsGEP(ptr.ElementType, curr, []ir.Value{idx}, "")
 				curr = g.ctx.Builder.CreateLoad(ptr.ElementType, gep, "")
 			}
@@ -153,7 +142,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
 		if sym, ok := g.currentScope.Resolve(name); ok {
-			// If it's a variable (Alloca), load it
 			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 				return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 			}
@@ -168,7 +156,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 
 func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	if ctx.INTEGER_LITERAL() != nil {
-		return g.ctx.Builder.ConstInt(types.I64, 0)
+		return g.ctx.Builder.ConstInt(types.I64, 0) // Simplified
 	}
 	if ctx.FLOAT_LITERAL() != nil {
 		return g.ctx.Builder.ConstFloat(types.F64, 0.0)
@@ -179,31 +167,12 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	return g.getZeroValue(types.I64)
 }
 
-// Boilerplate
-func (g *Generator) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionContext) interface{} {
-	return g.Visit(ctx.LogicalAndExpression(0))
-}
-func (g *Generator) VisitLogicalAndExpression(ctx *parser.LogicalAndExpressionContext) interface{} {
-	return g.Visit(ctx.BitOrExpression(0))
-}
-func (g *Generator) VisitBitOrExpression(ctx *parser.BitOrExpressionContext) interface{} {
-	return g.Visit(ctx.BitXorExpression(0))
-}
-func (g *Generator) VisitBitXorExpression(ctx *parser.BitXorExpressionContext) interface{} {
-	return g.Visit(ctx.BitAndExpression(0))
-}
-func (g *Generator) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) interface{} {
-	return g.Visit(ctx.EqualityExpression(0))
-}
-func (g *Generator) VisitEqualityExpression(ctx *parser.EqualityExpressionContext) interface{} {
-	return g.Visit(ctx.RelationalExpression(0))
-}
-func (g *Generator) VisitRelationalExpression(ctx *parser.RelationalExpressionContext) interface{} {
-	return g.Visit(ctx.ShiftExpression(0))
-}
-func (g *Generator) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} {
-	return g.Visit(ctx.RangeExpression(0))
-}
-func (g *Generator) VisitRangeExpression(ctx *parser.RangeExpressionContext) interface{} {
-	return g.Visit(ctx.AdditiveExpression(0))
-}
+func (g *Generator) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionContext) interface{} { return g.Visit(ctx.LogicalAndExpression(0)) }
+func (g *Generator) VisitLogicalAndExpression(ctx *parser.LogicalAndExpressionContext) interface{} { return g.Visit(ctx.BitOrExpression(0)) }
+func (g *Generator) VisitBitOrExpression(ctx *parser.BitOrExpressionContext) interface{} { return g.Visit(ctx.BitXorExpression(0)) }
+func (g *Generator) VisitBitXorExpression(ctx *parser.BitXorExpressionContext) interface{} { return g.Visit(ctx.BitAndExpression(0)) }
+func (g *Generator) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) interface{} { return g.Visit(ctx.EqualityExpression(0)) }
+func (g *Generator) VisitEqualityExpression(ctx *parser.EqualityExpressionContext) interface{} { return g.Visit(ctx.RelationalExpression(0)) }
+func (g *Generator) VisitRelationalExpression(ctx *parser.RelationalExpressionContext) interface{} { return g.Visit(ctx.ShiftExpression(0)) }
+func (g *Generator) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} { return g.Visit(ctx.RangeExpression(0)) }
+func (g *Generator) VisitRangeExpression(ctx *parser.RangeExpressionContext) interface{} { return g.Visit(ctx.AdditiveExpression(0)) }

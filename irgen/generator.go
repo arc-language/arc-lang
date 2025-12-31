@@ -1,6 +1,7 @@
 package irgen
 
 import (
+	"fmt"
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/context"
@@ -15,9 +16,7 @@ type Generator struct {
 	analysis     *semantics.AnalysisResult
 	currentScope *symbol.Scope
 	deferStack   *DeferStack
-	
-	// Loop stack for break/continue
-	loopStack []loopInfo
+	loopStack    []loopInfo
 }
 
 type loopInfo struct {
@@ -34,6 +33,8 @@ func Generate(tree parser.ICompilationUnitContext, moduleName string, analysis *
 		currentScope:         analysis.GlobalScope,
 		deferStack:           NewDeferStack(),
 	}
+	
+	// Start Traversal
 	gen.Visit(tree)
 	return ctx.Module
 }
@@ -47,5 +48,82 @@ func (g *Generator) enterScope(ctx antlr.ParserRuleContext) {
 func (g *Generator) exitScope() {
 	if g.currentScope.Parent != nil {
 		g.currentScope = g.currentScope.Parent
+	}
+}
+
+// Visit manually dispatches to ensure our methods are called.
+// BaseVisitor would otherwise silence them if not strictly overridden via interface.
+func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
+	if tree == nil { return nil }
+
+	// DEBUG: Uncomment this line if "0 functions" persists to see traversal
+	// fmt.Printf("Visiting: %T\n", tree)
+
+	switch ctx := tree.(type) {
+	case *parser.CompilationUnitContext:
+		return g.VisitCompilationUnit(ctx)
+	case *parser.TopLevelDeclContext:
+		return g.VisitTopLevelDecl(ctx)
+	case *parser.FunctionDeclContext:
+		return g.VisitFunctionDecl(ctx)
+	case *parser.VariableDeclContext:
+		return g.VisitVariableDecl(ctx)
+	case *parser.BlockContext:
+		return g.VisitBlock(ctx)
+	
+	// Statements
+	case *parser.StatementContext:
+		// Statement is a wrapper. We must visit the child that exists.
+		if ctx.VariableDecl() != nil { return g.VisitVariableDecl(ctx.VariableDecl()) }
+		if ctx.ReturnStmt() != nil { return g.VisitReturnStmt(ctx.ReturnStmt()) }
+		if ctx.IfStmt() != nil { return g.VisitIfStmt(ctx.IfStmt()) }
+		if ctx.ForStmt() != nil { return g.VisitForStmt(ctx.ForStmt()) }
+		if ctx.SwitchStmt() != nil { return g.VisitSwitchStmt(ctx.SwitchStmt()) }
+		if ctx.BreakStmt() != nil { return g.VisitBreakStmt(ctx.BreakStmt()) }
+		if ctx.ContinueStmt() != nil { return g.VisitContinueStmt(ctx.ContinueStmt()) }
+		if ctx.DeferStmt() != nil { return g.VisitDeferStmt(ctx.DeferStmt()) }
+		if ctx.ExpressionStmt() != nil { return g.Visit(ctx.ExpressionStmt().Expression()) }
+		if ctx.Block() != nil { return g.VisitBlock(ctx.Block()) }
+		if ctx.TryStmt() != nil { return g.VisitTryStmt(ctx.TryStmt()) }
+		if ctx.ThrowStmt() != nil { return g.VisitThrowStmt(ctx.ThrowStmt()) }
+		return nil
+
+	case *parser.ReturnStmtContext:
+		return g.VisitReturnStmt(ctx)
+	case *parser.IfStmtContext:
+		return g.VisitIfStmt(ctx)
+	case *parser.ForStmtContext:
+		return g.VisitForStmt(ctx)
+	case *parser.SwitchStmtContext:
+		return g.VisitSwitchStmt(ctx)
+	case *parser.BreakStmtContext:
+		return g.VisitBreakStmt(ctx)
+	case *parser.ContinueStmtContext:
+		return g.VisitContinueStmt(ctx)
+	case *parser.DeferStmtContext:
+		return g.VisitDeferStmt(ctx)
+	case *parser.TryStmtContext:
+		return g.VisitTryStmt(ctx)
+	case *parser.ThrowStmtContext:
+		return g.VisitThrowStmt(ctx)
+
+	// Expressions
+	case *parser.ExpressionContext:
+		return g.VisitExpression(ctx)
+	case *parser.AdditiveExpressionContext:
+		return g.VisitAdditiveExpression(ctx)
+	case *parser.MultiplicativeExpressionContext:
+		return g.VisitMultiplicativeExpression(ctx)
+	case *parser.UnaryExpressionContext:
+		return g.VisitUnaryExpression(ctx)
+	case *parser.PostfixExpressionContext:
+		return g.VisitPostfixExpression(ctx)
+	case *parser.PrimaryExpressionContext:
+		return g.VisitPrimaryExpression(ctx)
+	case *parser.LiteralContext:
+		return g.VisitLiteral(ctx)
+		
+	default:
+		return g.BaseArcParserVisitor.Visit(tree)
 	}
 }
