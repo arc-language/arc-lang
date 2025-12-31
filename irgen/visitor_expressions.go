@@ -322,7 +322,19 @@ func (g *Generator) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 	for _, expr := range ctx.AllExpression() { args = append(args, g.Visit(expr).(ir.Value)) }
 	if ctx.MEMSET() != nil && len(args) == 3 { return g.ctx.Builder.CreateMemSet(args[0], args[1], args[2]) }
 	if ctx.MEMCPY() != nil && len(args) == 3 { return g.ctx.Builder.CreateMemCpy(args[0], args[1], args[2]) }
+	if ctx.MEMMOVE() != nil && len(args) == 3 { return g.ctx.Builder.CreateMemMove(args[0], args[1], args[2]) }
 	if ctx.STRLEN() != nil && len(args) == 1 { return g.ctx.Builder.CreateStrLen(args[0], "") }
+	if ctx.VA_START() != nil {
+		vaListType := g.resolveType(ctx.Type_())
+		if vaListType == types.Void || vaListType == types.I64 { vaListType = types.NewPointer(types.I8) }
+		vaListPtr := g.ctx.Builder.CreateAlloca(vaListType, "va_list")
+		i8PtrType := types.NewPointer(types.I8)
+		vaStartArg := g.ctx.Builder.CreateBitCast(vaListPtr, i8PtrType, "")
+		g.ctx.Builder.CreateVaStart(vaStartArg)
+		return vaListPtr
+	}
+	if ctx.VA_ARG() != nil && len(args) == 1 { target := g.resolveType(ctx.Type_()); return g.ctx.Builder.CreateVaArg(args[0], target, "") }
+	if ctx.VA_END() != nil { return g.getZeroValue(types.I64) }
 	if ctx.BIT_CAST() != nil && len(args) == 1 { target := g.resolveType(ctx.Type_()); return g.ctx.Builder.CreateBitCast(args[0], target, "") }
 	if ctx.RAISE() != nil && len(args) == 1 { g.ctx.Builder.CreateRaise(args[0]) }
 	return g.getZeroValue(types.I64)
