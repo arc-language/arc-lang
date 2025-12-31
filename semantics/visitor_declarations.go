@@ -7,8 +7,7 @@ import (
 )
 
 func (a *Analyzer) VisitCompilationUnit(ctx *parser.CompilationUnitContext) interface{} {
-	// --- Pass 1: Register Types (Structs, Classes, Enums) ---
-	// This allows functions declared before structs to still refer to them.
+	// Pass 1: Register Types
 	for _, decl := range ctx.AllTopLevelDecl() {
 		if decl.StructDecl() != nil {
 			name := decl.StructDecl().IDENTIFIER().GetText()
@@ -16,26 +15,17 @@ func (a *Analyzer) VisitCompilationUnit(ctx *parser.CompilationUnitContext) inte
 			a.currentScope.Define(name, symbol.SymType, st)
 		} else if decl.ClassDecl() != nil {
 			name := decl.ClassDecl().IDENTIFIER().GetText()
-			// Classes are effectively structs passed by reference
 			st := types.NewStruct(name, nil, false)
 			a.currentScope.Define(name, symbol.SymType, st)
 		} else if decl.EnumDecl() != nil {
 			name := decl.EnumDecl().IDENTIFIER().GetText()
-			// Enums map to Int32 for now
 			a.currentScope.Define(name, symbol.SymType, types.I32)
 		}
 	}
 
-	// --- Pass 2: Process Declarations and Statements ---
-	for _, decl := range ctx.AllTopLevelDecl() {
-		a.Visit(decl)
-	}
-	
-	// Visit Namespace declarations (if any)
-	for _, ns := range ctx.AllNamespaceDecl() {
-		a.Visit(ns)
-	}
-
+	// Pass 2: Declarations
+	for _, decl := range ctx.AllTopLevelDecl() { a.Visit(decl) }
+	for _, ns := range ctx.AllNamespaceDecl() { a.Visit(ns) }
 	return nil
 }
 
@@ -44,40 +34,21 @@ func (a *Analyzer) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface{
 	if ctx.VariableDecl() != nil { return a.Visit(ctx.VariableDecl()) }
 	if ctx.StructDecl() != nil { return a.Visit(ctx.StructDecl()) }
 	if ctx.ClassDecl() != nil { return a.Visit(ctx.ClassDecl()) }
-	if ctx.EnumDecl() != nil { return a.Visit(ctx.EnumDecl()) }
 	if ctx.ExternDecl() != nil { return a.Visit(ctx.ExternDecl()) }
-	return nil
-}
-
-func (a *Analyzer) VisitNamespaceDecl(ctx *parser.NamespaceDeclContext) interface{} {
-	// In a full implementation, this might push a named scope.
-	// For now, we rely on the IRGen to handle namespace mangling, 
-	// but we must visit children to validate them.
+	if ctx.ConstDecl() != nil { return a.Visit(ctx.ConstDecl()) } // Added
 	return nil
 }
 
 func (a *Analyzer) VisitExternDecl(ctx *parser.ExternDeclContext) interface{} {
 	ns := ""
-	if ctx.IDENTIFIER() != nil {
-		ns = ctx.IDENTIFIER().GetText()
-	}
-
+	if ctx.IDENTIFIER() != nil { ns = ctx.IDENTIFIER().GetText() }
 	for _, member := range ctx.AllExternMember() {
 		if fnCtx := member.ExternFunctionDecl(); fnCtx != nil {
 			name := fnCtx.IDENTIFIER().GetText()
-			
 			var retType types.Type = types.Void
-			if fnCtx.Type_() != nil {
-				retType = a.resolveType(fnCtx.Type_())
-			}
-
-			// Construct lookup name (e.g., "io.printf")
+			if fnCtx.Type_() != nil { retType = a.resolveType(fnCtx.Type_()) }
 			lookupName := name
-			if ns != "" {
-				lookupName = ns + "." + name
-			}
-
-			// Externs are defined in the current (global) scope
+			if ns != "" { lookupName = ns + "." + name }
 			a.currentScope.Define(lookupName, symbol.SymFunc, retType)
 		}
 	}
@@ -85,17 +56,25 @@ func (a *Analyzer) VisitExternDecl(ctx *parser.ExternDeclContext) interface{} {
 }
 
 func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
-    // (Ensure this matches previous fix, re-listing for completeness)
 	name := ctx.IDENTIFIER().GetText()
 	var retType types.Type = types.Void
 	if ctx.ReturnType() != nil && ctx.ReturnType().Type_() != nil {
 		retType = a.resolveType(ctx.ReturnType().Type_())
+	} else if ctx.ReturnType() != nil && ctx.ReturnType().TypeList() != nil {
+		// Tuple return type
+		var tupleTypes []types.Type
+		for _, t := range ctx.ReturnType().TypeList().AllType_() {
+			tupleTypes = append(tupleTypes, a.resolveType(t))
+		}
+		// Represent tuple as anonymous struct
+		retType = types.NewStruct("", tupleTypes, false)
 	}
+
 	a.currentScope.Define(name, symbol.SymFunc, retType)
 	a.currentFuncRetType = retType
 	a.pushScope(ctx)
 	defer func() { a.popScope(); a.currentFuncRetType = nil }()
-	
+
 	if ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
 			if param.SELF() != nil { continue }
@@ -112,11 +91,58 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 }
 
 func (a *Analyzer) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
+	// Handle Tuple Destructuring: let (a, b) = pair
+	if ctx.TuplePattern() != nil {
+		var rhsType types.Type
+		if ctx.Expression() != nil {
+			rhsType = a.Visit(ctx.Expression()).(types.Type)
+		}
+		
+		names := ctx.TuplePattern().AllIDENTIFIER()
+		st, isStruct := rhsType.(*types.StructType)
+		
+		for i, idNode := range names {
+			name := idNode.GetText()
+			var fieldType types.Type = types.I64 // Fallback
+			
+			if isStruct && i < len(st.Fields) {
+				fieldType = st.Fields[i]
+			}
+			a.currentScope.Define(name, symbol.SymVar, fieldType)
+		}
+		return nil
+	}
+
+	// Standard Declaration: let x = ...
 	name := ctx.IDENTIFIER().GetText()
 	if _, ok := a.currentScope.ResolveLocal(name); ok {
 		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Redeclaration of '%s'", name)
 		return nil
 	}
+
+	var typ types.Type
+	if ctx.Type_() != nil { typ = a.resolveType(ctx.Type_()) }
+	
+	if ctx.Expression() != nil {
+		exprType := a.Visit(ctx.Expression()).(types.Type)
+		if typ == nil {
+			typ = exprType
+		} else {
+			// Allow Void expression to initialize Array/Struct (zero-init assumption)
+			if exprType != types.Void && !areTypesCompatible(exprType, typ) {
+				a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, 
+					"Type mismatch in variable '%s': expected %s, got %s", 
+					name, typ.String(), exprType.String())
+			}
+		}
+	}
+	if typ == nil { typ = types.I64 }
+	a.currentScope.Define(name, symbol.SymVar, typ)
+	return nil
+}
+
+func (a *Analyzer) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
+	name := ctx.IDENTIFIER().GetText()
 	var typ types.Type
 	if ctx.Type_() != nil { typ = a.resolveType(ctx.Type_()) }
 	if ctx.Expression() != nil {
@@ -124,7 +150,7 @@ func (a *Analyzer) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{
 		if typ == nil { typ = exprType }
 	}
 	if typ == nil { typ = types.I64 }
-	a.currentScope.Define(name, symbol.SymVar, typ)
+	a.currentScope.Define(name, symbol.SymConst, typ)
 	return nil
 }
 
@@ -169,24 +195,13 @@ func (a *Analyzer) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 func (a *Analyzer) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
 	for _, m := range ctx.AllEnumMember() {
+		// Define: Enum.Member
 		a.currentScope.Define(name+"."+m.IDENTIFIER().GetText(), symbol.SymConst, types.I32)
 	}
 	return nil
 }
 
-func (a *Analyzer) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
-	name := ctx.IDENTIFIER().GetText()
-	if _, ok := a.currentScope.ResolveLocal(name); ok {
-		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Redeclaration of '%s'", name)
-		return nil
-	}
-	var typ types.Type
-	if ctx.Type_() != nil { typ = a.resolveType(ctx.Type_()) }
-	if ctx.Expression() != nil {
-		exprType := a.Visit(ctx.Expression()).(types.Type)
-		if typ == nil { typ = exprType }
-	}
-	if typ == nil { typ = types.I64 }
-	a.currentScope.Define(name, symbol.SymConst, typ)
-	return nil
-}
+// Stubs
+func (a *Analyzer) VisitMethodDecl(ctx *parser.MethodDeclContext) interface{} { return nil }
+func (a *Analyzer) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface{} { return nil }
+func (a *Analyzer) VisitDeinitDecl(ctx *parser.DeinitDeclContext) interface{} { return nil }
