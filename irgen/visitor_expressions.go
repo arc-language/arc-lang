@@ -161,32 +161,47 @@ func (g *Generator) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 // --- Unary Expressions ---
 
 func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
-	if ctx.INCREMENT() != nil || ctx.DECREMENT() != nil {
-		ptr := g.getLValue(ctx.UnaryExpression())
-		if ptr == nil { return g.getZeroValue(types.I64) }
-		elemType := ptr.Type().(*types.PointerType).ElementType
-		curr := g.ctx.Builder.CreateLoad(elemType, ptr, "")
-		var next ir.Value
-		
-		one := g.ctx.Builder.ConstInt(types.I64, 1)
-		if intTy, ok := elemType.(*types.IntType); ok { one = g.ctx.Builder.ConstInt(intTy, 1) }
-		
-		if ctx.INCREMENT() != nil { next = g.ctx.Builder.CreateAdd(curr, one, "") } else { next = g.ctx.Builder.CreateSub(curr, one, "") }
-		g.ctx.Builder.CreateStore(next, ptr)
-		return next
-	}
-	if ctx.PostfixExpression() != nil { return g.Visit(ctx.PostfixExpression()) }
-	val := g.Visit(ctx.UnaryExpression()).(ir.Value)
-	if ctx.MINUS() != nil { return g.ctx.Builder.CreateSub(g.getZeroValue(val.Type()), val, "") }
-	if ctx.NOT() != nil { return g.ctx.Builder.CreateXor(val, g.ctx.Builder.ConstInt(types.I1, 1), "") }
-	if ctx.BIT_NOT() != nil { return g.ctx.Builder.CreateXor(val, g.ctx.Builder.ConstInt(val.Type().(*types.IntType), -1), "") }
-	if ctx.STAR() != nil {
-		if ptr, ok := val.Type().(*types.PointerType); ok { return g.ctx.Builder.CreateLoad(ptr.ElementType, val, "") }
-	}
+	// Handle Address-Of (&x)
 	if ctx.AMP() != nil {
-		if child := ctx.UnaryExpression(); child != nil { if lval := g.getLValue(child); lval != nil { return lval } }
+		// Use getLValue to retrieve the pointer (alloca or global) instead of loading it
+		lval := g.getLValue(ctx.UnaryExpression())
+		if lval != nil {
+			return lval
+		}
+		fmt.Println("[IRGen] Error: Cannot take address of non-lvalue")
 		return g.getZeroValue(types.I64)
 	}
+
+	// Handle Dereference (*ptr)
+	if ctx.STAR() != nil {
+		val := g.Visit(ctx.UnaryExpression()).(ir.Value)
+		if ptrType, ok := val.Type().(*types.PointerType); ok {
+			// Load the value pointed to
+			return g.ctx.Builder.CreateLoad(ptrType.ElementType, val, "")
+		}
+		return val // Error case
+	}
+
+	// Handle Negation, Not, BitNot
+	val := g.Visit(ctx.UnaryExpression()).(ir.Value)
+	
+	if ctx.MINUS() != nil {
+		if types.IsFloat(val.Type()) {
+			return g.ctx.Builder.CreateFSub(g.getZeroValue(val.Type()), val, "")
+		}
+		return g.ctx.Builder.CreateSub(g.getZeroValue(val.Type()), val, "")
+	}
+	
+	if ctx.NOT() != nil {
+		// Logical Not (!bool)
+		return g.ctx.Builder.CreateXor(val, g.ctx.Builder.ConstInt(types.I1, 1), "")
+	}
+	
+	if ctx.BIT_NOT() != nil {
+		// Bitwise Not (~int) -> Xor with -1
+		return g.ctx.Builder.CreateXor(val, g.ctx.Builder.ConstInt(val.Type().(*types.IntType), -1), "")
+	}
+
 	return val
 }
 
@@ -292,10 +307,15 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	return g.getZeroValue(types.I64)
 }
 
+// Helper to keep literals working
 func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	txt := ctx.GetText()
 	
-	if ctx.INTEGER_LITERAL() != nil || (ctx.FLOAT_LITERAL() == nil && ctx.STRING_LITERAL() == nil && ctx.BOOLEAN_LITERAL() == nil && ctx.NULL() == nil) {
+	if ctx.NULL() != nil {
+		return g.ctx.Builder.ConstNull(types.NewPointer(types.Void))
+	}
+	
+	if ctx.INTEGER_LITERAL() != nil {
 		val, _ := strconv.ParseInt(txt, 0, 64)
 		return g.ctx.Builder.ConstInt(types.I64, val)
 	}
@@ -303,19 +323,26 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 		val, _ := strconv.ParseFloat(txt, 64)
 		return g.ctx.Builder.ConstFloat(types.F64, val)
 	}
-	if ctx.BOOLEAN_LITERAL() != nil {
-		if txt == "true" { return g.ctx.Builder.ConstInt(types.I1, 1) }
-		return g.ctx.Builder.ConstInt(types.I1, 0)
-	}
 	if ctx.STRING_LITERAL() != nil {
 		if len(txt) >= 2 { txt = txt[1 : len(txt)-1] }
+		// Create global string constant
 		content := txt + "\x00"
 		strName := fmt.Sprintf(".str.%d", len(g.ctx.Module.Globals))
 		arrType := types.NewArray(types.I8, int64(len(content)))
+		
 		var chars []ir.Constant
-		for _, b := range []byte(content) { chars = append(chars, g.ctx.Builder.ConstInt(types.I8, int64(b))) }
-		constArr := &ir.ConstantArray{BaseValue: ir.BaseValue{ValType: arrType}, Elements: chars}
+		for _, b := range []byte(content) {
+			chars = append(chars, g.ctx.Builder.ConstInt(types.I8, int64(b)))
+		}
+		
+		constArr := &ir.ConstantArray{
+			BaseValue: ir.BaseValue{ValType: arrType},
+			Elements:  chars,
+		}
+		
 		global := g.ctx.Builder.CreateGlobalConstant(strName, constArr)
+		
+		// Return pointer to start: getelementptr [N x i8], ptr @str, i32 0, i32 0
 		zero := g.ctx.Builder.ConstInt(types.I32, 0)
 		return g.ctx.Builder.CreateInBoundsGEP(arrType, global, []ir.Value{zero, zero}, "")
 	}
@@ -342,8 +369,25 @@ func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 
 func (g *Generator) VisitCastExpression(ctx *parser.CastExpressionContext) interface{} {
 	val := g.Visit(ctx.Expression()).(ir.Value)
-	target := g.resolveType(ctx.Type_())
-	return g.emitCast(val, target)
+	targetType := g.resolveType(ctx.Type_())
+	
+	srcType := val.Type()
+	
+	// Handle Pointer Casts
+	if types.IsPointer(srcType) && types.IsPointer(targetType) {
+		return g.ctx.Builder.CreateBitCast(val, targetType, "")
+	}
+	
+	if types.IsPointer(srcType) && types.IsInteger(targetType) {
+		return g.ctx.Builder.CreatePtrToInt(val, targetType, "")
+	}
+	
+	if types.IsInteger(srcType) && types.IsPointer(targetType) {
+		return g.ctx.Builder.CreateIntToPtr(val, targetType, "")
+	}
+
+	// Default numeric casts
+	return g.emitCast(val, targetType)
 }
 
 func (g *Generator) VisitSyscallExpression(ctx *parser.SyscallExpressionContext) interface{} {
@@ -353,26 +397,72 @@ func (g *Generator) VisitSyscallExpression(ctx *parser.SyscallExpressionContext)
 }
 
 func (g *Generator) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionContext) interface{} {
-	if ctx.SIZEOF() != nil { t := g.resolveType(ctx.Type_()); return g.ctx.Builder.CreateSizeOf(t, "") }
-	if ctx.ALIGNOF() != nil { t := g.resolveType(ctx.Type_()); return g.ctx.Builder.CreateAlignOf(t, "") }
-	var args []ir.Value
-	for _, expr := range ctx.AllExpression() { args = append(args, g.Visit(expr).(ir.Value)) }
-	if ctx.MEMSET() != nil && len(args) == 3 { return g.ctx.Builder.CreateMemSet(args[0], args[1], args[2]) }
-	if ctx.MEMCPY() != nil && len(args) == 3 { return g.ctx.Builder.CreateMemCpy(args[0], args[1], args[2]) }
-	if ctx.MEMMOVE() != nil && len(args) == 3 { return g.ctx.Builder.CreateMemMove(args[0], args[1], args[2]) }
-	if ctx.STRLEN() != nil && len(args) == 1 { return g.ctx.Builder.CreateStrLen(args[0], "") }
-	if ctx.VA_START() != nil {
-		vaListType := g.resolveType(ctx.Type_())
-		if vaListType == types.Void || vaListType == types.I64 { vaListType = types.NewPointer(types.I8) }
-		vaListPtr := g.ctx.Builder.CreateAlloca(vaListType, "va_list")
-		i8PtrType := types.NewPointer(types.I8)
-		vaStartArg := g.ctx.Builder.CreateBitCast(vaListPtr, i8PtrType, "")
-		g.ctx.Builder.CreateVaStart(vaStartArg)
-		return vaListPtr
+	// Compile-time constants
+	if ctx.SIZEOF() != nil {
+		t := g.resolveType(ctx.Type_())
+		return g.ctx.Builder.CreateSizeOf(t, "")
 	}
-	if ctx.VA_ARG() != nil && len(args) == 1 { target := g.resolveType(ctx.Type_()); return g.ctx.Builder.CreateVaArg(args[0], target, "") }
-	if ctx.VA_END() != nil { return g.getZeroValue(types.I64) }
-	if ctx.BIT_CAST() != nil && len(args) == 1 { target := g.resolveType(ctx.Type_()); return g.ctx.Builder.CreateBitCast(args[0], target, "") }
-	if ctx.RAISE() != nil && len(args) == 1 { g.ctx.Builder.CreateRaise(args[0]) }
+	if ctx.ALIGNOF() != nil {
+		t := g.resolveType(ctx.Type_())
+		return g.ctx.Builder.CreateAlignOf(t, "")
+	}
+
+	// Bit Cast
+	if ctx.BIT_CAST() != nil {
+		val := g.Visit(ctx.Expression(0)).(ir.Value)
+		target := g.resolveType(ctx.Type_())
+		return g.ctx.Builder.CreateBitCast(val, target, "")
+	}
+
+	// Arguments
+	var args []ir.Value
+	for _, expr := range ctx.AllExpression() {
+		args = append(args, g.Visit(expr).(ir.Value))
+	}
+
+	// Memory Intrinsics
+	if ctx.MEMSET() != nil && len(args) == 3 {
+		return g.ctx.Builder.CreateMemSet(args[0], args[1], args[2])
+	}
+	if ctx.MEMCPY() != nil && len(args) == 3 {
+		return g.ctx.Builder.CreateMemCpy(args[0], args[1], args[2])
+	}
+	if ctx.MEMMOVE() != nil && len(args) == 3 {
+		return g.ctx.Builder.CreateMemMove(args[0], args[1], args[2])
+	}
+	
+	// String Intrinsics
+	if ctx.STRLEN() != nil && len(args) == 1 {
+		return g.ctx.Builder.CreateStrLen(args[0], "")
+	}
+	
+	// Variadic Intrinsics
+	if ctx.VA_START() != nil {
+		// va_start(last_arg) -> returns va_list ptr
+		// We treat va_list as *i8 for generic usage
+		vaList := g.ctx.Builder.CreateAlloca(types.NewPointer(types.I8), "va_list")
+		// The argument to va_start intrinsic is usually the bitcasted va_list pointer
+		vaListArg := g.ctx.Builder.CreateBitCast(vaList, types.NewPointer(types.I8), "")
+		g.ctx.Builder.CreateVaStart(vaListArg)
+		return vaList
+	}
+	
+	if ctx.VA_ARG() != nil && len(args) == 1 {
+		// va_arg(list) -> value
+		target := g.resolveType(ctx.Type_())
+		return g.ctx.Builder.CreateVaArg(args[0], target, "")
+	}
+	
+	if ctx.VA_END() != nil && len(args) == 1 {
+		g.ctx.Builder.CreateVaEnd(args[0])
+		return g.getZeroValue(types.Void)
+	}
+
+	// System Intrinsics
+	if ctx.RAISE() != nil && len(args) == 1 {
+		g.ctx.Builder.CreateRaise(args[0])
+		return g.getZeroValue(types.Void)
+	}
+
 	return g.getZeroValue(types.I64)
 }

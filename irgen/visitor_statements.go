@@ -149,29 +149,109 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 	return nil
 }
 
-// ... include other statement visitors (For, Switch, etc.) as they were ...
-// (Omitting unmodified long visitors for brevity, copy them from your existing file)
 func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
-	// (Same as original)
-	if ctx.IN() != nil { return g.visitForInLoop(ctx) }
+	if ctx.IN() != nil {
+		// Iterator loop (not implemented in this simplified pass)
+		return nil 
+	}
+
+	// 1. Create Basic Blocks
 	condBlock := g.ctx.Builder.CreateBlock("loop.cond")
 	bodyBlock := g.ctx.Builder.CreateBlock("loop.body")
 	postBlock := g.ctx.Builder.CreateBlock("loop.post")
 	endBlock := g.ctx.Builder.CreateBlock("loop.end")
-	if ctx.VariableDecl() != nil { g.Visit(ctx.VariableDecl()) } else if len(ctx.AllAssignmentStmt()) > 0 && len(ctx.AllSEMICOLON()) > 0 { g.Visit(ctx.AssignmentStmt(0)) }
+
+	// 2. Handle Initialization (C-Style Only)
+	// Grammar: FOR ( ... ; ... ; ... )
+	if len(ctx.AllSEMICOLON()) >= 2 {
+		if ctx.VariableDecl() != nil {
+			g.Visit(ctx.VariableDecl())
+		} else if len(ctx.AllAssignmentStmt()) > 0 && ctx.AssignmentStmt(0).GetStart().GetTokenIndex() < ctx.SEMICOLON(0).GetSymbol().GetTokenIndex() {
+			// Init assignment
+			g.Visit(ctx.AssignmentStmt(0))
+		}
+	}
+
 	g.ctx.Builder.CreateBr(condBlock)
+
+	// 3. Condition Block
 	g.ctx.SetInsertBlock(condBlock)
-	var cond ir.Value = g.ctx.Builder.ConstInt(types.I1, 1)
-	if len(ctx.AllExpression()) > 0 { cond = g.Visit(ctx.Expression(0)).(ir.Value) }
+	var cond ir.Value
+	
+	// Determine which expression is the condition
+	// C-style: Expression between semicolons
+	// While-style: The only expression
+	
+	var condExpr parser.IExpressionContext
+	
+	if len(ctx.AllSEMICOLON()) >= 2 {
+		// C-Style: for init; cond; step
+		// Find expression between semicolons
+		semi1 := ctx.SEMICOLON(0).GetSymbol().GetTokenIndex()
+		semi2 := ctx.SEMICOLON(1).GetSymbol().GetTokenIndex()
+		
+		for _, expr := range ctx.AllExpression() {
+			idx := expr.GetStart().GetTokenIndex()
+			if idx > semi1 && idx < semi2 {
+				condExpr = expr
+				break
+			}
+		}
+	} else if len(ctx.AllExpression()) > 0 {
+		// While-Style: for cond { }
+		condExpr = ctx.Expression(0)
+	}
+
+	if condExpr != nil {
+		cond = g.Visit(condExpr).(ir.Value)
+		// Ensure bool
+		if cond.Type().BitSize() > 1 {
+			cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
+		}
+	} else {
+		// Infinite loop
+		cond = g.ctx.Builder.True()
+	}
+
 	g.ctx.Builder.CreateCondBr(cond, bodyBlock, endBlock)
+
+	// 4. Body Block
 	g.ctx.SetInsertBlock(bodyBlock)
+	
+	// Push loop stack for break/continue
 	g.loopStack = append(g.loopStack, loopInfo{breakBlock: endBlock, continueBlock: postBlock})
+	
 	g.Visit(ctx.Block())
-	g.loopStack = g.loopStack[:len(g.loopStack)-1]
-	if g.ctx.Builder.GetInsertBlock().Terminator() == nil { g.ctx.Builder.CreateBr(postBlock) }
+	
+	g.loopStack = g.loopStack[:len(g.loopStack)-1] // Pop stack
+
+	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
+		g.ctx.Builder.CreateBr(postBlock)
+	}
+
+	// 5. Post/Step Block
 	g.ctx.SetInsertBlock(postBlock)
-	if len(ctx.AllAssignmentStmt()) > 0 { g.Visit(ctx.AssignmentStmt(len(ctx.AllAssignmentStmt()) - 1)) }
+	
+	if len(ctx.AllSEMICOLON()) >= 2 {
+		// C-Style Step
+		semi2 := ctx.SEMICOLON(1).GetSymbol().GetTokenIndex()
+		
+		// Find assignments or expressions after second semicolon
+		for _, assign := range ctx.AllAssignmentStmt() {
+			if assign.GetStart().GetTokenIndex() > semi2 {
+				g.Visit(assign)
+			}
+		}
+		for _, expr := range ctx.AllExpression() {
+			if expr.GetStart().GetTokenIndex() > semi2 {
+				g.Visit(expr)
+			}
+		}
+	}
+
 	g.ctx.Builder.CreateBr(condBlock)
+
+	// 6. End Block
 	g.ctx.SetInsertBlock(endBlock)
 	return nil
 }

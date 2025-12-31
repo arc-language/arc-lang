@@ -4,13 +4,17 @@ declare external i32 @printf(ptr<u8>, ...)
 
 define external i32 @main() {
 entry:
-  %0 = icmp eq i64 0, 1000
-  br i1 %0, label %if.then, label %if.end
+  %y.addr = alloca i64
+  store i64 1000, ptr<i64> %y.addr
+  %0 = load i64, ptr<i64> %y.addr
+  %1 = icmp eq i64 %0, 1000
+  br i1 %1, label %if.then, label %if.end
 if.then:
-  %1 = getelementptr inbounds [5 x i8], ptr<[5 x i8]> @.str.0, i32 0, i32 0
-  %2 = call i32 @printf(ptr<[5 x i8]> %1, i64 0)
+  %2 = getelementptr inbounds [5 x i8], ptr<[5 x i8]> @.str.0, i32 0, i32 0
+  %3 = load i64, ptr<i64> %y.addr
+  %4 = call i32 @printf(ptr<[5 x i8]> %2, i64 %3)
   br label %if.end
 if.end:
-  %3 = trunc i64 0 to i32
-  ret i32 %3
+  %5 = trunc i64 0 to i32
+  ret i32 %5
 }
