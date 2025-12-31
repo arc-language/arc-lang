@@ -368,3 +368,128 @@ func (a *Assembler) Cqo() {
 	a.emitByte(0x48)
 	a.emitByte(0x99)
 }
+
+
+func (a *Assembler) And(dst, src Operand) {
+	if d, ok := dst.(RegOp); ok {
+		if s, ok := src.(RegOp); ok {
+			a.encodeRex(true, Register(s), NoReg, Register(d))
+			a.emitByte(0x21)
+			a.encodeModRM(Register(s), d)
+		}
+	}
+}
+
+func (a *Assembler) Or(dst, src Operand) {
+	if d, ok := dst.(RegOp); ok {
+		if s, ok := src.(RegOp); ok {
+			a.encodeRex(true, Register(s), NoReg, Register(d))
+			a.emitByte(0x09)
+			a.encodeModRM(Register(s), d)
+		}
+	}
+}
+
+func (a *Assembler) Shl(dst, src Register) {
+	// D1 /4 for 1, D3 /4 for CL
+	// Assuming CL
+	a.encodeRex(true, 0, NoReg, dst)
+	a.emitByte(0xD3)
+	a.encodeModRM(4, RegOp(dst))
+}
+
+func (a *Assembler) Shr(dst, src Register) {
+	// D3 /5
+	a.encodeRex(true, 0, NoReg, dst)
+	a.emitByte(0xD3)
+	a.encodeModRM(5, RegOp(dst))
+}
+
+func (a *Assembler) Sar(dst, src Register) {
+	// D3 /7
+	a.encodeRex(true, 0, NoReg, dst)
+	a.emitByte(0xD3)
+	a.encodeModRM(7, RegOp(dst))
+}
+
+func (a *Assembler) Cmp(dst, src Operand) {
+	if d, ok := dst.(RegOp); ok {
+		if s, ok := src.(RegOp); ok {
+			a.encodeRex(true, Register(s), NoReg, Register(d))
+			a.emitByte(0x39)
+			a.encodeModRM(Register(s), d)
+		}
+	}
+}
+
+func (a *Assembler) Test(dst, src Register) {
+	a.encodeRex(true, src, NoReg, dst)
+	a.emitByte(0x85)
+	a.encodeModRM(src, RegOp(dst))
+}
+
+func (a *Assembler) MovZX(dst Register, src Operand, srcSize int) {
+	// 0F B6 /r (byte), 0F B7 /r (word)
+	if srcSize == 8 {
+		if m, ok := src.(MemOp); ok {
+			a.encodeRex(true, dst, NoReg, m.Base)
+			a.emitByte(0x0F); a.emitByte(0xB6)
+			a.encodeModRM(dst, src)
+		} else if s, ok := src.(RegOp); ok {
+			// MOVZX r64, r8
+			a.encodeRex(true, dst, NoReg, Register(s))
+			a.emitByte(0x0F); a.emitByte(0xB6)
+			a.encodeModRM(dst, src)
+		}
+	}
+}
+
+func (a *Assembler) Movsxd(dst, src Register) {
+	a.encodeRex(true, dst, NoReg, src)
+	a.emitByte(0x63)
+	a.encodeModRM(dst, RegOp(src))
+}
+
+func (a *Assembler) Movsx(dst, src Register, srcSize int) {
+	// 0F BE /r (byte)
+	if srcSize == 8 {
+		a.encodeRex(true, dst, NoReg, src)
+		a.emitByte(0x0F); a.emitByte(0xBE)
+		a.encodeModRM(dst, RegOp(src))
+	}
+}
+
+func (a *Assembler) Setcc(cc CondCode, dst Register) {
+	// 0F 9x /0 (SETcc r/m8)
+	// Note: REX not strictly needed if targeting AL, but needed for SIL/DIL
+	a.emitByte(0x0F)
+	a.emitByte(byte(cc) + 0x10) // 0x8x -> 0x9x
+	a.encodeModRM(0, RegOp(dst))
+}
+
+func (a *Assembler) ImulImm(dst Register, imm int32) {
+	// 69 /r id
+	a.encodeRex(true, dst, NoReg, dst)
+	a.emitByte(0x69)
+	a.encodeModRM(dst, RegOp(dst))
+	a.emitInt32(imm)
+}
+
+func (a *Assembler) LeaRel(dst Register, symbol string) {
+	// LEA dst, [RIP + disp32]
+	// REX + 8D /r
+	a.encodeRex(true, dst, NoReg, 0)
+	a.emitByte(0x8D)
+	// ModRM: Mod=00, Reg=dst, RM=101 (RIP-relative)
+	reg := byte(dst) & 7
+	a.emitByte(0x05 | (reg << 3))
+	
+	// Record Relocation
+	a.Relocs = append(a.Relocs, RelocationRecord{
+		Offset: a.Len(),
+		Symbol: symbol,
+		Type:   RelocPC32,
+		Addend: -4,
+	})
+	a.emitInt32(0)
+}

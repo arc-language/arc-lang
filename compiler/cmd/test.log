@@ -17,10 +17,6 @@ Compiling tests/test_alloca.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_alloca'
 [Compiler:test_alloca] [INFO] Compiling file: tests/test_alloca.arc
-[Compiler:test_alloca] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc (isEntry=true)
-[Compiler:test_alloca] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-[Compiler:test_alloca] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-[Compiler:test_alloca] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -42,7 +38,6 @@ Compiling tests/test_alloca.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-[Compiler:test_alloca] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
 Module has 1 functions, 0 globals
 [Compiler:test_alloca] [INFO] Generating object file to: /tmp/arc_tests/test_alloca.o
 [Compiler:test_alloca] [DEBUG] Calling code generator for module 'test_alloca'
@@ -58,10 +53,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_alloca'
       [Compiler:test_alloca] [INFO] Compiling file: tests/test_alloca.arc
-      [Compiler:test_alloca] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc (isEntry=true)
-      [Compiler:test_alloca] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-      [Compiler:test_alloca] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-      [Compiler:test_alloca] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -83,7 +74,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
-      [Compiler:test_alloca] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_alloca.arc
       Module has 1 functions, 0 globals
       [Compiler:test_alloca] [INFO] Generating object file to: /tmp/arc_tests/test_alloca.o
       [Compiler:test_alloca] [DEBUG] Calling code generator for module 'test_alloca'
@@ -104,10 +94,6 @@ Compiling tests/test_arithmetic.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_arithmetic'
 [Compiler:test_arithmetic] [INFO] Compiling file: tests/test_arithmetic.arc
-[Compiler:test_arithmetic] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc (isEntry=true)
-[Compiler:test_arithmetic] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-[Compiler:test_arithmetic] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-[Compiler:test_arithmetic] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -135,7 +121,6 @@ Compiling tests/test_arithmetic.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-[Compiler:test_arithmetic] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
 Module has 1 functions, 0 globals
 [Compiler:test_arithmetic] [INFO] Generating object file to: /tmp/arc_tests/test_arithmetic.o
 [Compiler:test_arithmetic] [DEBUG] Calling code generator for module 'test_arithmetic'
@@ -151,10 +136,6 @@ Object generation failed: code generation failed: unknown opcode: srem
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_arithmetic'
       [Compiler:test_arithmetic] [INFO] Compiling file: tests/test_arithmetic.arc
-      [Compiler:test_arithmetic] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc (isEntry=true)
-      [Compiler:test_arithmetic] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-      [Compiler:test_arithmetic] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-      [Compiler:test_arithmetic] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -182,7 +163,6 @@ Object generation failed: code generation failed: unknown opcode: srem
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
-      [Compiler:test_arithmetic] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_arithmetic.arc
       Module has 1 functions, 0 globals
       [Compiler:test_arithmetic] [INFO] Generating object file to: /tmp/arc_tests/test_arithmetic.o
       [Compiler:test_arithmetic] [DEBUG] Calling code generator for module 'test_arithmetic'
@@ -203,10 +183,6 @@ Compiling tests/test_array.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_array'
 [Compiler:test_array] [INFO] Compiling file: tests/test_array.arc
-[Compiler:test_array] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc (isEntry=true)
-[Compiler:test_array] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-[Compiler:test_array] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-[Compiler:test_array] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -229,7 +205,6 @@ Compiling tests/test_array.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-[Compiler:test_array] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
 Module has 1 functions, 0 globals
 [Compiler:test_array] [INFO] Generating object file to: /tmp/arc_tests/test_array.o
 [Compiler:test_array] [DEBUG] Calling code generator for module 'test_array'
@@ -245,10 +220,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_array'
       [Compiler:test_array] [INFO] Compiling file: tests/test_array.arc
-      [Compiler:test_array] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc (isEntry=true)
-      [Compiler:test_array] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-      [Compiler:test_array] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-      [Compiler:test_array] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -271,7 +242,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
-      [Compiler:test_array] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_array.arc
       Module has 1 functions, 0 globals
       [Compiler:test_array] [INFO] Generating object file to: /tmp/arc_tests/test_array.o
       [Compiler:test_array] [DEBUG] Calling code generator for module 'test_array'
@@ -292,10 +262,6 @@ Compiling tests/test_array_for_loop.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_array_for_loop'
 [Compiler:test_array_for_loop] [INFO] Compiling file: tests/test_array_for_loop.arc
-[Compiler:test_array_for_loop] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc (isEntry=true)
-[Compiler:test_array_for_loop] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-[Compiler:test_array_for_loop] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-[Compiler:test_array_for_loop] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -325,7 +291,6 @@ Compiling tests/test_array_for_loop.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-[Compiler:test_array_for_loop] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
 Module has 1 functions, 0 globals
 [Compiler:test_array_for_loop] [INFO] Generating object file to: /tmp/arc_tests/test_array_for_loop.o
 [Compiler:test_array_for_loop] [DEBUG] Calling code generator for module 'test_array_for_loop'
@@ -341,10 +306,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_array_for_loop'
       [Compiler:test_array_for_loop] [INFO] Compiling file: tests/test_array_for_loop.arc
-      [Compiler:test_array_for_loop] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc (isEntry=true)
-      [Compiler:test_array_for_loop] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-      [Compiler:test_array_for_loop] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-      [Compiler:test_array_for_loop] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -374,7 +335,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
-      [Compiler:test_array_for_loop] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_array_for_loop.arc
       Module has 1 functions, 0 globals
       [Compiler:test_array_for_loop] [INFO] Generating object file to: /tmp/arc_tests/test_array_for_loop.o
       [Compiler:test_array_for_loop] [DEBUG] Calling code generator for module 'test_array_for_loop'
@@ -395,10 +355,6 @@ Compiling tests/test_bitwise.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_bitwise'
 [Compiler:test_bitwise] [INFO] Compiling file: tests/test_bitwise.arc
-[Compiler:test_bitwise] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc (isEntry=true)
-[Compiler:test_bitwise] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-[Compiler:test_bitwise] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-[Compiler:test_bitwise] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -426,14 +382,13 @@ Compiling tests/test_bitwise.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-[Compiler:test_bitwise] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
 Module has 1 functions, 0 globals
 [Compiler:test_bitwise] [INFO] Generating object file to: /tmp/arc_tests/test_bitwise.o
 [Compiler:test_bitwise] [DEBUG] Calling code generator for module 'test_bitwise'
 [Compiler:test_bitwise] [ERROR] Code generation failed: unknown opcode: or
 Object generation failed: code generation failed: unknown opcode: or
 
-❌ FAIL (0.04s)
+❌ FAIL (0.03s)
     Compilation failed
     Compile output:
       Compiling tests/test_bitwise.arc...
@@ -442,10 +397,6 @@ Object generation failed: code generation failed: unknown opcode: or
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_bitwise'
       [Compiler:test_bitwise] [INFO] Compiling file: tests/test_bitwise.arc
-      [Compiler:test_bitwise] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc (isEntry=true)
-      [Compiler:test_bitwise] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-      [Compiler:test_bitwise] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-      [Compiler:test_bitwise] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -473,7 +424,6 @@ Object generation failed: code generation failed: unknown opcode: or
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
-      [Compiler:test_bitwise] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_bitwise.arc
       Module has 1 functions, 0 globals
       [Compiler:test_bitwise] [INFO] Generating object file to: /tmp/arc_tests/test_bitwise.o
       [Compiler:test_bitwise] [DEBUG] Calling code generator for module 'test_bitwise'
@@ -494,10 +444,6 @@ Compiling tests/test_cast.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_cast'
 [Compiler:test_cast] [INFO] Compiling file: tests/test_cast.arc
-[Compiler:test_cast] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc (isEntry=true)
-[Compiler:test_cast] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-[Compiler:test_cast] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-[Compiler:test_cast] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -519,7 +465,6 @@ Compiling tests/test_cast.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-[Compiler:test_cast] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
 Module has 1 functions, 0 globals
 [Compiler:test_cast] [INFO] Generating object file to: /tmp/arc_tests/test_cast.o
 [Compiler:test_cast] [DEBUG] Calling code generator for module 'test_cast'
@@ -535,10 +480,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_cast'
       [Compiler:test_cast] [INFO] Compiling file: tests/test_cast.arc
-      [Compiler:test_cast] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc (isEntry=true)
-      [Compiler:test_cast] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-      [Compiler:test_cast] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-      [Compiler:test_cast] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -560,7 +501,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
-      [Compiler:test_cast] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_cast.arc
       Module has 1 functions, 0 globals
       [Compiler:test_cast] [INFO] Generating object file to: /tmp/arc_tests/test_cast.o
       [Compiler:test_cast] [DEBUG] Calling code generator for module 'test_cast'
@@ -581,10 +521,6 @@ Compiling tests/test_char_literal.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_char_literal'
 [Compiler:test_char_literal] [INFO] Compiling file: tests/test_char_literal.arc
-[Compiler:test_char_literal] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc (isEntry=true)
-[Compiler:test_char_literal] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-[Compiler:test_char_literal] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-[Compiler:test_char_literal] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -602,7 +538,6 @@ Compiling tests/test_char_literal.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-[Compiler:test_char_literal] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
 Module has 1 functions, 0 globals
 [Compiler:test_char_literal] [INFO] Generating object file to: /tmp/arc_tests/test_char_literal.o
 [Compiler:test_char_literal] [DEBUG] Calling code generator for module 'test_char_literal'
@@ -618,10 +553,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_char_literal'
       [Compiler:test_char_literal] [INFO] Compiling file: tests/test_char_literal.arc
-      [Compiler:test_char_literal] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc (isEntry=true)
-      [Compiler:test_char_literal] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-      [Compiler:test_char_literal] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-      [Compiler:test_char_literal] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -639,7 +570,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
-      [Compiler:test_char_literal] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_char_literal.arc
       Module has 1 functions, 0 globals
       [Compiler:test_char_literal] [INFO] Generating object file to: /tmp/arc_tests/test_char_literal.o
       [Compiler:test_char_literal] [DEBUG] Calling code generator for module 'test_char_literal'
@@ -660,10 +590,6 @@ Compiling tests/test_class.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_class'
 [Compiler:test_class] [INFO] Compiling file: tests/test_class.arc
-[Compiler:test_class] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc (isEntry=true)
-[Compiler:test_class] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-[Compiler:test_class] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-[Compiler:test_class] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -704,10 +630,6 @@ Compiling tests/test_class.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-
-[Context] Compilation Summary:
-  Warnings: 1
-[Compiler:test_class] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
 Module has 2 functions, 1 globals
 [Compiler:test_class] [INFO] Generating object file to: /tmp/arc_tests/test_class.o
 [Compiler:test_class] [DEBUG] Calling code generator for module 'test_class'
@@ -723,10 +645,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_class'
       [Compiler:test_class] [INFO] Compiling file: tests/test_class.arc
-      [Compiler:test_class] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc (isEntry=true)
-      [Compiler:test_class] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-      [Compiler:test_class] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-      [Compiler:test_class] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -767,10 +685,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
-      
-      [Context] Compilation Summary:
-        Warnings: 1
-      [Compiler:test_class] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_class.arc
       Module has 2 functions, 1 globals
       [Compiler:test_class] [INFO] Generating object file to: /tmp/arc_tests/test_class.o
       [Compiler:test_class] [DEBUG] Calling code generator for module 'test_class'
@@ -791,10 +705,6 @@ Compiling tests/test_comparison.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_comparison'
 [Compiler:test_comparison] [INFO] Compiling file: tests/test_comparison.arc
-[Compiler:test_comparison] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc (isEntry=true)
-[Compiler:test_comparison] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-[Compiler:test_comparison] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-[Compiler:test_comparison] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -816,7 +726,6 @@ Compiling tests/test_comparison.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-[Compiler:test_comparison] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
 Module has 1 functions, 0 globals
 [Compiler:test_comparison] [INFO] Generating object file to: /tmp/arc_tests/test_comparison.o
 [Compiler:test_comparison] [DEBUG] Calling code generator for module 'test_comparison'
@@ -832,10 +741,6 @@ Object generation failed: code generation failed: unknown opcode: and
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_comparison'
       [Compiler:test_comparison] [INFO] Compiling file: tests/test_comparison.arc
-      [Compiler:test_comparison] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc (isEntry=true)
-      [Compiler:test_comparison] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-      [Compiler:test_comparison] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-      [Compiler:test_comparison] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -857,7 +762,6 @@ Object generation failed: code generation failed: unknown opcode: and
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
-      [Compiler:test_comparison] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_comparison.arc
       Module has 1 functions, 0 globals
       [Compiler:test_comparison] [INFO] Generating object file to: /tmp/arc_tests/test_comparison.o
       [Compiler:test_comparison] [DEBUG] Calling code generator for module 'test_comparison'
@@ -878,10 +782,6 @@ Compiling tests/test_compound_assignment.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_compound_assignment'
 [Compiler:test_compound_assignment] [INFO] Compiling file: tests/test_compound_assignment.arc
-[Compiler:test_compound_assignment] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc (isEntry=true)
-[Compiler:test_compound_assignment] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-[Compiler:test_compound_assignment] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-[Compiler:test_compound_assignment] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -902,14 +802,13 @@ Compiling tests/test_compound_assignment.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-[Compiler:test_compound_assignment] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
 Module has 1 functions, 0 globals
 [Compiler:test_compound_assignment] [INFO] Generating object file to: /tmp/arc_tests/test_compound_assignment.o
 [Compiler:test_compound_assignment] [DEBUG] Calling code generator for module 'test_compound_assignment'
 [Compiler:test_compound_assignment] [ERROR] Code generation failed: unknown opcode: trunc
 Object generation failed: code generation failed: unknown opcode: trunc
 
-❌ FAIL (0.02s)
+❌ FAIL (0.03s)
     Compilation failed
     Compile output:
       Compiling tests/test_compound_assignment.arc...
@@ -918,10 +817,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_compound_assignment'
       [Compiler:test_compound_assignment] [INFO] Compiling file: tests/test_compound_assignment.arc
-      [Compiler:test_compound_assignment] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc (isEntry=true)
-      [Compiler:test_compound_assignment] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-      [Compiler:test_compound_assignment] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-      [Compiler:test_compound_assignment] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -942,7 +837,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
-      [Compiler:test_compound_assignment] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_compound_assignment.arc
       Module has 1 functions, 0 globals
       [Compiler:test_compound_assignment] [INFO] Generating object file to: /tmp/arc_tests/test_compound_assignment.o
       [Compiler:test_compound_assignment] [DEBUG] Calling code generator for module 'test_compound_assignment'
@@ -963,10 +857,6 @@ Compiling tests/test_constant.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_constant'
 [Compiler:test_constant] [INFO] Compiling file: tests/test_constant.arc
-[Compiler:test_constant] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc (isEntry=true)
-[Compiler:test_constant] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-[Compiler:test_constant] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-[Compiler:test_constant] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -990,28 +880,27 @@ Compiling tests/test_constant.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-[Compiler:test_constant] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
 Module has 1 functions, 1 globals
 [Compiler:test_constant] [INFO] Generating object file to: /tmp/arc_tests/test_constant.o
 [Compiler:test_constant] [DEBUG] Calling code generator for module 'test_constant'
 panic: Value @main_MAX = external constant i64 100 not allocated
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf00c000423648?, {0x69b2d0, 0xc0002f25f0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:167 +0xa5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004239d0, 0x1, {0x69b2d0?, 0xc0002f25f0?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:179 +0x9d
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004239d0, {0x6a1890, 0xc0002f79e0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/ops.go:148 +0x947
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004239d0, 0xc0002d7680)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:143 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000ac070)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:66 +0x330
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/codegen/codegen.go:17 +0x25
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffffa6ed501, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/codegen.go:45 +0x105
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf00c0003775c0?, {0x69b0b0, 0xc00021dc70})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0003779d0, 0x1, {0x69b0b0?, 0xc00021dc70?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0003779d0, {0x6a1670, 0xc0004ec660})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:148 +0x947
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0003779d0, 0xc00057b180)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b6070)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00008c0c0?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc0000a6078, {0x7ffc087d5501, 0x1e})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
 main.main()
 	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
@@ -1025,10 +914,6 @@ main.main()
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_constant'
       [Compiler:test_constant] [INFO] Compiling file: tests/test_constant.arc
-      [Compiler:test_constant] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc (isEntry=true)
-      [Compiler:test_constant] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-      [Compiler:test_constant] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-      [Compiler:test_constant] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1052,28 +937,27 @@ main.main()
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
-      [Compiler:test_constant] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_constant.arc
       Module has 1 functions, 1 globals
       [Compiler:test_constant] [INFO] Generating object file to: /tmp/arc_tests/test_constant.o
       [Compiler:test_constant] [DEBUG] Calling code generator for module 'test_constant'
       panic: Value @main_MAX = external constant i64 100 not allocated
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf00c000423648?, {0x69b2d0, 0xc0002f25f0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:167 +0xa5
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004239d0, 0x1, {0x69b2d0?, 0xc0002f25f0?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:179 +0x9d
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004239d0, {0x6a1890, 0xc0002f79e0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/ops.go:148 +0x947
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004239d0, 0xc0002d7680)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:143 +0x625
-      github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000ac070)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:66 +0x330
-      github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/codegen/codegen.go:17 +0x25
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffffa6ed501, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/codegen.go:45 +0x105
-      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf00c0003775c0?, {0x69b0b0, 0xc00021dc70})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0003779d0, 0x1, {0x69b0b0?, 0xc00021dc70?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0003779d0, {0x6a1670, 0xc0004ec660})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:148 +0x947
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0003779d0, 0xc00057b180)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
+      github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b6070)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
+      github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00008c0c0?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc0000a6078, {0x7ffc087d5501, 0x1e})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
+      main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
       main.main()
       	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
@@ -1092,10 +976,6 @@ Compiling tests/test_defer.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_defer'
 [Compiler:test_defer] [INFO] Compiling file: tests/test_defer.arc
-[Compiler:test_defer] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc (isEntry=true)
-[Compiler:test_defer] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-[Compiler:test_defer] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-[Compiler:test_defer] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1119,30 +999,26 @@ Compiling tests/test_defer.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-
-[Context] Compilation Summary:
-  Warnings: 1
-[Compiler:test_defer] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
 Module has 2 functions, 0 globals
 [Compiler:test_defer] [INFO] Generating object file to: /tmp/arc_tests/test_defer.o
 [Compiler:test_defer] [DEBUG] Calling code generator for module 'test_defer'
 panic: Value call void @cleanup() not allocated
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e6460?, {0x69b618, 0xc00009d6c0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:167 +0xa5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc0005139d0, 0x0, {0x69b618?, 0xc00009d6c0?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:184 +0x34
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005139d0, {0x6a15f0, 0xc00009d6c0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/ops.go:75 +0x1085
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005139d0, 0xc00048ad00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:143 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e63e0?, {0x69b3f8, 0xc00009d6c0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc00046b9d0, 0x0, {0x69b3f8?, 0xc00009d6c0?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:184 +0x34
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00046b9d0, {0x6a13d0, 0xc00009d6c0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:75 +0x1085
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00046b9d0, 0xc0002c0000)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:66 +0x330
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
 github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/codegen/codegen.go:17 +0x25
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffcca8ca504, 0x1b})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/codegen.go:45 +0x105
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffe8159e504, 0x1b})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
 main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
 main.main()
@@ -1157,10 +1033,6 @@ main.main()
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_defer'
       [Compiler:test_defer] [INFO] Compiling file: tests/test_defer.arc
-      [Compiler:test_defer] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc (isEntry=true)
-      [Compiler:test_defer] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-      [Compiler:test_defer] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-      [Compiler:test_defer] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1184,30 +1056,26 @@ main.main()
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
-      
-      [Context] Compilation Summary:
-        Warnings: 1
-      [Compiler:test_defer] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_defer.arc
       Module has 2 functions, 0 globals
       [Compiler:test_defer] [INFO] Generating object file to: /tmp/arc_tests/test_defer.o
       [Compiler:test_defer] [DEBUG] Calling code generator for module 'test_defer'
       panic: Value call void @cleanup() not allocated
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e6460?, {0x69b618, 0xc00009d6c0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:167 +0xa5
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc0005139d0, 0x0, {0x69b618?, 0xc00009d6c0?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:184 +0x34
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005139d0, {0x6a15f0, 0xc00009d6c0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/ops.go:75 +0x1085
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005139d0, 0xc00048ad00)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:143 +0x625
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e63e0?, {0x69b3f8, 0xc00009d6c0})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc00046b9d0, 0x0, {0x69b3f8?, 0xc00009d6c0?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:184 +0x34
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00046b9d0, {0x6a13d0, 0xc00009d6c0})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:75 +0x1085
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00046b9d0, 0xc0002c0000)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
       github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:66 +0x330
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
       github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/codegen/codegen.go:17 +0x25
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffcca8ca504, 0x1b})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/codegen.go:45 +0x105
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffe8159e504, 0x1b})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
       main.handleBuild({0xc000022070?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
       main.main()
@@ -1227,10 +1095,6 @@ Compiling tests/test_enum.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_enum'
 [Compiler:test_enum] [INFO] Compiling file: tests/test_enum.arc
-[Compiler:test_enum] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc (isEntry=true)
-[Compiler:test_enum] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-[Compiler:test_enum] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-[Compiler:test_enum] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1253,27 +1117,26 @@ Compiling tests/test_enum.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-[Compiler:test_enum] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
 Module has 1 functions, 3 globals
 [Compiler:test_enum] [INFO] Generating object file to: /tmp/arc_tests/test_enum.o
 [Compiler:test_enum] [DEBUG] Calling code generator for module 'test_enum'
 panic: Value @Status_OK = external constant i32 0 not allocated
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf00c0001f9648?, {0x69b2d0, 0xc0001a0320})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:167 +0xa5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0001f99d0, 0x1, {0x69b2d0?, 0xc0001a0320?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:179 +0x9d
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0001f99d0, {0x6a1890, 0xc0002b9380})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/ops.go:148 +0x947
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0001f99d0, 0xc000297e00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:143 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf000000000011?, {0x69b0b0, 0xc0003b0f00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004c99d0, 0x1, {0x69b0b0?, 0xc0003b0f00?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004c99d0, {0x6a1670, 0xc000302000})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:148 +0x947
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004c99d0, 0xc0001dce00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:66 +0x330
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
 github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/codegen/codegen.go:17 +0x25
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7fff7a6e5505, 0x1a})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/codegen.go:45 +0x105
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffc7b9c0505, 0x1a})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
 main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
 main.main()
@@ -1288,10 +1151,6 @@ main.main()
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_enum'
       [Compiler:test_enum] [INFO] Compiling file: tests/test_enum.arc
-      [Compiler:test_enum] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc (isEntry=true)
-      [Compiler:test_enum] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-      [Compiler:test_enum] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-      [Compiler:test_enum] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1314,27 +1173,26 @@ main.main()
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
-      [Compiler:test_enum] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_enum.arc
       Module has 1 functions, 3 globals
       [Compiler:test_enum] [INFO] Generating object file to: /tmp/arc_tests/test_enum.o
       [Compiler:test_enum] [DEBUG] Calling code generator for module 'test_enum'
       panic: Value @Status_OK = external constant i32 0 not allocated
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf00c0001f9648?, {0x69b2d0, 0xc0001a0320})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:167 +0xa5
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0001f99d0, 0x1, {0x69b2d0?, 0xc0001a0320?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:179 +0x9d
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0001f99d0, {0x6a1890, 0xc0002b9380})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/ops.go:148 +0x947
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0001f99d0, 0xc000297e00)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:143 +0x625
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xf000000000011?, {0x69b0b0, 0xc0003b0f00})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004c99d0, 0x1, {0x69b0b0?, 0xc0003b0f00?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004c99d0, {0x6a1670, 0xc000302000})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:148 +0x947
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004c99d0, 0xc0001dce00)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
       github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:66 +0x330
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
       github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/codegen/codegen.go:17 +0x25
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7fff7a6e5505, 0x1a})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/codegen.go:45 +0x105
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffc7b9c0505, 0x1a})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
       main.handleBuild({0xc000022070?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
       main.main()
@@ -1354,10 +1212,6 @@ Compiling tests/test_extern.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_extern'
 [Compiler:test_extern] [INFO] Compiling file: tests/test_extern.arc
-[Compiler:test_extern] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc (isEntry=true)
-[Compiler:test_extern] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-[Compiler:test_extern] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-[Compiler:test_extern] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1381,7 +1235,6 @@ Compiling tests/test_extern.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-[Compiler:test_extern] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
 Module has 2 functions, 0 globals
 [Compiler:test_extern] [INFO] Generating object file to: /tmp/arc_tests/test_extern.o
 [Compiler:test_extern] [DEBUG] Calling code generator for module 'test_extern'
@@ -1397,10 +1250,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_extern'
       [Compiler:test_extern] [INFO] Compiling file: tests/test_extern.arc
-      [Compiler:test_extern] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc (isEntry=true)
-      [Compiler:test_extern] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-      [Compiler:test_extern] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-      [Compiler:test_extern] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1424,7 +1273,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
-      [Compiler:test_extern] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_extern.arc
       Module has 2 functions, 0 globals
       [Compiler:test_extern] [INFO] Generating object file to: /tmp/arc_tests/test_extern.o
       [Compiler:test_extern] [DEBUG] Calling code generator for module 'test_extern'
@@ -1445,10 +1293,6 @@ Compiling tests/test_for_in_range.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_for_in_range'
 [Compiler:test_for_in_range] [INFO] Compiling file: tests/test_for_in_range.arc
-[Compiler:test_for_in_range] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc (isEntry=true)
-[Compiler:test_for_in_range] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-[Compiler:test_for_in_range] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-[Compiler:test_for_in_range] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1475,7 +1319,6 @@ Compiling tests/test_for_in_range.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-[Compiler:test_for_in_range] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
 Module has 1 functions, 0 globals
 [Compiler:test_for_in_range] [INFO] Generating object file to: /tmp/arc_tests/test_for_in_range.o
 [Compiler:test_for_in_range] [DEBUG] Calling code generator for module 'test_for_in_range'
@@ -1491,10 +1334,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_for_in_range'
       [Compiler:test_for_in_range] [INFO] Compiling file: tests/test_for_in_range.arc
-      [Compiler:test_for_in_range] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc (isEntry=true)
-      [Compiler:test_for_in_range] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-      [Compiler:test_for_in_range] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-      [Compiler:test_for_in_range] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1521,7 +1360,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
-      [Compiler:test_for_in_range] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_for_in_range.arc
       Module has 1 functions, 0 globals
       [Compiler:test_for_in_range] [INFO] Generating object file to: /tmp/arc_tests/test_for_in_range.o
       [Compiler:test_for_in_range] [DEBUG] Calling code generator for module 'test_for_in_range'
@@ -1542,10 +1380,6 @@ Compiling tests/test_for_loop.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_for_loop'
 [Compiler:test_for_loop] [INFO] Compiling file: tests/test_for_loop.arc
-[Compiler:test_for_loop] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc (isEntry=true)
-[Compiler:test_for_loop] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-[Compiler:test_for_loop] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-[Compiler:test_for_loop] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1573,7 +1407,6 @@ Compiling tests/test_for_loop.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-[Compiler:test_for_loop] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
 Module has 1 functions, 0 globals
 [Compiler:test_for_loop] [INFO] Generating object file to: /tmp/arc_tests/test_for_loop.o
 [Compiler:test_for_loop] [DEBUG] Calling code generator for module 'test_for_loop'
@@ -1589,10 +1422,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_for_loop'
       [Compiler:test_for_loop] [INFO] Compiling file: tests/test_for_loop.arc
-      [Compiler:test_for_loop] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc (isEntry=true)
-      [Compiler:test_for_loop] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-      [Compiler:test_for_loop] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-      [Compiler:test_for_loop] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1620,7 +1449,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
-      [Compiler:test_for_loop] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_for_loop.arc
       Module has 1 functions, 0 globals
       [Compiler:test_for_loop] [INFO] Generating object file to: /tmp/arc_tests/test_for_loop.o
       [Compiler:test_for_loop] [DEBUG] Calling code generator for module 'test_for_loop'
@@ -1641,10 +1469,6 @@ Compiling tests/test_function_basic.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_function_basic'
 [Compiler:test_function_basic] [INFO] Compiling file: tests/test_function_basic.arc
-[Compiler:test_function_basic] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc (isEntry=true)
-[Compiler:test_function_basic] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-[Compiler:test_function_basic] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-[Compiler:test_function_basic] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1674,7 +1498,6 @@ Compiling tests/test_function_basic.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-[Compiler:test_function_basic] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
 Module has 2 functions, 0 globals
 [Compiler:test_function_basic] [INFO] Generating object file to: /tmp/arc_tests/test_function_basic.o
 [Compiler:test_function_basic] [DEBUG] Calling code generator for module 'test_function_basic'
@@ -1690,10 +1513,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_function_basic'
       [Compiler:test_function_basic] [INFO] Compiling file: tests/test_function_basic.arc
-      [Compiler:test_function_basic] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc (isEntry=true)
-      [Compiler:test_function_basic] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-      [Compiler:test_function_basic] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-      [Compiler:test_function_basic] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1723,7 +1542,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
-      [Compiler:test_function_basic] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_function_basic.arc
       Module has 2 functions, 0 globals
       [Compiler:test_function_basic] [INFO] Generating object file to: /tmp/arc_tests/test_function_basic.o
       [Compiler:test_function_basic] [DEBUG] Calling code generator for module 'test_function_basic'
@@ -1744,10 +1562,6 @@ Compiling tests/test_generics.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_generics'
 [Compiler:test_generics] [INFO] Compiling file: tests/test_generics.arc
-[Compiler:test_generics] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc (isEntry=true)
-[Compiler:test_generics] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-[Compiler:test_generics] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-[Compiler:test_generics] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1779,27 +1593,26 @@ Compiling tests/test_generics.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-[Compiler:test_generics] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
 Module has 2 functions, 0 globals
 [Compiler:test_generics] [INFO] Generating object file to: /tmp/arc_tests/test_generics.o
 [Compiler:test_generics] [DEBUG] Calling code generator for module 'test_generics'
 panic: Value call void @swap<i32>(ptr<i64> %x.addr, ptr<i64> %y.addr) not allocated
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e6460?, {0x69b618, 0xc00009d8f0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:167 +0xa5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc0004999d0, 0x0, {0x69b618?, 0xc00009d8f0?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:184 +0x34
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004999d0, {0x6a15f0, 0xc00009d8f0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/ops.go:75 +0x1085
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004999d0, 0xc0001b9c80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:143 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e63e0?, {0x69b3f8, 0xc00009d8f0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc0005499d0, 0x0, {0x69b3f8?, 0xc00009d8f0?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:184 +0x34
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005499d0, {0x6a13d0, 0xc00009d8f0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:75 +0x1085
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005499d0, 0xc0001f7900)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:66 +0x330
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
 github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/codegen/codegen.go:17 +0x25
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7fff8e5d5501, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/codegen.go:45 +0x105
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7fff0c001501, 0x1e})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
 main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
 main.main()
@@ -1814,10 +1627,6 @@ main.main()
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_generics'
       [Compiler:test_generics] [INFO] Compiling file: tests/test_generics.arc
-      [Compiler:test_generics] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc (isEntry=true)
-      [Compiler:test_generics] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      [Compiler:test_generics] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      [Compiler:test_generics] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1849,27 +1658,26 @@ main.main()
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
-      [Compiler:test_generics] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_generics.arc
       Module has 2 functions, 0 globals
       [Compiler:test_generics] [INFO] Generating object file to: /tmp/arc_tests/test_generics.o
       [Compiler:test_generics] [DEBUG] Calling code generator for module 'test_generics'
       panic: Value call void @swap<i32>(ptr<i64> %x.addr, ptr<i64> %y.addr) not allocated
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e6460?, {0x69b618, 0xc00009d8f0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:167 +0xa5
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc0004999d0, 0x0, {0x69b618?, 0xc00009d8f0?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:184 +0x34
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004999d0, {0x6a15f0, 0xc00009d8f0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/ops.go:75 +0x1085
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004999d0, 0xc0001b9c80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:143 +0x625
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x5e63e0?, {0x69b3f8, 0xc00009d8f0})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).store(0xc0005499d0, 0x0, {0x69b3f8?, 0xc00009d8f0?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:184 +0x34
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005499d0, {0x6a13d0, 0xc00009d8f0})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:75 +0x1085
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005499d0, 0xc0001f7900)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
       github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:66 +0x330
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
       github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/codegen/codegen.go:17 +0x25
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7fff8e5d5501, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/codegen.go:45 +0x105
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7fff0c001501, 0x1e})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
       main.handleBuild({0xc000022070?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
       main.main()
@@ -1889,17 +1697,14 @@ Compiling tests/test_generics_structs.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_generics_structs'
 [Compiler:test_generics_structs] [INFO] Compiling file: tests/test_generics_structs.arc
-[Compiler:test_generics_structs] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc (isEntry=true)
-[Compiler:test_generics_structs] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
-[Compiler:test_generics_structs] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
 [Context] [ERROR] /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc:26:4: missing '=' at 'p1'
 [Context] [ERROR] /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc:44:4: missing '=' at 'p2'
 
 [Context] Compilation Summary:
   Errors: 2
-Compilation failed: syntax errors found in /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
+Compilation failed: syntax errors in /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
 
-❌ FAIL (0.07s)
+❌ FAIL (0.11s)
     Compilation failed
     Compile output:
       Compiling tests/test_generics_structs.arc...
@@ -1908,15 +1713,12 @@ Compilation failed: syntax errors found in /workspaces/arc-lang/compiler/cmd/tes
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_generics_structs'
       [Compiler:test_generics_structs] [INFO] Compiling file: tests/test_generics_structs.arc
-      [Compiler:test_generics_structs] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc (isEntry=true)
-      [Compiler:test_generics_structs] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
-      [Compiler:test_generics_structs] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
       [Context] [ERROR] /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc:26:4: missing '=' at 'p1'
       [Context] [ERROR] /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc:44:4: missing '=' at 'p2'
       
       [Context] Compilation Summary:
         Errors: 2
-      Compilation failed: syntax errors found in /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
+      Compilation failed: syntax errors in /workspaces/arc-lang/compiler/cmd/tests/test_generics_structs.arc
 [20/39] test_if_else                                  
 --- Testing: test_if_else ---
 Source file: tests/test_if_else.arc
@@ -1932,10 +1734,6 @@ Compiling tests/test_if_else.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_if_else'
 [Compiler:test_if_else] [INFO] Compiling file: tests/test_if_else.arc
-[Compiler:test_if_else] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc (isEntry=true)
-[Compiler:test_if_else] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-[Compiler:test_if_else] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-[Compiler:test_if_else] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -1958,7 +1756,6 @@ Compiling tests/test_if_else.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-[Compiler:test_if_else] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
 Module has 1 functions, 0 globals
 [Compiler:test_if_else] [INFO] Generating object file to: /tmp/arc_tests/test_if_else.o
 [Compiler:test_if_else] [DEBUG] Calling code generator for module 'test_if_else'
@@ -1974,10 +1771,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_if_else'
       [Compiler:test_if_else] [INFO] Compiling file: tests/test_if_else.arc
-      [Compiler:test_if_else] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc (isEntry=true)
-      [Compiler:test_if_else] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-      [Compiler:test_if_else] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-      [Compiler:test_if_else] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2000,7 +1793,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
-      [Compiler:test_if_else] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_if_else.arc
       Module has 1 functions, 0 globals
       [Compiler:test_if_else] [INFO] Generating object file to: /tmp/arc_tests/test_if_else.o
       [Compiler:test_if_else] [DEBUG] Calling code generator for module 'test_if_else'
@@ -2021,10 +1813,6 @@ Compiling tests/test_if_statement.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_if_statement'
 [Compiler:test_if_statement] [INFO] Compiling file: tests/test_if_statement.arc
-[Compiler:test_if_statement] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc (isEntry=true)
-[Compiler:test_if_statement] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-[Compiler:test_if_statement] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-[Compiler:test_if_statement] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2045,7 +1833,6 @@ Compiling tests/test_if_statement.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-[Compiler:test_if_statement] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
 Module has 1 functions, 0 globals
 [Compiler:test_if_statement] [INFO] Generating object file to: /tmp/arc_tests/test_if_statement.o
 [Compiler:test_if_statement] [DEBUG] Calling code generator for module 'test_if_statement'
@@ -2061,10 +1848,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_if_statement'
       [Compiler:test_if_statement] [INFO] Compiling file: tests/test_if_statement.arc
-      [Compiler:test_if_statement] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc (isEntry=true)
-      [Compiler:test_if_statement] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-      [Compiler:test_if_statement] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-      [Compiler:test_if_statement] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2085,7 +1868,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
-      [Compiler:test_if_statement] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_if_statement.arc
       Module has 1 functions, 0 globals
       [Compiler:test_if_statement] [INFO] Generating object file to: /tmp/arc_tests/test_if_statement.o
       [Compiler:test_if_statement] [DEBUG] Calling code generator for module 'test_if_statement'
@@ -2106,30 +1888,26 @@ Compiling tests/test_import_multiple.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_import_multiple'
 [Compiler:test_import_multiple] [INFO] Compiling file: tests/test_import_multiple.arc
-[Compiler:test_import_multiple] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc (isEntry=true)
-[Compiler:test_import_multiple] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-[Compiler:test_import_multiple] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-[Compiler:test_import_multiple] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
 panic: runtime error: invalid memory address or nil pointer dereference
-[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59c1eb]
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59bc6b]
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0003b1800, 0x63a2a0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/visitor_declarations.go:18 +0x2b
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69ce48?, 0xc00010ac00?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/visitor.go:55 +0x757
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0003b1800, 0xc00010aa80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/visitor.go:169 +0x1fa
-github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69cd10?, 0xc00010aa80?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/visitor.go:49 +0x266
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a4078, {0xc0000c6080, 0x40}, 0x1)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/compiler.go:180 +0x673
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a4078, {0x7ffce21ae4d8, 0x1e})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/compiler.go:60 +0x18b
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0004b1200, 0x63a1c0?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor_declarations.go:18 +0x2b
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69cc28?, 0xc0000dec00?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:55 +0x757
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0004b1200, 0xc0000dea80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:169 +0x1fa
+github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69caf0?, 0xc0000dea80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:49 +0x266
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc000010090, {0xc00002a400, 0x40}, 0x1)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/compiler.go:194 +0x445
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010090, {0x7fffe9a8f4d8, 0x1e})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/compiler.go:60 +0x18b
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:76 +0x451
 main.main()
 	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
@@ -2143,30 +1921,26 @@ main.main()
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_import_multiple'
       [Compiler:test_import_multiple] [INFO] Compiling file: tests/test_import_multiple.arc
-      [Compiler:test_import_multiple] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc (isEntry=true)
-      [Compiler:test_import_multiple] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-      [Compiler:test_import_multiple] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
-      [Compiler:test_import_multiple] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_multiple.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
       panic: runtime error: invalid memory address or nil pointer dereference
-      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59c1eb]
+      [signal SIGSEGV: segmentation violation code=0x1 addr=0x58 pc=0x59bc6b]
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0003b1800, 0x63a2a0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/visitor_declarations.go:18 +0x2b
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69ce48?, 0xc00010ac00?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/visitor.go:55 +0x757
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0003b1800, 0xc00010aa80)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/visitor.go:169 +0x1fa
-      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69cd10?, 0xc00010aa80?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/visitor.go:49 +0x266
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc0000a4078, {0xc0000c6080, 0x40}, 0x1)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/compiler.go:180 +0x673
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc0000a4078, {0x7ffce21ae4d8, 0x1e})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/compiler.go:60 +0x18b
-      main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitImportDecl(0xc0004b1200, 0x63a1c0?)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor_declarations.go:18 +0x2b
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x8334b0?, {0x69cc28?, 0xc0000dec00?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:55 +0x757
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).VisitCompilationUnit(0xc0004b1200, 0xc0000dea80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:169 +0x1fa
+      github.com/arc-language/arc-lang/compiler/compiler.(*IRVisitor).Visit(0x833430?, {0x69caf0?, 0xc0000dea80?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/visitor.go:49 +0x266
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).compileFileInternal(0xc000010090, {0xc00002a400, 0x40}, 0x1)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/compiler.go:194 +0x445
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileFile(0xc000010090, {0x7fffe9a8f4d8, 0x1e})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/compiler.go:60 +0x18b
+      main.handleBuild({0xc000022070?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:76 +0x451
       main.main()
       	/workspaces/arc-lang/compiler/cmd/main.go:22 +0xad
@@ -2185,10 +1959,6 @@ Compiling tests/test_import_single.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_import_single'
 [Compiler:test_import_single] [INFO] Compiling file: tests/test_import_single.arc
-[Compiler:test_import_single] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc (isEntry=true)
-[Compiler:test_import_single] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-[Compiler:test_import_single] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-[Compiler:test_import_single] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2217,9 +1987,9 @@ Compiling tests/test_import_single.arc...
 
 [Context] Compilation Summary:
   Errors: 1
-Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
+Compilation failed: compilation failed
 
-❌ FAIL (0.02s)
+❌ FAIL (0.03s)
     Compilation failed
     Compile output:
       Compiling tests/test_import_single.arc...
@@ -2228,10 +1998,6 @@ Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/c
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_import_single'
       [Compiler:test_import_single] [INFO] Compiling file: tests/test_import_single.arc
-      [Compiler:test_import_single] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc (isEntry=true)
-      [Compiler:test_import_single] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-      [Compiler:test_import_single] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
-      [Compiler:test_import_single] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2260,7 +2026,7 @@ Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/c
       
       [Context] Compilation Summary:
         Errors: 1
-      Compilation failed: compilation failed with 1 error(s) in /workspaces/arc-lang/compiler/cmd/tests/test_import_single.arc
+      Compilation failed: compilation failed
 [24/39] test_increment                                
 --- Testing: test_increment ---
 Source file: tests/test_increment.arc
@@ -2276,10 +2042,6 @@ Compiling tests/test_increment.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_increment'
 [Compiler:test_increment] [INFO] Compiling file: tests/test_increment.arc
-[Compiler:test_increment] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc (isEntry=true)
-[Compiler:test_increment] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-[Compiler:test_increment] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-[Compiler:test_increment] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2300,7 +2062,6 @@ Compiling tests/test_increment.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-[Compiler:test_increment] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
 Module has 1 functions, 0 globals
 [Compiler:test_increment] [INFO] Generating object file to: /tmp/arc_tests/test_increment.o
 [Compiler:test_increment] [DEBUG] Calling code generator for module 'test_increment'
@@ -2316,10 +2077,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_increment'
       [Compiler:test_increment] [INFO] Compiling file: tests/test_increment.arc
-      [Compiler:test_increment] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc (isEntry=true)
-      [Compiler:test_increment] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-      [Compiler:test_increment] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-      [Compiler:test_increment] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2340,7 +2097,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
-      [Compiler:test_increment] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_increment.arc
       Module has 1 functions, 0 globals
       [Compiler:test_increment] [INFO] Generating object file to: /tmp/arc_tests/test_increment.o
       [Compiler:test_increment] [DEBUG] Calling code generator for module 'test_increment'
@@ -2361,10 +2117,6 @@ Compiling tests/test_namespace.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_namespace'
 [Compiler:test_namespace] [INFO] Compiling file: tests/test_namespace.arc
-[Compiler:test_namespace] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc (isEntry=true)
-[Compiler:test_namespace] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-[Compiler:test_namespace] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-[Compiler:test_namespace] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2382,7 +2134,6 @@ Compiling tests/test_namespace.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-[Compiler:test_namespace] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
 Module has 1 functions, 0 globals
 [Compiler:test_namespace] [INFO] Generating object file to: /tmp/arc_tests/test_namespace.o
 [Compiler:test_namespace] [DEBUG] Calling code generator for module 'test_namespace'
@@ -2398,10 +2149,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_namespace'
       [Compiler:test_namespace] [INFO] Compiling file: tests/test_namespace.arc
-      [Compiler:test_namespace] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc (isEntry=true)
-      [Compiler:test_namespace] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-      [Compiler:test_namespace] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-      [Compiler:test_namespace] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2419,7 +2166,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
-      [Compiler:test_namespace] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_namespace.arc
       Module has 1 functions, 0 globals
       [Compiler:test_namespace] [INFO] Generating object file to: /tmp/arc_tests/test_namespace.o
       [Compiler:test_namespace] [DEBUG] Calling code generator for module 'test_namespace'
@@ -2440,10 +2186,6 @@ Compiling tests/test_null_check.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_null_check'
 [Compiler:test_null_check] [INFO] Compiling file: tests/test_null_check.arc
-[Compiler:test_null_check] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc (isEntry=true)
-[Compiler:test_null_check] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-[Compiler:test_null_check] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-[Compiler:test_null_check] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2464,27 +2206,26 @@ Compiling tests/test_null_check.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-[Compiler:test_null_check] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
 Module has 1 functions, 0 globals
 [Compiler:test_null_check] [INFO] Generating object file to: /tmp/arc_tests/test_null_check.o
 [Compiler:test_null_check] [DEBUG] Calling code generator for module 'test_null_check'
 panic: Value ptr<void> null not allocated
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0004927e0?, {0x69b7d8, 0xc0004926e0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:167 +0xa5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0003c59d0, 0x0, {0x69b7d8?, 0xc0004926e0?})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:179 +0x9d
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0003c59d0, {0x6a1820, 0xc00041f440})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/ops.go:153 +0xa45
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0003c59d0, 0xc0002ad400)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:143 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003cc500?, {0x69b5b8, 0xc0003cc400})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00029d9d0, 0x0, {0x69b5b8?, 0xc0003cc400?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00029d9d0, {0x6a1600, 0xc000275800})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:153 +0xa45
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00029d9d0, 0xc00043fc80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:66 +0x330
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
 github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/codegen/codegen.go:17 +0x25
-github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffe60fb14ff, 0x20})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/codegen.go:45 +0x105
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
+github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffe539ac4ff, 0x20})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
 main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
 main.main()
@@ -2499,10 +2240,6 @@ main.main()
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_null_check'
       [Compiler:test_null_check] [INFO] Compiling file: tests/test_null_check.arc
-      [Compiler:test_null_check] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc (isEntry=true)
-      [Compiler:test_null_check] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-      [Compiler:test_null_check] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-      [Compiler:test_null_check] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2523,27 +2260,26 @@ main.main()
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
-      [Compiler:test_null_check] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_null_check.arc
       Module has 1 functions, 0 globals
       [Compiler:test_null_check] [INFO] Generating object file to: /tmp/arc_tests/test_null_check.o
       [Compiler:test_null_check] [DEBUG] Calling code generator for module 'test_null_check'
       panic: Value ptr<void> null not allocated
       
       goroutine 1 [running]:
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0004927e0?, {0x69b7d8, 0xc0004926e0})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:167 +0xa5
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0003c59d0, 0x0, {0x69b7d8?, 0xc0004926e0?})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:179 +0x9d
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0003c59d0, {0x6a1820, 0xc00041f440})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/ops.go:153 +0xa45
-      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0003c59d0, 0xc0002ad400)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:143 +0x625
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003cc500?, {0x69b5b8, 0xc0003cc400})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:167 +0xa5
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00029d9d0, 0x0, {0x69b5b8?, 0xc0003cc400?})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:179 +0x9d
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00029d9d0, {0x6a1600, 0xc000275800})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/ops.go:153 +0xa45
+      github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00029d9d0, 0xc00043fc80)
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:143 +0x625
       github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009c070)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/arch/amd64/compiler.go:66 +0x330
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/arch/amd64/compiler.go:66 +0x330
       github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0xc00007c0c0?)
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/codegen/codegen/codegen.go:17 +0x25
-      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffe60fb14ff, 0x20})
-      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231033629-460ab08d1f62/compiler/compiler/codegen.go:45 +0x105
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/codegen/codegen/codegen.go:17 +0x25
+      github.com/arc-language/arc-lang/compiler/compiler.(*Compiler).CompileToObject(0xc000010090, {0x7ffe539ac4ff, 0x20})
+      	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20251231034807-1f023d42c2f1/compiler/compiler/codegen.go:44 +0x105
       main.handleBuild({0xc000022070?, 0x0?, 0x0?})
       	/workspaces/arc-lang/compiler/cmd/main.go:87 +0x58a
       main.main()
@@ -2563,10 +2299,6 @@ Compiling tests/test_pointer.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_pointer'
 [Compiler:test_pointer] [INFO] Compiling file: tests/test_pointer.arc
-[Compiler:test_pointer] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc (isEntry=true)
-[Compiler:test_pointer] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-[Compiler:test_pointer] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-[Compiler:test_pointer] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2589,7 +2321,6 @@ Compiling tests/test_pointer.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-[Compiler:test_pointer] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
 Module has 1 functions, 0 globals
 [Compiler:test_pointer] [INFO] Generating object file to: /tmp/arc_tests/test_pointer.o
 [Compiler:test_pointer] [DEBUG] Calling code generator for module 'test_pointer'
@@ -2605,10 +2336,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_pointer'
       [Compiler:test_pointer] [INFO] Compiling file: tests/test_pointer.arc
-      [Compiler:test_pointer] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc (isEntry=true)
-      [Compiler:test_pointer] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-      [Compiler:test_pointer] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-      [Compiler:test_pointer] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2631,7 +2358,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
-      [Compiler:test_pointer] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_pointer.arc
       Module has 1 functions, 0 globals
       [Compiler:test_pointer] [INFO] Generating object file to: /tmp/arc_tests/test_pointer.o
       [Compiler:test_pointer] [DEBUG] Calling code generator for module 'test_pointer'
@@ -2652,10 +2378,6 @@ Compiling tests/test_sizeof.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_sizeof'
 [Compiler:test_sizeof] [INFO] Compiling file: tests/test_sizeof.arc
-[Compiler:test_sizeof] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc (isEntry=true)
-[Compiler:test_sizeof] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-[Compiler:test_sizeof] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-[Compiler:test_sizeof] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2677,14 +2399,13 @@ Compiling tests/test_sizeof.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-[Compiler:test_sizeof] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
 Module has 1 functions, 0 globals
 [Compiler:test_sizeof] [INFO] Generating object file to: /tmp/arc_tests/test_sizeof.o
 [Compiler:test_sizeof] [DEBUG] Calling code generator for module 'test_sizeof'
 [Compiler:test_sizeof] [ERROR] Code generation failed: unknown opcode: sizeof
 Object generation failed: code generation failed: unknown opcode: sizeof
 
-❌ FAIL (0.04s)
+❌ FAIL (0.05s)
     Compilation failed
     Compile output:
       Compiling tests/test_sizeof.arc...
@@ -2693,10 +2414,6 @@ Object generation failed: code generation failed: unknown opcode: sizeof
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_sizeof'
       [Compiler:test_sizeof] [INFO] Compiling file: tests/test_sizeof.arc
-      [Compiler:test_sizeof] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc (isEntry=true)
-      [Compiler:test_sizeof] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-      [Compiler:test_sizeof] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-      [Compiler:test_sizeof] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2718,7 +2435,6 @@ Object generation failed: code generation failed: unknown opcode: sizeof
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
-      [Compiler:test_sizeof] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_sizeof.arc
       Module has 1 functions, 0 globals
       [Compiler:test_sizeof] [INFO] Generating object file to: /tmp/arc_tests/test_sizeof.o
       [Compiler:test_sizeof] [DEBUG] Calling code generator for module 'test_sizeof'
@@ -2739,10 +2455,6 @@ Compiling tests/test_string_interpolation.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_string_interpolation'
 [Compiler:test_string_interpolation] [INFO] Compiling file: tests/test_string_interpolation.arc
-[Compiler:test_string_interpolation] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc (isEntry=true)
-[Compiler:test_string_interpolation] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-[Compiler:test_string_interpolation] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-[Compiler:test_string_interpolation] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2761,14 +2473,13 @@ Compiling tests/test_string_interpolation.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-[Compiler:test_string_interpolation] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
 Module has 1 functions, 2 globals
 [Compiler:test_string_interpolation] [INFO] Generating object file to: /tmp/arc_tests/test_string_interpolation.o
 [Compiler:test_string_interpolation] [DEBUG] Calling code generator for module 'test_string_interpolation'
 [Compiler:test_string_interpolation] [ERROR] Code generation failed: unknown opcode: getelementptr
 Object generation failed: code generation failed: unknown opcode: getelementptr
 
-❌ FAIL (0.03s)
+❌ FAIL (0.02s)
     Compilation failed
     Compile output:
       Compiling tests/test_string_interpolation.arc...
@@ -2777,10 +2488,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_string_interpolation'
       [Compiler:test_string_interpolation] [INFO] Compiling file: tests/test_string_interpolation.arc
-      [Compiler:test_string_interpolation] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc (isEntry=true)
-      [Compiler:test_string_interpolation] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-      [Compiler:test_string_interpolation] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-      [Compiler:test_string_interpolation] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2799,7 +2506,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
-      [Compiler:test_string_interpolation] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_string_interpolation.arc
       Module has 1 functions, 2 globals
       [Compiler:test_string_interpolation] [INFO] Generating object file to: /tmp/arc_tests/test_string_interpolation.o
       [Compiler:test_string_interpolation] [DEBUG] Calling code generator for module 'test_string_interpolation'
@@ -2820,10 +2526,6 @@ Compiling tests/test_struct_basic.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_struct_basic'
 [Compiler:test_struct_basic] [INFO] Compiling file: tests/test_struct_basic.arc
-[Compiler:test_struct_basic] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc (isEntry=true)
-[Compiler:test_struct_basic] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-[Compiler:test_struct_basic] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-[Compiler:test_struct_basic] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2848,7 +2550,6 @@ Compiling tests/test_struct_basic.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-[Compiler:test_struct_basic] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
 Module has 1 functions, 0 globals
 [Compiler:test_struct_basic] [INFO] Generating object file to: /tmp/arc_tests/test_struct_basic.o
 [Compiler:test_struct_basic] [DEBUG] Calling code generator for module 'test_struct_basic'
@@ -2864,10 +2565,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_struct_basic'
       [Compiler:test_struct_basic] [INFO] Compiling file: tests/test_struct_basic.arc
-      [Compiler:test_struct_basic] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc (isEntry=true)
-      [Compiler:test_struct_basic] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-      [Compiler:test_struct_basic] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-      [Compiler:test_struct_basic] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2892,7 +2589,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
-      [Compiler:test_struct_basic] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_basic.arc
       Module has 1 functions, 0 globals
       [Compiler:test_struct_basic] [INFO] Generating object file to: /tmp/arc_tests/test_struct_basic.o
       [Compiler:test_struct_basic] [DEBUG] Calling code generator for module 'test_struct_basic'
@@ -2913,10 +2609,6 @@ Compiling tests/test_struct_method.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_struct_method'
 [Compiler:test_struct_method] [INFO] Compiling file: tests/test_struct_method.arc
-[Compiler:test_struct_method] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc (isEntry=true)
-[Compiler:test_struct_method] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-[Compiler:test_struct_method] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-[Compiler:test_struct_method] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -2950,14 +2642,13 @@ Compiling tests/test_struct_method.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-[Compiler:test_struct_method] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
 Module has 2 functions, 0 globals
 [Compiler:test_struct_method] [INFO] Generating object file to: /tmp/arc_tests/test_struct_method.o
 [Compiler:test_struct_method] [DEBUG] Calling code generator for module 'test_struct_method'
 [Compiler:test_struct_method] [ERROR] Code generation failed: unknown opcode: getelementptr
 Object generation failed: code generation failed: unknown opcode: getelementptr
 
-❌ FAIL (0.05s)
+❌ FAIL (0.06s)
     Compilation failed
     Compile output:
       Compiling tests/test_struct_method.arc...
@@ -2966,10 +2657,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_struct_method'
       [Compiler:test_struct_method] [INFO] Compiling file: tests/test_struct_method.arc
-      [Compiler:test_struct_method] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc (isEntry=true)
-      [Compiler:test_struct_method] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-      [Compiler:test_struct_method] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-      [Compiler:test_struct_method] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3003,7 +2690,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
-      [Compiler:test_struct_method] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_struct_method.arc
       Module has 2 functions, 0 globals
       [Compiler:test_struct_method] [INFO] Generating object file to: /tmp/arc_tests/test_struct_method.o
       [Compiler:test_struct_method] [DEBUG] Calling code generator for module 'test_struct_method'
@@ -3024,10 +2710,6 @@ Compiling tests/test_switch.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_switch'
 [Compiler:test_switch] [INFO] Compiling file: tests/test_switch.arc
-[Compiler:test_switch] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc (isEntry=true)
-[Compiler:test_switch] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-[Compiler:test_switch] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-[Compiler:test_switch] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3049,7 +2731,6 @@ Compiling tests/test_switch.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-[Compiler:test_switch] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
 Module has 1 functions, 0 globals
 [Compiler:test_switch] [INFO] Generating object file to: /tmp/arc_tests/test_switch.o
 [Compiler:test_switch] [DEBUG] Calling code generator for module 'test_switch'
@@ -3065,10 +2746,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_switch'
       [Compiler:test_switch] [INFO] Compiling file: tests/test_switch.arc
-      [Compiler:test_switch] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc (isEntry=true)
-      [Compiler:test_switch] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-      [Compiler:test_switch] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-      [Compiler:test_switch] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3090,7 +2767,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
-      [Compiler:test_switch] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_switch.arc
       Module has 1 functions, 0 globals
       [Compiler:test_switch] [INFO] Generating object file to: /tmp/arc_tests/test_switch.o
       [Compiler:test_switch] [DEBUG] Calling code generator for module 'test_switch'
@@ -3111,10 +2787,6 @@ Compiling tests/test_try_except_raise.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_try_except_raise'
 [Compiler:test_try_except_raise] [INFO] Compiling file: tests/test_try_except_raise.arc
-[Compiler:test_try_except_raise] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc (isEntry=true)
-[Compiler:test_try_except_raise] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-[Compiler:test_try_except_raise] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-[Compiler:test_try_except_raise] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3148,14 +2820,13 @@ Compiling tests/test_try_except_raise.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-[Compiler:test_try_except_raise] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
 Module has 2 functions, 1 globals
 [Compiler:test_try_except_raise] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise.o
 [Compiler:test_try_except_raise] [DEBUG] Calling code generator for module 'test_try_except_raise'
 [Compiler:test_try_except_raise] [ERROR] Code generation failed: unknown opcode: getelementptr
 Object generation failed: code generation failed: unknown opcode: getelementptr
 
-❌ FAIL (0.04s)
+❌ FAIL (0.05s)
     Compilation failed
     Compile output:
       Compiling tests/test_try_except_raise.arc...
@@ -3164,10 +2835,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_try_except_raise'
       [Compiler:test_try_except_raise] [INFO] Compiling file: tests/test_try_except_raise.arc
-      [Compiler:test_try_except_raise] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc (isEntry=true)
-      [Compiler:test_try_except_raise] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-      [Compiler:test_try_except_raise] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-      [Compiler:test_try_except_raise] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3201,7 +2868,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
-      [Compiler:test_try_except_raise] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise.arc
       Module has 2 functions, 1 globals
       [Compiler:test_try_except_raise] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise.o
       [Compiler:test_try_except_raise] [DEBUG] Calling code generator for module 'test_try_except_raise'
@@ -3222,10 +2888,6 @@ Compiling tests/test_try_except_raise_err.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_try_except_raise_err'
 [Compiler:test_try_except_raise_err] [INFO] Compiling file: tests/test_try_except_raise_err.arc
-[Compiler:test_try_except_raise_err] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc (isEntry=true)
-[Compiler:test_try_except_raise_err] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-[Compiler:test_try_except_raise_err] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-[Compiler:test_try_except_raise_err] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3261,14 +2923,13 @@ Compiling tests/test_try_except_raise_err.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-[Compiler:test_try_except_raise_err] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
 Module has 2 functions, 1 globals
 [Compiler:test_try_except_raise_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise_err.o
 [Compiler:test_try_except_raise_err] [DEBUG] Calling code generator for module 'test_try_except_raise_err'
 [Compiler:test_try_except_raise_err] [ERROR] Code generation failed: unknown opcode: getelementptr
 Object generation failed: code generation failed: unknown opcode: getelementptr
 
-❌ FAIL (0.04s)
+❌ FAIL (0.06s)
     Compilation failed
     Compile output:
       Compiling tests/test_try_except_raise_err.arc...
@@ -3277,10 +2938,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_try_except_raise_err'
       [Compiler:test_try_except_raise_err] [INFO] Compiling file: tests/test_try_except_raise_err.arc
-      [Compiler:test_try_except_raise_err] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc (isEntry=true)
-      [Compiler:test_try_except_raise_err] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-      [Compiler:test_try_except_raise_err] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-      [Compiler:test_try_except_raise_err] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3316,7 +2973,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
-      [Compiler:test_try_except_raise_err] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_raise_err.arc
       Module has 2 functions, 1 globals
       [Compiler:test_try_except_raise_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_raise_err.o
       [Compiler:test_try_except_raise_err] [DEBUG] Calling code generator for module 'test_try_except_raise_err'
@@ -3337,10 +2993,6 @@ Compiling tests/test_try_except_throw.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_try_except_throw'
 [Compiler:test_try_except_throw] [INFO] Compiling file: tests/test_try_except_throw.arc
-[Compiler:test_try_except_throw] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc (isEntry=true)
-[Compiler:test_try_except_throw] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-[Compiler:test_try_except_throw] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-[Compiler:test_try_except_throw] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3376,7 +3028,6 @@ Compiling tests/test_try_except_throw.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-[Compiler:test_try_except_throw] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
 Module has 2 functions, 2 globals
 [Compiler:test_try_except_throw] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw.o
 [Compiler:test_try_except_throw] [DEBUG] Calling code generator for module 'test_try_except_throw'
@@ -3392,10 +3043,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_try_except_throw'
       [Compiler:test_try_except_throw] [INFO] Compiling file: tests/test_try_except_throw.arc
-      [Compiler:test_try_except_throw] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc (isEntry=true)
-      [Compiler:test_try_except_throw] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-      [Compiler:test_try_except_throw] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-      [Compiler:test_try_except_throw] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3431,7 +3078,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
-      [Compiler:test_try_except_throw] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw.arc
       Module has 2 functions, 2 globals
       [Compiler:test_try_except_throw] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw.o
       [Compiler:test_try_except_throw] [DEBUG] Calling code generator for module 'test_try_except_throw'
@@ -3452,10 +3098,6 @@ Compiling tests/test_try_except_throw_err.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_try_except_throw_err'
 [Compiler:test_try_except_throw_err] [INFO] Compiling file: tests/test_try_except_throw_err.arc
-[Compiler:test_try_except_throw_err] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc (isEntry=true)
-[Compiler:test_try_except_throw_err] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-[Compiler:test_try_except_throw_err] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-[Compiler:test_try_except_throw_err] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3491,14 +3133,13 @@ Compiling tests/test_try_except_throw_err.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-[Compiler:test_try_except_throw_err] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
 Module has 2 functions, 2 globals
 [Compiler:test_try_except_throw_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw_err.o
 [Compiler:test_try_except_throw_err] [DEBUG] Calling code generator for module 'test_try_except_throw_err'
 [Compiler:test_try_except_throw_err] [ERROR] Code generation failed: unknown opcode: getelementptr
 Object generation failed: code generation failed: unknown opcode: getelementptr
 
-❌ FAIL (0.04s)
+❌ FAIL (0.05s)
     Compilation failed
     Compile output:
       Compiling tests/test_try_except_throw_err.arc...
@@ -3507,10 +3148,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_try_except_throw_err'
       [Compiler:test_try_except_throw_err] [INFO] Compiling file: tests/test_try_except_throw_err.arc
-      [Compiler:test_try_except_throw_err] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc (isEntry=true)
-      [Compiler:test_try_except_throw_err] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-      [Compiler:test_try_except_throw_err] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-      [Compiler:test_try_except_throw_err] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3546,7 +3183,6 @@ Object generation failed: code generation failed: unknown opcode: getelementptr
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
-      [Compiler:test_try_except_throw_err] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_try_except_throw_err.arc
       Module has 2 functions, 2 globals
       [Compiler:test_try_except_throw_err] [INFO] Generating object file to: /tmp/arc_tests/test_try_except_throw_err.o
       [Compiler:test_try_except_throw_err] [DEBUG] Calling code generator for module 'test_try_except_throw_err'
@@ -3567,10 +3203,6 @@ Compiling tests/test_tuple_return.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_tuple_return'
 [Compiler:test_tuple_return] [INFO] Compiling file: tests/test_tuple_return.arc
-[Compiler:test_tuple_return] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc (isEntry=true)
-[Compiler:test_tuple_return] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-[Compiler:test_tuple_return] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-[Compiler:test_tuple_return] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3612,7 +3244,6 @@ Compiling tests/test_tuple_return.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-[Compiler:test_tuple_return] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
 Module has 2 functions, 0 globals
 [Compiler:test_tuple_return] [INFO] Generating object file to: /tmp/arc_tests/test_tuple_return.o
 [Compiler:test_tuple_return] [DEBUG] Calling code generator for module 'test_tuple_return'
@@ -3628,10 +3259,6 @@ Object generation failed: code generation failed: unknown opcode: insertvalue
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_tuple_return'
       [Compiler:test_tuple_return] [INFO] Compiling file: tests/test_tuple_return.arc
-      [Compiler:test_tuple_return] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc (isEntry=true)
-      [Compiler:test_tuple_return] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-      [Compiler:test_tuple_return] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-      [Compiler:test_tuple_return] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3673,7 +3300,6 @@ Object generation failed: code generation failed: unknown opcode: insertvalue
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
-      [Compiler:test_tuple_return] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_tuple_return.arc
       Module has 2 functions, 0 globals
       [Compiler:test_tuple_return] [INFO] Generating object file to: /tmp/arc_tests/test_tuple_return.o
       [Compiler:test_tuple_return] [DEBUG] Calling code generator for module 'test_tuple_return'
@@ -3694,10 +3320,6 @@ Compiling tests/test_variable_inferred.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_variable_inferred'
 [Compiler:test_variable_inferred] [INFO] Compiling file: tests/test_variable_inferred.arc
-[Compiler:test_variable_inferred] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc (isEntry=true)
-[Compiler:test_variable_inferred] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-[Compiler:test_variable_inferred] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-[Compiler:test_variable_inferred] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3718,14 +3340,13 @@ Compiling tests/test_variable_inferred.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-[Compiler:test_variable_inferred] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
 Module has 1 functions, 0 globals
 [Compiler:test_variable_inferred] [INFO] Generating object file to: /tmp/arc_tests/test_variable_inferred.o
 [Compiler:test_variable_inferred] [DEBUG] Calling code generator for module 'test_variable_inferred'
 [Compiler:test_variable_inferred] [ERROR] Code generation failed: unknown opcode: trunc
 Object generation failed: code generation failed: unknown opcode: trunc
 
-❌ FAIL (0.02s)
+❌ FAIL (0.03s)
     Compilation failed
     Compile output:
       Compiling tests/test_variable_inferred.arc...
@@ -3734,10 +3355,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_variable_inferred'
       [Compiler:test_variable_inferred] [INFO] Compiling file: tests/test_variable_inferred.arc
-      [Compiler:test_variable_inferred] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc (isEntry=true)
-      [Compiler:test_variable_inferred] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-      [Compiler:test_variable_inferred] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-      [Compiler:test_variable_inferred] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3758,7 +3375,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
-      [Compiler:test_variable_inferred] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_inferred.arc
       Module has 1 functions, 0 globals
       [Compiler:test_variable_inferred] [INFO] Generating object file to: /tmp/arc_tests/test_variable_inferred.o
       [Compiler:test_variable_inferred] [DEBUG] Calling code generator for module 'test_variable_inferred'
@@ -3779,10 +3395,6 @@ Compiling tests/test_variable_typed.arc...
 [Context] [DEBUG] Registered 35 builtin types
 [Context] [DEBUG] Context initialized for module 'test_variable_typed'
 [Compiler:test_variable_typed] [INFO] Compiling file: tests/test_variable_typed.arc
-[Compiler:test_variable_typed] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc (isEntry=true)
-[Compiler:test_variable_typed] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-[Compiler:test_variable_typed] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-[Compiler:test_variable_typed] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
 [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
 [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
 [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3803,7 +3415,6 @@ Compiling tests/test_variable_typed.arc...
 [Context] [DEBUG] Exited function 'main'
 [Context] [DEBUG] Popped scope
 [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-[Compiler:test_variable_typed] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
 Module has 1 functions, 0 globals
 [Compiler:test_variable_typed] [INFO] Generating object file to: /tmp/arc_tests/test_variable_typed.o
 [Compiler:test_variable_typed] [DEBUG] Calling code generator for module 'test_variable_typed'
@@ -3819,10 +3430,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Registered 35 builtin types
       [Context] [DEBUG] Context initialized for module 'test_variable_typed'
       [Compiler:test_variable_typed] [INFO] Compiling file: tests/test_variable_typed.arc
-      [Compiler:test_variable_typed] [DEBUG] Internal compilation of file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc (isEntry=true)
-      [Compiler:test_variable_typed] [DEBUG] Lexing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-      [Compiler:test_variable_typed] [DEBUG] Parsing file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-      [Compiler:test_variable_typed] [DEBUG] Generating IR for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
       [Visitor] [DEBUG] Created visitor for file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
       [Visitor] [INFO] Starting compilation of /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
       [Visitor] [DEBUG] Pass 0 - Processing imports
@@ -3843,7 +3450,6 @@ Object generation failed: code generation failed: unknown opcode: trunc
       [Context] [DEBUG] Exited function 'main'
       [Context] [DEBUG] Popped scope
       [Visitor] [INFO] Compilation complete for /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
-      [Compiler:test_variable_typed] [INFO] Successfully compiled file: /workspaces/arc-lang/compiler/cmd/tests/test_variable_typed.arc
       Module has 1 functions, 0 globals
       [Compiler:test_variable_typed] [INFO] Generating object file to: /tmp/arc_tests/test_variable_typed.o
       [Compiler:test_variable_typed] [DEBUG] Calling code generator for module 'test_variable_typed'
@@ -3857,7 +3463,7 @@ Failed:           39
   Compile errors: 39
   Link errors:    0
   Runtime errors: 0
-Total Duration:   1.27s
+Total Duration:   1.40s
 
 Failed Tests:
   ❌ test_alloca                              (compile)
