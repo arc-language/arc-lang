@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
+	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/context"
 	"github.com/arc-language/arc-lang/parser"
 	"github.com/arc-language/arc-lang/semantics"
@@ -34,7 +35,6 @@ func Generate(tree parser.ICompilationUnitContext, moduleName string, analysis *
 		deferStack:           NewDeferStack(),
 	}
 	
-	// Start Traversal
 	gen.Visit(tree)
 	return ctx.Module
 }
@@ -51,13 +51,9 @@ func (g *Generator) exitScope() {
 	}
 }
 
-// Visit manually dispatches to ensure our methods are called.
-// BaseVisitor would otherwise silence them if not strictly overridden via interface.
+// Visit manually dispatches to ensure correct IR generation methods are called
 func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil { return nil }
-
-	// DEBUG: Uncomment this line if "0 functions" persists to see traversal
-	// fmt.Printf("Visiting: %T\n", tree)
 
 	switch ctx := tree.(type) {
 	case *parser.CompilationUnitContext:
@@ -73,19 +69,43 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	
 	// Statements
 	case *parser.StatementContext:
-		// Statement is a wrapper. We must visit the child that exists.
-		if ctx.VariableDecl() != nil { return g.VisitVariableDecl(ctx.VariableDecl()) }
-		if ctx.ReturnStmt() != nil { return g.VisitReturnStmt(ctx.ReturnStmt()) }
-		if ctx.IfStmt() != nil { return g.VisitIfStmt(ctx.IfStmt()) }
-		if ctx.ForStmt() != nil { return g.VisitForStmt(ctx.ForStmt()) }
-		if ctx.SwitchStmt() != nil { return g.VisitSwitchStmt(ctx.SwitchStmt()) }
-		if ctx.BreakStmt() != nil { return g.VisitBreakStmt(ctx.BreakStmt()) }
-		if ctx.ContinueStmt() != nil { return g.VisitContinueStmt(ctx.ContinueStmt()) }
-		if ctx.DeferStmt() != nil { return g.VisitDeferStmt(ctx.DeferStmt()) }
-		if ctx.ExpressionStmt() != nil { return g.Visit(ctx.ExpressionStmt().Expression()) }
-		if ctx.Block() != nil { return g.VisitBlock(ctx.Block()) }
-		if ctx.TryStmt() != nil { return g.VisitTryStmt(ctx.TryStmt()) }
-		if ctx.ThrowStmt() != nil { return g.VisitThrowStmt(ctx.ThrowStmt()) }
+		if ctx.VariableDecl() != nil { 
+			return g.VisitVariableDecl(ctx.VariableDecl().(*parser.VariableDeclContext)) 
+		}
+		if ctx.ReturnStmt() != nil { 
+			return g.VisitReturnStmt(ctx.ReturnStmt().(*parser.ReturnStmtContext)) 
+		}
+		if ctx.IfStmt() != nil { 
+			return g.VisitIfStmt(ctx.IfStmt().(*parser.IfStmtContext)) 
+		}
+		if ctx.ForStmt() != nil { 
+			return g.VisitForStmt(ctx.ForStmt().(*parser.ForStmtContext)) 
+		}
+		if ctx.SwitchStmt() != nil { 
+			return g.VisitSwitchStmt(ctx.SwitchStmt().(*parser.SwitchStmtContext)) 
+		}
+		if ctx.BreakStmt() != nil { 
+			return g.VisitBreakStmt(ctx.BreakStmt().(*parser.BreakStmtContext)) 
+		}
+		if ctx.ContinueStmt() != nil { 
+			return g.VisitContinueStmt(ctx.ContinueStmt().(*parser.ContinueStmtContext)) 
+		}
+		if ctx.DeferStmt() != nil { 
+			return g.VisitDeferStmt(ctx.DeferStmt().(*parser.DeferStmtContext)) 
+		}
+		if ctx.ExpressionStmt() != nil { 
+			// ExpressionStmt just wraps an expression
+			return g.Visit(ctx.ExpressionStmt().Expression()) 
+		}
+		if ctx.Block() != nil { 
+			return g.VisitBlock(ctx.Block().(*parser.BlockContext)) 
+		}
+		if ctx.TryStmt() != nil { 
+			return g.VisitTryStmt(ctx.TryStmt().(*parser.TryStmtContext)) 
+		}
+		if ctx.ThrowStmt() != nil { 
+			return g.VisitThrowStmt(ctx.ThrowStmt().(*parser.ThrowStmtContext)) 
+		}
 		return nil
 
 	case *parser.ReturnStmtContext:
