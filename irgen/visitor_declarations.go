@@ -7,26 +7,33 @@ import (
 )
 
 func (g *Generator) VisitCompilationUnit(ctx *parser.CompilationUnitContext) interface{} {
-	for _, decl := range ctx.AllTopLevelDecl() { g.Visit(decl) }
+	for _, decl := range ctx.AllTopLevelDecl() {
+		g.Visit(decl)
+	}
 	return nil
 }
 
 func (g *Generator) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface{} {
-	if ctx.FunctionDecl() != nil { return g.Visit(ctx.FunctionDecl()) }
-	if ctx.VariableDecl() != nil { return g.Visit(ctx.VariableDecl()) }
+	if ctx.FunctionDecl() != nil {
+		return g.Visit(ctx.FunctionDecl())
+	}
+	if ctx.VariableDecl() != nil {
+		return g.Visit(ctx.VariableDecl())
+	}
 	return nil
 }
 
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
-	// Generics skipping (handled separately if implemented)
-	if ctx.GenericParams() != nil { return nil }
+	if ctx.GenericParams() != nil {
+		return nil
+	}
 
 	name := ctx.IDENTIFIER().GetText()
 	sym, _ := g.currentScope.Resolve(name)
 
 	var paramTypes []types.Type
 	var paramNames []string
-	
+
 	if ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
 			pType := g.resolveType(param.Type_())
@@ -54,7 +61,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		arg.SetName(paramNames[i])
 		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
 		g.ctx.Builder.CreateStore(arg, alloca)
-		
+
 		if s, ok := g.currentScope.Resolve(paramNames[i]); ok {
 			s.IRValue = alloca
 		}
@@ -68,10 +75,13 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	}
 
 	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
-		if retType == types.Void { g.ctx.Builder.CreateRetVoid() } 
-		else { g.ctx.Builder.CreateRet(g.getZeroValue(retType)) }
+		if retType == types.Void {
+			g.ctx.Builder.CreateRetVoid()
+		} else {
+			g.ctx.Builder.CreateRet(g.getZeroValue(retType))
+		}
 	}
-	
+
 	g.ctx.ExitFunction()
 	return nil
 }
@@ -79,11 +89,13 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
 	sym, ok := g.currentScope.Resolve(name)
-	if !ok { return nil }
-	
+	if !ok {
+		return nil
+	}
+
 	alloca := g.ctx.Builder.CreateAlloca(sym.Type, name+".addr")
 	sym.IRValue = alloca
-	
+
 	if ctx.Expression() != nil {
 		val := g.Visit(ctx.Expression()).(ir.Value)
 		val = g.emitCast(val, sym.Type)
