@@ -49,7 +49,8 @@ func (g *Generator) VisitExternDecl(ctx *parser.ExternDeclContext) interface{} {
 
 	for _, member := range ctx.AllExternMember() {
 		if fnDecl := member.ExternFunctionDecl(); fnDecl != nil {
-			g.visitExternFunctionDecl(fnDecl)
+			// CAST: Interface -> Concrete Pointer
+			g.visitExternFunctionDecl(fnDecl.(*parser.ExternFunctionDeclContext))
 		}
 	}
 
