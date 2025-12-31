@@ -100,14 +100,9 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 
 	case ir.OpZExt:
 		c.load(RAX, inst.Operands()[0])
-		// load() likely zero-extended to 64-bit already if it used MOVZX
-		// but to be safe, we can just store it.
-		// If src was 32-bit, MOV EAX, ... zeroes high bits.
 		c.store(RAX, inst)
 
 	case ir.OpSExt:
-		// We need to sign extend explicitly if the load didn't do it (our load does MOVZX/MOV usually).
-		// A proper implementation checks source type.
 		src := inst.Operands()[0]
 		srcSize := SizeOf(src.Type())
 		c.load(RAX, src)
@@ -124,20 +119,10 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		// Address is already in stackMap from compileFunction
 		offset := c.stackMap[inst.(*ir.AllocaInst)]
 		c.asm.Lea(RAX, NewMem(RBP, offset))
-		// We don't "store" the result of alloca to stack because alloca *is* the stack slot.
-		// But in IR, %1 = alloca is a value.
-		// So we actually need to store the POINTER to %1's slot?
-		// Wait, in my `compileFunction`, `stackMap[inst]` points to the DATA.
-		// So if any other instruction uses `%1`, `c.load` performs `LEA`.
-		// So we don't need to generate code here! The slot is static.
-		// EXCEPT if the IR expects `%1` to be a pointer stored in memory?
-		// For optimization, we treat alloca values as their addresses.
-		// No-op here.
 
 	case ir.OpLoad:
 		c.load(RCX, inst.Operands()[0]) // Load Pointer Address into RCX
 		// Now load value FROM [RCX]
-		// Determine destination size
 		size := SizeOf(inst.Type())
 		if size == 1 {
 			c.asm.MovZX(RAX, NewMem(RCX, 0), 8)
@@ -166,17 +151,11 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		base := gep.Operands()[0]
 		c.load(RAX, base) // RAX = Base Pointer
 
-		// Process indices
 		currentType := gep.SourceElementType
 		
-		// Skip the first index if it's 0 (pointer arithmetic base)
-		// Usually GEP %ptr, 0, 1 -> Access field 1 of struct at %ptr
-		// GEP %ptr, 1 -> Access element 1 of array starting at %ptr
-		
-		for i, idxVal := range gep.Operands()[1:] {
-			// Calculate offset
+		// Use _ instead of i to fix unused variable error
+		for _, idxVal := range gep.Operands()[1:] {
 			if st, ok := currentType.(*types.StructType); ok {
-				// Struct access - index must be constant
 				if cIdx, ok := idxVal.(*ir.ConstantInt); ok {
 					offset := GetStructFieldOffset(st, int(cIdx.Value))
 					if offset != 0 {
@@ -187,23 +166,19 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 					return fmt.Errorf("GEP struct index must be constant")
 				}
 			} else if at, ok := currentType.(*types.ArrayType); ok {
-				// Array access
 				elemSize := SizeOf(at.ElementType)
 				if cIdx, ok := idxVal.(*ir.ConstantInt); ok {
-					// Constant index
 					offset := int(cIdx.Value) * elemSize
 					if offset != 0 {
 						c.asm.Add(RegOp(RAX), ImmOp(int64(offset)))
 					}
 				} else {
-					// Dynamic index
 					c.load(RCX, idxVal) // Index
-					c.asm.ImulImm(RCX, int32(elemSize)) // RCX = Index * Size
+					c.asm.ImulImm(RCX, int32(elemSize))
 					c.asm.Add(RegOp(RAX), RegOp(RCX))
 				}
 				currentType = at.ElementType
 			} else if pt, ok := currentType.(*types.PointerType); ok {
-				// Pointer arithmetic (usually first index)
 				elemSize := SizeOf(pt.ElementType)
 				if cIdx, ok := idxVal.(*ir.ConstantInt); ok {
 					offset := int(cIdx.Value) * elemSize
@@ -217,9 +192,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 				}
 				currentType = pt.ElementType
 			}
-			
-			// Note: The logic above simplifies multi-level GEPs. 
-			// A robust implementation tracks type at every step.
 		}
 		c.store(RAX, inst)
 
@@ -258,9 +230,8 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	case ir.OpCondBr:
 		cbr := inst.(*ir.CondBrInst)
 		c.load(RAX, cbr.Condition)
-		c.asm.Test(RAX, RAX) // TEST RAX, RAX
+		c.asm.Test(RAX, RAX)
 		
-		// JZ (Zero) -> False
 		offFalse := c.asm.JccRel(CondEq, 0)
 		c.jumpsToFix = append(c.jumpsToFix, jumpFixup{asmOffset: offFalse, target: cbr.FalseBlock})
 		
@@ -271,7 +242,8 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	case ir.OpICmp:
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
-		c.asm.Cmp(RAX, RCX)
+		// Cast Registers to RegOp to satisfy Operand interface
+		c.asm.Cmp(RegOp(RAX), RegOp(RCX))
 		
 		icmp := inst.(*ir.ICmpInst)
 		var cc CondCode
@@ -282,7 +254,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		case ir.ICmpSLE: cc = CondLe
 		case ir.ICmpSGT: cc = CondGt
 		case ir.ICmpSGE: cc = CondGe
-		// Unsigned
 		case ir.ICmpULT: cc = CondBlo
 		case ir.ICmpULE: cc = CondBle
 		case ir.ICmpUGT: cc = CondA
@@ -290,14 +261,11 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		default: cc = CondEq
 		}
 		
-		// SETcc AL
 		c.asm.Setcc(cc, RAX)
-		// MOVZX RAX, AL (Clear high bits)
 		c.asm.MovZX(RAX, RegOp(RAX), 8)
 		c.store(RAX, inst)
 
 	case ir.OpPhi:
-		// No-op
 		return nil
 
 	default:
@@ -312,7 +280,6 @@ func (c *compiler) handlePhi(from, to *ir.BasicBlock) {
 			for _, incoming := range phi.Incoming {
 				if incoming.Block == from {
 					c.load(RAX, incoming.Value)
-					// Store to the stack slot allocated for the PHI instruction
 					c.store(RAX, phi)
 					break
 				}

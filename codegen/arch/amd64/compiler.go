@@ -94,28 +94,21 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 	c.jumpsToFix = nil
 	
 	// 1. Stack Allocation
-	// Reserve space for args and locals
 	offset := 0
 	
-	// Arguments (System V ABI: first 6 in regs, rest on stack)
-	// For simplicity, we spill register args to shadow stack slots immediately.
+	// Arguments
 	for _, arg := range fn.Arguments {
 		size := SizeOf(arg.Type())
 		offset += size
-		if offset % 8 != 0 { offset += 8 - (offset%8) } // Align to 8
+		if offset % 8 != 0 { offset += 8 - (offset%8) }
 		c.stackMap[arg] = -offset
 	}
 
 	// Instructions
 	for _, block := range fn.Blocks {
 		for _, inst := range block.Instructions {
-			// Void types don't need storage (e.g. call void, store)
 			if inst.Type() != nil && inst.Type().Kind() != types.VoidKind {
 				size := SizeOf(inst.Type())
-				// Alloca instruction returns a pointer, so we need 8 bytes for the pointer itself.
-				// However, `ir.AllocaInst` logic in `ops.go` handles the actual allocation size differently.
-				// Here we just allocate the slot for the *result* of the instruction.
-				// For alloca, the result is the pointer.
 				if size == 0 { continue }
 				
 				offset += size
@@ -123,25 +116,25 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 				c.stackMap[inst] = -offset
 			}
 			
-			// If it is an AllocaInst, we ALSO need space for the allocated data itself.
 			if alloca, ok := inst.(*ir.AllocaInst); ok {
 				allocSize := SizeOf(alloca.AllocatedType)
-				// Handle array counts if constant
 				if count, ok := alloca.NumElements.(*ir.ConstantInt); ok {
 					allocSize *= int(count.Value)
 				}
 				offset += allocSize
 				if offset % 16 != 0 { offset += 16 - (offset%16) }
 				
-				// We store the frame-relative offset in a special way or just rely on LEA calculation.
-				// To keep it simple: we just expanded 'offset'. 
-				// We need a way to map the AllocaInst to this data area.
-				// Let's use a secondary map or encode it.
-				// Current hack: The `stackMap[inst]` holds the POINTER. 
-				// The data is at `RBP - current_offset`.
-				c.stackMap[ir.Value(alloca)] = -offset // Point directly to data area? 
-				// Actually, `OpAlloca` implementation usually LEAs the address into a register.
-				// So `stackMap[alloca]` should ideally point to the DATA area.
+				// Map the alloca instruction to the offset of the allocated data
+				// Note: stackMap entry for the inst itself (the pointer) was handled above
+				// We need a separate way to track the data block, but for now 
+				// we assume the 'alloca' instruction *value* resolves to the pointer slot,
+				// and we calculate the data address relative to RBP using this offset
+				// when handling OpAlloca.
+				
+				// Actually, `OpAlloca` in ops.go uses `c.stackMap[inst]`.
+				// If we overwrite it here, we lose the pointer slot (if we allocated one).
+				// Optimization: Don't allocate a pointer slot for AllocaInst. Just use the calculated offset.
+				c.stackMap[ir.Value(alloca)] = -offset
 			}
 		}
 	}
@@ -162,7 +155,6 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 	for i, arg := range fn.Arguments {
 		if i < len(regs) {
 			slot := c.getStackSlot(arg)
-			// Move register to stack
 			c.asm.Mov(slot, RegOp(regs[i]), SizeOf(arg.Type())*8)
 		}
 	}
@@ -198,7 +190,6 @@ func (c *compiler) getStackSlot(v ir.Value) MemOp {
 	return NewMem(RBP, off)
 }
 
-// load puts the value of `src` into `dst` register.
 func (c *compiler) load(dst Register, src ir.Value) {
 	switch v := src.(type) {
 	case *ir.ConstantInt:
@@ -208,38 +199,26 @@ func (c *compiler) load(dst Register, src ir.Value) {
 	case *ir.ConstantZero:
 		c.asm.Xor(RegOp(dst), RegOp(dst))
 	case *ir.Global:
-		// Globals are pointers. We load their ADDRESS (LEA).
-		// Accessing the value requires a subsequent Load instruction in IR.
 		c.asm.LeaRel(dst, v.Name())
 	case *ir.AllocaInst:
-		// Alloca is an instruction that produces a pointer.
-		// If it's in the stack map, we usually LEA it.
-		// NOTE: In `compileFunction`, we mapped AllocaInst to its data offset.
 		off := c.stackMap[v]
 		c.asm.Lea(dst, NewMem(RBP, off))
 	default:
-		// Load from stack slot
 		slot := c.getStackSlot(v)
-		
-		// Determine size for MOV/MOVZX
 		size := SizeOf(v.Type())
 		
 		if size == 8 {
 			c.asm.Mov(RegOp(dst), slot, 64)
 		} else if size == 4 {
-			// MOV r32, r/m32 (zero extends to r64 automatically)
 			c.asm.Mov(RegOp(dst), slot, 32)
 		} else if size == 1 {
-			// MOVZX
 			c.asm.MovZX(dst, slot, 8)
 		} else {
-			// Fallback
 			c.asm.Mov(RegOp(dst), slot, 64)
 		}
 	}
 }
 
-// store puts the value in `src` register into `dst`'s stack slot.
 func (c *compiler) store(src Register, dst ir.Value) {
 	slot := c.getStackSlot(dst)
 	size := SizeOf(dst.Type())
@@ -250,7 +229,6 @@ func (c *compiler) emitGlobal(g *ir.Global) error {
 	if g.Initializer != nil {
 		return c.emitConstant(g.Initializer)
 	}
-	// Zero init
 	size := SizeOf(g.Type())
 	c.data.Write(make([]byte, size))
 	return nil
@@ -260,9 +238,7 @@ func (c *compiler) emitConstant(k ir.Constant) error {
 	switch v := k.(type) {
 	case *ir.ConstantInt:
 		size := SizeOf(v.Type())
-		buf := make([]byte, 8) // Max size
-		// We can use binary.PutVarint but we need fixed size
-		// Simple implementation
+		// Removed unused 'buf' variable here
 		val := uint64(v.Value)
 		for i := 0; i < size; i++ {
 			c.data.WriteByte(byte(val))
