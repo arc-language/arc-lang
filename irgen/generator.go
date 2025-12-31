@@ -1,6 +1,7 @@
 package irgen
 
 import (
+	"fmt"
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/context"
@@ -41,6 +42,9 @@ func Generate(tree parser.ICompilationUnitContext, moduleName string, analysis *
 func (g *Generator) enterScope(ctx antlr.ParserRuleContext) {
 	if s, ok := g.analysis.Scopes[ctx]; ok {
 		g.currentScope = s
+	} else {
+		// Fallback/Debug: If scope is missing, we might be in trouble
+		// fmt.Printf("[IRGen] Warning: No scope found for context %T. Staying in current scope.\n", ctx)
 	}
 }
 
@@ -50,6 +54,10 @@ func (g *Generator) exitScope() {
 	}
 }
 
+// Visit implements the visitor dispatch. 
+// CRITICAL: We must manually dispatch to g.Visit* methods or call tree.Accept(g).
+// Calling g.BaseArcParserVisitor.Visit(tree) is WRONG because it passes the Base visitor 
+// to Accept(), bypassing all our overrides.
 func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil { return nil }
 
@@ -94,7 +102,7 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.TryStmtContext: return g.VisitTryStmt(ctx)
 	case *parser.ThrowStmtContext: return g.VisitThrowStmt(ctx)
 
-	// Expressions - Full Dispatch
+	// Expressions
 	case *parser.ExpressionContext: return g.VisitExpression(ctx)
 	case *parser.LogicalOrExpressionContext: return g.VisitLogicalOrExpression(ctx)
 	case *parser.LogicalAndExpressionContext: return g.VisitLogicalAndExpression(ctx)
@@ -119,6 +127,7 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.IntrinsicExpressionContext: return g.VisitIntrinsicExpression(ctx)
 		
 	default:
-		return g.BaseArcParserVisitor.Visit(tree)
+		// Fix: Use Accept(g) instead of BaseArcParserVisitor.Visit
+		return tree.Accept(g)
 	}
 }

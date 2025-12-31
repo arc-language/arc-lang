@@ -8,10 +8,9 @@ import (
 )
 
 func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
-	// Check if this block defines a new scope
 	shouldEnter := false
 	if targetScope, isMapped := g.analysis.Scopes[ctx]; isMapped {
-		// Only enter if we aren't ALREADY in this scope (e.g. from FunctionDecl)
+		// Only enter if we aren't ALREADY in this scope
 		if targetScope != g.currentScope {
 			g.enterScope(ctx)
 			shouldEnter = true

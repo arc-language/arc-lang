@@ -137,25 +137,23 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
 	
-	// Resolve logic must succeed, or we log error
+	// Critical Debug Check
 	sym, ok := g.currentScope.Resolve(name)
 	if !ok {
-		fmt.Printf("[IRGen] Error: Variable symbol '%s' not found in scope\n", name)
+		fmt.Printf("[IRGen] Error: Variable '%s' was not defined in the symbol table (Semantic pass failure?)\n", name)
 		return nil
 	}
 	
-	// Create stack slot
 	alloca := g.ctx.Builder.CreateAlloca(sym.Type, name+".addr")
 	sym.IRValue = alloca
 	
-	// Initialize
 	if ctx.Expression() != nil {
 		val := g.Visit(ctx.Expression())
 		if irVal, ok := val.(ir.Value); ok {
 			irVal = g.emitCast(irVal, sym.Type)
 			g.ctx.Builder.CreateStore(irVal, alloca)
 		} else {
-			fmt.Printf("[IRGen] Error: Initializer for '%s' did not produce a value\n", name)
+			// Fallback for failed expression gen
 			g.ctx.Builder.CreateStore(g.getZeroValue(sym.Type), alloca)
 		}
 	} else {
