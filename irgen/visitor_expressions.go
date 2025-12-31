@@ -11,7 +11,7 @@ import (
 	"github.com/arc-language/arc-lang/symbol"
 )
 
-// ... [getBinaryOp helper] ...
+// Helper to get operator token type at a specific index
 func getBinaryOp(ctx antlr.ParserRuleContext, index int) int {
 	if child := ctx.GetChild(2*index - 1); child != nil {
 		if term, ok := child.(antlr.TerminalNode); ok {
@@ -25,7 +25,8 @@ func (g *Generator) VisitExpression(ctx *parser.ExpressionContext) interface{} {
 	return g.Visit(ctx.LogicalOrExpression())
 }
 
-// ... [Binary, Unary, Postfix visitors remain the same] ...
+// --- Binary Expressions ---
+
 func (g *Generator) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionContext) interface{} {
 	lhs := g.Visit(ctx.LogicalAndExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllLogicalAndExpression()); i++ {
@@ -102,12 +103,10 @@ func (g *Generator) VisitRelationalExpression(ctx *parser.RelationalExpressionCo
 
 func (g *Generator) VisitShiftExpression(ctx *parser.ShiftExpressionContext) interface{} {
 	children := ctx.GetChildren()
-	if len(children) == 0 { return nil }
-
+	if len(children) == 0 { return g.getZeroValue(types.I64) }
 	lhs := g.Visit(children[0].(antlr.ParseTree)).(ir.Value)
 	const (OpNone = iota; OpLeft; OpRight)
 	pendingOp := OpNone
-
 	for i := 1; i < len(children); i++ {
 		child := children[i]
 		if term, ok := child.(antlr.TerminalNode); ok {
@@ -157,6 +156,8 @@ func (g *Generator) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 	return lhs
 }
 
+// --- Unary, Postfix, Primary ---
+
 func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
 	if ctx.INCREMENT() != nil || ctx.DECREMENT() != nil {
 		ptr := g.getLValue(ctx.UnaryExpression())
@@ -164,10 +165,8 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		elemType := ptr.Type().(*types.PointerType).ElementType
 		curr := g.ctx.Builder.CreateLoad(elemType, ptr, "")
 		var next ir.Value
-		
 		one := g.ctx.Builder.ConstInt(types.I64, 1)
 		if intTy, ok := elemType.(*types.IntType); ok { one = g.ctx.Builder.ConstInt(intTy, 1) }
-		
 		if ctx.INCREMENT() != nil { next = g.ctx.Builder.CreateAdd(curr, one, "") } else { next = g.ctx.Builder.CreateSub(curr, one, "") }
 		g.ctx.Builder.CreateStore(next, ptr)
 		return next
@@ -204,7 +203,12 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					if argExpr := g.Visit(arg.Expression()); argExpr != nil { args = append(args, argExpr.(ir.Value)) }
 				}
 			}
-			if fn, ok := curr.(*ir.Function); ok { curr = g.ctx.Builder.CreateCall(fn, args, ""); currPtr = nil }
+			if fn, ok := curr.(*ir.Function); ok {
+				curr = g.ctx.Builder.CreateCall(fn, args, "")
+				currPtr = nil
+			} else {
+				fmt.Printf("[IRGen] Warning: Attempted call on non-function value: %v\n", curr)
+			}
 			continue
 		}
 		if op.DOT() != nil {
@@ -257,30 +261,50 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			name += id.GetText()
 		}
 		
-		// 1. Try resolve as full name (e.g. io.printf)
+		// 1. Try Resolve in Symbol Table (Best)
 		if sym, ok := g.currentScope.Resolve(name); ok && sym.IRValue != nil {
 			return sym.IRValue
 		}
 		
-		// 2. Try Global Lookup (likely externs)
+		// 2. Try Module Lookup (Fallback for externs/functions)
 		if fn := g.ctx.Module.GetFunction(name); fn != nil {
 			return fn
 		}
+		// 3. Try Mangled Module Lookup if dot notation failed
+		// (e.g. extern was declared as "printf" but called as "io.printf")
+		// Often externs are simple names in LLVM
+		simpleName := ids[len(ids)-1].GetText()
+		if fn := g.ctx.Module.GetFunction(simpleName); fn != nil {
+			return fn
+		}
 		
-		// 3. Fallback to underscore mangling if simple dot lookup fails
-		// (Depends on how externs were declared vs registered)
 		return g.getZeroValue(types.I64)
 	}
 
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
 		
+		// 1. Scope Resolve
 		if sym, ok := g.currentScope.Resolve(name); ok {
-			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok { return g.ctx.Builder.CreateLoad(sym.Type, alloca, "") }
-			if sym.IRValue != nil { return sym.IRValue }
+			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
+				// Variable: Load it
+				return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
+			}
+			// Function/Global/Constant: Return the pointer/value directly
+			if sym.IRValue != nil {
+				return sym.IRValue
+			}
 		}
 		
-		if glob := g.ctx.Module.GetGlobal(name); glob != nil { return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "") }
+		// 2. Global Function Lookup
+		if fn := g.ctx.Module.GetFunction(name); fn != nil {
+			return fn
+		}
+		
+		// 3. Global Variable Lookup
+		if glob := g.ctx.Module.GetGlobal(name); glob != nil {
+			return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
+		}
 	}
 	
 	if ctx.Expression() != nil { return g.Visit(ctx.Expression()) }
@@ -288,22 +312,24 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	return g.getZeroValue(types.I64)
 }
 
-// ... [Rest of file: VisitLiteral, VisitStructLiteral, etc. remain the same] ...
 func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
-	if ctx.INTEGER_LITERAL() != nil {
-		txt := ctx.INTEGER_LITERAL().GetText()
+	txt := ctx.GetText()
+	
+	if ctx.INTEGER_LITERAL() != nil || (ctx.FLOAT_LITERAL() == nil && ctx.STRING_LITERAL() == nil && ctx.BOOLEAN_LITERAL() == nil && ctx.NULL() == nil) {
 		val, _ := strconv.ParseInt(txt, 0, 64)
 		return g.ctx.Builder.ConstInt(types.I64, val)
 	}
 	if ctx.FLOAT_LITERAL() != nil {
-		txt := ctx.FLOAT_LITERAL().GetText()
 		val, _ := strconv.ParseFloat(txt, 64)
 		return g.ctx.Builder.ConstFloat(types.F64, val)
 	}
+	if ctx.BOOLEAN_LITERAL() != nil {
+		if txt == "true" { return g.ctx.Builder.ConstInt(types.I1, 1) }
+		return g.ctx.Builder.ConstInt(types.I1, 0)
+	}
 	if ctx.STRING_LITERAL() != nil {
-		raw := ctx.STRING_LITERAL().GetText()
-		if len(raw) >= 2 { raw = raw[1 : len(raw)-1] }
-		content := raw + "\x00"
+		if len(txt) >= 2 { txt = txt[1 : len(txt)-1] }
+		content := txt + "\x00"
 		strName := fmt.Sprintf(".str.%d", len(g.ctx.Module.Globals))
 		arrType := types.NewArray(types.I8, int64(len(content)))
 		var chars []ir.Constant
