@@ -5,7 +5,7 @@ import (
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/diagnostic"
 	"github.com/arc-language/arc-lang/parser"
-	"github.com/arc-language/arc-lang/symbol"
+	"github.com/arc-language/arc-lang/pkg/symbol"
 )
 
 type AnalysisResult struct {
@@ -73,5 +73,49 @@ func (a *Analyzer) pushScope(ctx antlr.ParserRuleContext) {
 func (a *Analyzer) popScope() {
 	if a.currentScope.Parent != nil {
 		a.currentScope = a.currentScope.Parent
+	}
+}
+
+// Visit implements manual dispatch to ensure our methods are called
+func (a *Analyzer) Visit(tree antlr.ParseTree) interface{} {
+	if tree == nil { return nil }
+
+	switch ctx := tree.(type) {
+	case *parser.CompilationUnitContext:
+		return a.VisitCompilationUnit(ctx)
+	case *parser.TopLevelDeclContext:
+		return a.VisitTopLevelDecl(ctx)
+	case *parser.FunctionDeclContext:
+		return a.VisitFunctionDecl(ctx)
+	case *parser.VariableDeclContext:
+		return a.VisitVariableDecl(ctx)
+	case *parser.StructDeclContext:
+		return a.VisitStructDecl(ctx)
+	case *parser.BlockContext:
+		return a.VisitBlock(ctx)
+	case *parser.StatementContext:
+		// Dispatch statement types manually if needed, or rely on children
+		// But usually Statement just wraps one child
+		return a.BaseArcParserVisitor.Visit(tree)
+	case *parser.ReturnStmtContext:
+		return a.VisitReturnStmt(ctx)
+	case *parser.IfStmtContext:
+		return a.VisitIfStmt(ctx)
+	case *parser.ExpressionContext:
+		return a.VisitExpression(ctx)
+	case *parser.AdditiveExpressionContext:
+		return a.VisitAdditiveExpression(ctx)
+	case *parser.MultiplicativeExpressionContext:
+		return a.VisitMultiplicativeExpression(ctx)
+	case *parser.UnaryExpressionContext:
+		return a.VisitUnaryExpression(ctx)
+	case *parser.PostfixExpressionContext:
+		return a.VisitPostfixExpression(ctx)
+	case *parser.PrimaryExpressionContext:
+		return a.VisitPrimaryExpression(ctx)
+	case *parser.LiteralContext:
+		return a.VisitLiteral(ctx)
+	default:
+		return a.BaseArcParserVisitor.Visit(tree)
 	}
 }
