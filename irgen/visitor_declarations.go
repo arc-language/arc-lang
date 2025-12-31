@@ -5,7 +5,6 @@ import (
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
-	"github.com/arc-language/arc-lang/symbol"
 )
 
 func (g *Generator) VisitCompilationUnit(ctx *parser.CompilationUnitContext) interface{} {
