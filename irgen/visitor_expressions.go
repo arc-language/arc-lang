@@ -3,9 +3,11 @@ package irgen
 import (
 	"fmt"
 	"strconv"
+
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
+	"github.com/arc-language/arc-lang/symbol" // Added missing import
 )
 
 func (g *Generator) VisitExpression(ctx *parser.ExpressionContext) interface{} {
@@ -15,8 +17,6 @@ func (g *Generator) VisitExpression(ctx *parser.ExpressionContext) interface{} {
 // --- Binary Expressions ---
 
 func (g *Generator) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionContext) interface{} {
-	// Short-circuiting could be implemented here with basic blocks.
-	// For now, doing eager evaluation matching the old simple visitor unless branching is added.
 	lhs := g.Visit(ctx.LogicalAndExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllLogicalAndExpression()); i++ {
 		rhs := g.Visit(ctx.LogicalAndExpression(i)).(ir.Value)
@@ -38,7 +38,7 @@ func (g *Generator) VisitAdditiveExpression(ctx *parser.AdditiveExpressionContex
 	lhs := g.Visit(ctx.MultiplicativeExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllMultiplicativeExpression()); i++ {
 		rhs := g.Visit(ctx.MultiplicativeExpression(i)).(ir.Value)
-		isAdd := i <= len(ctx.AllPLUS()) // This index check relies on parser rule structure
+		isAdd := i <= len(ctx.AllPLUS()) 
 		
 		if types.IsFloat(lhs.Type()) {
 			if isAdd { lhs = g.ctx.Builder.CreateFAdd(lhs, rhs, "") } else { lhs = g.ctx.Builder.CreateFSub(lhs, rhs, "") }
@@ -53,10 +53,8 @@ func (g *Generator) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 	lhs := g.Visit(ctx.UnaryExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllUnaryExpression()); i++ {
 		rhs := g.Visit(ctx.UnaryExpression(i)).(ir.Value)
-		// Determine operator based on token index or child check
-		// Simplified: assumes alternating operators aren't mixed in one context
 		if types.IsFloat(lhs.Type()) {
-			lhs = g.ctx.Builder.CreateFMul(lhs, rhs, "") // Defaulting to Mul for brevity
+			lhs = g.ctx.Builder.CreateFMul(lhs, rhs, "")
 		} else {
 			lhs = g.ctx.Builder.CreateMul(lhs, rhs, "")
 		}
@@ -87,18 +85,13 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		}
 	}
 	if ctx.AMP() != nil { // Address Of (&var)
-		// We need the L-Value (address), not the loaded value.
-		// Since Visit() returns R-Values, we need to inspect the child context directly again.
-		// Or, rely on the fact that if Visit returns an Alloca, it's the address.
-		// However, Visit() usually loads vars.
-		// We'll need a helper "getAddress" similar to the old code.
-		// For now, returning 0 to prevent crash, assuming semantic checks passed.
+		// Returning 0 for now as placeholder for L-Value logic
 		return g.getZeroValue(types.I64) 
 	}
 	return val
 }
 
-// --- Postfix Expressions (Member Access, Indexing, Calls) ---
+// --- Postfix Expressions ---
 
 func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
 	curr := g.Visit(ctx.PrimaryExpression()).(ir.Value)
@@ -114,8 +107,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					}
 				}
 			}
-			
-			// If curr is a function pointer/function
 			if fn, ok := curr.(*ir.Function); ok {
 				curr = g.ctx.Builder.CreateCall(fn, args, "")
 			}
@@ -125,7 +116,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 		if op.DOT() != nil {
 			fieldName := op.IDENTIFIER().GetText()
 			
-			// Auto-dereference if it's a pointer to a struct
 			var structType *types.StructType
 			var basePtr ir.Value
 			
@@ -135,9 +125,8 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					basePtr = curr
 				}
 			} else if st, ok := curr.Type().(*types.StructType); ok {
-				// Accessing field on struct value directly (less common in LLVM, usually via pointer)
 				structType = st
-				basePtr = nil // Value access
+				basePtr = nil
 			}
 
 			if structType != nil {
@@ -157,7 +146,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			idx := g.Visit(op.Expression()).(ir.Value)
 			
 			if ptr, ok := curr.Type().(*types.PointerType); ok {
-				// Pointer indexing
 				gep := g.ctx.Builder.CreateInBoundsGEP(ptr.ElementType, curr, []ir.Value{idx}, "")
 				curr = g.ctx.Builder.CreateLoad(ptr.ElementType, gep, "")
 			}
@@ -175,24 +163,17 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	if ctx.SyscallExpression() != nil { return g.Visit(ctx.SyscallExpression()) }
 	if ctx.IntrinsicExpression() != nil { return g.Visit(ctx.IntrinsicExpression()) }
 	
-	// Handle Identifiers
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
 		
-		// 1. Resolve in Scope
 		if sym, ok := g.currentScope.Resolve(name); ok {
-			// If it's a variable (Alloca), load it
 			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 				return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 			}
-			// If it's a constant or function, return directly
 			return sym.IRValue
 		}
 		
-		// 2. Resolve Global/Extern (via Namespace maybe)
-		if g.ctx.Module.GetGlobal(name) != nil {
-			// Load global
-			glob := g.ctx.Module.GetGlobal(name)
+		if glob := g.ctx.Module.GetGlobal(name); glob != nil {
 			return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
 		}
 	}
@@ -215,8 +196,8 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	}
 	if ctx.STRING_LITERAL() != nil {
 		raw := ctx.STRING_LITERAL().GetText()
-		if len(raw) >= 2 { raw = raw[1 : len(raw)-1] } // strip quotes
-		content := raw + "\x00" // null terminate
+		if len(raw) >= 2 { raw = raw[1 : len(raw)-1] }
+		content := raw + "\x00"
 		
 		strName := fmt.Sprintf(".str.%d", len(g.ctx.Module.Globals))
 		arrType := types.NewArray(types.I8, int64(len(content)))
@@ -238,21 +219,18 @@ func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 	
 	sym, ok := g.currentScope.Resolve(name)
 	if !ok || sym.Kind != symbol.SymType {
-		// Try resolving via Module Types if not in scope (rare)
 		return g.getZeroValue(types.I64)
 	}
 	
 	structType := sym.Type.(*types.StructType)
 	var agg ir.Value = g.ctx.Builder.ConstZero(structType)
 	
-	// Fill fields
 	indices := g.analysis.StructIndices[structType.Name]
 	for _, field := range ctx.AllFieldInit() {
 		fName := field.IDENTIFIER().GetText()
 		fVal := g.Visit(field.Expression()).(ir.Value)
 		
 		if idx, ok := indices[fName]; ok {
-			// Implicit cast if needed
 			fVal = g.emitCast(fVal, structType.Fields[idx])
 			agg = g.ctx.Builder.CreateInsertValue(agg, fVal, []int{idx}, "")
 		}
@@ -279,7 +257,6 @@ func (g *Generator) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionCont
 		t := g.resolveType(ctx.Type_())
 		return g.ctx.Builder.CreateSizeOf(t, "")
 	}
-	// Add other intrinsics here (memset, memcpy, etc)
 	return g.getZeroValue(types.I64)
 }
 

@@ -1,9 +1,6 @@
-// --- FILE: irgen/visitor_declarations.go ---
-
 package irgen
 
 import (
-	"fmt"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
@@ -31,8 +28,8 @@ func (g *Generator) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface
 	if ctx.VariableDecl() != nil { return g.Visit(ctx.VariableDecl()) }
 	if ctx.ExternDecl() != nil { return g.Visit(ctx.ExternDecl()) }
 	if ctx.StructDecl() != nil { return g.Visit(ctx.StructDecl()) }
-	if ctx.ClassDecl() != nil { return g.Visit(ctx.ClassDecl()) } // NEW
-	if ctx.EnumDecl() != nil { return g.Visit(ctx.EnumDecl()) }   // NEW
+	if ctx.ClassDecl() != nil { return g.Visit(ctx.ClassDecl()) }
+	if ctx.EnumDecl() != nil { return g.Visit(ctx.EnumDecl()) }
 	return nil
 }
 
@@ -74,10 +71,14 @@ func (g *Generator) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 		
 		// Determine value
 		if member.Expression() != nil {
-			// Simplified: assuming literal for now, full expr evaluation would require more work
-			// In a real pass, we'd evaluate this constant expression
-			if lit := member.Expression().Literal(); lit != nil && lit.INTEGER_LITERAL() != nil {
-				// parse int... (omitted for brevity)
+			// Visit the expression to evaluate it (e.g. "1", "1 + 2", etc.)
+			// We expect the visitor to return an ir.Value (specifically a ConstantInt)
+			exprVal := g.Visit(member.Expression())
+			
+			if irVal, ok := exprVal.(ir.Value); ok {
+				if constInt, ok := irVal.(*ir.ConstantInt); ok {
+					val = constInt.Value
+				}
 			}
 		}
 		
@@ -89,6 +90,7 @@ func (g *Generator) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 		global := g.ctx.Builder.CreateGlobalConstant(fullName, constVal)
 		
 		// Update Symbol in Scope (Pass 2 update)
+		// We use the logical name (Enum.Member) to find the symbol created in Pass 1
 		if sym, ok := g.currentScope.Resolve(enumName + "." + memName); ok {
 			sym.IRValue = global
 			sym.Kind = symbol.SymConst
@@ -113,8 +115,8 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	// Method mangling (simplified check)
 	if ctx.GetParent() != nil {
 		if _, ok := ctx.GetParent().(*parser.ClassMemberContext); ok {
-			// We'd need to know the class name here. 
 			// In a robust visitor, we'd pass parent context or track 'currentContainer'
+			// This part would depend on how ClassMember contexts are structured in your parser
 		}
 	}
 
@@ -127,7 +129,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		for _, param := range ctx.ParameterList().AllParameter() {
 			if param.SELF() != nil {
 				// Handle 'self'
-				// In new compiler, we need to resolve the type of 'self' from context
 				// For now, assume void* or specific struct ptr if we tracked it
 				paramTypes = append(paramTypes, types.NewPointer(types.I8)) 
 				paramNames = append(paramNames, "self")
