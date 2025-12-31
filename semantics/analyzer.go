@@ -45,7 +45,6 @@ func Analyze(tree parser.ICompilationUnitContext, filename string, bag *diagnost
 		structIndices:        make(map[string]map[string]int),
 	}
 
-	// Start visitation
 	a.Visit(tree)
 
 	return &AnalysisResult{
@@ -73,9 +72,8 @@ func (a *Analyzer) popScope() {
 	}
 }
 
-// Visit implements manual dispatch to ensure our methods are called.
-// CRITICAL FIX: We must use tree.Accept(a) so that 'a' (the Analyzer) 
-// is passed as the visitor, not the embedded BaseArcParserVisitor.
+// Visit implements manual dispatch.
+// FIX: We must use tree.Accept(a) for default cases so 'a' remains the receiver.
 func (a *Analyzer) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil { return nil }
 
@@ -98,9 +96,6 @@ func (a *Analyzer) Visit(tree antlr.ParseTree) interface{} {
 		return a.VisitReturnStmt(ctx)
 	case *parser.IfStmtContext:
 		return a.VisitIfStmt(ctx)
-	case *parser.ForStmtContext:
-		// Add specific visit method if you implemented it, otherwise fallthrough
-		return ctx.Accept(a)
 		
 	// Expressions
 	case *parser.ExpressionContext:
@@ -119,9 +114,8 @@ func (a *Analyzer) Visit(tree antlr.ParseTree) interface{} {
 		return a.VisitLiteral(ctx)
 		
 	default:
-		// Universal fallback: call Accept on the node passing 'a' as the visitor.
-		// This ensures that if ctx is a StatementContext, it calls a.VisitStatement(ctx),
-		// which delegates to children using 'a'.
+		// CRITICAL: Call Accept passing 'a' (this analyzer) as the visitor.
+		// If we called a.BaseArcParserVisitor.Visit(tree), it would lose our overrides.
 		return tree.Accept(a)
 	}
 }

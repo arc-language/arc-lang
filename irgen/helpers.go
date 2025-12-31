@@ -9,10 +9,20 @@ import (
 func (g *Generator) resolveType(ctx parser.ITypeContext) types.Type {
 	tc := ctx.(*parser.TypeContext)
 	if tc.PrimitiveType() != nil {
-		switch tc.PrimitiveType().GetText() {
+		text := tc.PrimitiveType().GetText()
+		switch text {
 		case "int": return types.I64
+		case "int8": return types.I8
+		case "int16": return types.I16
 		case "int32": return types.I32
+		case "int64": return types.I64
+		case "uint8", "byte": return types.U8
+		case "uint16": return types.U16
+		case "uint32": return types.U32
+		case "uint64": return types.U64
 		case "float": return types.F64
+		case "float32": return types.F32
+		case "float64": return types.F64
 		case "bool": return types.I1
 		case "void": return types.Void
 		case "string": return types.NewPointer(types.I8)
