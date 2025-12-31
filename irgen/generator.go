@@ -16,7 +16,7 @@ type Generator struct {
 	currentScope     *symbol.Scope
 	deferStack       *DeferStack
 	loopStack        []loopInfo
-	currentNamespace string // NEW: Track extern namespace
+	currentNamespace string
 }
 
 type loopInfo struct {
@@ -50,11 +50,14 @@ func (g *Generator) exitScope() {
 	}
 }
 
-// Visit manually dispatches to ensure correct IR generation methods are called
+// Visit manually dispatches to ensure correct IR generation methods are called.
+// This is critical because the default BaseArcParserVisitor returns nil for unvisited nodes,
+// which causes runtime panics when we expect an ir.Value.
 func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil { return nil }
 
 	switch ctx := tree.(type) {
+	// Declarations
 	case *parser.CompilationUnitContext:
 		return g.VisitCompilationUnit(ctx)
 	case *parser.TopLevelDeclContext:
@@ -64,7 +67,13 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.VariableDeclContext:
 		return g.VisitVariableDecl(ctx)
 	case *parser.ExternDeclContext:
-		return g.VisitExternDecl(ctx) // NEW: Dispatch Extern
+		return g.VisitExternDecl(ctx)
+	case *parser.StructDeclContext:
+		return g.VisitStructDecl(ctx)
+	case *parser.ClassDeclContext:
+		return g.VisitClassDecl(ctx)
+	case *parser.EnumDeclContext:
+		return g.VisitEnumDecl(ctx)
 	case *parser.BlockContext:
 		return g.VisitBlock(ctx)
 	
@@ -78,48 +87,51 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 		if ctx.BreakStmt() != nil { return g.VisitBreakStmt(ctx.BreakStmt().(*parser.BreakStmtContext)) }
 		if ctx.ContinueStmt() != nil { return g.VisitContinueStmt(ctx.ContinueStmt().(*parser.ContinueStmtContext)) }
 		if ctx.DeferStmt() != nil { return g.VisitDeferStmt(ctx.DeferStmt().(*parser.DeferStmtContext)) }
+		if ctx.AssignmentStmt() != nil { return g.VisitAssignmentStmt(ctx.AssignmentStmt().(*parser.AssignmentStmtContext)) }
 		if ctx.ExpressionStmt() != nil { return g.Visit(ctx.ExpressionStmt().Expression()) }
 		if ctx.Block() != nil { return g.VisitBlock(ctx.Block().(*parser.BlockContext)) }
 		if ctx.TryStmt() != nil { return g.VisitTryStmt(ctx.TryStmt().(*parser.TryStmtContext)) }
 		if ctx.ThrowStmt() != nil { return g.VisitThrowStmt(ctx.ThrowStmt().(*parser.ThrowStmtContext)) }
 		return nil
 
-	case *parser.ReturnStmtContext:
-		return g.VisitReturnStmt(ctx)
-	case *parser.IfStmtContext:
-		return g.VisitIfStmt(ctx)
-	case *parser.ForStmtContext:
-		return g.VisitForStmt(ctx)
-	case *parser.SwitchStmtContext:
-		return g.VisitSwitchStmt(ctx)
-	case *parser.BreakStmtContext:
-		return g.VisitBreakStmt(ctx)
-	case *parser.ContinueStmtContext:
-		return g.VisitContinueStmt(ctx)
-	case *parser.DeferStmtContext:
-		return g.VisitDeferStmt(ctx)
-	case *parser.TryStmtContext:
-		return g.VisitTryStmt(ctx)
-	case *parser.ThrowStmtContext:
-		return g.VisitThrowStmt(ctx)
+	// Statement Wrappers
+	case *parser.ReturnStmtContext: return g.VisitReturnStmt(ctx)
+	case *parser.IfStmtContext: return g.VisitIfStmt(ctx)
+	case *parser.ForStmtContext: return g.VisitForStmt(ctx)
+	case *parser.SwitchStmtContext: return g.VisitSwitchStmt(ctx)
+	case *parser.BreakStmtContext: return g.VisitBreakStmt(ctx)
+	case *parser.ContinueStmtContext: return g.VisitContinueStmt(ctx)
+	case *parser.DeferStmtContext: return g.VisitDeferStmt(ctx)
+	case *parser.AssignmentStmtContext: return g.VisitAssignmentStmt(ctx)
+	case *parser.TryStmtContext: return g.VisitTryStmt(ctx)
+	case *parser.ThrowStmtContext: return g.VisitThrowStmt(ctx)
 
-	// Expressions
-	case *parser.ExpressionContext:
-		return g.VisitExpression(ctx)
-	case *parser.AdditiveExpressionContext:
-		return g.VisitAdditiveExpression(ctx)
-	case *parser.MultiplicativeExpressionContext:
-		return g.VisitMultiplicativeExpression(ctx)
-	case *parser.UnaryExpressionContext:
-		return g.VisitUnaryExpression(ctx)
-	case *parser.PostfixExpressionContext:
-		return g.VisitPostfixExpression(ctx)
-	case *parser.PrimaryExpressionContext:
-		return g.VisitPrimaryExpression(ctx)
-	case *parser.LiteralContext:
-		return g.VisitLiteral(ctx)
+	// Expressions - Full Dispatch
+	case *parser.ExpressionContext: return g.VisitExpression(ctx)
+	case *parser.LogicalOrExpressionContext: return g.VisitLogicalOrExpression(ctx)
+	case *parser.LogicalAndExpressionContext: return g.VisitLogicalAndExpression(ctx)
+	case *parser.BitOrExpressionContext: return g.VisitBitOrExpression(ctx)
+	case *parser.BitXorExpressionContext: return g.VisitBitXorExpression(ctx)
+	case *parser.BitAndExpressionContext: return g.VisitBitAndExpression(ctx)
+	case *parser.EqualityExpressionContext: return g.VisitEqualityExpression(ctx)
+	case *parser.RelationalExpressionContext: return g.VisitRelationalExpression(ctx)
+	case *parser.ShiftExpressionContext: return g.VisitShiftExpression(ctx)
+	case *parser.RangeExpressionContext: return g.VisitRangeExpression(ctx)
+	case *parser.AdditiveExpressionContext: return g.VisitAdditiveExpression(ctx)
+	case *parser.MultiplicativeExpressionContext: return g.VisitMultiplicativeExpression(ctx)
+	case *parser.UnaryExpressionContext: return g.VisitUnaryExpression(ctx)
+	case *parser.PostfixExpressionContext: return g.VisitPostfixExpression(ctx)
+	case *parser.PrimaryExpressionContext: return g.VisitPrimaryExpression(ctx)
+	
+	// Terminals/Literals
+	case *parser.LiteralContext: return g.VisitLiteral(ctx)
+	case *parser.StructLiteralContext: return g.VisitStructLiteral(ctx)
+	case *parser.CastExpressionContext: return g.VisitCastExpression(ctx)
+	case *parser.SyscallExpressionContext: return g.VisitSyscallExpression(ctx)
+	case *parser.IntrinsicExpressionContext: return g.VisitIntrinsicExpression(ctx)
 		
 	default:
+		// Fallback for nodes that might be wrapped (e.g. ExpressionStmt -> Expression -> LogicalOr -> ... -> Primary)
 		return g.BaseArcParserVisitor.Visit(tree)
 	}
 }
