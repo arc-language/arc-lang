@@ -54,6 +54,7 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil { return nil }
 
 	switch ctx := tree.(type) {
+	// --- Top Level ---
 	case *parser.CompilationUnitContext:
 		return g.VisitCompilationUnit(ctx)
 	case *parser.TopLevelDeclContext:
@@ -65,45 +66,20 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.BlockContext:
 		return g.VisitBlock(ctx)
 	
-	// Statements
+	// --- Statements ---
 	case *parser.StatementContext:
-		if ctx.VariableDecl() != nil { 
-			return g.VisitVariableDecl(ctx.VariableDecl().(*parser.VariableDeclContext)) 
-		}
-		if ctx.ReturnStmt() != nil { 
-			return g.VisitReturnStmt(ctx.ReturnStmt().(*parser.ReturnStmtContext)) 
-		}
-		if ctx.IfStmt() != nil { 
-			return g.VisitIfStmt(ctx.IfStmt().(*parser.IfStmtContext)) 
-		}
-		if ctx.ForStmt() != nil { 
-			return g.VisitForStmt(ctx.ForStmt().(*parser.ForStmtContext)) 
-		}
-		if ctx.SwitchStmt() != nil { 
-			return g.VisitSwitchStmt(ctx.SwitchStmt().(*parser.SwitchStmtContext)) 
-		}
-		if ctx.BreakStmt() != nil { 
-			return g.VisitBreakStmt(ctx.BreakStmt().(*parser.BreakStmtContext)) 
-		}
-		if ctx.ContinueStmt() != nil { 
-			return g.VisitContinueStmt(ctx.ContinueStmt().(*parser.ContinueStmtContext)) 
-		}
-		if ctx.DeferStmt() != nil { 
-			return g.VisitDeferStmt(ctx.DeferStmt().(*parser.DeferStmtContext)) 
-		}
-		if ctx.ExpressionStmt() != nil { 
-			// ExpressionStmt just wraps an expression
-			return g.Visit(ctx.ExpressionStmt().Expression()) 
-		}
-		if ctx.Block() != nil { 
-			return g.VisitBlock(ctx.Block().(*parser.BlockContext)) 
-		}
-		if ctx.TryStmt() != nil { 
-			return g.VisitTryStmt(ctx.TryStmt().(*parser.TryStmtContext)) 
-		}
-		if ctx.ThrowStmt() != nil { 
-			return g.VisitThrowStmt(ctx.ThrowStmt().(*parser.ThrowStmtContext)) 
-		}
+		if ctx.VariableDecl() != nil { return g.VisitVariableDecl(ctx.VariableDecl().(*parser.VariableDeclContext)) }
+		if ctx.ReturnStmt() != nil { return g.VisitReturnStmt(ctx.ReturnStmt().(*parser.ReturnStmtContext)) }
+		if ctx.IfStmt() != nil { return g.VisitIfStmt(ctx.IfStmt().(*parser.IfStmtContext)) }
+		if ctx.ForStmt() != nil { return g.VisitForStmt(ctx.ForStmt().(*parser.ForStmtContext)) }
+		if ctx.SwitchStmt() != nil { return g.VisitSwitchStmt(ctx.SwitchStmt().(*parser.SwitchStmtContext)) }
+		if ctx.BreakStmt() != nil { return g.VisitBreakStmt(ctx.BreakStmt().(*parser.BreakStmtContext)) }
+		if ctx.ContinueStmt() != nil { return g.VisitContinueStmt(ctx.ContinueStmt().(*parser.ContinueStmtContext)) }
+		if ctx.DeferStmt() != nil { return g.VisitDeferStmt(ctx.DeferStmt().(*parser.DeferStmtContext)) }
+		if ctx.ExpressionStmt() != nil { return g.Visit(ctx.ExpressionStmt().Expression()) }
+		if ctx.Block() != nil { return g.VisitBlock(ctx.Block().(*parser.BlockContext)) }
+		if ctx.TryStmt() != nil { return g.VisitTryStmt(ctx.TryStmt().(*parser.TryStmtContext)) }
+		if ctx.ThrowStmt() != nil { return g.VisitThrowStmt(ctx.ThrowStmt().(*parser.ThrowStmtContext)) }
 		return nil
 
 	case *parser.ReturnStmtContext:
@@ -125,13 +101,37 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.ThrowStmtContext:
 		return g.VisitThrowStmt(ctx)
 
-	// Expressions
+	// --- Expressions (The Missing Pieces) ---
 	case *parser.ExpressionContext:
 		return g.VisitExpression(ctx)
+	
+	// Binary Logic Chain
+	case *parser.LogicalOrExpressionContext:
+		return g.VisitLogicalOrExpression(ctx)
+	case *parser.LogicalAndExpressionContext:
+		return g.VisitLogicalAndExpression(ctx)
+	case *parser.BitOrExpressionContext:
+		return g.VisitBitOrExpression(ctx)
+	case *parser.BitXorExpressionContext:
+		return g.VisitBitXorExpression(ctx)
+	case *parser.BitAndExpressionContext:
+		return g.VisitBitAndExpression(ctx)
+	case *parser.EqualityExpressionContext:
+		return g.VisitEqualityExpression(ctx)
+	case *parser.RelationalExpressionContext:
+		return g.VisitRelationalExpression(ctx)
+	case *parser.ShiftExpressionContext:
+		return g.VisitShiftExpression(ctx)
+	case *parser.RangeExpressionContext:
+		return g.VisitRangeExpression(ctx)
+	
+	// Arithmetic
 	case *parser.AdditiveExpressionContext:
 		return g.VisitAdditiveExpression(ctx)
 	case *parser.MultiplicativeExpressionContext:
 		return g.VisitMultiplicativeExpression(ctx)
+	
+	// Unary & Terminals
 	case *parser.UnaryExpressionContext:
 		return g.VisitUnaryExpression(ctx)
 	case *parser.PostfixExpressionContext:
