@@ -1,54 +1,42 @@
 package semantics
 
 import (
+	"strconv"
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/types"
-	"github.com/arc-language/arc-lang/parser"
 	"github.com/arc-language/arc-lang/diagnostic"
-	"github.com/arc-language/arc-lang/symbol"
+	"github.com/arc-language/arc-lang/parser"
+	"github.com/arc-language/arc-lang/pkg/symbol"
 )
 
-// AnalysisResult contains everything Pass 2 needs to generate code
 type AnalysisResult struct {
 	GlobalScope *symbol.Scope
-	
-	// Scopes maps AST nodes (like Blocks or FunctionDecls) to the Scope they created.
-	// Pass 2 uses this to enter the correct scope at the right time.
-	Scopes map[antlr.ParserRuleContext]*symbol.Scope
-	
-	// NodeTypes maps Expression AST nodes to their resolved Type.
-	// Pass 2 uses this so it doesn't have to re-calculate types.
-	NodeTypes map[antlr.ParseTree]types.Type
+	Scopes      map[antlr.ParserRuleContext]*symbol.Scope
+	NodeTypes   map[antlr.ParseTree]types.Type
+	// Map to store Struct Name -> Field Name -> Index
+	StructIndices map[string]map[string]int
 }
 
-// Analyzer maintains the state during the semantic pass
 type Analyzer struct {
 	*parser.BaseArcParserVisitor
-	
-	// Inputs
 	file string
 	bag  *diagnostic.Bag
 	
-	// State
 	globalScope  *symbol.Scope
 	currentScope *symbol.Scope
 	
-	// Context Tracking
-	currentFuncRetType types.Type // To check 'return' statements
-	inLoop             bool       // To check 'break/continue' statements
+	currentFuncRetType types.Type
 	
-	// Outputs
-	scopes    map[antlr.ParserRuleContext]*symbol.Scope
-	nodeTypes map[antlr.ParseTree]types.Type
+	scopes        map[antlr.ParserRuleContext]*symbol.Scope
+	nodeTypes     map[antlr.ParseTree]types.Type
+	structIndices map[string]map[string]int
 }
 
-// Analyze is the entry point for Pass 1
 func Analyze(tree parser.ICompilationUnitContext, filename string, bag *diagnostic.Bag) (*AnalysisResult, error) {
-	// Initialize Global Scope with Primitives
 	global := symbol.NewScope(nil)
-	registerPrimitives(global)
+	initGlobalScope(global)
 
-	analyzer := &Analyzer{
+	a := &Analyzer{
 		BaseArcParserVisitor: &parser.BaseArcParserVisitor{},
 		file:                 filename,
 		bag:                  bag,
@@ -56,38 +44,80 @@ func Analyze(tree parser.ICompilationUnitContext, filename string, bag *diagnost
 		currentScope:         global,
 		scopes:               make(map[antlr.ParserRuleContext]*symbol.Scope),
 		nodeTypes:            make(map[antlr.ParseTree]types.Type),
+		structIndices:        make(map[string]map[string]int),
 	}
 
-	// Start the walk
-	analyzer.Visit(tree)
+	a.Visit(tree)
 
 	return &AnalysisResult{
-		GlobalScope: analyzer.globalScope,
-		Scopes:      analyzer.scopes,
-		NodeTypes:   analyzer.nodeTypes,
+		GlobalScope:   a.globalScope,
+		Scopes:        a.scopes,
+		NodeTypes:     a.nodeTypes,
+		StructIndices: a.structIndices,
 	}, nil
 }
 
-func registerPrimitives(s *symbol.Scope) {
+func initGlobalScope(s *symbol.Scope) {
 	s.Define("int", symbol.SymType, types.I64)
+	s.Define("int32", symbol.SymType, types.I32)
 	s.Define("float", symbol.SymType, types.F64)
 	s.Define("bool", symbol.SymType, types.I1)
-	s.Define("char", symbol.SymType, types.I32) // Rune
 	s.Define("void", symbol.SymType, types.Void)
-	// Simplified String for now
-	s.Define("string", symbol.SymType, types.NewPointer(types.I8)) 
+	s.Define("string", symbol.SymType, types.NewPointer(types.I8))
 }
 
-// --- Scope Helpers ---
-
 func (a *Analyzer) pushScope(ctx antlr.ParserRuleContext) {
-	newScope := symbol.NewScope(a.currentScope)
-	a.scopes[ctx] = newScope // Record for Pass 2
-	a.currentScope = newScope
+	s := symbol.NewScope(a.currentScope)
+	a.scopes[ctx] = s
+	a.currentScope = s
 }
 
 func (a *Analyzer) popScope() {
 	if a.currentScope.Parent != nil {
 		a.currentScope = a.currentScope.Parent
 	}
+}
+
+// resolveType from original visitor
+func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
+	if ctx == nil { return types.Void }
+	tc := ctx.(*parser.TypeContext)
+
+	if tc.PrimitiveType() != nil {
+		name := tc.PrimitiveType().GetText()
+		if s, ok := a.currentScope.Resolve(name); ok && s.Kind == symbol.SymType {
+			return s.Type
+		}
+		// Default to I64 if unknown (matching old logic)
+		return types.I64
+	}
+	if tc.PointerType() != nil {
+		return types.NewPointer(a.resolveType(tc.PointerType().Type_()))
+	}
+	if tc.ArrayType() != nil {
+		elem := a.resolveType(tc.ArrayType().Type_())
+		size := int64(0)
+		if s := tc.ArrayType().ArraySize(); s != nil {
+			if s.INTEGER_LITERAL() != nil {
+				size, _ = strconv.ParseInt(s.INTEGER_LITERAL().GetText(), 0, 64)
+			}
+		}
+		return types.NewArray(elem, size)
+	}
+	if tc.IDENTIFIER() != nil {
+		name := tc.IDENTIFIER().GetText()
+		if s, ok := a.currentScope.Resolve(name); ok && s.Kind == symbol.SymType {
+			return s.Type
+		}
+	}
+	return types.I64
+}
+
+// Compatibility check from old logic
+func areTypesCompatible(src, dest types.Type) bool {
+	if src.Equal(dest) { return true }
+	if types.IsInteger(src) && types.IsInteger(dest) { return true } // Allow implicit int casting
+	if types.IsFloat(src) && types.IsFloat(dest) { return true }
+	// Pointer/Array checks can be added here
+	return false
 }

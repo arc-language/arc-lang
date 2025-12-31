@@ -3,10 +3,19 @@ package semantics
 import (
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
-	"github.com/arc-language/arc-lang/symbol"
+	"github.com/arc-language/arc-lang/pkg/symbol"
 )
 
 func (a *Analyzer) VisitCompilationUnit(ctx *parser.CompilationUnitContext) interface{} {
+	// Pass 1: Register Structs first (Forward Declaration support)
+	for _, decl := range ctx.AllTopLevelDecl() {
+		if decl.StructDecl() != nil {
+			name := decl.StructDecl().IDENTIFIER().GetText()
+			st := types.NewStruct(name, nil, false)
+			a.currentScope.Define(name, symbol.SymType, st)
+		}
+	}
+	// Pass 2: Process everything
 	for _, decl := range ctx.AllTopLevelDecl() {
 		a.Visit(decl)
 	}
@@ -20,98 +29,85 @@ func (a *Analyzer) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface{
 	return nil
 }
 
-func (a *Analyzer) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
+func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
+	sym, _ := a.currentScope.Resolve(name)
+	structType := sym.Type.(*types.StructType)
+
+	var fieldTypes []types.Type
+	fieldIndices := make(map[string]int)
 	
-	// 1. Check Redeclaration
-	if _, exists := a.currentScope.ResolveLocal(name); exists {
-		a.bag.Report(a.file, ctx.GetStart().GetLine(), ctx.GetStart().GetColumn(),
-			"Redeclaration of variable '%s'", name)
-		return nil
-	}
-
-	// 2. Resolve Declared Type (if exists)
-	var declaredType types.Type
-	if ctx.Type_() != nil {
-		declaredType = a.resolveType(ctx.Type_())
-	}
-
-	// 3. Check Initializer Expression
-	if ctx.Expression() != nil {
-		exprType := a.Visit(ctx.Expression()).(types.Type)
-		
-		if declaredType == nil {
-			// Type Inference
-			declaredType = exprType
-		} else {
-			// Type Checking
-			if !areTypesCompatible(exprType, declaredType) {
-				a.bag.Report(a.file, ctx.GetStart().GetLine(), ctx.GetStart().GetColumn(),
-					"Type Mismatch: Cannot assign '%s' to variable of type '%s'", 
-					exprType.String(), declaredType.String())
-			}
+	idx := 0
+	for _, member := range ctx.AllStructMember() {
+		if f := member.StructField(); f != nil {
+			fName := f.IDENTIFIER().GetText()
+			fType := a.resolveType(f.Type_())
+			
+			fieldTypes = append(fieldTypes, fType)
+			fieldIndices[fName] = idx
+			idx++
 		}
-	} else if declaredType == nil {
-		a.bag.Report(a.file, ctx.GetStart().GetLine(), ctx.GetStart().GetColumn(),
-			"Variable '%s' must have a type annotation or an initializer", name)
-		declaredType = types.Void // Prevent nil panic downstream
 	}
-
-	// 4. Define Symbol
-	a.currentScope.Define(name, symbol.SymVar, declaredType)
+	structType.Fields = fieldTypes
+	a.structIndices[name] = fieldIndices // Store for Pass 2
 	return nil
 }
 
 func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
-
-	// 1. Resolve Return Type
-	// FIX: Explicitly define as interface type to avoid mismatch with *types.VoidType
-	var retType types.Type = types.Void
 	
+	// Generics skip in Pass 1 (handled in IRGen instantiation)
+	if ctx.GenericParams() != nil {
+		return nil 
+	}
+
+	var retType types.Type = types.Void
 	if ctx.ReturnType() != nil && ctx.ReturnType().Type_() != nil {
 		retType = a.resolveType(ctx.ReturnType().Type_())
 	}
 
-	// 2. Create Function Symbol
-	// FIX: Use underscore to ignore the returned symbol since we don't use it locally
-	_ = a.currentScope.Define(name, symbol.SymFunc, retType)
+	// Simplified: Define function type
+	a.currentScope.Define(name, symbol.SymFunc, retType)
 	
-	// 3. Enter Scope
 	a.currentFuncRetType = retType
 	a.pushScope(ctx)
 	defer a.popScope()
 
-	// 4. Process Parameters
 	if ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
 			pName := param.IDENTIFIER().GetText()
 			pType := a.resolveType(param.Type_())
-			
-			// Define param in function scope
 			a.currentScope.Define(pName, symbol.SymVar, pType)
 		}
 	}
 
-	// 5. Visit Body
 	if ctx.Block() != nil {
-		// Map the Block to the CURRENT function scope.
 		a.scopes[ctx.Block()] = a.currentScope
-		
 		for _, stmt := range ctx.Block().AllStatement() {
 			a.Visit(stmt)
 		}
 	}
-
 	return nil
 }
 
-func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
+func (a *Analyzer) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
-	
-	// Placeholder for struct type
-	structType := types.NewStruct(name, nil, false)
-	a.currentScope.Define(name, symbol.SymType, structType)
-	
+	var typ types.Type
+	if ctx.Type_() != nil {
+		typ = a.resolveType(ctx.Type_())
+	}
+
+	if ctx.Expression() != nil {
+		exprType := a.Visit(ctx.Expression()).(types.Type)
+		if typ == nil {
+			typ = exprType
+		} else if !areTypesCompatible(exprType, typ) {
+			a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Type mismatch: %s vs %s", typ, exprType)
+		}
+	} else if typ == nil {
+		typ = types.Void
+	}
+
+	a.currentScope.Define(name, symbol.SymVar, typ)
 	return nil
 }

@@ -2,78 +2,41 @@ package semantics
 
 import (
 	"strconv"
-
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
 	"github.com/arc-language/arc-lang/symbol"
 )
 
-// resolveType converts an AST Type Context into an internal Type definition
 func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 	tc := ctx.(*parser.TypeContext)
 
-	// 1. Primitives
 	if tc.PrimitiveType() != nil {
 		name := tc.PrimitiveType().GetText()
-		if sym, ok := a.currentScope.Resolve(name); ok && sym.Kind == symbol.SymType {
-			return sym.Type
+		if s, ok := a.currentScope.Resolve(name); ok && s.Kind == symbol.SymType {
+			return s.Type
 		}
-		a.bag.Report(a.file, tc.GetStart().GetLine(), 0, "Unknown primitive type '%s'", name)
-		return types.Void
+		return types.I64
 	}
-
-	// 2. Pointers
+	
 	if tc.PointerType() != nil {
-		inner := a.resolveType(tc.PointerType().Type_())
-		return types.NewPointer(inner)
+		return types.NewPointer(a.resolveType(tc.PointerType().Type_()))
 	}
 
-	// 3. Arrays
 	if tc.ArrayType() != nil {
-		inner := a.resolveType(tc.ArrayType().Type_())
+		elem := a.resolveType(tc.ArrayType().Type_())
 		size := int64(0)
-		if tc.ArrayType().ArraySize() != nil && tc.ArrayType().ArraySize().INTEGER_LITERAL() != nil {
-			txt := tc.ArrayType().ArraySize().INTEGER_LITERAL().GetText()
-			val, _ := strconv.ParseInt(txt, 10, 64)
-			size = val
+		if s := tc.ArrayType().ArraySize(); s != nil && s.INTEGER_LITERAL() != nil {
+			size, _ = strconv.ParseInt(s.INTEGER_LITERAL().GetText(), 10, 64)
 		}
-		return types.NewArray(inner, size)
+		return types.NewArray(elem, size)
 	}
 
-	// 4. Named Types (Structs, Classes, Typedefs)
 	if tc.IDENTIFIER() != nil {
 		name := tc.IDENTIFIER().GetText()
-		if sym, ok := a.currentScope.Resolve(name); ok {
-			if sym.Kind != symbol.SymType {
-				a.bag.Report(a.file, tc.GetStart().GetLine(), 0, "'%s' is not a type", name)
-				return types.Void
-			}
-			return sym.Type
-		}
-		a.bag.Report(a.file, tc.GetStart().GetLine(), 0, "Unknown type '%s'", name)
-	}
-
-	return types.I64 // Fallback
-}
-
-// areTypesCompatible checks if src can be assigned to dest
-func areTypesCompatible(src, dest types.Type) bool {
-	// 1. Exact Match
-	if src.Equal(dest) {
-		return true
-	}
-
-	// 2. Implicit Integer Casting (e.g. i32 -> i64)
-	if types.IsInteger(src) && types.IsInteger(dest) {
-		if src.BitSize() <= dest.BitSize() {
-			return true
+		if s, ok := a.currentScope.Resolve(name); ok && s.Kind == symbol.SymType {
+			return s.Type
 		}
 	}
 	
-	// 3. Void handling (always incompatible unless both void)
-	if src == types.Void || dest == types.Void {
-		return false
-	}
-
-	return false
+	return types.I64
 }
