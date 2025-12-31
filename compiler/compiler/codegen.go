@@ -1,4 +1,3 @@
-// Package compiler provides the Arc language compiler implementation.
 package compiler
 
 import (
@@ -31,7 +30,7 @@ func (c *Compiler) CompileToIR(outputPath string) error {
 	return nil
 }
 
-// CompileToObject generates an object file from the module
+// CompileToObject generates an object file (.o) from the module
 func (c *Compiler) CompileToObject(outputPath string) error {
 	c.logger.Info("Generating object file to: %s", outputPath)
 	
@@ -40,7 +39,7 @@ func (c *Compiler) CompileToObject(outputPath string) error {
 		return fmt.Errorf("no module to compile")
 	}
 
-	// Generate object code
+	// Generate object code using the new codegen package
 	c.logger.Debug("Calling code generator for module '%s'", c.context.Module.Name)
 	objData, err := codegen.GenerateObject(c.context.Module)
 	if err != nil {
@@ -71,6 +70,8 @@ func (c *Compiler) CompileToExecutable(outputPath string) error {
 
 	// Generate executable code (static binary)
 	c.logger.Debug("Calling code generator for module '%s' (executable)", c.context.Module.Name)
+	
+	// The new codegen package handles the _start stub and internal linking
 	exeData, err := codegen.GenerateExecutable(c.context.Module)
 	if err != nil {
 		c.logger.Error("Code generation failed: %v", err)
