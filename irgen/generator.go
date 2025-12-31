@@ -1,7 +1,7 @@
 package irgen
 
 import (
-	"fmt"
+
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/context"
