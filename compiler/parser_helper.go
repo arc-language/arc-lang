@@ -3,7 +3,7 @@ package compiler
 import (
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/parser" // The generated ANTLR parser
-	"github.com/arc-language/arc-lang/pkg/diagnostic"
+	"github.com/arc-language/arc-lang/diagnostic"
 )
 
 // syntaxListener bridges ANTLR errors to our Diagnostic system

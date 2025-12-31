@@ -7,9 +7,9 @@ import (
 
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/codegen/codegen" // Assumes your codegen logic is here
-	"github.com/arc-language/arc-lang/pkg/diagnostic"
-	"github.com/arc-language/arc-lang/pkg/irgen"
-	"github.com/arc-language/arc-lang/pkg/semantics"
+	"github.com/arc-language/arc-lang/diagnostic"
+	"github.com/arc-language/arc-lang/irgen"
+	"github.com/arc-language/arc-lang/semantics"
 )
 
 // Compiler coordinates the compilation pipeline

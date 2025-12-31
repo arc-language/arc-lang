@@ -4,9 +4,9 @@ import (
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/parser"
-	"github.com/arc-language/arc-lang/pkg/compiler" // For Context
-	"github.com/arc-language/arc-lang/pkg/semantics"
-	"github.com/arc-language/arc-lang/pkg/symbol"
+	"github.com/arc-language/arc-lang/compiler" // For Context
+	"github.com/arc-language/arc-lang/semantics"
+	"github.com/arc-language/arc-lang/symbol"
 )
 
 // Generator implements Pass 2 (IR Generation)

@@ -5,7 +5,7 @@ import (
 
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
-	"github.com/arc-language/arc-lang/pkg/symbol"
+	"github.com/arc-language/arc-lang/symbol"
 )
 
 // resolveType converts an AST Type Context into an internal Type definition

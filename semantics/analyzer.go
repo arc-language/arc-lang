@@ -4,8 +4,8 @@ import (
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
-	"github.com/arc-language/arc-lang/pkg/diagnostic"
-	"github.com/arc-language/arc-lang/pkg/symbol"
+	"github.com/arc-language/arc-lang/diagnostic"
+	"github.com/arc-language/arc-lang/symbol"
 )
 
 // AnalysisResult contains everything Pass 2 needs to generate code
