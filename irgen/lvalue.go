@@ -8,16 +8,13 @@ import (
 )
 
 // getLValue returns the memory address (pointer) of an expression.
-// Returns nil if the expression is not an L-Value (e.g. a literal or binary operation).
+// Returns nil if the expression is not an L-Value (e.g. a literal).
 func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 	switch ctx := tree.(type) {
 	
 	// --- Drill-down layers ---
-	// Handles: (expr), or the chain Expression -> LogicalOr -> ... -> Unary
-	
 	case *parser.ExpressionContext:
 		return g.getLValue(ctx.LogicalOrExpression())
-	
 	case *parser.LogicalOrExpressionContext:
 		if len(ctx.AllLogicalAndExpression()) == 1 {
 			return g.getLValue(ctx.LogicalAndExpression(0))
@@ -67,28 +64,23 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 
 	case *parser.PrimaryExpressionContext:
 		if ctx.Expression() != nil {
-			// Parenthesized expression: (x)
 			return g.getLValue(ctx.Expression())
 		}
 		if ctx.IDENTIFIER() != nil {
 			name := ctx.IDENTIFIER().GetText()
 			if sym, ok := g.currentScope.Resolve(name); ok {
-				// If it's an alloca (variable), that IS the address.
 				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 					return alloca
 				}
-				// If it's a global, that IS the address.
 				if glob := g.ctx.Module.GetGlobal(name); glob != nil {
 					return glob
 				}
-				// Arguments or other pointers
 				return sym.IRValue
 			}
 		}
 
 	case *parser.UnaryExpressionContext:
 		if ctx.STAR() != nil {
-			// Dereference *ptr -> value of ptr is the address
 			return g.Visit(ctx.UnaryExpression()).(ir.Value)
 		}
 		if ctx.PostfixExpression() != nil {
@@ -99,15 +91,11 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		baseExpr := ctx.PrimaryExpression()
 		addr := g.getLValue(baseExpr)
 		
-		if addr == nil {
-			return nil
-		}
+		if addr == nil { return nil }
 
 		for _, op := range ctx.AllPostfixOp() {
-			// .Field
 			if op.DOT() != nil {
 				fieldName := op.IDENTIFIER().GetText()
-				
 				ptrType, isPtr := addr.Type().(*types.PointerType)
 				if !isPtr { return nil }
 
@@ -120,10 +108,8 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 				return nil
 			}
 
-			// [Index]
 			if op.LBRACKET() != nil {
 				idxVal := g.Visit(op.Expression()).(ir.Value)
-				
 				ptrType, isPtr := addr.Type().(*types.PointerType)
 				if !isPtr { return nil }
 

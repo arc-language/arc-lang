@@ -104,12 +104,7 @@ func (g *Generator) VisitShiftExpression(ctx *parser.ShiftExpressionContext) int
 	if len(children) == 0 { return nil }
 
 	lhs := g.Visit(children[0].(antlr.ParseTree)).(ir.Value)
-	
-	const (
-		OpNone = iota
-		OpLeft
-		OpRight
-	)
+	const (OpNone = iota; OpLeft; OpRight)
 	pendingOp := OpNone
 
 	for i := 1; i < len(children); i++ {
@@ -322,5 +317,13 @@ func (g *Generator) VisitSyscallExpression(ctx *parser.SyscallExpressionContext)
 
 func (g *Generator) VisitIntrinsicExpression(ctx *parser.IntrinsicExpressionContext) interface{} {
 	if ctx.SIZEOF() != nil { t := g.resolveType(ctx.Type_()); return g.ctx.Builder.CreateSizeOf(t, "") }
+	if ctx.ALIGNOF() != nil { t := g.resolveType(ctx.Type_()); return g.ctx.Builder.CreateAlignOf(t, "") }
+	var args []ir.Value
+	for _, expr := range ctx.AllExpression() { args = append(args, g.Visit(expr).(ir.Value)) }
+	if ctx.MEMSET() != nil && len(args) == 3 { return g.ctx.Builder.CreateMemSet(args[0], args[1], args[2]) }
+	if ctx.MEMCPY() != nil && len(args) == 3 { return g.ctx.Builder.CreateMemCpy(args[0], args[1], args[2]) }
+	if ctx.STRLEN() != nil && len(args) == 1 { return g.ctx.Builder.CreateStrLen(args[0], "") }
+	if ctx.BIT_CAST() != nil && len(args) == 1 { target := g.resolveType(ctx.Type_()); return g.ctx.Builder.CreateBitCast(args[0], target, "") }
+	if ctx.RAISE() != nil && len(args) == 1 { g.ctx.Builder.CreateRaise(args[0]) }
 	return g.getZeroValue(types.I64)
 }

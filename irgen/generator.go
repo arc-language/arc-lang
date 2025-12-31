@@ -39,42 +39,27 @@ func Generate(tree parser.ICompilationUnitContext, moduleName string, analysis *
 }
 
 func (g *Generator) enterScope(ctx antlr.ParserRuleContext) {
-	if s, ok := g.analysis.Scopes[ctx]; ok {
-		g.currentScope = s
-	}
+	if s, ok := g.analysis.Scopes[ctx]; ok { g.currentScope = s }
 }
 
 func (g *Generator) exitScope() {
-	if g.currentScope.Parent != nil {
-		g.currentScope = g.currentScope.Parent
-	}
+	if g.currentScope.Parent != nil { g.currentScope = g.currentScope.Parent }
 }
 
 func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil { return nil }
 
 	switch ctx := tree.(type) {
-	// Declarations
-	case *parser.CompilationUnitContext:
-		return g.VisitCompilationUnit(ctx)
-	case *parser.TopLevelDeclContext:
-		return g.VisitTopLevelDecl(ctx)
-	case *parser.FunctionDeclContext:
-		return g.VisitFunctionDecl(ctx)
-	case *parser.VariableDeclContext:
-		return g.VisitVariableDecl(ctx)
-	case *parser.ExternDeclContext:
-		return g.VisitExternDecl(ctx)
-	case *parser.StructDeclContext:
-		return g.VisitStructDecl(ctx)
-	case *parser.ClassDeclContext:
-		return g.VisitClassDecl(ctx)
-	case *parser.EnumDeclContext:
-		return g.VisitEnumDecl(ctx)
-	case *parser.BlockContext:
-		return g.VisitBlock(ctx)
+	case *parser.CompilationUnitContext: return g.VisitCompilationUnit(ctx)
+	case *parser.TopLevelDeclContext: return g.VisitTopLevelDecl(ctx)
+	case *parser.FunctionDeclContext: return g.VisitFunctionDecl(ctx)
+	case *parser.VariableDeclContext: return g.VisitVariableDecl(ctx)
+	case *parser.ExternDeclContext: return g.VisitExternDecl(ctx)
+	case *parser.StructDeclContext: return g.VisitStructDecl(ctx)
+	case *parser.ClassDeclContext: return g.VisitClassDecl(ctx)
+	case *parser.EnumDeclContext: return g.VisitEnumDecl(ctx)
+	case *parser.BlockContext: return g.VisitBlock(ctx)
 	
-	// Statements
 	case *parser.StatementContext:
 		if ctx.VariableDecl() != nil { return g.VisitVariableDecl(ctx.VariableDecl().(*parser.VariableDeclContext)) }
 		if ctx.ReturnStmt() != nil { return g.VisitReturnStmt(ctx.ReturnStmt().(*parser.ReturnStmtContext)) }
@@ -91,7 +76,6 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 		if ctx.ThrowStmt() != nil { return g.VisitThrowStmt(ctx.ThrowStmt().(*parser.ThrowStmtContext)) }
 		return nil
 
-	// Statement Wrappers
 	case *parser.ReturnStmtContext: return g.VisitReturnStmt(ctx)
 	case *parser.IfStmtContext: return g.VisitIfStmt(ctx)
 	case *parser.ForStmtContext: return g.VisitForStmt(ctx)
@@ -103,7 +87,6 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.TryStmtContext: return g.VisitTryStmt(ctx)
 	case *parser.ThrowStmtContext: return g.VisitThrowStmt(ctx)
 
-	// Expressions - Full Dispatch
 	case *parser.ExpressionContext: return g.VisitExpression(ctx)
 	case *parser.LogicalOrExpressionContext: return g.VisitLogicalOrExpression(ctx)
 	case *parser.LogicalAndExpressionContext: return g.VisitLogicalAndExpression(ctx)
@@ -120,7 +103,6 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.PostfixExpressionContext: return g.VisitPostfixExpression(ctx)
 	case *parser.PrimaryExpressionContext: return g.VisitPrimaryExpression(ctx)
 	
-	// Terminals/Literals
 	case *parser.LiteralContext: return g.VisitLiteral(ctx)
 	case *parser.StructLiteralContext: return g.VisitStructLiteral(ctx)
 	case *parser.CastExpressionContext: return g.VisitCastExpression(ctx)
