@@ -1,6 +1,7 @@
 package irgen
 
 import (
+	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
 )
@@ -50,7 +51,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	fn := g.ctx.Builder.CreateFunction(name, retType, paramTypes, false)
 	g.ctx.EnterFunction(fn)
 	
-	// IMPORTANT: Update symbol so calls inside body can find this function
+	// Update symbol so calls inside body can find this function
 	if sym != nil {
 		sym.IRValue = fn
 	}
@@ -102,9 +103,11 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 
 	if ctx.Expression() != nil {
 		val := g.Visit(ctx.Expression())
-		if irVal, ok := val.(interface{ Type() types.Type }); ok {
-			// Cast safely using helper (assuming helper is in helpers.go)
-			// val = g.emitCast(irVal, sym.Type)
+		
+		// FIX: Assert strictly to ir.Value
+		if irVal, ok := val.(ir.Value); ok {
+			// Now safe to pass to emitCast and CreateStore
+			irVal = g.emitCast(irVal, sym.Type)
 			g.ctx.Builder.CreateStore(irVal, alloca)
 		}
 	} else {
