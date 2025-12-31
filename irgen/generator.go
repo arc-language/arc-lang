@@ -11,11 +11,12 @@ import (
 
 type Generator struct {
 	*parser.BaseArcParserVisitor
-	ctx          *context.Context
-	analysis     *semantics.AnalysisResult
-	currentScope *symbol.Scope
-	deferStack   *DeferStack
-	loopStack    []loopInfo
+	ctx              *context.Context
+	analysis         *semantics.AnalysisResult
+	currentScope     *symbol.Scope
+	deferStack       *DeferStack
+	loopStack        []loopInfo
+	currentNamespace string // NEW: Track extern namespace
 }
 
 type loopInfo struct {
@@ -54,7 +55,6 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil { return nil }
 
 	switch ctx := tree.(type) {
-	// --- Top Level ---
 	case *parser.CompilationUnitContext:
 		return g.VisitCompilationUnit(ctx)
 	case *parser.TopLevelDeclContext:
@@ -63,10 +63,12 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 		return g.VisitFunctionDecl(ctx)
 	case *parser.VariableDeclContext:
 		return g.VisitVariableDecl(ctx)
+	case *parser.ExternDeclContext:
+		return g.VisitExternDecl(ctx) // NEW: Dispatch Extern
 	case *parser.BlockContext:
 		return g.VisitBlock(ctx)
 	
-	// --- Statements ---
+	// Statements
 	case *parser.StatementContext:
 		if ctx.VariableDecl() != nil { return g.VisitVariableDecl(ctx.VariableDecl().(*parser.VariableDeclContext)) }
 		if ctx.ReturnStmt() != nil { return g.VisitReturnStmt(ctx.ReturnStmt().(*parser.ReturnStmtContext)) }
@@ -101,37 +103,13 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.ThrowStmtContext:
 		return g.VisitThrowStmt(ctx)
 
-	// --- Expressions (The Missing Pieces) ---
+	// Expressions
 	case *parser.ExpressionContext:
 		return g.VisitExpression(ctx)
-	
-	// Binary Logic Chain
-	case *parser.LogicalOrExpressionContext:
-		return g.VisitLogicalOrExpression(ctx)
-	case *parser.LogicalAndExpressionContext:
-		return g.VisitLogicalAndExpression(ctx)
-	case *parser.BitOrExpressionContext:
-		return g.VisitBitOrExpression(ctx)
-	case *parser.BitXorExpressionContext:
-		return g.VisitBitXorExpression(ctx)
-	case *parser.BitAndExpressionContext:
-		return g.VisitBitAndExpression(ctx)
-	case *parser.EqualityExpressionContext:
-		return g.VisitEqualityExpression(ctx)
-	case *parser.RelationalExpressionContext:
-		return g.VisitRelationalExpression(ctx)
-	case *parser.ShiftExpressionContext:
-		return g.VisitShiftExpression(ctx)
-	case *parser.RangeExpressionContext:
-		return g.VisitRangeExpression(ctx)
-	
-	// Arithmetic
 	case *parser.AdditiveExpressionContext:
 		return g.VisitAdditiveExpression(ctx)
 	case *parser.MultiplicativeExpressionContext:
 		return g.VisitMultiplicativeExpression(ctx)
-	
-	// Unary & Terminals
 	case *parser.UnaryExpressionContext:
 		return g.VisitUnaryExpression(ctx)
 	case *parser.PostfixExpressionContext:

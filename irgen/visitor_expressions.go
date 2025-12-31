@@ -1,6 +1,8 @@
 package irgen
 
 import (
+	"fmt"
+	"strconv"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
@@ -10,24 +12,16 @@ func (g *Generator) VisitExpression(ctx *parser.ExpressionContext) interface{} {
 	return g.Visit(ctx.LogicalOrExpression())
 }
 
+// ... Arithmetic/Logic visitors (same as before) ...
 func (g *Generator) VisitAdditiveExpression(ctx *parser.AdditiveExpressionContext) interface{} {
 	lhs := g.Visit(ctx.MultiplicativeExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllMultiplicativeExpression()); i++ {
 		rhs := g.Visit(ctx.MultiplicativeExpression(i)).(ir.Value)
-
 		isAdd := i <= len(ctx.AllPLUS())
 		if types.IsFloat(lhs.Type()) {
-			if isAdd {
-				lhs = g.ctx.Builder.CreateFAdd(lhs, rhs, "")
-			} else {
-				lhs = g.ctx.Builder.CreateFSub(lhs, rhs, "")
-			}
+			if isAdd { lhs = g.ctx.Builder.CreateFAdd(lhs, rhs, "") } else { lhs = g.ctx.Builder.CreateFSub(lhs, rhs, "") }
 		} else {
-			if isAdd {
-				lhs = g.ctx.Builder.CreateAdd(lhs, rhs, "")
-			} else {
-				lhs = g.ctx.Builder.CreateSub(lhs, rhs, "")
-			}
+			if isAdd { lhs = g.ctx.Builder.CreateAdd(lhs, rhs, "") } else { lhs = g.ctx.Builder.CreateSub(lhs, rhs, "") }
 		}
 	}
 	return lhs
@@ -37,41 +31,25 @@ func (g *Generator) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 	lhs := g.Visit(ctx.UnaryExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllUnaryExpression()); i++ {
 		rhs := g.Visit(ctx.UnaryExpression(i)).(ir.Value)
-
 		isMult := i <= len(ctx.AllSTAR())
 		if types.IsFloat(lhs.Type()) {
-			if isMult {
-				lhs = g.ctx.Builder.CreateFMul(lhs, rhs, "")
-			} else {
-				lhs = g.ctx.Builder.CreateFDiv(lhs, rhs, "")
-			}
+			if isMult { lhs = g.ctx.Builder.CreateFMul(lhs, rhs, "") } else { lhs = g.ctx.Builder.CreateFDiv(lhs, rhs, "") }
 		} else {
-			if isMult {
-				lhs = g.ctx.Builder.CreateMul(lhs, rhs, "")
-			} else {
-				lhs = g.ctx.Builder.CreateSDiv(lhs, rhs, "")
-			}
+			if isMult { lhs = g.ctx.Builder.CreateMul(lhs, rhs, "") } else { lhs = g.ctx.Builder.CreateSDiv(lhs, rhs, "") }
 		}
 	}
 	return lhs
 }
 
 func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
-	if ctx.PostfixExpression() != nil {
-		return g.Visit(ctx.PostfixExpression())
-	}
-
+	if ctx.PostfixExpression() != nil { return g.Visit(ctx.PostfixExpression()) }
 	val := g.Visit(ctx.UnaryExpression()).(ir.Value)
 	if ctx.MINUS() != nil {
-		if types.IsFloat(val.Type()) {
-			return g.ctx.Builder.CreateFSub(g.getZeroValue(val.Type()), val, "")
-		}
+		if types.IsFloat(val.Type()) { return g.ctx.Builder.CreateFSub(g.getZeroValue(val.Type()), val, "") }
 		return g.ctx.Builder.CreateSub(g.getZeroValue(val.Type()), val, "")
 	}
 	if ctx.STAR() != nil {
-		if ptr, ok := val.Type().(*types.PointerType); ok {
-			return g.ctx.Builder.CreateLoad(ptr.ElementType, val, "")
-		}
+		if ptr, ok := val.Type().(*types.PointerType); ok { return g.ctx.Builder.CreateLoad(ptr.ElementType, val, "") }
 	}
 	return val
 }
@@ -84,21 +62,20 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			var args []ir.Value
 			if op.ArgumentList() != nil {
 				for _, arg := range op.ArgumentList().AllArgument() {
-					args = append(args, g.Visit(arg.Expression()).(ir.Value))
+					if argExpr := g.Visit(arg.Expression()); argExpr != nil {
+						args = append(args, argExpr.(ir.Value))
+					}
 				}
 			}
 			if fn, ok := curr.(*ir.Function); ok {
 				curr = g.ctx.Builder.CreateCall(fn, args, "")
 			}
 		}
-
+		
 		if op.DOT() != nil {
 			fieldName := op.IDENTIFIER().GetText()
-			
 			isPtr := false
-			if _, ok := curr.Type().(*types.PointerType); ok {
-				isPtr = true
-			}
+			if _, ok := curr.Type().(*types.PointerType); ok { isPtr = true }
 			
 			var structType *types.StructType
 			if isPtr {
@@ -109,9 +86,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 
 			idx := -1
 			if indices, ok := g.analysis.StructIndices[structType.Name]; ok {
-				if i, ok := indices[fieldName]; ok {
-					idx = i
-				}
+				if i, ok := indices[fieldName]; ok { idx = i }
 			}
 
 			if idx >= 0 {
@@ -136,9 +111,21 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 }
 
 func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
-	if ctx.Literal() != nil {
-		return g.Visit(ctx.Literal())
+	if ctx.Literal() != nil { return g.Visit(ctx.Literal()) }
+	
+	// Handle Qualified Identifiers (io.printf)
+	if ctx.QualifiedIdentifier() != nil {
+		q := ctx.QualifiedIdentifier()
+		parts := ""
+		for i, id := range q.AllIDENTIFIER() {
+			if i > 0 { parts += "." }
+			parts += id.GetText()
+		}
+		if sym, ok := g.currentScope.Resolve(parts); ok {
+			return sym.IRValue
+		}
 	}
+
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
 		if sym, ok := g.currentScope.Resolve(name); ok {
@@ -148,25 +135,41 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			return sym.IRValue
 		}
 	}
-	if ctx.Expression() != nil {
-		return g.Visit(ctx.Expression())
-	}
+	if ctx.Expression() != nil { return g.Visit(ctx.Expression()) }
 	return g.getZeroValue(types.I64)
 }
 
 func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	if ctx.INTEGER_LITERAL() != nil {
-		return g.ctx.Builder.ConstInt(types.I64, 0) // Simplified
+		txt := ctx.INTEGER_LITERAL().GetText()
+		val, _ := strconv.ParseInt(txt, 0, 64)
+		return g.ctx.Builder.ConstInt(types.I64, val)
 	}
 	if ctx.FLOAT_LITERAL() != nil {
-		return g.ctx.Builder.ConstFloat(types.F64, 0.0)
+		txt := ctx.FLOAT_LITERAL().GetText()
+		val, _ := strconv.ParseFloat(txt, 64)
+		return g.ctx.Builder.ConstFloat(types.F64, val)
 	}
-	if ctx.BOOLEAN_LITERAL() != nil {
-		return g.ctx.Builder.ConstInt(types.I1, 0)
+	if ctx.STRING_LITERAL() != nil {
+		raw := ctx.STRING_LITERAL().GetText()
+		if len(raw) >= 2 { raw = raw[1 : len(raw)-1] }
+		content := raw + "\x00"
+		
+		strName := fmt.Sprintf(".str.%d", len(g.ctx.Module.Globals))
+		arrType := types.NewArray(types.I8, int64(len(content)))
+		var chars []ir.Constant
+		for _, b := range []byte(content) {
+			chars = append(chars, g.ctx.Builder.ConstInt(types.I8, int64(b)))
+		}
+		constArr := &ir.ConstantArray{BaseValue: ir.BaseValue{ValType: arrType}, Elements: chars}
+		global := g.ctx.Builder.CreateGlobalConstant(strName, constArr)
+		zero := g.ctx.Builder.ConstInt(types.I32, 0)
+		return g.ctx.Builder.CreateInBoundsGEP(arrType, global, []ir.Value{zero, zero}, "")
 	}
 	return g.getZeroValue(types.I64)
 }
 
+// Boilerplate
 func (g *Generator) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionContext) interface{} { return g.Visit(ctx.LogicalAndExpression(0)) }
 func (g *Generator) VisitLogicalAndExpression(ctx *parser.LogicalAndExpressionContext) interface{} { return g.Visit(ctx.BitOrExpression(0)) }
 func (g *Generator) VisitBitOrExpression(ctx *parser.BitOrExpressionContext) interface{} { return g.Visit(ctx.BitXorExpression(0)) }
