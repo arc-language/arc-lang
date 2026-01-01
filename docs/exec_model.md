@@ -30,6 +30,7 @@ This allows the language to scale from a single concurrent web server to secure,
 *   **Syntax:** `let h = process my_logic()`
 
 ### 4. `container` (Sandboxed Processes)
+*   **Module Builder:** Works with build.arc files to build modules that need c or c++ deps.
 *   **Mechanism:** Linux Namespaces & Cgroups (`clone` with `CLONE_NEWPID`, `CLONE_NEWNET`, etc.).
 *   **Cost:** Milliseconds.
 *   **Capabilities:** Can isolate Network, Filesystem (`chroot`), and PID view (looks like PID 1).
