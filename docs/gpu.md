@@ -4,6 +4,23 @@ This document explains how Arc's GPU execution works from end-to-end using the `
 
 ---
 
+## Arc's Native Linking - No GCC/G++ Required
+
+**Arc has its own linker** and can link directly to C libraries without requiring gcc, g++, or any C/C++ toolchain. As long as the NVIDIA CUDA SDK (or the `.so`/`.a` library files) are present on the system, Arc can:
+
+- Link directly to `libcuda.so` (Linux) or `cuda.dll` (Windows)
+- Call CUDA Driver API functions via `extern` declarations
+- Generate and execute PTX code on NVIDIA GPUs
+
+**No intermediate C/C++ code is generated.** Arc compiles directly to:
+- Native machine code (AMD64, ARM64, etc.) for CPU code
+- PTX assembly for GPU code
+- Links to system libraries natively
+
+This makes Arc a **truly independent systems language** with first-class GPU support.
+
+---
+
 ## The Complete Flow
 
 ```
@@ -14,6 +31,8 @@ Arc Parser → AST
 Arc IR Generator → SSA IR
     ↓
 PTX Backend → PTX Assembly (text)
+    ↓
+Arc Linker → Links to libcuda.so (no gcc/g++ needed!)
     ↓
 Arc Runtime (via extern cuda driver API)
     ↓
@@ -88,6 +107,10 @@ The compiler extracts the kernel and compiles it separately:
 ```
 Main Program Path:          GPU Kernel Path:
 Arc → IR → AMD64            Arc → IR → PTX
+        ↓                           ↓
+    Arc Linker ← Links to libcuda.so → Embedded in binary
+        ↓
+    Executable (no gcc/g++ involved!)
 ```
 
 ### Step 3: PTX Generation
@@ -148,7 +171,25 @@ The compiler embeds the PTX string into the Arc executable:
 const __double_array_ptx: string = ".version 7.0\n.target sm_75\n..."
 ```
 
-### Step 5: Runtime Execution via CUDA Driver API
+### Step 5: Arc Linker Links to CUDA Library
+
+**Arc's native linker** links the executable directly to the CUDA Driver library:
+
+```bash
+# Linux
+arc build gpu_program.arc
+# Arc linker finds and links: /usr/lib/x86_64-linux-gnu/libcuda.so
+
+# Windows
+arc build gpu_program.arc
+# Arc linker finds and links: C:\Windows\System32\nvcuda.dll
+
+# No gcc, g++, nvcc, or any C++ toolchain required!
+```
+
+The linker resolves all `extern cuda { ... }` declarations against the CUDA Driver library.
+
+### Step 6: Runtime Execution via CUDA Driver API
 
 Arc interfaces with NVIDIA's CUDA Driver API using `extern`:
 
@@ -188,6 +229,8 @@ extern cuda {
     func cuMemFree "cuMemFree" (ptr: *void) int32
 }
 ```
+
+**These `extern` functions are resolved by Arc's linker** at link time, binding directly to the symbols in `libcuda.so` or `nvcuda.dll`.
 
 ---
 
@@ -865,16 +908,17 @@ func distributed_training(batches: array<*float32, 4>, model: *float32) {
 
 ## Key Points
 
-1. **`async func<gpu>` marks GPU compilation** - Compiler generates PTX for these functions
-2. **`await` uses default device** - Simple, works 90% of the time (device 0)
-3. **`await(N)` for explicit device** - Runtime device selection when needed
-4. **PTX is embedded** - Compiler embeds PTX strings in the Arc binary
-5. **JIT happens at runtime** - First kernel launch compiles PTX → SASS (cached)
-6. **Unified memory is easiest** - CPU and GPU share the same pointers
-7. **Synchronization is explicit** - `await` blocks until GPU completes
-8. **Composable pipelines** - Functions return values, enabling chaining
-9. **No separate runtime needed** - Arc uses `extern` to call CUDA Driver API directly
-10. **Multi-GPU is natural** - Use `await(device_id)` with runtime variables
+1. **Arc has its own linker** - Links directly to C libraries (`.so`/`.a`/`.dll`) without gcc/g++
+2. **`async func<gpu>` marks GPU compilation** - Compiler generates PTX for these functions
+3. **`await` uses default device** - Simple, works 90% of the time (device 0)
+4. **`await(N)` for explicit device** - Runtime device selection when needed
+5. **PTX is embedded** - Compiler embeds PTX strings in the Arc binary
+6. **JIT happens at runtime** - First kernel launch compiles PTX → SASS (cached)
+7. **Unified memory is easiest** - CPU and GPU share the same pointers
+8. **Synchronization is explicit** - `await` blocks until GPU completes
+9. **Composable pipelines** - Functions return values, enabling chaining
+10. **No C/C++ toolchain needed** - Arc compiles and links independently
+11. **Multi-GPU is natural** - Use `await(device_id)` with runtime variables
 
 ---
 
@@ -893,19 +937,27 @@ let result = await double_values(array, 1024)
 
 **What actually happens:**
 
-1. Compiler sees `async func<gpu>` → generates PTX assembly
-2. PTX embedded in binary as string constant
-3. At runtime when `await` is encountered:
-   - Switches to device 0 (default)
-   - `cuModuleLoadData(ptx_string)` loads to GPU
-   - NVIDIA driver JIT compiles PTX → SASS (once, then cached)
-   - `cuLaunchKernel()` executes 1024 threads in parallel
-   - Each thread runs with a different `thread_id()`
-   - `await` blocks and calls `cuCtxSynchronize()` 
-   - Returns result when GPU completes
-4. Result is synchronized and ready to use
+1. **Compilation:**
+   - Arc compiler sees `async func<gpu>` → generates PTX assembly
+   - PTX embedded in binary as string constant
+   - Arc linker links to `libcuda.so` (no gcc/g++ involved!)
 
-**All with clean, intuitive async/await syntax.** 🚀
+2. **Runtime:**
+   - When `await` is encountered:
+     - Switches to device 0 (default)
+     - `cuModuleLoadData(ptx_string)` loads to GPU
+     - NVIDIA driver JIT compiles PTX → SASS (once, then cached)
+     - `cuLaunchKernel()` executes 1024 threads in parallel
+     - Each thread runs with a different `thread_id()`
+     - `await` blocks and calls `cuCtxSynchronize()` 
+     - Returns result when GPU completes
+
+3. **Result:**
+   - Data is synchronized and ready to use
+   - No intermediate C/C++ code generated
+   - Pure Arc → Native machine code + PTX → GPU
+
+**All with clean, intuitive async/await syntax and zero dependency on C/C++ toolchains.** 🚀
 
 ---
 
@@ -1004,4 +1056,38 @@ func main() {
 }
 ```
 
-The `<gpu>` marker in `async func<gpu>` tells the compiler this is GPU code (compile to PTX), while the absence of `<gpu>` means regular CPU async. The `await` vs `await(device)` at the call site determines device selection. Clean, simple, powerful! ✨
+---
+
+## Build and Deployment
+
+```bash
+# Build Arc program with GPU support
+arc build my_gpu_program.arc
+
+# Arc automatically:
+# 1. Compiles Arc → AMD64/ARM64 for CPU code
+# 2. Compiles Arc → PTX for GPU code
+# 3. Links to libcuda.so using Arc's native linker
+# 4. Produces standalone executable
+
+# Run
+./my_gpu_program
+
+# No nvcc, no gcc, no g++ required!
+# Just Arc compiler + NVIDIA driver
+```
+
+**Requirements:**
+- NVIDIA GPU with driver installed
+- CUDA Driver library (`libcuda.so` on Linux, `nvcuda.dll` on Windows)
+- Arc compiler
+
+**NOT Required:**
+- CUDA Toolkit (optional, only needed for development/debugging)
+- nvcc compiler
+- gcc/g++ toolchain
+- Any C/C++ dependencies
+
+---
+
+The `<gpu>` marker in `async func<gpu>` tells the compiler this is GPU code (compile to PTX), while the absence of `<gpu>` means regular CPU async. The `await` vs `await(device)` at the call site determines device selection. Arc's native linker handles all the heavy lifting - linking to CUDA libraries without any C/C++ toolchain dependency. Clean, simple, powerful, and fully independent! ✨

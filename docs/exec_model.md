@@ -1,12 +1,12 @@
 # Arc Language Execution Model
 
-Arc separates **logic definition** from **execution context**. Write your code once as a function, then choose where to run it: cooperative threads, OS threads, isolated processes, sandboxed containers, or GPU.
+Arc separates **logic definition** from **execution context**. Write your code once as a function, then choose where to run it: cooperative threads, OS threads, isolated processes, or sandboxed containers.
 
-This allows Arc to scale from lightweight concurrency to security isolation to GPU acceleration—all with the same language and syntax.
+This allows Arc to scale from lightweight concurrency to security isolation—all with the same language and syntax.
 
 ---
 
-## The 5 Execution Models
+## The 4 Execution Models
 
 ### 1. `spawn` - Green Threads (Cooperative Multitasking)
 
@@ -148,76 +148,6 @@ let handle = container func() {
 
 ---
 
-### 5. `gpu` - GPU Execution (Massive Parallelism)
-
-**What:** Executes Arc code on GPU via JIT compilation to PTX assembly. Runs thousands of threads in parallel.
-
-**When to use:**
-- Data-parallel operations (same operation on many elements)
-- Matrix operations, transformers, ML kernels
-- Scientific simulations (N-body, fluid dynamics)
-- Image/video processing
-- Financial modeling (Monte Carlo)
-
-**Cost:** Microseconds to milliseconds (JIT + kernel launch)
-
-**Syntax:**
-```arc
-// Allocate GPU memory
-let data = gpu.unified_malloc<float32>(1024)
-
-// Initialize on CPU
-for i in 0..1024 {
-    data[i] = cast<float32>(i)
-}
-
-// GPU kernel - inline Arc code
-gpu func(arr: *float32, n: usize) {
-    let idx = gpu.thread_id()
-    if idx < n {
-        arr[idx] = arr[idx] * 2.0  // Runs in parallel on GPU
-    }
-}(data, 1024)
-
-// Result automatically synced (unified memory)
-let result = data[0]  // Read on CPU
-```
-
-**Advanced usage:**
-```arc
-// Named kernel function
-func vec_add(a: *float32, b: *float32, out: *float32, n: usize) {
-    let idx = gpu.thread_id()
-    if idx < n {
-        out[idx] = a[idx] + b[idx]
-    }
-}
-
-// Execute on GPU
-let handle = gpu vec_add(a, b, result, 1024)
-handle.await  // Wait for GPU to finish
-
-// Manual memory management (for performance)
-let gpu_buf = gpu.malloc<float32>(1024)
-gpu.copy_to_device(gpu_buf, cpu_data, 1024)
-gpu kernel(gpu_buf, 1024)
-gpu.copy_to_host(cpu_data, gpu_buf, 1024)
-gpu.free(gpu_buf)
-```
-
-**Restrictions:**
-- No malloc/free inside kernels
-- No system calls
-- Limited recursion
-- Must use GPU-compatible Arc subset
-
-**Compilation:**
-```
-Arc GPU code → Arc IR → PTX assembly → NVIDIA driver JIT → GPU execution
-```
-
----
-
 ## Quick Comparison
 
 | Model | Isolation | Concurrency | Use Case | Overhead |
@@ -226,7 +156,6 @@ Arc GPU code → Arc IR → PTX assembly → NVIDIA driver JIT → GPU execution
 | `thread` | Shared memory | Preemptive | CPU-bound, blocking calls | ~5µs |
 | `process` | Separate memory | Full | Fault tolerance | ~1-10ms |
 | `container` | Sandboxed + limits | Full | Security, multi-tenant | ~10-50ms |
-| `gpu` | Separate device | Massive parallel | Data-parallel compute | ~100µs-1ms |
 
 ---
 
@@ -292,25 +221,15 @@ func run_user_code(code: string, user_id: int32) {
 }
 ```
 
-### AI/ML Computation (gpu)
-```arc
-// Matrix multiplication on GPU
-func matmul_gpu(A: *float32, B: *float32, C: *float32, N: usize) {
-    gpu func(a: *float32, b: *float32, c: *float32, n: usize) {
-        let idx = gpu.thread_id()
-        let row = idx / n
-        let col = idx % n
-        
-        if row < n && col < n {
-            let mut sum: float32 = 0.0
-            for k in 0..n {
-                sum += a[row * n + k] * b[k * n + col]
-            }
-            c[row * n + col] = sum
-        }
-    }(A, B, C, N)
-}
-```
+---
+
+## GPU Execution
+
+For GPU/CUDA execution, see the separate **GPU Execution Model** documentation which covers:
+- `async func<gpu>` syntax for GPU kernels
+- `await` and `await(device)` for device selection
+- Multi-GPU programming
+- PTX compilation and CUDA Driver API integration
 
 ---
 
@@ -321,6 +240,5 @@ Arc's execution model gives you the right tool for every job:
 - **thread**: When you need real parallelism
 - **process**: When you need isolation
 - **container**: When you need security
-- **gpu**: When you need massive throughput
 
 All with the same language, same syntax, same binary. No external dependencies, no frameworks, no runtime bloat.
