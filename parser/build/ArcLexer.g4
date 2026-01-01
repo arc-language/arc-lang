@@ -1,6 +1,10 @@
+// ArcLexer.g4
 lexer grammar ArcLexer;
 
-// Keywords
+// =============================================================================
+// Keywords - Control Flow & Declarations
+// =============================================================================
+
 IMPORT: 'import';
 NAMESPACE: 'namespace';
 LET: 'let';
@@ -23,8 +27,6 @@ DEFER: 'defer';
 EXTERN: 'extern';
 SELF: 'self';
 NULL: 'null';
-
-// Control flow keywords
 SWITCH: 'switch';
 CASE: 'case';
 DEFAULT: 'default';
@@ -32,11 +34,12 @@ TRY: 'try';
 THROW: 'throw';
 EXCEPT: 'except';
 FINALLY: 'finally';
-
-// Enum keyword
 ENUM: 'enum';
 
+// =============================================================================
 // Type Keywords
+// =============================================================================
+
 INT8: 'int8';
 INT16: 'int16';
 INT32: 'int32';
@@ -54,28 +57,18 @@ BOOL: 'bool';
 CHAR: 'char';
 STRING: 'string';
 VOID: 'void';
-ARRAY: 'array';
 
-// Built-in Functions/Intrinsics
-ALLOCA: 'alloca';
-CAST: 'cast';
-SYSCALL: 'syscall';
-SIZEOF: 'sizeof';
-ALIGNOF: 'alignof';
-MEMSET: 'memset';
-MEMCPY: 'memcpy';
-MEMMOVE: 'memmove';
-STRLEN: 'strlen';
-MEMCHR: 'memchr';
-VA_START: 'va_start';
-VA_ARG: 'va_arg';
-VA_END: 'va_end';
-RAISE: 'raise';
-MEMCMP: 'memcmp';
-BIT_CAST: 'bit_cast';
-SLICE: 'slice';
+// =============================================================================
+// Operators with Unique Syntax (compile-time queries)
+// =============================================================================
 
+SIZEOF: 'sizeof';    // sizeof<T> - no parens
+ALIGNOF: 'alignof';  // alignof<T> - no parens
+
+// =============================================================================
 // Operators (multi-character first - ORDER MATTERS!)
+// =============================================================================
+
 ARROW: '->';
 RANGE: '..';
 ELLIPSIS: '...';
@@ -97,7 +90,10 @@ INCREMENT: '++';
 DECREMENT: '--';
 FAT_ARROW: '=>';
 
-// Single character operators
+// =============================================================================
+// Single Character Operators
+// =============================================================================
+
 PLUS: '+';
 MINUS: '-';
 STAR: '*';
@@ -113,7 +109,10 @@ BIT_NOT: '~';
 AT: '@';
 ASSIGN: '=';
 
+// =============================================================================
 // Delimiters
+// =============================================================================
+
 LPAREN: '(';
 RPAREN: ')';
 LBRACE: '{';
@@ -126,7 +125,10 @@ SEMICOLON: ';';
 DOT: '.';
 UNDERSCORE: '_';
 
+// =============================================================================
 // Literals
+// =============================================================================
+
 BOOLEAN_LITERAL: 'true' | 'false';
 
 INTEGER_LITERAL
@@ -167,12 +169,18 @@ fragment ESCAPE_SEQUENCE
 
 fragment HEX_DIGIT: [0-9a-fA-F];
 
+// =============================================================================
 // Identifiers
+// =============================================================================
+
 IDENTIFIER
     : [a-zA-Z_] [a-zA-Z0-9_]*
     ;
 
+// =============================================================================
 // Whitespace and Comments
+// =============================================================================
+
 WS: [ \t\r\n]+ -> skip;
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
 BLOCK_COMMENT: '/*' .*? '*/' -> skip;

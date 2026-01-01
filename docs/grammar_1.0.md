@@ -1,10 +1,4 @@
-# arc Language Grammar Snippets (Version 1.0 - Core Features & Intrinsics)
-
-## Collections, implementation note
-* Note: vector<T> and map<K,V> are NOT compiler builtins.
-* They are generic structs defined in the standard library.
-* See "Generics, struct" for implementation patterns.
-
+# arc Language Grammar (Version 1.2 - Core Syntax)
 
 ## Comments
 ```arc
@@ -175,40 +169,6 @@ let handle: *void = malloc(64)
 let ref: &int32 = value
 ```
 
-## Collections, vector
-```arc
-let v: vector<int32> = {}
-```
-
-## Collections, vector initialization
-```arc
-// Empty vector
-let empty: vector<int32> = {}
-
-// Initialized with values
-let nums: vector<int32> = {1, 2, 3, 4, 5}
-
-// Type inference
-let items = {10, 20, 30}
-```
-
-## Collections, map
-```arc
-let m: map<string, int32> = {}
-```
-
-## Collections, map initialization
-```arc
-// Empty map
-let empty: map<string, int32> = {}
-
-// Initialized with key-value pairs
-let scores: map<string, int32> = {"alice": 100, "bob": 95}
-
-// Type inference
-let config = {"host": "localhost", "port": "8080"}
-```
-
 ## Functions, basic
 ```arc
 func add(a: int32, b: int32) int32 {
@@ -273,6 +233,18 @@ some.fetch(args, async (url: string, timeout: int32) => {
 button.on_click(async () => {
     await save_state()
 })
+```
+
+## Function Return Tuples
+```arc
+func divide(a: int32, b: int32) (int32, bool) {
+    if b == 0 {
+        return (0, false)
+    }
+    return (a / b, true)
+}
+
+let (result, ok) = divide(10, 2)
 ```
 
 ## Structs, basic (value type - stack allocated, copied)
@@ -565,6 +537,103 @@ defer free(ptr)
 return value
 ```
 
+## Control Flow, switch
+```arc
+let status = 2
+
+switch status {
+    case 0:
+        io.print("OK")
+    case 1:
+        io.print("Pending")
+    case 2:
+        io.print("Error")
+    default:
+        io.print("Unknown")
+}
+```
+
+## Control Flow, try-except with throw
+```arc
+// Function that throws exceptions
+func divide(s: int32, d: int32) int32 {
+    if d == 0 {
+        throw "Division by zero"  // throw a recoverable exception
+    }
+    return s / d
+}
+
+// Basic try-except block
+try {
+    let result = divide(10, 0)  // This will throw
+    io.printf("Result: %d\n", result)
+} except err {
+    io.printf("Error: %s\n", err)  // Handle the thrown exception
+}
+
+// Function throwing typed exceptions
+func read_file(path: string) string {
+    if !file_exists(path) {
+        throw FileError.NotFound  // Throw specific error type
+    }
+    if !has_permission(path) {
+        throw FileError.PermissionDenied  // Throw different error type
+    }
+    return load_contents(path)
+}
+
+// Multiple except clauses for different exception types
+try {
+    let data = read_file("/tmp/config.txt")
+    process(data)
+} except FileError.NotFound {
+    io.printf("File not found\n")
+} except FileError.PermissionDenied {
+    io.printf("Permission denied\n")
+} except err {
+    // Handle-all for other errors
+    io.printf("Unexpected error: %s\n", err)
+}
+
+// Try-except with finally (always executes)
+func process_file(filename: string) void {
+    let file: File
+    try {
+        file = open(filename)
+        if file.size() > MAX_SIZE {
+            throw "File too large"  // Throw from within try block
+        }
+        process(file)
+    } except err {
+        io.printf("Error: %s\n", err)
+    } finally {
+        // Cleanup code always runs, even if exception was thrown
+        if file != null {
+            file.close()
+        }
+    }
+}
+
+// Comparison: throw vs raise()
+func validate_data(data: ptr<byte>) void {
+    if data == null {
+        raise("Fatal: null pointer passed to validate_data")  // Unrecoverable, aborts program
+    }
+    
+    if !is_valid_format(data) {
+        throw "Invalid data format" // throw a recoverable exception
+    }
+}
+
+// Re-throwing exceptions
+try {
+    risky_operation()
+} except err {
+    io.printf("Logging error: %s\n", err)
+    throw err  // Re-throw the exception to caller
+}
+```
+
 ## Operators, arithmetic
 ```arc
 let sum = a + b
@@ -655,111 +724,6 @@ let x = *ptr
 
 // Dereference pointer to write value
 *ptr = 42
-```
-
-## Intrinsics, stack allocation (alloca)
-```arc
-// Allocate single item on stack (returns *T)
-// Essential for creating kernel buffers without malloc
-let ptr = alloca(int32)
-
-// Allocate array/buffer on stack (returns *T, second arg is count)
-let buffer = alloca(byte, 1024)
-```
-
-## Intrinsics, meta (sizeof, alignof)
-```arc
-// Compile-time size in bytes (returns usize)
-// Essential for passing buffer sizes to read/write/mmap
-let sz = sizeof<int32>       // 4
-let st_sz = sizeof<Stat>     // Struct size (with padding)
-
-// Compile-time alignment requirement (returns usize)
-let align = alignof<float64> // 8
-```
-
-## Intrinsics, memory block (memset, memcpy, memmove)
-```arc
-let buf = alloca(byte, 1024)
-
-// memset(dest: *void, val: byte, count: usize)
-// Essential for zeroing stack structs before syscalls
-memset(buf, 0, 1024)
-
-// memcpy(dest: *void, src: *void, count: usize)
-// Essential for copying data to/from kernel buffers
-// UNSAFE if regions overlap
-memcpy(dest_ptr, src_ptr, 1024)
-
-// memmove(dest: *void, src: *void, count: usize)
-// Like memcpy but handles overlapping regions safely
-// Essential for buffer manipulation where source/dest might overlap
-memmove(dest_ptr, src_ptr, 1024)
-```
-
-## Intrinsics, string operations (strlen, memchr)
-```arc
-// strlen(str: *byte) -> usize
-// Calculate C-string length (stops at null terminator)
-// Essential when interfacing with syscalls expecting null-terminated strings
-let cstr: *byte = "hello\0"
-let len = strlen(cstr)  // 5
-
-// memchr(ptr: *void, val: byte, count: usize) -> *void
-// Find first occurrence of byte in memory region
-// Returns pointer to found byte, or null if not found
-// Essential for parsing, finding newlines in buffers, etc.
-let buf: *byte = "hello\nworld"
-let newline = memchr(buf, '\n', 11)  // Points to '\n'
-```
-
-## Intrinsics, variadic (va_start, va_arg, va_end)
-```arc
-// Essential for implementing printf without libc
-func printf(fmt: string, ...) {
-    // Initialize argument walker using the last known arg
-    let args = va_start(fmt)
-    defer va_end(args)
-
-    // Retrieve next argument as specific type
-    let val = va_arg<int32>(args)
-}
-```
-
-## Intrinsics, process (raise)
-```arc
-// Immediately abort execution with a message
-// Internally calls SYS_EXIT or triggers SIGABRT
-// Used for unrecoverable errors/crashes.
-if ptr == null {
-    raise("Memory corrupted")
-}
-```
-
-### Intrinsics, memory compare (memcmp)
-```arc
-// memcmp(ptr1: *void, ptr2: *void, count: usize) -> int32
-// Returns 0 if equal, <0 or >0 if different.
-// Essential for implementing '==' for strings and structs.
-let diff = memcmp(ptr1, ptr2, 1024)
-```
-
-### Intrinsics, bit manipulation
-```arc
-// bit_cast<TargetType>(SourceValue)
-// Reinterprets the raw bits without conversion.
-// Example: getting the IEEE754 integer representation of a float.
-let f: float32 = 1.0
-let bits = bit_cast<uint32>(f) // 0x3F800000, not 1
-```
-
-## Intrinsics, syscall
-```arc
-let msg = "Hello, Direct Syscall!\n"
-let len = 23
-
-// syscall(number, arg1, arg2, arg3, arg4, arg5, arg6)
-let result = syscall(SYS_WRITE, STDOUT, msg, len)
 ```
 
 ## Memory, load (dereference to read)
@@ -854,144 +818,6 @@ enum Color: uint8 {
 }
 ```
 
-
-## Control Flow, try-except with throw
-```arc
-// Function that throws exceptions
-func divide(s: int32, d: int32) int32 {
-    if d == 0 {
-        throw "Division by zero"  // throw a recoverable exception
-    }
-    return s / d
-}
-
-// Basic try-except block
-try {
-    let result = divide(10, 0)  // This will throw
-    io.printf("Result: %d\n", result)
-} except err {
-    io.printf("Error: %s\n", err)  // Handle the thrown exception
-}
-
-// Function throwing typed exceptions
-func read_file(path: string) string {
-    if !file_exists(path) {
-        throw FileError.NotFound  // Throw specific error type
-    }
-    if !has_permission(path) {
-        throw FileError.PermissionDenied  // Throw different error type
-    }
-    return load_contents(path)
-}
-
-// Multiple except clauses for different exception types
-try {
-    let data = read_file("/tmp/config.txt")
-    process(data)
-} except FileError.NotFound {
-    io.printf("File not found\n")
-} except FileError.PermissionDenied {
-    io.printf("Permission denied\n")
-} except err {
-    // Handle-all for other errors
-    io.printf("Unexpected error: %s\n", err)
-}
-
-// Try-except with finally (always executes)
-func process_file(filename: string) void {
-    let file: File
-    try {
-        file = open(filename)
-        if file.size() > MAX_SIZE {
-            throw "File too large"  // Throw from within try block
-        }
-        process(file)
-    } except err {
-        io.printf("Error: %s\n", err)
-    } finally {
-        // Cleanup code always runs, even if exception was thrown
-        if file != null {
-            file.close()
-        }
-    }
-}
-
-// Comparison: throw vs raise()
-func validate_data(data: ptr<byte>) void {
-    if data == null {
-        raise("Fatal: null pointer passed to validate_data")  // Unrecoverable, aborts program
-    }
-    
-    if !is_valid_format(data) {
-        throw "Invalid data format" // throw a recoverable exception
-    }
-}
-
-// Re-throwing exceptions
-try {
-    risky_operation()
-} except err {
-    io.printf("Logging error: %s\n", err)
-    throw err  // Re-throw the exception to caller
-}
-```
-
-## Function Return Tuples
-```arc
-func divide(a: int32, b: int32) (int32, bool) {
-    if b == 0 {
-        return (0, false)
-    }
-    return (a / b, true)
-}
-
-let (result, ok) = divide(10, 2)
-```
-
-## Collections, array (fixed-size)
-```arc
-let arr: array<int32, 5> = {1, 2, 3, 4, 5}
-let coords: array<float64, 3> = {1.0, 2.0, 3.0}
-```
-
-## Collections, array initialization
-```arc
-// Initialized with values
-let nums: array<int32, 5> = {1, 2, 3, 4, 5}
-
-// Zero/default initialization
-let zeros: array<int32, 100> = {}
-
-// Type inference (size still required)
-let items: array<_, 3> = {10, 20, 30}
-```
-
-## Collections, array access
-```arc
-let arr: array<int32, 5> = {1, 2, 3, 4, 5}
-
-// Read element
-let val = arr[2]
-
-// Write element
-arr[3] = 42
-
-// Get pointer to element
-let ptr: *int32 = &arr[0]
-```
-
-## Intrinsics, slice (array/vector view)
-```arc
-
-let arr: array<int32, 10> = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-let (ptr, len) = slice(arr, 1..4)  // ptr points to arr[1], len = 3
-
-// Use with vectors
-let vec: vector<byte> = {1, 2, 3, 4, 5}
-let (data_ptr, data_len) = slice(vec, 0..3)
-
-```
-
 ## String Interpolation
 ```arc
 let name = "Alice"
@@ -1010,57 +836,32 @@ let result = "Sum: \(a + b), Product: \(a * b)"
 let upper = "Name: \(name.to_upper())"
 ```
 
-## Control Flow, switch
-```arc
-let status = 2
-
-switch status {
-    case 0:
-        io.print("OK")
-    case 1:
-        io.print("Pending")
-    case 2:
-        io.print("Error")
-    default:
-        io.print("Unknown")
-}
-```
-
 ## Generics, struct, monomorphizes
 ```arc
-struct vector<T> {
-    data: *T
-    len: usize
-    cap: usize
+struct Box<T> {
+    value: T
     
-    func push(self v: *vector<T>, item: T) {
-        if v.len >= v.cap {
-            v.grow()
-        }
-        v.data[v.len] = item
-        v.len++
+    func get(self b: Box<T>) T {
+        return b.value
     }
     
-    func get(self v: *vector<T>, idx: usize) *T {
-        return &v.data[idx]
+    func set(self b: *Box<T>, val: T) {
+        b.value = val
     }
 }
 ```
 
 ## Generics, multiple type parameters, monomorphizes
 ```arc
-struct Entry<K, V> {
+struct Pair<K, V> {
     key: K
     value: V
 }
 
-struct map<K, V> {
-    buckets: *vector<Entry<K, V>>
-    count: usize
-    
-    func insert(self m: *map<K, V>, key: K, val: V) {
-        // ...
-    }
+struct Result<T, E> {
+    data: T
+    error: E
+    success: bool
 }
 ```
 

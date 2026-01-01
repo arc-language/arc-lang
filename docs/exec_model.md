@@ -1,92 +1,326 @@
 # Arc Language Execution Model
 
-This document outlines the architecture for Arc's 4-Tier Execution Model. The design philosophy separates **Logic Definition** (`async func`) from **Execution Context** (`spawn`, `thread`, `process`, `container`).
+Arc separates **logic definition** from **execution context**. Write your code once as a function, then choose where to run it: cooperative threads, OS threads, isolated processes, sandboxed containers, or GPU.
 
-This allows the language to scale from a single concurrent web server to secure, isolated sandboxes without changing the core syntax or relying on heavy external dependencies.
-
----
-
-## The 4 Tiers of Execution
-
-### 1. `spawn` (Green Threads)
-*   **Mechanism:** User-space cooperative multitasking (Stackless Coroutines).
-*   **Cost:** ~200ns switching, ~200 bytes memory.
-*   **Under the hood:** Runs on a single OS thread (Main Loop). Uses `coro.suspend` and `coro.resume`.
-*   **Use Case:** High-concurrency I/O, Web Servers (10k+ connections), Business Logic.
-*   **Syntax:** `let h = spawn my_logic()`
-
-### 2. `thread` (OS Threads)
-*   **Mechanism:** Kernel-managed preemptive threading (`clone` syscall with shared VM).
-*   **Cost:** ~5µs switching, ~1MB stack (configurable).
-*   **Under the hood:** Maps 1:1 to a real OS thread.
-*   **Use Case:** Blocking C functions (`libc.sleep`, DB drivers), CPU-heavy math that would freeze the Event Loop.
-*   **Syntax:** `let h = thread my_logic()` or `thread func() { ... }(stack_size)`
-
-### 3. `process` (OS Processes)
-*   **Mechanism:** Kernel-managed memory isolation (`fork` syscall / `clone` without shared VM).
-*   **Cost:** Milliseconds setup, Copy-on-Write memory.
-*   **Communication:** Pipes / IPC (Cannot share Heap).
-*   **Use Case:** Crash resilience, Fault tolerance, Plugins.
-*   **Syntax:** `let h = process my_logic()`
-
-### 4. `container` (Sandboxed Processes)
-*   **Module Builder:** Works with build.arc files to build modules that need c or c++ deps.
-*   **Mechanism:** Linux Namespaces & Cgroups (`clone` with `CLONE_NEWPID`, `CLONE_NEWNET`, etc.).
-*   **Cost:** Milliseconds.
-*   **Capabilities:** Can isolate Network, Filesystem (`chroot`), and PID view (looks like PID 1).
-*   **Use Case:** Security testing, Multi-tenant execution, "Serverless" logic inside the binary.
-*   **Syntax:** `let h = container func() { ... }(config)`
+This allows Arc to scale from lightweight concurrency to security isolation to GPU acceleration—all with the same language and syntax.
 
 ---
 
-## Implementation Roadmap
+## The 5 Execution Models
 
-### Phase 1: The Foundation (Async/Await & Coroutines)
+### 1. `spawn` - Green Threads (Cooperative Multitasking)
 
-To enable Green Threads (`spawn`) and the logic for all other tiers, we must implement **LLVM-style Coroutine Intrinsics** in our custom backend.
+**What:** Lightweight coroutines managed by Arc's runtime scheduler. Runs on the event loop.
 
-**1. Parser & Semantics:**
-*   Add support for `intrinsic` keyword or map specific `extern` function names (e.g., `__coro_resume`) to internal IR operations.
-*   Update `VisitFunctionDecl` to handle `async`. If `async`, the function must allocate a frame, return a Handle (`ptr<i8>`), and setup the cleanup block.
-*   Update `VisitReturnStmt` to store results in the Promise slot and jump to cleanup (Suspend Final) instead of returning normally.
+**When to use:**
+- High-concurrency I/O (web servers, 10k+ connections)
+- Async operations (network, file I/O)
+- Tasks that yield frequently
 
-**2. IR Generation:**
-*   Implement the custom coroutine instructions in `builder`:
-    *   `OpCoroId`, `OpCoroBegin`, `OpCoroSuspend`, `OpCoroResume`, `OpCoroDestroy`, `OpCoroPromise`.
+**Cost:** ~200ns switching, ~200 bytes memory
 
-**3. Codegen (AMD64 Backend):**
-*   **Manual Assembly Generation:** Since we aren't using LLVM libraries, we implement the "Context Switch" manually in `amd64/coroutines.go`.
-    *   **Suspend:** Save callee-saved registers (RBX, RBP, R12-15), RIP, and RSP to the heap frame.
-    *   **Resume:** Load registers/RSP from the heap frame and JMP to the saved RIP.
-    *   **Begin:** `mmap` a stack chunk/frame.
+**Syntax:**
+```arc
+// Inline anonymous function
+spawn func(url: string) {
+    let data = await http.get(url)
+    process(data)
+}("https://api.example.com")
 
-### Phase 2: The Runtime (Pure Arc)
+// Named function
+func fetch_data(url: string) {
+    let data = await http.get(url)
+    process(data)
+}
 
-We build the Scheduler and Thread Pool in `lib/runtime.arc` using the primitives above.
+let handle = spawn fetch_data("https://api.example.com")
+handle.await  // Wait for completion
+```
 
-*   **Scheduler:** A simple Queue of Handles. The Main Loop pops a handle and calls `__coro_resume(h)`.
-*   **Thread Pool:** Uses `syscall_clone` to create 4-8 dumb OS threads that wait for function pointers (for the `thread` tier).
-*   **Container Helper:** Wraps `syscall_clone` with namespace flags to implement the `container` tier.
-
-### Phase 3: Core Modules (Non-Blocking I/O)
-
-Because Green Threads (`spawn`) share the main OS thread, we cannot use blocking syscalls (like `libc.read`) inside standard library modules, or the whole server freezes.
-
-*   **The "Dance":** Core modules (`std.net`, `std.io`) must be rewritten to be async-aware.
-    1.  Try Non-Blocking Read.
-    2.  If `EAGAIN`: Register File Descriptor with the Runtime Poller (using `poll` syscall).
-    3.  `await suspend()` (Yield to scheduler).
-    4.  Resume when Poller says data is ready.
-*   **Ease of Implementation:** Since we have `async` and `await` keywords working, writing this "dance" in `lib/std/*.arc` is straightforward and readable, unlike C-based callbacks.
+**Restrictions:**
+- Must use non-blocking I/O (async APIs)
+- Cannot call blocking C functions (use `thread` instead)
 
 ---
 
-## Summary
+### 2. `thread` - OS Threads (Preemptive Multitasking)
 
-We are avoiding the "One size fits all" trap. By treating `async` as a state-machine transform and separating it from the runner (`spawn` vs `thread`), we get:
+**What:** Real OS threads managed by the kernel. Each thread has its own stack.
 
-1.  **Massive Scalability** (Green Threads/Spawn).
-2.  **Compatibility** (OS Threads for blocking C).
-3.  **DevOps Powers** (Inline Containers).
+**When to use:**
+- Blocking C library calls (libc, database drivers)
+- CPU-intensive work that shouldn't block the event loop
+- True parallel computation on multiple cores
 
-This architecture provides a professional-grade runtime environment entirely self-hosted in Arc.
+**Cost:** ~5µs switching, ~1MB stack
+
+**Syntax:**
+```arc
+// Call blocking C function safely
+func blocking_work(path: string) {
+    let file = libc.fopen(path, "r")
+    libc.sleep(1000)  // Blocks this thread only
+    libc.fclose(file)
+}
+
+let handle = thread blocking_work("/tmp/data.txt")
+handle.join()  // Wait for thread to finish
+```
+
+---
+
+### 3. `process` - OS Processes (Memory Isolation)
+
+**What:** Separate OS process with isolated memory space. Uses fork/clone syscall.
+
+**When to use:**
+- Fault tolerance (crashes don't affect parent)
+- Plugins or untrusted code (limited isolation)
+- Tasks that need complete memory separation
+
+**Cost:** Milliseconds setup, copy-on-write memory
+
+**Syntax:**
+```arc
+// Run risky operation in isolated process
+func risky_task(data: *byte) int32 {
+    // If this crashes, parent process is safe
+    let result = dangerous_computation(data)
+    return result
+}
+
+let handle = process risky_task(data_ptr)
+let result = handle.wait()  // Blocks until process exits
+
+// Check exit status
+if handle.exit_code() != 0 {
+    io.printf("Process crashed\n")
+}
+```
+
+**Communication:**
+- Processes share nothing (no shared heap)
+- Use pipes, sockets, or shared memory for IPC
+
+---
+
+### 4. `container` - Sandboxed Processes (Security Isolation)
+
+**What:** Process with Linux namespaces and cgroups. Isolated network, filesystem, and PID view.
+
+**When to use:**
+- Security-critical tasks (user-submitted code)
+- Multi-tenant execution
+- "Serverless" functions inside your binary
+- Limiting resource usage (CPU, memory, network)
+
+**Cost:** Milliseconds setup
+
+**Syntax:**
+```arc
+// Run untrusted code in sandbox
+let handle = container func(code: string) {
+    // Isolated filesystem (chroot)
+    // Isolated network (own network namespace)
+    // CPU/memory limits enforced by cgroups
+    let result = eval(code)
+    return result
+}("user_code_here")
+
+// Configure container limits
+let config = ContainerConfig{
+    cpu_limit: 50,        // 50% of one core
+    memory_limit: 128_MB,
+    network: false,       // No network access
+    readonly_fs: true
+}
+
+let handle = container func() {
+    // Sandboxed execution
+}(config)
+```
+
+**Isolation provided:**
+- Filesystem (chroot/pivot_root)
+- Network (separate network namespace)
+- PIDs (appears as PID 1 inside container)
+- Resource limits (cgroups)
+
+---
+
+### 5. `gpu` - GPU Execution (Massive Parallelism)
+
+**What:** Executes Arc code on GPU via JIT compilation to PTX assembly. Runs thousands of threads in parallel.
+
+**When to use:**
+- Data-parallel operations (same operation on many elements)
+- Matrix operations, transformers, ML kernels
+- Scientific simulations (N-body, fluid dynamics)
+- Image/video processing
+- Financial modeling (Monte Carlo)
+
+**Cost:** Microseconds to milliseconds (JIT + kernel launch)
+
+**Syntax:**
+```arc
+// Allocate GPU memory
+let data = gpu.unified_malloc<float32>(1024)
+
+// Initialize on CPU
+for i in 0..1024 {
+    data[i] = cast<float32>(i)
+}
+
+// GPU kernel - inline Arc code
+gpu func(arr: *float32, n: usize) {
+    let idx = gpu.thread_id()
+    if idx < n {
+        arr[idx] = arr[idx] * 2.0  // Runs in parallel on GPU
+    }
+}(data, 1024)
+
+// Result automatically synced (unified memory)
+let result = data[0]  // Read on CPU
+```
+
+**Advanced usage:**
+```arc
+// Named kernel function
+func vec_add(a: *float32, b: *float32, out: *float32, n: usize) {
+    let idx = gpu.thread_id()
+    if idx < n {
+        out[idx] = a[idx] + b[idx]
+    }
+}
+
+// Execute on GPU
+let handle = gpu vec_add(a, b, result, 1024)
+handle.await  // Wait for GPU to finish
+
+// Manual memory management (for performance)
+let gpu_buf = gpu.malloc<float32>(1024)
+gpu.copy_to_device(gpu_buf, cpu_data, 1024)
+gpu kernel(gpu_buf, 1024)
+gpu.copy_to_host(cpu_data, gpu_buf, 1024)
+gpu.free(gpu_buf)
+```
+
+**Restrictions:**
+- No malloc/free inside kernels
+- No system calls
+- Limited recursion
+- Must use GPU-compatible Arc subset
+
+**Compilation:**
+```
+Arc GPU code → Arc IR → PTX assembly → NVIDIA driver JIT → GPU execution
+```
+
+---
+
+## Quick Comparison
+
+| Model | Isolation | Concurrency | Use Case | Overhead |
+|-------|-----------|-------------|----------|----------|
+| `spawn` | Shared memory | Cooperative | I/O-bound | ~200ns |
+| `thread` | Shared memory | Preemptive | CPU-bound, blocking calls | ~5µs |
+| `process` | Separate memory | Full | Fault tolerance | ~1-10ms |
+| `container` | Sandboxed + limits | Full | Security, multi-tenant | ~10-50ms |
+| `gpu` | Separate device | Massive parallel | Data-parallel compute | ~100µs-1ms |
+
+---
+
+## Examples
+
+### Web Server (spawn)
+```arc
+async func handle_request(req: Request) Response {
+    let data = await db.query("SELECT * FROM users")
+    return Response{body: data}
+}
+
+func main() {
+    let server = http.listen(":8080")
+    for req in server.accept() {
+        spawn handle_request(req)  // 10k+ concurrent requests
+    }
+}
+```
+
+### Database Driver (thread)
+```arc
+func query_blocking_db(sql: string) Result {
+    let conn = libc.connect_db()  // Blocking C call
+    let result = libc.execute(conn, sql)  // Blocks
+    return result
+}
+
+let handle = thread query_blocking_db("SELECT * FROM large_table")
+let result = handle.join()
+```
+
+### Plugin System (process)
+```arc
+func load_plugin(path: string) {
+    let handle = process func(p: string) {
+        let plugin = load_library(p)
+        plugin.run()
+    }(path)
+    
+    // If plugin crashes, main process continues
+    if handle.wait() != 0 {
+        io.printf("Plugin crashed\n")
+    }
+}
+```
+
+### Multi-Tenant Execution (container)
+```arc
+func run_user_code(code: string, user_id: int32) {
+    let config = ContainerConfig{
+        cpu_limit: 10,           // 10% CPU
+        memory_limit: 64_MB,
+        timeout: 5_000,          // 5 seconds
+        network: false
+    }
+    
+    let handle = container func(c: string) {
+        eval_and_run(c)
+    }(code).with_config(config)
+    
+    let result = handle.wait_timeout(5_000)
+}
+```
+
+### AI/ML Computation (gpu)
+```arc
+// Matrix multiplication on GPU
+func matmul_gpu(A: *float32, B: *float32, C: *float32, N: usize) {
+    gpu func(a: *float32, b: *float32, c: *float32, n: usize) {
+        let idx = gpu.thread_id()
+        let row = idx / n
+        let col = idx % n
+        
+        if row < n && col < n {
+            let mut sum: float32 = 0.0
+            for k in 0..n {
+                sum += a[row * n + k] * b[k * n + col]
+            }
+            c[row * n + col] = sum
+        }
+    }(A, B, C, N)
+}
+```
+
+---
+
+## Philosophy
+
+Arc's execution model gives you the right tool for every job:
+- **spawn**: Lightweight, everywhere
+- **thread**: When you need real parallelism
+- **process**: When you need isolation
+- **container**: When you need security
+- **gpu**: When you need massive throughput
+
+All with the same language, same syntax, same binary. No external dependencies, no frameworks, no runtime bloat.

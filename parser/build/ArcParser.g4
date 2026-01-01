@@ -1,3 +1,4 @@
+// ArcParser.g4
 parser grammar ArcParser;
 
 options {
@@ -30,7 +31,7 @@ importSpec
 // =============================================================================
 
 namespaceDecl
-    : NAMESPACE (IDENTIFIER | SYSCALL)
+    : NAMESPACE IDENTIFIER
     ;
 
 // =============================================================================
@@ -84,11 +85,17 @@ genericParamList
     ;
 
 genericArgs
-    : LT typeList GT
+    : LT genericArgList GT
     ;
 
-typeList
-    : type (COMMA type)*
+genericArgList
+    : genericArg (COMMA genericArg)*
+    ;
+
+// Generic arguments can be types OR constant expressions (for array<T, N>)
+genericArg
+    : type
+    | expression
     ;
 
 // =============================================================================
@@ -102,6 +109,10 @@ functionDecl
 returnType
     : type
     | LPAREN typeList RPAREN
+    ;
+
+typeList
+    : type (COMMA type)*
     ;
 
 parameterList
@@ -206,14 +217,13 @@ type
     : primitiveType
     | pointerType
     | referenceType
-    | arrayType
     | qualifiedType
-    | IDENTIFIER genericArgs?
+    | IDENTIFIER genericArgs?  // Handles: array<T,N>, vector<T>, map<K,V>, custom types
     | UNDERSCORE
     ;
 
 qualifiedType
-    : (IDENTIFIER | SYSCALL) (DOT IDENTIFIER)+ genericArgs?
+    : IDENTIFIER (DOT IDENTIFIER)+ genericArgs?
     ;
 
 primitiveType
@@ -232,16 +242,6 @@ pointerType
 
 referenceType
     : AMP type
-    ;
-
-arrayType
-    : ARRAY LT type COMMA arraySize GT
-    ;
-
-arraySize
-    : INTEGER_LITERAL
-    | IDENTIFIER
-    | UNDERSCORE
     ;
 
 // =============================================================================
@@ -418,7 +418,7 @@ relationalExpression
     ;
 
 shiftExpression
-    : rangeExpression ((LT LT | GT GT) rangeExpression)* // Decomposed << and >>
+    : rangeExpression ((LT LT | GT GT) rangeExpression)*  // Decomposed << and >>
     ;
 
 rangeExpression
@@ -460,19 +460,31 @@ postfixOp
 primaryExpression
     : literal
     | structLiteral
-    | castExpression
-    | allocaExpression
-    | syscallExpression
-    | intrinsicExpression
+    | sizeofExpression
+    | alignofExpression
     | lambdaExpression
     | tupleExpression
     | LPAREN expression RPAREN
-    | qualifiedIdentifier genericArgs?
+    | qualifiedIdentifier genericArgs? (LPAREN argumentList? RPAREN)?
+    | IDENTIFIER genericArgs? (LPAREN argumentList? RPAREN)?
     | IDENTIFIER genericArgs?
+    | qualifiedIdentifier genericArgs?
     ;
 
 qualifiedIdentifier
-    : (IDENTIFIER | SYSCALL) (DOT IDENTIFIER)+
+    : IDENTIFIER (DOT IDENTIFIER)+
+    ;
+
+// =============================================================================
+// Sizeof/Alignof - Only operators with unique syntax
+// =============================================================================
+
+sizeofExpression
+    : SIZEOF LT type GT
+    ;
+
+alignofExpression
+    : ALIGNOF LT type GT
     ;
 
 // =============================================================================
@@ -550,49 +562,4 @@ lambdaParam
 
 tupleExpression
     : LPAREN expression COMMA expression (COMMA expression)* RPAREN
-    ;
-
-// =============================================================================
-// Cast Expression
-// =============================================================================
-
-castExpression
-    : CAST LT type GT LPAREN expression RPAREN
-    ;
-
-// =============================================================================
-// Alloca Expression
-// =============================================================================
-
-allocaExpression
-    : ALLOCA LPAREN type (COMMA expression)? RPAREN
-    ;
-
-// =============================================================================
-// Syscall Expression
-// =============================================================================
-
-syscallExpression
-    : SYSCALL LPAREN expression (COMMA expression)* RPAREN
-    ;
-
-// =============================================================================
-// Intrinsic Expressions
-// =============================================================================
-
-intrinsicExpression
-    : SIZEOF LT type GT
-    | ALIGNOF LT type GT
-    | MEMSET LPAREN expression COMMA expression COMMA expression RPAREN
-    | MEMCPY LPAREN expression COMMA expression COMMA expression RPAREN
-    | MEMMOVE LPAREN expression COMMA expression COMMA expression RPAREN
-    | STRLEN LPAREN expression RPAREN
-    | MEMCHR LPAREN expression COMMA expression COMMA expression RPAREN
-    | VA_START LPAREN IDENTIFIER RPAREN
-    | VA_ARG LT type GT LPAREN expression RPAREN
-    | VA_END LPAREN expression RPAREN
-    | RAISE LPAREN expression RPAREN
-    | MEMCMP LPAREN expression COMMA expression COMMA expression RPAREN
-    | BIT_CAST LT type GT LPAREN expression RPAREN
-    | SLICE LPAREN expression COMMA expression RPAREN
     ;
