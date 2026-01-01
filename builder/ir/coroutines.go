@@ -1,30 +1,31 @@
-// Package ir - coroutine instruction definitions
+// --- START OF FILE builder/ir/coroutines.go ---
 package ir
 
 import (
     "fmt"
+    "github.com/arc-language/arc-lang/builder/types"
 )
 
-// CoroIdInst represents llvm.coro.id intrinsic
+// CoroIdInst represents coro.id intrinsic
 type CoroIdInst struct {
     BaseInstruction
 }
 
 func (i *CoroIdInst) String() string {
-    return fmt.Sprintf("%%%s = call token @llvm.coro.id(i32 0, ptr null, ptr null, ptr null)", i.ValName)
+    return fmt.Sprintf("%%%s = call token coro.id(i32 0, ptr null, ptr null, ptr null)", i.ValName)
 }
 
-// CoroBeginInst represents llvm.coro.begin intrinsic
+// CoroBeginInst represents coro.begin intrinsic
 type CoroBeginInst struct {
     BaseInstruction
 }
 
 func (i *CoroBeginInst) String() string {
     id := i.Ops[0]
-    return fmt.Sprintf("%%%s = call ptr @llvm.coro.begin(token %s, ptr null)", i.ValName, formatOp(id))
+    return fmt.Sprintf("%%%s = call ptr coro.begin(token %s, ptr null)", i.ValName, formatOp(id))
 }
 
-// CoroSuspendInst represents llvm.coro.suspend intrinsic (await point)
+// CoroSuspendInst represents coro.suspend intrinsic (await point)
 type CoroSuspendInst struct {
     BaseInstruction
     Final bool // true for final suspend
@@ -35,20 +36,20 @@ func (i *CoroSuspendInst) String() string {
     if i.Final {
         finalFlag = "true"
     }
-    return fmt.Sprintf("%%%s = call i8 @llvm.coro.suspend(token none, i1 %s)", i.ValName, finalFlag)
+    return fmt.Sprintf("%%%s = call i8 coro.suspend(token none, i1 %s)", i.ValName, finalFlag)
 }
 
-// CoroEndInst represents llvm.coro.end intrinsic
+// CoroEndInst represents coro.end intrinsic
 type CoroEndInst struct {
     BaseInstruction
 }
 
 func (i *CoroEndInst) String() string {
     handle := i.Ops[0]
-    return fmt.Sprintf("call i1 @llvm.coro.end(ptr %s, i1 false)", formatOp(handle))
+    return fmt.Sprintf("call i1 coro.end(ptr %s, i1 false)", formatOp(handle))
 }
 
-// CoroFreeInst represents llvm.coro.free intrinsic
+// CoroFreeInst represents coro.free intrinsic
 type CoroFreeInst struct {
     BaseInstruction
 }
@@ -56,5 +57,50 @@ type CoroFreeInst struct {
 func (i *CoroFreeInst) String() string {
     id := i.Ops[0]
     handle := i.Ops[1]
-    return fmt.Sprintf("%%%s = call ptr @llvm.coro.free(token %s, ptr %s)", i.ValName, formatOp(id), formatOp(handle))
+    return fmt.Sprintf("%%%s = call ptr coro.free(token %s, ptr %s)", i.ValName, formatOp(id), formatOp(handle))
+}
+
+// --- New Instructions ---
+
+// CoroResumeInst represents coro.resume intrinsic
+type CoroResumeInst struct {
+    BaseInstruction
+}
+
+func (i *CoroResumeInst) String() string {
+    handle := i.Ops[0]
+    return fmt.Sprintf("call void coro.resume(ptr %s)", formatOp(handle))
+}
+
+// CoroDestroyInst represents coro.destroy intrinsic
+type CoroDestroyInst struct {
+    BaseInstruction
+}
+
+func (i *CoroDestroyInst) String() string {
+    handle := i.Ops[0]
+    return fmt.Sprintf("call void coro.destroy(ptr %s)", formatOp(handle))
+}
+
+// CoroPromiseInst represents coro.promise intrinsic (get promise from handle)
+type CoroPromiseInst struct {
+    BaseInstruction
+}
+
+func (i *CoroPromiseInst) String() string {
+    handle := i.Ops[0]
+    align := i.Ops[1]
+    fromStart := i.Ops[2]
+    return fmt.Sprintf("%%%s = call ptr coro.promise(ptr %s, i32 %s, i1 %s)", 
+        i.ValName, formatOp(handle), formatOp(align), formatOp(fromStart))
+}
+
+// CoroDoneInst represents coro.done intrinsic
+type CoroDoneInst struct {
+    BaseInstruction
+}
+
+func (i *CoroDoneInst) String() string {
+    handle := i.Ops[0]
+    return fmt.Sprintf("%%%s = call i1 coro.done(ptr %s)", i.ValName, formatOp(handle))
 }

@@ -1101,3 +1101,60 @@ func (b *Builder) CreateCoroFree(id ir.Value, handle ir.Value, name string) *ir.
     b.insert(inst)
     return inst
 }
+
+// --- Append to builder/builder.go ---
+
+// CreateCoroResume creates a resume instruction
+func (b *Builder) CreateCoroResume(handle ir.Value) *ir.CoroResumeInst {
+    inst := &ir.CoroResumeInst{}
+    inst.Op = ir.OpCoroResume
+    inst.SetType(types.Void)
+    inst.SetOperand(0, handle)
+    b.insert(inst)
+    return inst
+}
+
+// CreateCoroDestroy creates a destroy instruction
+func (b *Builder) CreateCoroDestroy(handle ir.Value) *ir.CoroDestroyInst {
+    inst := &ir.CoroDestroyInst{}
+    inst.Op = ir.OpCoroDestroy
+    inst.SetType(types.Void)
+    inst.SetOperand(0, handle)
+    b.insert(inst)
+    return inst
+}
+
+// CreateCoroPromise gets the promise address from a handle
+func (b *Builder) CreateCoroPromise(handle ir.Value, align int, fromStart bool, name string) *ir.CoroPromiseInst {
+    if name == "" {
+        name = b.generateName()
+    }
+    inst := &ir.CoroPromiseInst{}
+    inst.Op = ir.OpCoroPromise
+    inst.SetName(name)
+    inst.SetType(types.NewPointer(types.I8)) // Returns raw pointer to promise
+    
+    inst.SetOperand(0, handle)
+    inst.SetOperand(1, b.ConstInt(types.I32, int64(align)))
+    
+    valStart := int64(0)
+    if fromStart { valStart = 1 }
+    inst.SetOperand(2, b.ConstInt(types.I1, valStart))
+    
+    b.insert(inst)
+    return inst
+}
+
+// CreateCoroDone checks if the coroutine is finished
+func (b *Builder) CreateCoroDone(handle ir.Value, name string) *ir.CoroDoneInst {
+    if name == "" {
+        name = b.generateName()
+    }
+    inst := &ir.CoroDoneInst{}
+    inst.Op = ir.OpCoroDone
+    inst.SetName(name)
+    inst.SetType(types.I1)
+    inst.SetOperand(0, handle)
+    b.insert(inst)
+    return inst
+}
