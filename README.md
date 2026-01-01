@@ -152,7 +152,7 @@ Arc AI Language follows these core principles:
 1. **Explicit is better than implicit** - No hidden allocations, conversions, or side effects
 2. **Zero-cost abstractions** - High-level AI features compile to optimal machine code
 3. **Control when you need it** - Drop down to CUDA kernels or assembly without friction
-4. **Python ergonomics, C performance** - Clean syntax that doesn't sacrifice speed
+4. **Modern ergonomics, C performance** - Clean syntax that doesn't sacrifice speed
 5. **AI-native primitives** - Tensors, models, and GPU operations as first-class citizens
 6. **Interoperable by design** - Play nice with existing ML frameworks and C/C++ codebases
 
