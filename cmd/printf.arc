@@ -4,15 +4,19 @@ extern libc {
     func printf(*byte, ...) int32
 }
 
-struct Rectangle {
-    width: int32
-    height: int32
+struct Counter {
+    value: int32
+}
+
+func get(self c: Counter) int32 {
+    return c.value
 }
 
 func main() int32 {
 
-    let rect = Rectangle{width: 100, height: 50}
-    libc.printf("width=%d\n", rect.width)
+    let counter = Counter{value: 77}
+    let val = counter.get()
+    libc.printf("value=%d\n", val)
 
     return 0
 }

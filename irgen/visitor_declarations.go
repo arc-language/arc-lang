@@ -174,6 +174,10 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
+	// Also check if 'self' param exists to treat as method (for name mangling if implemented)
+	// But IRGen uses name from Symbol, or just constructs it.
+	// For now, respect scoping.
+
 	if isMethod {
 		irName = parentName + "_" + name
 	} else if g.currentNamespace != "" && name != "main" {
@@ -187,18 +191,21 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	
 	if ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
+			// Even if SELF is present, we use the identifier
+			pName := param.IDENTIFIER().GetText()
+			paramNames = append(paramNames, pName)
+			
+			// Resolve type
 			if param.SELF() != nil {
-				// Self handling: assume semantic pass resolved this to a pointer type
-				if param.Type_() != nil {
-					paramTypes = append(paramTypes, g.resolveType(param.Type_()))
-				} else {
-					paramTypes = append(paramTypes, types.NewPointer(types.I8)) // Fallback
-				}
-				paramNames = append(paramNames, "self")
-				continue
+				// Self handling: use resolved type from symbol or helper
+				// Assuming resolveType works for explicit type, 
+				// or if implicit need to lookup struct.
+				// But parser rule says: SELF? IDENTIFIER COLON type
+				// So type is always explicit in current grammar.
+				paramTypes = append(paramTypes, g.resolveType(param.Type_()))
+			} else {
+				paramTypes = append(paramTypes, g.resolveType(param.Type_()))
 			}
-			paramTypes = append(paramTypes, g.resolveType(param.Type_()))
-			paramNames = append(paramNames, param.IDENTIFIER().GetText())
 		}
 	}
 
@@ -207,7 +214,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		if ctx.ReturnType().Type_() != nil {
 			retType = g.resolveType(ctx.ReturnType().Type_())
 		} else if ctx.ReturnType().TypeList() != nil {
-			// Tuple Return: represented as anonymous struct
+			// Tuple Return
 			var fields []types.Type
 			for _, t := range ctx.ReturnType().TypeList().AllType_() {
 				fields = append(fields, g.resolveType(t))
@@ -258,11 +265,10 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 }
 
 func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
-	// 1. Tuple Destructuring: let (a, b) = call()
+	// 1. Tuple Destructuring
 	if ctx.TuplePattern() != nil {
 		if ctx.Expression() == nil { return nil }
 		
-		// Evaluate RHS (returns struct/tuple value)
 		val := g.Visit(ctx.Expression()).(ir.Value)
 		names := ctx.TuplePattern().AllIDENTIFIER()
 		
@@ -271,10 +277,8 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 			sym, ok := g.currentScope.Resolve(name)
 			if !ok { continue }
 			
-			// Extract field from tuple
 			fieldVal := g.ctx.Builder.CreateExtractValue(val, []int{i}, "")
 			
-			// Create local variable
 			alloca := g.ctx.Builder.CreateAlloca(sym.Type, name+".addr")
 			g.ctx.Builder.CreateStore(fieldVal, alloca)
 			sym.IRValue = alloca
@@ -282,7 +286,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		return nil
 	}
 
-	// 2. Standard Declaration: let x = ...
+	// 2. Standard Declaration
 	name := ctx.IDENTIFIER().GetText()
 	sym, ok := g.currentScope.Resolve(name)
 	if !ok {
@@ -314,14 +318,12 @@ func (g *Generator) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 
 	val := g.Visit(ctx.Expression()).(ir.Value)
 	
-	// Global Constants
 	if g.currentScope.Parent == nil {
 		if constant, ok := val.(ir.Constant); ok {
 			global := g.ctx.Builder.CreateGlobalConstant(name, constant)
 			sym.IRValue = global
 		}
 	} else {
-		// Local constants behave like values
 		sym.IRValue = val
 	}
 	
