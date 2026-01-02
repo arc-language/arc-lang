@@ -28,8 +28,19 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.store(RAX, inst)
 
 	case ir.OpSDiv:
-		c.load(RAX, inst.Operands()[0])
-		c.load(RCX, inst.Operands()[1])
+		op0 := inst.Operands()[0]
+		op1 := inst.Operands()[1]
+		c.load(RAX, op0)
+		// Sign extend if 32-bit to ensure negative values are handled correctly in 64-bit div
+		if op0.Type().BitSize() == 32 {
+			c.asm.Movsxd(RAX, RAX)
+		}
+		
+		c.load(RCX, op1)
+		if op1.Type().BitSize() == 32 {
+			c.asm.Movsxd(RCX, RCX)
+		}
+
 		c.asm.Cqo()
 		c.asm.Div(RCX, true)
 		c.store(RAX, inst)
@@ -42,8 +53,18 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.store(RAX, inst)
 
 	case ir.OpSRem:
-		c.load(RAX, inst.Operands()[0])
-		c.load(RCX, inst.Operands()[1])
+		op0 := inst.Operands()[0]
+		op1 := inst.Operands()[1]
+		c.load(RAX, op0)
+		if op0.Type().BitSize() == 32 {
+			c.asm.Movsxd(RAX, RAX)
+		}
+
+		c.load(RCX, op1)
+		if op1.Type().BitSize() == 32 {
+			c.asm.Movsxd(RCX, RCX)
+		}
+
 		c.asm.Cqo()
 		c.asm.Div(RCX, true)
 		c.store(RDX, inst) // Remainder in RDX
@@ -87,7 +108,13 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.store(RAX, inst)
 
 	case ir.OpAShr:
-		c.load(RAX, inst.Operands()[0])
+		op0 := inst.Operands()[0]
+		c.load(RAX, op0)
+		// Arithmetic shift requires proper sign extension of the value
+		if op0.Type().BitSize() == 32 {
+			c.asm.Movsxd(RAX, RAX)
+		}
+		
 		c.load(RCX, inst.Operands()[1])
 		c.asm.Sar(RAX, RCX)
 		c.store(RAX, inst)
@@ -117,35 +144,18 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 
 	// --- Memory ---
 	case ir.OpAlloca:
-		// Address is already in stackMap from compileFunction.
-		// We calculate the address of the data slot and store it into the pointer slot
-		// if the instruction expects a result value (the pointer).
-		// Note: compileFunction sets stackMap[inst] to the DATA offset. 
-		// But in typical IR, %1 = alloca returns a pointer. 
-		// Here we simply LEA that address into RAX.
 		offset := c.stackMap[inst.(*ir.AllocaInst)]
 		c.asm.Lea(RAX, NewMem(RBP, offset))
-		// We don't store it back to memory because AllocaInst doesn't have a separate pointer slot
-		// in our simplified allocator; we mostly use it directly or via load().
-		// However, if other instructions refer to it as a Value, they expect to load the POINTER.
-		// If we treated stackMap[inst] as the data, 'load' would try to load data from it.
-		// This is a subtle mismatch. For now, assume callers use LEA logic via c.load() special case.
 
 	case ir.OpLoad:
 		c.load(RCX, inst.Operands()[0]) // Load Pointer Address into RCX
 		
-		// Now load value FROM [RCX]
 		size := SizeOf(inst.Type())
 		if size == 1 {
 			c.asm.MovZX(RAX, NewMem(RCX, 0), 8)
 		} else if size == 4 {
 			c.asm.Mov(RegOp(RAX), NewMem(RCX, 0), 32)
 		} else {
-			// For aggregates > 8 bytes, this is tricky in registers.
-			// But our allocator spills everything.
-			// If it's a large struct, we probably shouldn't be loading it into RAX.
-			// We should be doing a memcpy to the dest slot.
-			// Simplified: assume <= 8 bytes or pointer.
 			c.asm.Mov(RegOp(RAX), NewMem(RCX, 0), 64)
 		}
 		c.store(RAX, inst)
@@ -168,17 +178,12 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		base := gep.Operands()[0]
 		c.load(RAX, base) // RAX = Base Pointer
 
-		// GEP semantics:
-		// First index is ALWAYS pointer arithmetic on SourceElementType.
-		// Subsequent indices drill down into the type.
-		
 		indices := gep.Operands()[1:]
 		if len(indices) == 0 {
 			c.store(RAX, inst)
 			return nil
 		}
 
-		// 1. Handle First Index (Pointer Arithmetic)
 		firstIdx := indices[0]
 		baseType := gep.SourceElementType
 		baseSize := SizeOf(baseType)
@@ -194,7 +199,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			c.asm.Add(RegOp(RAX), RegOp(RCX))
 		}
 
-		// 2. Handle Subsequent Indices (Structural Drill-down)
 		currentType := baseType
 		for _, idxVal := range indices[1:] {
 			if st, ok := currentType.(*types.StructType); ok {
@@ -229,23 +233,13 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	// --- Aggregates (Structs/Arrays) ---
 	
 	case ir.OpInsertValue:
-		// %res = insertvalue %agg, %val, idx
-		// 1. Copy aggregate from source operand to dest slot
 		iv := inst.(*ir.InsertValueInst)
 		agg := iv.Operands()[0]
 		val := iv.Operands()[1]
 		
-		// We need to copy the *data* of agg to inst's slot.
-		// Since we don't have a memcpy helper exposed here easily, we rely on stack-to-stack moves.
-		// Warning: This implementation assumes small structs fitting in registers for now, 
-		// or relies on the fact that `c.store` only stores 8 bytes.
-		// TODO: Implement proper memcpy for large aggregates.
-		
-		// For now, load/store the base (likely pointer or small struct)
 		c.load(RAX, agg)
 		c.store(RAX, inst)
 		
-		// 2. Calculate offset of the field
 		currentType := agg.Type()
 		offset := 0
 		for _, idx := range iv.Indices {
@@ -258,21 +252,16 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			}
 		}
 		
-		// 3. Store new value at dest + offset
-		// Dest address = RBP + instOffset
 		destOff := c.stackMap[inst]
 		targetAddr := destOff + offset
 		
 		c.load(RAX, val)
-		// mov [rbp + targetAddr], rax
 		c.asm.Mov(NewMem(RBP, targetAddr), RegOp(RAX), SizeOf(val.Type())*8)
 
 	case ir.OpExtractValue:
-		// %res = extractvalue %agg, idx
 		ev := inst.(*ir.ExtractValueInst)
 		agg := ev.Operands()[0]
 		
-		// 1. Calculate offset
 		currentType := agg.Type()
 		offset := 0
 		for _, idx := range ev.Indices {
@@ -285,15 +274,9 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			}
 		}
 		
-		// 2. Load from AggBase + Offset
-		// Agg is likely in memory.
-		aggBase := c.stackMap[agg] // This might be the pointer if it's alloca, or data if argument
-		
-		// If agg is Alloca, stackMap points to data.
-		// We load from [RBP + aggBase + offset]
+		aggBase := c.stackMap[agg]
 		finalOffset := aggBase + offset
 		
-		// Determine size
 		size := SizeOf(inst.Type())
 		if size == 1 {
 			c.asm.MovZX(RAX, NewMem(RBP, finalOffset), 8)
@@ -319,57 +302,34 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.store(RAX, inst)
 
 	case ir.OpRaise:
-		// raise %val
-		// 1. Load exception payload
 		c.load(RCX, inst.Operands()[0])
-		
-		// 2. Find __exception_state global
 		c.asm.LeaRel(RAX, "__exception_state")
-		
-		// 3. Set hasException = 1 (byte at offset 0)
 		c.asm.Mov(NewMem(RAX, 0), ImmOp(1), 8)
-		
-		// 4. Store payload (pointer at offset 8, due to alignment)
 		c.asm.Mov(NewMem(RAX, 8), RegOp(RCX), 64)
-		
-		// 5. Do NOT exit. The try/catch block checks this flag.
-		// In a real runtime, we might unwind here, but for this simple model, we fall through.
 
 	case ir.OpSyscall:
-		// operands: [syscall_id, arg0, arg1, ...]
 		ops := inst.Operands()
 		idVal := ops[0]
 		args := ops[1:]
-		
-		// Syscall calling convention: RAX=id, RDI, RSI, RDX, R10, R8, R9
 		regs := []Register{RDI, RSI, RDX, R10, R8, R9}
-		
-		// Load ID to RAX
 		c.load(RAX, idVal)
-		
-		// Load Args
 		for i, arg := range args {
 			if i < len(regs) {
 				c.load(regs[i], arg)
 			}
 		}
-		
 		c.asm.Syscall()
 		c.store(RAX, inst)
 
 	case ir.OpSelect:
-		// %res = select %cond, %true, %false
 		ops := inst.Operands()
 		c.load(RAX, ops[0]) // Cond
 		c.load(RCX, ops[1]) // True
 		c.load(RDX, ops[2]) // False
-		
 		c.asm.Test(RAX, RAX)
-		// CMOVZ RCX, RDX (If Zero/False, move FalseVal to Result)
-		// Note: CMOVZ is 0F 44
+		// CMOVZ RCX, RDX
 		c.asm.emitByte(0x0F); c.asm.emitByte(0x44)
-		c.asm.encodeModRM(RCX, RegOp(RDX)) // dst=RCX, src=RDX
-		
+		c.asm.encodeModRM(RCX, RegOp(RDX))
 		c.store(RCX, inst)
 
 	// --- Control Flow ---
@@ -417,11 +377,29 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.jumpsToFix = append(c.jumpsToFix, jumpFixup{asmOffset: offTrue, target: cbr.TrueBlock})
 
 	case ir.OpICmp:
-		c.load(RAX, inst.Operands()[0])
-		c.load(RCX, inst.Operands()[1])
-		c.asm.Cmp(RegOp(RAX), RegOp(RCX))
+		op0 := inst.Operands()[0]
+		op1 := inst.Operands()[1]
+		c.load(RAX, op0)
+		c.load(RCX, op1)
 		
 		icmp := inst.(*ir.ICmpInst)
+		
+		// Sign extend for signed comparisons on 32-bit values
+		isSigned := false
+		switch icmp.Predicate {
+		case ir.ICmpSLT, ir.ICmpSLE, ir.ICmpSGT, ir.ICmpSGE:
+			isSigned = true
+		}
+		
+		if isSigned && op0.Type().BitSize() == 32 {
+			c.asm.Movsxd(RAX, RAX)
+		}
+		if isSigned && op1.Type().BitSize() == 32 {
+			c.asm.Movsxd(RCX, RCX)
+		}
+
+		c.asm.Cmp(RegOp(RAX), RegOp(RCX))
+		
 		var cc CondCode
 		switch icmp.Predicate {
 		case ir.ICmpEQ: cc = CondEq
