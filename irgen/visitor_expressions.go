@@ -318,23 +318,13 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 
 			if basePtr != nil {
 				ptrType := basePtr.Type().(*types.PointerType)
-				
 				var elemPtr ir.Value
 				
-				// Case A: Pointer to Array
 				if _, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
 					zero := g.ctx.Builder.ConstInt(types.I32, 0)
 					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{zero, idx}, "")
 				} else {
-					// Case B: Pointer to Pointer (or Pointer to Value)
-					actualBase := basePtr
-					if ptrToPtr, ok := ptrType.ElementType.(*types.PointerType); ok {
-						_ = ptrToPtr
-						actualBase = g.ctx.Builder.CreateLoad(ptrType.ElementType, basePtr, "")
-						ptrType = ptrType.ElementType.(*types.PointerType)
-					}
-					
-					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, actualBase, []ir.Value{idx}, "")
+					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{idx}, "")
 				}
 				
 				currPtr = elemPtr
@@ -376,13 +366,12 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		return g.Visit(ctx.Expression())
 	}
 
-	// 1. Resolve Name
 	var name string
 	var isQualified bool
-	var qCtx *parser.QualifiedIdentifierContext // Declared here
+	var qCtx *parser.QualifiedIdentifierContext
 
 	if ctx.QualifiedIdentifier() != nil {
-		qCtx = ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext) // Type assertion here
+		qCtx = ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
 		for i, id := range qCtx.AllIDENTIFIER() {
 			if i > 0 { name += "." }
 			name += id.GetText()
@@ -437,8 +426,8 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			}
 		}
 
-		// 2. Resolve Symbol
 		var entity ir.Value
+		var argsToPass []ir.Value = args
 		
 		// Attempt Full Name Resolution
 		if sym, ok := g.currentScope.Resolve(name); ok {
@@ -455,7 +444,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			if !isCall { return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "") }
 			entity = g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
 		} else if isQualified {
-			// Handle Member Access via QualifiedIdentifier: `rect.width`
+			// Handle Member Access via QualifiedIdentifier: `rect.width` or `counter.get`
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
 			
@@ -478,17 +467,44 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					if !isPtr { valid = false; break }
 					
 					if st, ok := ptrType.ElementType.(*types.StructType); ok {
+						// Field Check
 						if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
 							currPtr = g.ctx.Builder.CreateStructGEP(st, currPtr, idx, "")
-						} else {
-							valid = false; break
+							continue
 						}
+						
+						// Method Check
+						// Only valid if this is the last element
+						if i == len(ids) - 1 {
+							methodName := st.Name + "_" + fieldName
+							if methodSym, ok := g.currentScope.Resolve(methodName); ok {
+								entity = methodSym.IRValue
+								// If it's a method, we must pass 'self' (the current struct/pointer) as first argument
+								// Check if 'currPtr' needs to be loaded if 'self' is passed by value
+								
+								// For now, assume 'self' is passed by value (since struct args are byval in our simple ABI)
+								// Load the struct value from currPtr
+								selfVal := g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
+								
+								// Prepend to args
+								newArgs := []ir.Value{selfVal}
+								newArgs = append(newArgs, args...)
+								argsToPass = newArgs
+								
+								// We found the method, stop iteration
+								valid = true // marked valid so we don't zero it out
+								break
+							}
+						}
+						
+						valid = false; break
 					} else {
 						valid = false; break
 					}
 				}
 				
-				if valid {
+				if valid && entity == nil {
+					// It was a field access (entity not set by method logic)
 					ptrType := currPtr.Type().(*types.PointerType)
 					entity = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 				}
@@ -506,14 +522,15 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 
 		if isCall {
 			if fn, ok := entity.(*ir.Function); ok {
-				if len(args) == len(fn.FuncType.ParamTypes) || (fn.FuncType.Variadic && len(args) >= len(fn.FuncType.ParamTypes)) {
+				// Use argsToPass (which might include self)
+				if len(argsToPass) == len(fn.FuncType.ParamTypes) || (fn.FuncType.Variadic && len(argsToPass) >= len(fn.FuncType.ParamTypes)) {
 					for i, paramType := range fn.FuncType.ParamTypes {
-						if i < len(args) {
-							args[i] = g.emitCast(args[i], paramType)
+						if i < len(argsToPass) {
+							argsToPass[i] = g.emitCast(argsToPass[i], paramType)
 						}
 					}
 				}
-				return g.ctx.Builder.CreateCall(fn, args, "")
+				return g.ctx.Builder.CreateCall(fn, argsToPass, "")
 			} else {
 				panic(fmt.Sprintf("Indirect calls not fully implemented. Target: %s", name))
 			}
