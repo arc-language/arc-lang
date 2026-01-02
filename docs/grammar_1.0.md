@@ -183,6 +183,22 @@ func print(msg: string) {
 }
 ```
 
+## Functions, async gpu
+```arc
+async func process_gpu_memory<gpu>(gpu_arr: *float32, n: usize, gpu_result: *float32) {
+    let idx = gpu.thread_id()
+}
+```
+
+## Functions, async gpu await usage
+```arc
+// Await with gpu device index 1
+let result = await(1) process_gpu_memory()
+
+// Await with auto gpu
+let result = await process_gpu_memory()
+```
+
 ## Functions, async
 ```arc
 // Async function that returns a value
@@ -881,4 +897,56 @@ func find<T>(arr: *T, len: usize, val: T) isize {
     }
     return -1
 }
+```
+
+## Execution Context, thread
+```arc
+// With args and return
+let handle = thread func(x: int) { 
+    work(x) 
+}(1000)
+
+// Without args and return
+thread func() {  
+    work(x)
+}()
+```
+
+## Execution Context, process
+```arc
+// With args and return
+let handle = process func(x: int) { 
+    work(x) 
+}(1000)
+
+// Without args and return
+process func() {  
+    work(x)
+}()
+```
+
+## Execution Context, container
+```arc
+// With args and return
+let handle = container func(x: int) { 
+    work(x) 
+}(1000)
+
+// Without args and return
+container func() {  
+    work(x)
+}()
+```
+
+## Execution Context, async
+```arc
+// With args and return
+async func(x: int) { 
+    work(x) 
+}(1000)
+
+// Without args and return
+async func() {  
+    work(x)
+}()
 ```
