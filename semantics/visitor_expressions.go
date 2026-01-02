@@ -202,10 +202,11 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 	var name string
 	var isQualified bool
 	var hasParens bool = (ctx.LPAREN() != nil)
+	var qCtx *parser.QualifiedIdentifierContext
 
 	if ctx.QualifiedIdentifier() != nil {
-		q := ctx.QualifiedIdentifier()
-		for i, id := range q.AllIDENTIFIER() {
+		qCtx = ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
+		for i, id := range qCtx.AllIDENTIFIER() {
 			if i > 0 { name += "." }
 			name += id.GetText()
 		}
@@ -223,11 +224,9 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 					argCtx := gArgs.GenericArg(0)
 					if argCtx.Type_() != nil {
 						targetType := a.resolveType(argCtx.Type_())
-						// If parens present, we are calling it -> returns T
 						if hasParens {
 							return targetType
 						}
-						// Otherwise returns func -> T
 						return types.NewFunction(targetType, nil, true)
 					}
 				}
@@ -252,17 +251,53 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 		// Normal Symbol Resolution
 		if s, ok := a.currentScope.Resolve(name); ok {
 			typ := s.Type
-			// If it's a function and we have parens, return return type
 			if hasParens {
 				if fn, ok := typ.(*types.FunctionType); ok {
 					return fn.ReturnType
 				}
-				// If it's not a function type but has parens, might be error or call on value
-				// But VisitPostfixExpression handles postfix calls.
-				// This PrimaryExpression call syntax is for "func(args)" directly.
 				a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Called non-function '%s'", name)
 			}
 			return typ
+		} else if isQualified {
+			// Handle Member Access Fallback: rect.width
+			// Try to resolve the first part as a symbol
+			ids := qCtx.AllIDENTIFIER()
+			baseName := ids[0].GetText()
+			
+			if s, ok := a.currentScope.Resolve(baseName); ok {
+				curr := s.Type
+				valid := true
+				
+				for i := 1; i < len(ids); i++ {
+					fieldName := ids[i].GetText()
+					
+					// Auto-deref
+					if ptr, ok := curr.(*types.PointerType); ok {
+						curr = ptr.ElementType
+					}
+					
+					if st, ok := curr.(*types.StructType); ok {
+						if indices, ok := a.structIndices[st.Name]; ok {
+							if idx, ok := indices[fieldName]; ok {
+								curr = st.Fields[idx]
+								continue
+							}
+						}
+						
+						// Method check? (Only if last element)
+						// ... simplified: field access only for now
+						valid = false
+						break
+					} else {
+						valid = false
+						break
+					}
+				}
+				
+				if valid {
+					return curr
+				}
+			}
 		}
 		
 		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Undefined identifier '%s'", name)
