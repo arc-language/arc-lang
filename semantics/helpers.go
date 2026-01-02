@@ -1,7 +1,6 @@
 package semantics
 
 import (
-	"strconv"
 
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
