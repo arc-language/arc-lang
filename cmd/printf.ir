@@ -1,7 +1,11 @@
+@.str = external constant [5 x i8] [i8 79, i8 107, i8 92, i8 110, i8 0]
+
 declare external i32 @printf(ptr<u8>, ...)
 
 define external i32 @main() {
 entry:
-  %0 = trunc i64 0 to i32
-  ret i32 %0
+  %0 = getelementptr inbounds [5 x i8], ptr<[5 x i8]> @.str, i32 0, i32 0
+  %1 = call i32 @printf(ptr<[5 x i8]> %0)
+  %2 = trunc i64 0 to i32
+  ret i32 %2
 }

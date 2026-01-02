@@ -357,9 +357,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	}
 
 	// Parenthesized Expression: ( expr )
-	// Grammar: LPAREN expression RPAREN (without args/identifier)
-	// But grammar says: LPAREN expression RPAREN is a top-level alt.
-	// Also qualified/IDENTIFIER alts have (LPAREN argumentList? RPAREN)?
 	if ctx.Expression() != nil && ctx.LPAREN() != nil && ctx.IDENTIFIER() == nil && ctx.QualifiedIdentifier() == nil {
 		return g.Visit(ctx.Expression())
 	}
@@ -415,19 +412,14 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		
 		if sym, ok := g.currentScope.Resolve(name); ok {
 			if sym.Kind == symbol.SymFunc && sym.IRValue == nil {
-				// Intrinsic placeholder or undefined forward decl
 				return nil
 			}
-			// If it's a variable and we are NOT calling it, load the value.
-			// If we ARE calling it, we might be loading a func ptr, or calling the IR Function directly.
 			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 				if !isCall {
 					return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 				}
-				// Call to variable (func ptr)
 				entity = g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 			} else {
-				// Likely *ir.Function or Global
 				entity = sym.IRValue
 			}
 		} else if fn := g.ctx.Module.GetFunction(name); fn != nil {
@@ -436,9 +428,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			if !isCall {
 				return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
 			}
-			// Global function pointer not loaded yet? 
-			// If Global is a function declaration, it's covered by GetFunction usually.
-			// If Global is a variable holding a func ptr:
 			entity = g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
 		} else {
 			// Not found
@@ -463,11 +452,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 				return g.ctx.Builder.CreateCall(fn, args, "")
 			} else {
-				// Indirect call (pointer to function)
-				// Simplified: assume entity is the function pointer value
-				// In a real implementation, we'd check the type of entity to ensure it's a function pointer
-				// and extract the return type.
-				// For this fix, we simply error as indirect calls need more builder support.
+				// Indirect call support (simplified error for now)
 				panic(fmt.Sprintf("Indirect calls not fully implemented. Target: %s", name))
 			}
 		}
@@ -504,8 +489,16 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 		return g.ctx.Builder.ConstInt(types.I1, val)
 	}
 	if ctx.STRING_LITERAL() != nil {
-		if len(txt) >= 2 { txt = txt[1 : len(txt)-1] }
-		content := txt + "\x00"
+		// Use strconv.Unquote to handle escape sequences (\n, \t, etc.)
+		unquoted, err := strconv.Unquote(txt)
+		if err != nil {
+			// Fallback if unquote fails (shouldn't happen if lexer is correct)
+			if len(txt) >= 2 {
+				unquoted = txt[1 : len(txt)-1]
+			}
+		}
+		
+		content := unquoted + "\x00"
 		arrType := types.NewArray(types.I8, int64(len(content)))
 		var chars []ir.Constant
 		for _, b := range []byte(content) { chars = append(chars, g.ctx.Builder.ConstInt(types.I8, int64(b))) }
