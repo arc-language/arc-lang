@@ -318,32 +318,13 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 
 			if basePtr != nil {
 				ptrType := basePtr.Type().(*types.PointerType)
-				
-				// Handle Pointer variables vs Arrays
-				// If basePtr is **T (variable holding pointer), we need to load it to get *T
-				// If basePtr is *[N x T] (pointer to array), we decay it to *T
-				
 				var elemPtr ir.Value
 				
-				// Case A: Pointer to Array
 				if _, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
 					zero := g.ctx.Builder.ConstInt(types.I32, 0)
 					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{zero, idx}, "")
 				} else {
-					// Case B: Pointer to Pointer (or Pointer to Value)
-					// If it's a variable holding a pointer (ptr: *int32), basePtr is **int32 (alloca).
-					// We need to load the *int32 value before indexing.
-					
-					actualBase := basePtr
-					if ptrToPtr, ok := ptrType.ElementType.(*types.PointerType); ok {
-						_ = ptrToPtr
-						// Load the pointer value
-						actualBase = g.ctx.Builder.CreateLoad(ptrType.ElementType, basePtr, "")
-						ptrType = ptrType.ElementType.(*types.PointerType) // Update type to *T
-					}
-					
-					// Now GEP on the loaded pointer
-					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, actualBase, []ir.Value{idx}, "")
+					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{idx}, "")
 				}
 				
 				currPtr = elemPtr
@@ -385,12 +366,14 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		return g.Visit(ctx.Expression())
 	}
 
+	// 1. Resolve Name
 	var name string
 	var isQualified bool
+	var qCtx *parser.QualifiedIdentifierContext
 
 	if ctx.QualifiedIdentifier() != nil {
-		q := ctx.QualifiedIdentifier()
-		for i, id := range q.AllIDENTIFIER() {
+		qCtx = ctx.QualifiedIdentifier()
+		for i, id := range qCtx.AllIDENTIFIER() {
 			if i > 0 { name += "." }
 			name += id.GetText()
 		}
@@ -400,7 +383,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	}
 
 	if name != "" {
-		isCall := ctx.LPAREN() != nil && (ctx.IDENTIFIER() != nil || ctx.QualifiedIdentifier() != nil)
+		isCall := ctx.LPAREN() != nil
 		
 		var args []ir.Value
 		if isCall {
@@ -412,6 +395,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 			}
 
+			// Intrinsics
 			if !isQualified {
 				if name == "cast" && len(args) == 1 {
 					if ga := ctx.GenericArgs(); ga != nil {
@@ -443,16 +427,14 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			}
 		}
 
+		// 2. Resolve Symbol
 		var entity ir.Value
 		
+		// Attempt Full Name Resolution
 		if sym, ok := g.currentScope.Resolve(name); ok {
-			if sym.Kind == symbol.SymFunc && sym.IRValue == nil {
-				return nil
-			}
+			if sym.Kind == symbol.SymFunc && sym.IRValue == nil { return nil }
 			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
-				if !isCall {
-					return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
-				}
+				if !isCall { return g.ctx.Builder.CreateLoad(sym.Type, alloca, "") }
 				entity = g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 			} else {
 				entity = sym.IRValue
@@ -460,11 +442,58 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		} else if fn := g.ctx.Module.GetFunction(name); fn != nil {
 			entity = fn
 		} else if glob := g.ctx.Module.GetGlobal(name); glob != nil {
-			if !isCall {
-				return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
-			}
+			if !isCall { return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "") }
 			entity = g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
-		} else {
+		} else if isQualified {
+			// Handle Member Access via QualifiedIdentifier: `rect.width`
+			// We need to resolve `rect` then access `width`
+			// The QualifiedIdentifier `rect.width` failed to resolve as a whole symbol.
+			// So we must try to resolve `rect` and treat `width` as a field.
+			// Currently simplified to handle ONE level of dot access for struct fields.
+			
+			ids := qCtx.AllIDENTIFIER()
+			baseName := ids[0].GetText()
+			
+			// Resolve base
+			var basePtr ir.Value
+			if sym, ok := g.currentScope.Resolve(baseName); ok {
+				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
+					basePtr = alloca
+				} else {
+					basePtr = sym.IRValue
+				}
+			}
+			
+			if basePtr != nil {
+				// Iterate remaining parts
+				currPtr := basePtr
+				valid := true
+				
+				for i := 1; i < len(ids); i++ {
+					fieldName := ids[i].GetText()
+					ptrType, isPtr := currPtr.Type().(*types.PointerType)
+					if !isPtr { valid = false; break }
+					
+					if st, ok := ptrType.ElementType.(*types.StructType); ok {
+						if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
+							currPtr = g.ctx.Builder.CreateStructGEP(st, currPtr, idx, "")
+						} else {
+							valid = false; break
+						}
+					} else {
+						valid = false; break
+					}
+				}
+				
+				if valid {
+					// Found it! Load the value (since it's an expression)
+					ptrType := currPtr.Type().(*types.PointerType)
+					entity = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
+				}
+			}
+		}
+
+		if entity == nil {
 			if isCall {
 				fmt.Printf("[IRGen] Error: Call to undefined function '%s'\n", name)
 			} else {

@@ -1,29 +1,17 @@
-@.str.0 = external constant [11 x i8] [i8 97, i8 114, i8 114, i8 91, i8 49, i8 93, i8 61, i8 37, i8 100, i8 10, i8 0]
+@.str.0 = external constant [10 x i8] [i8 119, i8 105, i8 100, i8 116, i8 104, i8 61, i8 37, i8 100, i8 10, i8 0]
 
 declare external i32 @printf(ptr<u8>, ...)
 
 define external i32 @main() {
 entry:
-  %arr.addr = alloca ptr<i32>
-  %0 = alloca i32, i64 3
-  store ptr<i32> %0, ptr<ptr<i32>> %arr.addr
-  %1 = load ptr<i32>, ptr<ptr<i32>> %arr.addr
-  %2 = getelementptr inbounds i32, ptr<i32> %1, i64 0
-  %3 = trunc i64 100 to i32
-  store i32 %3, ptr<i32> %2
-  %4 = load ptr<i32>, ptr<ptr<i32>> %arr.addr
-  %5 = getelementptr inbounds i32, ptr<i32> %4, i64 1
-  %6 = trunc i64 200 to i32
-  store i32 %6, ptr<i32> %5
-  %7 = load ptr<i32>, ptr<ptr<i32>> %arr.addr
-  %8 = getelementptr inbounds i32, ptr<i32> %7, i64 2
-  %9 = trunc i64 300 to i32
-  store i32 %9, ptr<i32> %8
-  %10 = getelementptr inbounds [11 x i8], ptr<[11 x i8]> @.str.0, i32 0, i32 0
-  %11 = load ptr<i32>, ptr<ptr<i32>> %arr.addr
-  %12 = getelementptr inbounds ptr<i32>, ptr<ptr<i32>> %arr.addr, i64 1
-  %13 = load ptr<i32>, ptr<ptr<i32>> %12
-  %14 = call i32 @printf(ptr<[11 x i8]> %10, ptr<i32> %13)
-  %15 = trunc i64 0 to i32
-  ret i32 %15
+  %rect.addr = alloca %Rectangle
+  %0 = trunc i64 100 to i32
+  %1 = insertvalue %Rectangle zeroinitializer, i32 %0, 0
+  %2 = trunc i64 50 to i32
+  %3 = insertvalue %Rectangle %1, i32 %2, 1
+  store %Rectangle %3, ptr<%Rectangle> %rect.addr
+  %4 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
+  %5 = call i32 @printf(ptr<[10 x i8]> %4, i64 0)
+  %6 = trunc i64 0 to i32
+  ret i32 %6
 }
