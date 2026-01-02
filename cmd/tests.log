@@ -2330,11 +2330,8 @@ func main() int32 {
 }
 
 Run Output:
-width=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "width=100"
-Got output: "width=0\n"
+width=100
+Result: PASS
 
 --- Test: struct_field_write ---
 Source Code:
@@ -2367,11 +2364,8 @@ func main() int32 {
 }
 
 Run Output:
-x=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "x=99"
-Got output: "x=0\n"
+x=99
+Result: PASS
 
 --- Test: struct_init_default ---
 Source Code:
@@ -2436,11 +2430,8 @@ func main() int32 {
 }
 
 Run Output:
-x=0 y=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "x=10 y=20"
-Got output: "x=0 y=0\n"
+x=10 y=20
+Result: PASS
 
 --- Test: struct_method_flat ---
 Source Code:
@@ -2565,11 +2556,11 @@ func main() int32 {
 }
 
 Run Output:
-age=0 height=0
+age=30 height=32764
 Result: FAIL
 Error: assertion failed.
 Expected substring: "age=30 height=180"
-Got output: "age=0 height=0\n"
+Got output: "age=30 height=32764\n"
 
 --- Test: struct_mutating_method ---
 Source Code:
@@ -2732,11 +2723,8 @@ func main() int32 {
 }
 
 Run Output:
-x=0 y=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "x=5 y=10"
-Got output: "x=0 y=0\n"
+x=5 y=10
+Result: PASS
 
 --- Test: struct_pointer_field ---
 Source Code:
@@ -4328,4 +4316,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 96 | Failed: 38 | Total Time: 9.37s
+Passed: 100 | Failed: 34 | Total Time: 9.55s

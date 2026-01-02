@@ -90,16 +90,32 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		retType = types.NewStruct("", tupleTypes, false)
 	}
 
-	// Resolve Parameter Types
+	// Resolve Parameter Types & Handle 'self'
 	var paramTypes []types.Type
+	var selfType types.Type
+	
 	if ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
-			if param.SELF() != nil { 
-				// Handle Self (placeholder for now, pointer to struct)
-				paramTypes = append(paramTypes, types.NewPointer(types.Void)) 
-				continue 
+			pType := a.resolveType(param.Type_())
+			if param.SELF() != nil {
+				// Mark that we found self
+				selfType = pType
 			}
-			paramTypes = append(paramTypes, a.resolveType(param.Type_()))
+			paramTypes = append(paramTypes, pType)
+		}
+	}
+	
+	// Mangle name if it's a method (has self)
+	if selfType != nil {
+		// Extract struct name from self type
+		// Self can be T or *T
+		base := selfType
+		if ptr, ok := base.(*types.PointerType); ok {
+			base = ptr.ElementType
+		}
+		
+		if st, ok := base.(*types.StructType); ok {
+			name = st.Name + "_" + name
 		}
 	}
 	
@@ -115,7 +131,6 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 
 	if ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
-			if param.SELF() != nil { continue }
 			pName := param.IDENTIFIER().GetText()
 			pType := a.resolveType(param.Type_())
 			a.currentScope.Define(pName, symbol.SymVar, pType)
