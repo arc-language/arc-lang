@@ -1948,16 +1948,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
-/tmp/arc_test_env/test.arc:21:0: Type mismatch in addition: ptr<i32> and i64
+Run Output:
+value=0
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
-/tmp/arc_test_env/test.arc:21:0: Type mismatch in addition: ptr<i32> and i64
+Error: assertion failed.
+Expected substring: "value=20"
+Got output: "value=0\n"
 
 --- Test: pointer_arithmetic_sub ---
 Source Code:
@@ -1987,18 +1983,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:20:0: Type mismatch in addition: ptr<i8> and i64
-/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
-/tmp/arc_test_env/test.arc:21:0: Type mismatch in addition: ptr<i32> and i64
+Run Output:
+value=0
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:20:0: Type mismatch in addition: ptr<i8> and i64
-/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
-/tmp/arc_test_env/test.arc:21:0: Type mismatch in addition: ptr<i32> and i64
+Error: assertion failed.
+Expected substring: "value=10"
+Got output: "value=0\n"
 
 --- Test: pointer_array_indexing ---
 Source Code:
@@ -2028,11 +2018,11 @@ func main() int32 {
 }
 
 Run Output:
-arr[1]=-1104984248
+arr[1]=-2121180440
 Result: FAIL
 Error: assertion failed.
 Expected substring: "arr[1]=200"
-Got output: "arr[1]=-1104984248\n"
+Got output: "arr[1]=-2121180440\n"
 
 --- Test: pointer_basic_type ---
 Source Code:
@@ -4262,11 +4252,11 @@ func main() int32 {
 }
 
 Run Output:
-last=1936024687
+last=1415533651
 Result: FAIL
 Error: assertion failed.
 Expected substring: "last=555"
-Got output: "last=1936024687\n"
+Got output: "last=1415533651\n"
 
 --- Test: edge_null_deref_skip ---
 Source Code:
@@ -4393,4 +4383,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 83 | Failed: 51 | Total Time: 9.02s
+Passed: 83 | Failed: 51 | Total Time: 8.80s
