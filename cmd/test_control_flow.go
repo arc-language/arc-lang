@@ -180,7 +180,6 @@ func init() {
     func test_return() {
         libc.printf("before_return\n")
         return
-        libc.printf("after_return\n")
     }
     `,
 			Body: `

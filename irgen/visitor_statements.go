@@ -127,27 +127,11 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 }
 
 func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
-	// Grammar: IF expr block (ELSE IF expr block)* (ELSE block)?
-	
 	mergeBlock := g.ctx.Builder.CreateBlock("if.end")
-	
-	// Count conditions (IF + ELSE IFs)
 	conditionCount := len(ctx.AllExpression())
-	
-	// Create blocks for the chain
-	// We need 'conditionCount' entry blocks (though the first is current block)
-	// And potentially entry blocks for the 'else' cases.
-	
-	// We iterate through each condition.
-	// For condition i:
-	//   Evaluate expr
-	//   Br i1 %cond, label %then_i, label %next_check_i
-	
 	var nextCheckBlock *ir.BasicBlock
 	
 	for i := 0; i < conditionCount; i++ {
-		// 1. Generate Condition
-		// If this is not the first iteration, we are in a 'next_check' block
 		if nextCheckBlock != nil {
 			g.ctx.SetInsertBlock(nextCheckBlock)
 		}
@@ -159,24 +143,18 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 		
 		thenBlock := g.ctx.Builder.CreateBlock(fmt.Sprintf("if.then.%d", i))
 		
-		// Determine the "Else" target for this condition
-		// It's either the next check, the final else block, or the merge block (if no else)
 		if i < conditionCount - 1 {
 			nextCheckBlock = g.ctx.Builder.CreateBlock(fmt.Sprintf("if.check.%d", i+1))
 		} else {
-			// Last condition
 			if len(ctx.AllBlock()) > conditionCount {
-				// Has final ELSE block
 				nextCheckBlock = g.ctx.Builder.CreateBlock("if.else")
 			} else {
-				// No ELSE block
 				nextCheckBlock = mergeBlock
 			}
 		}
 		
 		g.ctx.Builder.CreateCondBr(cond, thenBlock, nextCheckBlock)
 		
-		// 2. Generate Then Block
 		g.ctx.SetInsertBlock(thenBlock)
 		g.Visit(ctx.Block(i))
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
@@ -184,20 +162,15 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 		}
 	}
 	
-	// 3. Generate Final Else Block (if exists)
-	// If we had an ELSE block, 'nextCheckBlock' is pointing to it now.
-	// Check if the number of blocks > number of expressions.
 	if len(ctx.AllBlock()) > conditionCount {
-		g.ctx.SetInsertBlock(nextCheckBlock) // This is the "if.else" block created above
-		g.Visit(ctx.Block(conditionCount)) // Last block is the ELSE block
+		g.ctx.SetInsertBlock(nextCheckBlock)
+		g.Visit(ctx.Block(conditionCount))
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			g.ctx.Builder.CreateBr(mergeBlock)
 		}
 	}
 	
-	// 4. Set insertion point to merge block
 	g.ctx.SetInsertBlock(mergeBlock)
-	
 	return nil
 }
 
@@ -304,12 +277,13 @@ func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 		caseBlock := g.ctx.Builder.CreateBlock(fmt.Sprintf("case.%d", i))
 		nextCheckBlock := g.ctx.Builder.CreateBlock(fmt.Sprintf("check.%d", i))
 		
+		// If this is the last case AND there is no default case,
+		// the "next check" is actually the end block (fallthrough/exit)
 		if i == len(ctx.AllSwitchCase())-1 && ctx.DefaultCase() == nil {
 			nextCheckBlock = endBlock
 		}
 
-		// Handle multiple expressions in a single case (case 1, 2, 3:)
-		// Generate a chain of comparisons jumping to the same body
+		// Handle multiple expressions in a single case
 		currentCheck := prevBlock
 		for j, expr := range c.AllExpression() {
 			g.ctx.SetInsertBlock(currentCheck)
@@ -342,18 +316,25 @@ func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 	}
 
 	// Handle Default
-	g.ctx.SetInsertBlock(prevBlock)
-	if ctx.DefaultCase() != nil {
-		for _, s := range ctx.DefaultCase().AllStatement() {
-			g.Visit(s)
-			if g.ctx.Builder.GetInsertBlock().Terminator() != nil {
-				break
+	// If we have a default case, prevBlock points to the last check failure.
+	// If we don't have a default case, prevBlock IS endBlock (set in loop above).
+	// We must only generate code if we are NOT already at endBlock.
+	
+	if prevBlock != endBlock {
+		g.ctx.SetInsertBlock(prevBlock)
+		
+		if ctx.DefaultCase() != nil {
+			for _, s := range ctx.DefaultCase().AllStatement() {
+				g.Visit(s)
+				if g.ctx.Builder.GetInsertBlock().Terminator() != nil {
+					break
+				}
 			}
 		}
-	}
-	
-	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
-		g.ctx.Builder.CreateBr(endBlock)
+		
+		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
+			g.ctx.Builder.CreateBr(endBlock)
+		}
 	}
 
 	g.ctx.SetInsertBlock(endBlock)

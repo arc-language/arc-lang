@@ -1,20 +1,35 @@
-@.str.0 = external constant [10 x i8] [i8 118, i8 97, i8 108, i8 117, i8 101, i8 61, i8 37, i8 100, i8 10, i8 0]
+@.str.0 = external constant [5 x i8] [i8 111, i8 110, i8 101, i8 10, i8 0]
+@.str.1 = external constant [5 x i8] [i8 116, i8 119, i8 111, i8 10, i8 0]
+@.str.2 = external constant [7 x i8] [i8 116, i8 104, i8 114, i8 101, i8 101, i8 10, i8 0]
 
 declare external i32 @printf(ptr<u8>, ...)
 
-define external i32 @main_get_value() {
-entry:
-  %0 = trunc i64 42 to i32
-  ret i32 %0
-}
-
 define external i32 @main() {
 entry:
-  %x.addr = alloca i32
-  store fn() -> i32 %main_get_value, ptr<i32> %x.addr
-  %1 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
-  %2 = load i32, ptr<i32> %x.addr
-  %3 = call i32 @printf(ptr<[10 x i8]> %1, i32 %2)
-  %4 = trunc i64 0 to i32
-  ret i32 %4
+  %x.addr = alloca i64
+  store i64 2, ptr<i64> %x.addr
+  %0 = load i64, ptr<i64> %x.addr
+  %1 = icmp eq i64 %0, 1
+  br i1 %1, label %case.0, label %check.0
+switch.end:
+  br label %switch.end
+case.0:
+  %2 = getelementptr inbounds [5 x i8], ptr<[5 x i8]> @.str.0, i32 0, i32 0
+  %3 = call i32 @printf(ptr<[5 x i8]> %2)
+  br label %switch.end
+check.0:
+  %4 = icmp eq i64 %0, 2
+  br i1 %4, label %case.1, label %check.1
+case.1:
+  %5 = getelementptr inbounds [5 x i8], ptr<[5 x i8]> @.str.1, i32 0, i32 0
+  %6 = call i32 @printf(ptr<[5 x i8]> %5)
+  br label %switch.end
+check.1:
+  %7 = icmp eq i64 %0, 3
+  br i1 %7, label %case.2, label %switch.end
+case.2:
+  %8 = getelementptr inbounds [7 x i8], ptr<[7 x i8]> @.str.2, i32 0, i32 0
+  %9 = call i32 @printf(ptr<[7 x i8]> %8)
+  br label %switch.end
+check.2:
 }
