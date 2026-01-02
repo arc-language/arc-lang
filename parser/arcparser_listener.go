@@ -113,11 +113,14 @@ type ArcParserListener interface {
 	// EnterType is called when entering the type production.
 	EnterType(c *TypeContext)
 
+	// EnterQualifiedType is called when entering the qualifiedType production.
+	EnterQualifiedType(c *QualifiedTypeContext)
+
 	// EnterFunctionType is called when entering the functionType production.
 	EnterFunctionType(c *FunctionTypeContext)
 
-	// EnterQualifiedType is called when entering the qualifiedType production.
-	EnterQualifiedType(c *QualifiedTypeContext)
+	// EnterQualifiedIdentifier is called when entering the qualifiedIdentifier production.
+	EnterQualifiedIdentifier(c *QualifiedIdentifierContext)
 
 	// EnterPrimitiveType is called when entering the primitiveType production.
 	EnterPrimitiveType(c *PrimitiveTypeContext)
@@ -232,9 +235,6 @@ type ArcParserListener interface {
 
 	// EnterPrimaryExpression is called when entering the primaryExpression production.
 	EnterPrimaryExpression(c *PrimaryExpressionContext)
-
-	// EnterQualifiedIdentifier is called when entering the qualifiedIdentifier production.
-	EnterQualifiedIdentifier(c *QualifiedIdentifierContext)
 
 	// EnterSizeofExpression is called when entering the sizeofExpression production.
 	EnterSizeofExpression(c *SizeofExpressionContext)
@@ -383,11 +383,14 @@ type ArcParserListener interface {
 	// ExitType is called when exiting the type production.
 	ExitType(c *TypeContext)
 
+	// ExitQualifiedType is called when exiting the qualifiedType production.
+	ExitQualifiedType(c *QualifiedTypeContext)
+
 	// ExitFunctionType is called when exiting the functionType production.
 	ExitFunctionType(c *FunctionTypeContext)
 
-	// ExitQualifiedType is called when exiting the qualifiedType production.
-	ExitQualifiedType(c *QualifiedTypeContext)
+	// ExitQualifiedIdentifier is called when exiting the qualifiedIdentifier production.
+	ExitQualifiedIdentifier(c *QualifiedIdentifierContext)
 
 	// ExitPrimitiveType is called when exiting the primitiveType production.
 	ExitPrimitiveType(c *PrimitiveTypeContext)
@@ -502,9 +505,6 @@ type ArcParserListener interface {
 
 	// ExitPrimaryExpression is called when exiting the primaryExpression production.
 	ExitPrimaryExpression(c *PrimaryExpressionContext)
-
-	// ExitQualifiedIdentifier is called when exiting the qualifiedIdentifier production.
-	ExitQualifiedIdentifier(c *QualifiedIdentifierContext)
 
 	// ExitSizeofExpression is called when exiting the sizeofExpression production.
 	ExitSizeofExpression(c *SizeofExpressionContext)

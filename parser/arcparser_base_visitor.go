@@ -148,11 +148,15 @@ func (v *BaseArcParserVisitor) VisitType(ctx *TypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseArcParserVisitor) VisitQualifiedType(ctx *QualifiedTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseArcParserVisitor) VisitFunctionType(ctx *FunctionTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitQualifiedType(ctx *QualifiedTypeContext) interface{} {
+func (v *BaseArcParserVisitor) VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -305,10 +309,6 @@ func (v *BaseArcParserVisitor) VisitPostfixOp(ctx *PostfixOpContext) interface{}
 }
 
 func (v *BaseArcParserVisitor) VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

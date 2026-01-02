@@ -231,17 +231,23 @@ func (s *BaseArcParserListener) EnterType(ctx *TypeContext) {}
 // ExitType is called when production type is exited.
 func (s *BaseArcParserListener) ExitType(ctx *TypeContext) {}
 
+// EnterQualifiedType is called when production qualifiedType is entered.
+func (s *BaseArcParserListener) EnterQualifiedType(ctx *QualifiedTypeContext) {}
+
+// ExitQualifiedType is called when production qualifiedType is exited.
+func (s *BaseArcParserListener) ExitQualifiedType(ctx *QualifiedTypeContext) {}
+
 // EnterFunctionType is called when production functionType is entered.
 func (s *BaseArcParserListener) EnterFunctionType(ctx *FunctionTypeContext) {}
 
 // ExitFunctionType is called when production functionType is exited.
 func (s *BaseArcParserListener) ExitFunctionType(ctx *FunctionTypeContext) {}
 
-// EnterQualifiedType is called when production qualifiedType is entered.
-func (s *BaseArcParserListener) EnterQualifiedType(ctx *QualifiedTypeContext) {}
+// EnterQualifiedIdentifier is called when production qualifiedIdentifier is entered.
+func (s *BaseArcParserListener) EnterQualifiedIdentifier(ctx *QualifiedIdentifierContext) {}
 
-// ExitQualifiedType is called when production qualifiedType is exited.
-func (s *BaseArcParserListener) ExitQualifiedType(ctx *QualifiedTypeContext) {}
+// ExitQualifiedIdentifier is called when production qualifiedIdentifier is exited.
+func (s *BaseArcParserListener) ExitQualifiedIdentifier(ctx *QualifiedIdentifierContext) {}
 
 // EnterPrimitiveType is called when production primitiveType is entered.
 func (s *BaseArcParserListener) EnterPrimitiveType(ctx *PrimitiveTypeContext) {}
@@ -470,12 +476,6 @@ func (s *BaseArcParserListener) EnterPrimaryExpression(ctx *PrimaryExpressionCon
 
 // ExitPrimaryExpression is called when production primaryExpression is exited.
 func (s *BaseArcParserListener) ExitPrimaryExpression(ctx *PrimaryExpressionContext) {}
-
-// EnterQualifiedIdentifier is called when production qualifiedIdentifier is entered.
-func (s *BaseArcParserListener) EnterQualifiedIdentifier(ctx *QualifiedIdentifierContext) {}
-
-// ExitQualifiedIdentifier is called when production qualifiedIdentifier is exited.
-func (s *BaseArcParserListener) ExitQualifiedIdentifier(ctx *QualifiedIdentifierContext) {}
 
 // EnterSizeofExpression is called when production sizeofExpression is entered.
 func (s *BaseArcParserListener) EnterSizeofExpression(ctx *SizeofExpressionContext) {}

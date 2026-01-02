@@ -113,11 +113,14 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#type.
 	VisitType(ctx *TypeContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#qualifiedType.
+	VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#functionType.
 	VisitFunctionType(ctx *FunctionTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#qualifiedType.
-	VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
+	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
+	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#primitiveType.
 	VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
@@ -232,9 +235,6 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#primaryExpression.
 	VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
-	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#sizeofExpression.
 	VisitSizeofExpression(ctx *SizeofExpressionContext) interface{}
