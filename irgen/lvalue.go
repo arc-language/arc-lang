@@ -63,6 +63,12 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 	// --- Actual L-Value Logic ---
 
 	case *parser.PrimaryExpressionContext:
+		// Function calls are NOT l-values. 
+		// Check if parens are present (indicating a call).
+		if ctx.LPAREN() != nil {
+			return nil
+		}
+
 		if ctx.Expression() != nil {
 			return g.getLValue(ctx.Expression())
 		}
@@ -88,6 +94,14 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		}
 
 	case *parser.PostfixExpressionContext:
+		// Postfix calls (foo()) are not l-values.
+		// Check if any op is a call.
+		for _, op := range ctx.AllPostfixOp() {
+			if op.LPAREN() != nil {
+				return nil
+			}
+		}
+
 		baseExpr := ctx.PrimaryExpression()
 		addr := g.getLValue(baseExpr)
 		

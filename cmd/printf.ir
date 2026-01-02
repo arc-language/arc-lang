@@ -1,24 +1,20 @@
-@.str.0 = external constant [3 x i8] [i8 65, i8 10, i8 0]
-@.str.1 = external constant [3 x i8] [i8 66, i8 10, i8 0]
+@.str.0 = external constant [10 x i8] [i8 118, i8 97, i8 108, i8 117, i8 101, i8 61, i8 37, i8 100, i8 10, i8 0]
 
 declare external i32 @printf(ptr<u8>, ...)
 
+define external i32 @main_get_value() {
+entry:
+  %0 = trunc i64 42 to i32
+  ret i32 %0
+}
+
 define external i32 @main() {
 entry:
-  %score.addr = alloca i64
-  store i64 75, ptr<i64> %score.addr
-  %0 = load i64, ptr<i64> %score.addr
-  %1 = icmp sge i64 %0, 90
-  br i1 %1, label %if.then, label %if.else
-if.then:
-  %2 = getelementptr inbounds [3 x i8], ptr<[3 x i8]> @.str.0, i32 0, i32 0
-  %3 = call i32 @printf(ptr<[3 x i8]> %2)
-  br label %if.end
-if.end:
-  %6 = trunc i64 0 to i32
-  ret i32 %6
-if.else:
-  %4 = getelementptr inbounds [3 x i8], ptr<[3 x i8]> @.str.1, i32 0, i32 0
-  %5 = call i32 @printf(ptr<[3 x i8]> %4)
-  br label %if.end
+  %x.addr = alloca i32
+  store fn() -> i32 %main_get_value, ptr<i32> %x.addr
+  %1 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
+  %2 = load i32, ptr<i32> %x.addr
+  %3 = call i32 @printf(ptr<[10 x i8]> %1, i32 %2)
+  %4 = trunc i64 0 to i32
+  ret i32 %4
 }

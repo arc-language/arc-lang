@@ -1390,62 +1390,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @get_value() {
-	entry:
-	  %0 = trunc i64 42 to i32
-	  ret i32 %0
-	} (get_value) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69ebc0, 0xc000195f00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004e5a58, 0x0, {0x69ebc0, 0xc000195f00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004e5a58, {0x6a45e0, 0xc000328420})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004e5a58, 0xc000334000)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fff0ad2554a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Run Output:
+value=4198704
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @get_value() {
-	entry:
-	  %0 = trunc i64 42 to i32
-	  ret i32 %0
-	} (get_value) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69ebc0, 0xc000195f00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004e5a58, 0x0, {0x69ebc0, 0xc000195f00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004e5a58, {0x6a45e0, 0xc000328420})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004e5a58, 0xc000334000)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fff0ad2554a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Error: assertion failed.
+Expected substring: "value=42"
+Got output: "value=4198704\n"
 
 --- Test: control_return_void ---
 Source Code:
@@ -1680,80 +1630,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @check_positive(i32 %x) {
-	entry:
-	  %x.addr = alloca i32
-	  store i32 %x, ptr<i32> %x.addr
-	  %0 = load i32, ptr<i32> %x.addr
-	  %1 = icmp slt i32 %0, 0
-	  br i1 %1, label %if.then.0, label %if.end
-	if.end:
-	  %3 = load i32, ptr<i32> %x.addr
-	  ret i32 %3
-	if.then.0:
-	  %2 = trunc i64 0 to i32
-	  ret i32 %2
-	} (check_positive) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc0004e7b00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc000531a58, 0x0, {0x69ebc0, 0xc0004e7b00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000531a58, {0x6a45e0, 0xc000344360})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000531a58, 0xc0004e7c00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffd3406f54a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Run Output:
+result=4198704
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @check_positive(i32 %x) {
-	entry:
-	  %x.addr = alloca i32
-	  store i32 %x, ptr<i32> %x.addr
-	  %0 = load i32, ptr<i32> %x.addr
-	  %1 = icmp slt i32 %0, 0
-	  br i1 %1, label %if.then.0, label %if.end
-	if.end:
-	  %3 = load i32, ptr<i32> %x.addr
-	  ret i32 %3
-	if.then.0:
-	  %2 = trunc i64 0 to i32
-	  ret i32 %2
-	} (check_positive) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc0004e7b00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc000531a58, 0x0, {0x69ebc0, 0xc0004e7b00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000531a58, {0x6a45e0, 0xc000344360})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000531a58, 0xc0004e7c00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffd3406f54a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Error: assertion failed.
+Expected substring: "result=0"
+Got output: "result=4198704\n"
 
 --- Test: func_multiple_return ---
 Source Code:
@@ -1787,11 +1669,11 @@ func main() int32 {
 }
 
 Run Output:
-result=490576960 ok=64
+result=758044848 ok=176
 Result: FAIL
 Error: assertion failed.
 Expected substring: "result=5 ok=1"
-Got output: "result=490576960 ok=64\n"
+Got output: "result=758044848 ok=176\n"
 
 --- Test: func_nested_calls ---
 Source Code:
@@ -1824,68 +1706,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (9 functions)
-panic: Value define external i32 @double(i32 %x) {
-	entry:
-	  %x.addr = alloca i32
-	  store i32 %x, ptr<i32> %x.addr
-	  %0 = load i32, ptr<i32> %x.addr
-	  %1 = mul i32 %0, 2
-	  ret i32 %1
-	} (double) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc000498500})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004d1a58, 0x0, {0x69ebc0, 0xc000498500})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004d1a58, {0x6a45e0, 0xc000244ae0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004d1a58, 0xc000498700)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc4296854a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Run Output:
+result=4198704
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (9 functions)
-panic: Value define external i32 @double(i32 %x) {
-	entry:
-	  %x.addr = alloca i32
-	  store i32 %x, ptr<i32> %x.addr
-	  %0 = load i32, ptr<i32> %x.addr
-	  %1 = mul i32 %0, 2
-	  ret i32 %1
-	} (double) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc000498500})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004d1a58, 0x0, {0x69ebc0, 0xc000498500})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004d1a58, {0x6a45e0, 0xc000244ae0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004d1a58, 0xc000498700)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc4296854a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Error: assertion failed.
+Expected substring: "result=30"
+Got output: "result=4198704\n"
 
 --- Test: func_no_params_void ---
 Source Code:
@@ -1984,82 +1810,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @factorial(i32 %n) {
-	entry:
-	  %n.addr = alloca i32
-	  store i32 %n, ptr<i32> %n.addr
-	  %0 = load i32, ptr<i32> %n.addr
-	  %1 = icmp sle i32 %0, 1
-	  br i1 %1, label %if.then.0, label %if.end
-	if.end:
-	  %3 = load i32, ptr<i32> %n.addr
-	  %4 = mul i32 %3, %factorial
-	  ret i32 %4
-	if.then.0:
-	  %2 = trunc i64 1 to i32
-	  ret i32 %2
-	} (factorial) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00033a540?, {0x69ebc0, 0xc000664d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005efa58, 0x1, {0x69ebc0, 0xc000664d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005efa58, {0x6a46c0, 0xc0001c0190})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:26 +0x645
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005efa58, 0xc000664d80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffda8a1854a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Run Output:
+factorial=4198704
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @factorial(i32 %n) {
-	entry:
-	  %n.addr = alloca i32
-	  store i32 %n, ptr<i32> %n.addr
-	  %0 = load i32, ptr<i32> %n.addr
-	  %1 = icmp sle i32 %0, 1
-	  br i1 %1, label %if.then.0, label %if.end
-	if.end:
-	  %3 = load i32, ptr<i32> %n.addr
-	  %4 = mul i32 %3, %factorial
-	  ret i32 %4
-	if.then.0:
-	  %2 = trunc i64 1 to i32
-	  ret i32 %2
-	} (factorial) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00033a540?, {0x69ebc0, 0xc000664d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005efa58, 0x1, {0x69ebc0, 0xc000664d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005efa58, {0x6a46c0, 0xc0001c0190})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:26 +0x645
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005efa58, 0xc000664d80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffda8a1854a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Error: assertion failed.
+Expected substring: "factorial=120"
+Got output: "factorial=4198704\n"
 
 --- Test: func_recursive_fibonacci ---
 Source Code:
@@ -2092,80 +1848,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @fib(i32 %n) {
-	entry:
-	  %n.addr = alloca i32
-	  store i32 %n, ptr<i32> %n.addr
-	  %0 = load i32, ptr<i32> %n.addr
-	  %1 = icmp sle i32 %0, 1
-	  br i1 %1, label %if.then.0, label %if.end
-	if.end:
-	  %3 = add fn(i32) -> i32 %fib, %fib
-	  ret fn(i32) -> i32 %3
-	if.then.0:
-	  %2 = load i32, ptr<i32> %n.addr
-	  ret i32 %2
-	} (fib) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc000493aa0?, {0x69ebc0, 0xc00057dc00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00054ba58, 0x0, {0x69ebc0, 0xc00057dc00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00054ba58, {0x6a46c0, 0xc00023a8c0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:13 +0x485
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00054ba58, 0xc00057dc00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffe3790654a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Run Output:
+fib=4198704
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @fib(i32 %n) {
-	entry:
-	  %n.addr = alloca i32
-	  store i32 %n, ptr<i32> %n.addr
-	  %0 = load i32, ptr<i32> %n.addr
-	  %1 = icmp sle i32 %0, 1
-	  br i1 %1, label %if.then.0, label %if.end
-	if.end:
-	  %3 = add fn(i32) -> i32 %fib, %fib
-	  ret fn(i32) -> i32 %3
-	if.then.0:
-	  %2 = load i32, ptr<i32> %n.addr
-	  ret i32 %2
-	} (fib) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc000493aa0?, {0x69ebc0, 0xc00057dc00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00054ba58, 0x0, {0x69ebc0, 0xc00057dc00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00054ba58, {0x6a46c0, 0xc00023a8c0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:13 +0x485
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00054ba58, 0xc00057dc00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffe3790654a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Error: assertion failed.
+Expected substring: "fib=13"
+Got output: "fib=4198704\n"
 
 --- Test: func_with_params_void ---
 Source Code:
@@ -2228,74 +1916,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @add(i32 %a, i32 %b) {
-	entry:
-	  %a.addr = alloca i32
-	  store i32 %a, ptr<i32> %a.addr
-	  %b.addr = alloca i32
-	  store i32 %b, ptr<i32> %b.addr
-	  %0 = load i32, ptr<i32> %a.addr
-	  %1 = load i32, ptr<i32> %b.addr
-	  %2 = add i32 %0, %1
-	  ret i32 %2
-	} (add) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc0003e9580})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00054da58, 0x0, {0x69ebc0, 0xc0003e9580})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00054da58, {0x6a45e0, 0xc0004d79e0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00054da58, 0xc0003e9680)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffd1d4a154a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Run Output:
+result=4198704
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @add(i32 %a, i32 %b) {
-	entry:
-	  %a.addr = alloca i32
-	  store i32 %a, ptr<i32> %a.addr
-	  %b.addr = alloca i32
-	  store i32 %b, ptr<i32> %b.addr
-	  %0 = load i32, ptr<i32> %a.addr
-	  %1 = load i32, ptr<i32> %b.addr
-	  %2 = add i32 %0, %1
-	  ret i32 %2
-	} (add) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc0003e9580})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00054da58, 0x0, {0x69ebc0, 0xc0003e9580})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00054da58, {0x6a45e0, 0xc0004d79e0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00054da58, 0xc0003e9680)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffd1d4a154a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Error: assertion failed.
+Expected substring: "result=40"
+Got output: "result=4198704\n"
 
 --- Test: pointer_address_of ---
 Source Code:
@@ -4523,80 +4149,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @countdown(i32 %n) {
-	entry:
-	  %n.addr = alloca i32
-	  store i32 %n, ptr<i32> %n.addr
-	  %0 = load i32, ptr<i32> %n.addr
-	  %1 = icmp sle i32 %0, 0
-	  br i1 %1, label %if.then.0, label %if.end
-	if.end:
-	  %3 = add fn(i32) -> i32 %countdown, 1
-	  ret fn(i32) -> i32 %3
-	if.then.0:
-	  %2 = trunc i64 0 to i32
-	  ret i32 %2
-	} (countdown) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc000076c00?, {0x69ebc0, 0xc0000c2400})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005ada58, 0x0, {0x69ebc0, 0xc0000c2400})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005ada58, {0x6a46c0, 0xc0002a3ef0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:13 +0x485
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005ada58, 0xc0000c2400)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc03a5954a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Run Output:
+depth=4198704
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @countdown(i32 %n) {
-	entry:
-	  %n.addr = alloca i32
-	  store i32 %n, ptr<i32> %n.addr
-	  %0 = load i32, ptr<i32> %n.addr
-	  %1 = icmp sle i32 %0, 0
-	  br i1 %1, label %if.then.0, label %if.end
-	if.end:
-	  %3 = add fn(i32) -> i32 %countdown, 1
-	  ret fn(i32) -> i32 %3
-	if.then.0:
-	  %2 = trunc i64 0 to i32
-	  ret i32 %2
-	} (countdown) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc000076c00?, {0x69ebc0, 0xc0000c2400})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005ada58, 0x0, {0x69ebc0, 0xc0000c2400})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005ada58, {0x6a46c0, 0xc0002a3ef0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:13 +0x485
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005ada58, 0xc0000c2400)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc03a5954a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Error: assertion failed.
+Expected substring: "depth=100"
+Got output: "depth=4198704\n"
 
 --- Test: edge_div_zero_skip ---
 Source Code:
@@ -4656,72 +4214,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @side_effect(i32 %x) {
-	entry:
-	  %x.addr = alloca i32
-	  store i32 %x, ptr<i32> %x.addr
-	  %0 = getelementptr inbounds [9 x i8], ptr<[9 x i8]> @.str.0, i32 0, i32 0
-	  %1 = load i32, ptr<i32> %x.addr
-	  %2 = call i32 @printf(ptr<[9 x i8]> %0, i32 %1)
-	  %3 = load i32, ptr<i32> %x.addr
-	  ret i32 %3
-	} (side_effect) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0000c9808?, {0x69ebc0, 0xc0002a0d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00049fa58, 0x0, {0x69ebc0, 0xc0002a0d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00049fa58, {0x6a46c0, 0xc0003cab40})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:25 +0x609
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00049fa58, 0xc0002a0f00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc332f454a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Run Output:
+result=-1721271760
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (8 functions)
-panic: Value define external i32 @side_effect(i32 %x) {
-	entry:
-	  %x.addr = alloca i32
-	  store i32 %x, ptr<i32> %x.addr
-	  %0 = getelementptr inbounds [9 x i8], ptr<[9 x i8]> @.str.0, i32 0, i32 0
-	  %1 = load i32, ptr<i32> %x.addr
-	  %2 = call i32 @printf(ptr<[9 x i8]> %0, i32 %1)
-	  %3 = load i32, ptr<i32> %x.addr
-	  ret i32 %3
-	} (side_effect) not allocated in stack map
-
-goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0000c9808?, {0x69ebc0, 0xc0002a0d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00049fa58, 0x0, {0x69ebc0, 0xc0002a0d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00049fa58, {0x6a46c0, 0xc0003cab40})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:25 +0x609
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00049fa58, 0xc0002a0f00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc332f454a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
-	/workspaces/arc-lang/cmd/main.go:96 +0x465
-main.main()
-	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Error: assertion failed.
+Expected substring: "eval_1 eval_2 eval_3 result=7"
+Got output: "result=-1721271760\n"
 
 --- Test: edge_function_pointer_placeholder ---
 Source Code:
@@ -4808,11 +4306,11 @@ func main() int32 {
 }
 
 Run Output:
-last=1701670760
+last=1831742010
 Result: FAIL
 Error: assertion failed.
 Expected substring: "last=555"
-Got output: "last=1701670760\n"
+Got output: "last=1831742010\n"
 
 --- Test: edge_null_deref_skip ---
 Source Code:
@@ -4939,4 +4437,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 68 | Failed: 66 | Total Time: 13.32s
+Passed: 68 | Failed: 66 | Total Time: 13.97s
