@@ -466,23 +466,14 @@ func (b *Builder) CreateGEP(pointeeType types.Type, ptr ir.Value, indices []ir.V
 	inst.Op = ir.OpGetElementPtr
 	inst.SetName(name)
 	
-	// Better Return Type Calculation
-	// If first index is variable (pointer arithmetic), type stays *T.
-	// If subsequent indices exist, we drill down.
-	// Currently simplified logic assumes:
-	// - If len(indices) == 1: Result is *pointeeType
-	// - If len(indices) > 1: We must drill down into pointeeType.
-	
 	resultType := pointeeType
-	
-	// Skip the first index (pointer arithmetic)
-	// But only if we drill down (GEP on aggregate)
-	// If we just do ptr + N, result is *T.
-	// If we do ptr[0].field, result is *FieldType.
 	
 	if len(indices) > 1 {
 		// Iterate from 2nd index
-		for _, idxVal := range indices[1:] {
+		for i, idxVal := range indices[1:] {
+			// Debug
+			// fmt.Printf("GEP Drilling: %s, idx: %v\n", resultType, idxVal)
+			
 			if st, ok := resultType.(*types.StructType); ok {
 				if cIdx, ok := idxVal.(*ir.ConstantInt); ok {
 					if int(cIdx.Value) < len(st.Fields) {
@@ -494,6 +485,9 @@ func (b *Builder) CreateGEP(pointeeType types.Type, ptr ir.Value, indices []ir.V
 			}
 		}
 	}
+	
+	// Debug
+	// fmt.Printf("GEP Result Type: ptr<%s>\n", resultType)
 	
 	inst.SetType(types.NewPointer(resultType))
 	
@@ -513,7 +507,6 @@ func (b *Builder) CreateInBoundsGEP(pointeeType types.Type, ptr ir.Value, indice
 func (b *Builder) CreateStructGEP(structType types.Type, ptr ir.Value, idx int, name string) *ir.GetElementPtrInst {
 	zero := b.ConstInt(types.I32, 0)
 	idxVal := b.ConstInt(types.I32, int64(idx))
-	// This calls CreateGEP, which now has fix for type calculation
 	return b.CreateGEP(structType, ptr, []ir.Value{zero, idxVal}, name)
 }
 
