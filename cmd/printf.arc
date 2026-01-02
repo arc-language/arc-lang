@@ -6,12 +6,11 @@ extern libc {
 
 func main() int32 {
 
-    let arr = alloca<int32>(5)
-    arr[0] = 10
-    arr[1] = 20
-    let ptr: *int32 = arr
-    let next = ptr + 1
-    libc.printf("value=%d\n", *next)
+    let arr = alloca<int32>(3)
+    arr[0] = 100
+    arr[1] = 200
+    arr[2] = 300
+    libc.printf("arr[1]=%d\n", arr[1])
 
     return 0
 }

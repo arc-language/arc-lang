@@ -318,13 +318,32 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 
 			if basePtr != nil {
 				ptrType := basePtr.Type().(*types.PointerType)
+				
+				// Handle Pointer variables vs Arrays
+				// If basePtr is **T (variable holding pointer), we need to load it to get *T
+				// If basePtr is *[N x T] (pointer to array), we decay it to *T
+				
 				var elemPtr ir.Value
 				
+				// Case A: Pointer to Array
 				if _, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
 					zero := g.ctx.Builder.ConstInt(types.I32, 0)
 					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{zero, idx}, "")
 				} else {
-					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{idx}, "")
+					// Case B: Pointer to Pointer (or Pointer to Value)
+					// If it's a variable holding a pointer (ptr: *int32), basePtr is **int32 (alloca).
+					// We need to load the *int32 value before indexing.
+					
+					actualBase := basePtr
+					if ptrToPtr, ok := ptrType.ElementType.(*types.PointerType); ok {
+						_ = ptrToPtr
+						// Load the pointer value
+						actualBase = g.ctx.Builder.CreateLoad(ptrType.ElementType, basePtr, "")
+						ptrType = ptrType.ElementType.(*types.PointerType) // Update type to *T
+					}
+					
+					// Now GEP on the loaded pointer
+					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, actualBase, []ir.Value{idx}, "")
 				}
 				
 				currPtr = elemPtr
@@ -403,7 +422,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					}
 				}
 				
-				// Handle alloca<T>(count)
 				if name == "alloca" {
 					if ga := ctx.GenericArgs(); ga != nil {
 						if gl := ga.GenericArgList(); gl != nil && len(gl.AllGenericArg()) > 0 {

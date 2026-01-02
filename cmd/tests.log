@@ -1949,11 +1949,8 @@ func main() int32 {
 }
 
 Run Output:
-value=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "value=20"
-Got output: "value=0\n"
+value=20
+Result: PASS
 
 --- Test: pointer_arithmetic_sub ---
 Source Code:
@@ -1984,11 +1981,8 @@ func main() int32 {
 }
 
 Run Output:
-value=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "value=10"
-Got output: "value=0\n"
+value=10
+Result: PASS
 
 --- Test: pointer_array_indexing ---
 Source Code:
@@ -2018,11 +2012,11 @@ func main() int32 {
 }
 
 Run Output:
-arr[1]=-2121180440
+arr[1]=-76057736
 Result: FAIL
 Error: assertion failed.
 Expected substring: "arr[1]=200"
-Got output: "arr[1]=-2121180440\n"
+Got output: "arr[1]=-76057736\n"
 
 --- Test: pointer_basic_type ---
 Source Code:
@@ -2259,11 +2253,8 @@ func main() int32 {
 }
 
 Run Output:
-x=10
-Result: FAIL
-Error: assertion failed.
-Expected substring: "x=888"
-Got output: "x=10\n"
+x=888
+Result: PASS
 
 --- Test: pointer_void_type ---
 Source Code:
@@ -4252,11 +4243,9 @@ func main() int32 {
 }
 
 Run Output:
-last=1415533651
 Result: FAIL
-Error: assertion failed.
-Expected substring: "last=555"
-Got output: "last=1415533651\n"
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: edge_null_deref_skip ---
 Source Code:
@@ -4383,4 +4372,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 83 | Failed: 51 | Total Time: 8.80s
+Passed: 86 | Failed: 48 | Total Time: 9.21s
