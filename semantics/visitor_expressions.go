@@ -21,6 +21,19 @@ func (a *Analyzer) VisitAdditiveExpression(ctx *parser.AdditiveExpressionContext
 	lhs := a.Visit(ctx.MultiplicativeExpression(0)).(types.Type)
 	for i := 1; i < len(ctx.AllMultiplicativeExpression()); i++ {
 		rhs := a.Visit(ctx.MultiplicativeExpression(i)).(types.Type)
+		
+		// Handle Pointer Arithmetic (ptr + int, ptr - int)
+		if types.IsPointer(lhs) && types.IsInteger(rhs) {
+			continue
+		}
+		
+		// Handle Pointer Arithmetic (int + ptr) - mostly for addition
+		if types.IsInteger(lhs) && types.IsPointer(rhs) {
+			// Result of int + ptr is ptr
+			lhs = rhs 
+			continue
+		}
+
 		if !areTypesCompatible(lhs, rhs) {
 			a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, 
 				"Type mismatch in addition: %s and %s", lhs.String(), rhs.String())
@@ -205,18 +218,29 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
 
-		// Special handling for 'cast<T>' or 'bit_cast<T>'
-		// These behave like functions that return T.
-		if (name == "cast" || name == "bit_cast") && ctx.GenericArgs() != nil {
-			// Extract target type T from generic args
-			gArgs := ctx.GenericArgs().GenericArgList()
-			if gArgs != nil && len(gArgs.AllGenericArg()) > 0 {
-				argCtx := gArgs.GenericArg(0)
-				// resolveType expects ITypeContext, usually in GenericArg
-				if argCtx.Type_() != nil {
-					targetType := a.resolveType(argCtx.Type_())
-					// Return a synthetic function type: func(...) -> targetType
-					return types.NewFunction(targetType, nil, true)
+		// Special handling for 'cast<T>', 'bit_cast<T>', 'alloca<T>'
+		if ctx.GenericArgs() != nil {
+			if name == "cast" || name == "bit_cast" {
+				gArgs := ctx.GenericArgs().GenericArgList()
+				if gArgs != nil && len(gArgs.AllGenericArg()) > 0 {
+					argCtx := gArgs.GenericArg(0)
+					if argCtx.Type_() != nil {
+						targetType := a.resolveType(argCtx.Type_())
+						// Return a synthetic function type: func(...) -> targetType
+						return types.NewFunction(targetType, nil, true)
+					}
+				}
+			}
+			
+			if name == "alloca" {
+				gArgs := ctx.GenericArgs().GenericArgList()
+				if gArgs != nil && len(gArgs.AllGenericArg()) > 0 {
+					argCtx := gArgs.GenericArg(0)
+					if argCtx.Type_() != nil {
+						targetType := a.resolveType(argCtx.Type_())
+						// alloca<T> returns *T
+						return types.NewPointer(targetType)
+					}
 				}
 			}
 		}

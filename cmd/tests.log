@@ -1938,7 +1938,7 @@ extern libc {
 func main() int32 {
     // --- Test Body ---
 
-    let arr = alloca(int32, 5)
+    let arr = alloca<int32>(5)
     arr[0] = 10
     arr[1] = 20
     let ptr: *int32 = arr
@@ -1951,13 +1951,13 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
+/tmp/arc_test_env/test.arc:21:0: Type mismatch in addition: ptr<i32> and i64
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
+/tmp/arc_test_env/test.arc:21:0: Type mismatch in addition: ptr<i32> and i64
 
 --- Test: pointer_arithmetic_sub ---
 Source Code:
@@ -1977,7 +1977,7 @@ extern libc {
 func main() int32 {
     // --- Test Body ---
 
-    let arr = alloca(int32, 5)
+    let arr = alloca<int32>(5)
     arr[0] = 10
     arr[1] = 20
     let ptr: *int32 = arr + 1
@@ -1990,13 +1990,15 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+/tmp/arc_test_env/test.arc:20:0: Type mismatch in addition: ptr<i8> and i64
+/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
+/tmp/arc_test_env/test.arc:21:0: Type mismatch in addition: ptr<i32> and i64
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+/tmp/arc_test_env/test.arc:20:0: Type mismatch in addition: ptr<i8> and i64
+/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
+/tmp/arc_test_env/test.arc:21:0: Type mismatch in addition: ptr<i32> and i64
 
 --- Test: pointer_array_indexing ---
 Source Code:
@@ -2016,7 +2018,7 @@ extern libc {
 func main() int32 {
     // --- Test Body ---
 
-    let arr = alloca(int32, 3)
+    let arr = alloca<int32>(3)
     arr[0] = 100
     arr[1] = 200
     arr[2] = 300
@@ -2025,16 +2027,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+Run Output:
+arr[1]=-1104984248
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+Error: assertion failed.
+Expected substring: "arr[1]=200"
+Got output: "arr[1]=-1104984248\n"
 
 --- Test: pointer_basic_type ---
 Source Code:
@@ -4264,11 +4262,11 @@ func main() int32 {
 }
 
 Run Output:
-last=0
+last=1936024687
 Result: FAIL
 Error: assertion failed.
 Expected substring: "last=555"
-Got output: "last=0\n"
+Got output: "last=1936024687\n"
 
 --- Test: edge_null_deref_skip ---
 Source Code:
@@ -4395,4 +4393,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 83 | Failed: 51 | Total Time: 8.86s
+Passed: 83 | Failed: 51 | Total Time: 9.02s

@@ -71,7 +71,7 @@ func init() {
 		TestCase{
 			Name: "pointer_arithmetic_add",
 			Body: `
-    let arr = alloca(int32, 5)
+    let arr = alloca<int32>(5)
     arr[0] = 10
     arr[1] = 20
     let ptr: *int32 = arr
@@ -84,7 +84,7 @@ func init() {
 		TestCase{
 			Name: "pointer_arithmetic_sub",
 			Body: `
-    let arr = alloca(int32, 5)
+    let arr = alloca<int32>(5)
     arr[0] = 10
     arr[1] = 20
     let ptr: *int32 = arr + 1
@@ -97,7 +97,7 @@ func init() {
 		TestCase{
 			Name: "pointer_array_indexing",
 			Body: `
-    let arr = alloca(int32, 3)
+    let arr = alloca<int32>(3)
     arr[0] = 100
     arr[1] = 200
     arr[2] = 300
