@@ -259,8 +259,7 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 			}
 			return typ
 		} else if isQualified {
-			// Handle Member Access Fallback: rect.width
-			// Try to resolve the first part as a symbol
+			// Handle Member Access Fallback: rect.width or counter.get
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
 			
@@ -284,17 +283,27 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 							}
 						}
 						
-						// Method check? (Only if last element)
-						// ... simplified: field access only for now
+						// Method check
+						methodName := st.Name + "_" + fieldName
+						if sym, ok := a.globalScope.Resolve(methodName); ok {
+							curr = sym.Type
+							continue
+						}
+						
 						valid = false
 						break
 					} else {
-						valid = false
-						break
+						valid = false; break
 					}
 				}
 				
 				if valid {
+					if hasParens {
+						if fn, ok := curr.(*types.FunctionType); ok {
+							return fn.ReturnType
+						}
+						a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Called non-function '%s'", name)
+					}
 					return curr
 				}
 			}

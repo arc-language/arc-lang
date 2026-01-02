@@ -2469,14 +2469,10 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Undefined identifier 'c.value'
-/tmp/arc_test_env/test.arc:18:0: Return type mismatch: expected i32, got void
 /tmp/arc_test_env/test.arc:26:0: Undefined identifier 'counter.get'
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Undefined identifier 'c.value'
-/tmp/arc_test_env/test.arc:18:0: Return type mismatch: expected i32, got void
 /tmp/arc_test_env/test.arc:26:0: Undefined identifier 'counter.get'
 
 --- Test: struct_method_inline ---
@@ -2556,11 +2552,11 @@ func main() int32 {
 }
 
 Run Output:
-age=30 height=32765
+age=30 height=32766
 Result: FAIL
 Error: assertion failed.
 Expected substring: "age=30 height=180"
-Got output: "age=30 height=32765\n"
+Got output: "age=30 height=32766\n"
 
 --- Test: struct_mutating_method ---
 Source Code:
@@ -4316,4 +4312,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 100 | Failed: 34 | Total Time: 9.20s
+Passed: 100 | Failed: 34 | Total Time: 9.40s
