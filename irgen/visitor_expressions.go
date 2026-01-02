@@ -126,6 +126,17 @@ func (g *Generator) VisitAdditiveExpression(ctx *parser.AdditiveExpressionContex
 		rhs := g.Visit(ctx.MultiplicativeExpression(i)).(ir.Value)
 		op := getOp(ctx, i)
 		
+		// Pointer Arithmetic
+		if ptrType, ok := lhs.Type().(*types.PointerType); ok {
+			if op == parser.ArcParserPLUS {
+				lhs = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, lhs, []ir.Value{rhs}, "")
+			} else if op == parser.ArcParserMINUS {
+				negRhs := g.ctx.Builder.CreateSub(g.getZeroValue(rhs.Type()), rhs, "")
+				lhs = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, lhs, []ir.Value{negRhs}, "")
+			}
+			continue
+		}
+		
 		if types.IsFloat(lhs.Type()) {
 			if op == parser.ArcParserPLUS {
 				lhs = g.ctx.Builder.CreateFAdd(lhs, rhs, "")
@@ -351,12 +362,10 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		return g.ctx.Builder.CreateAlignOf(t, "")
 	}
 
-	// Parenthesized Expression: ( expr )
 	if ctx.Expression() != nil && ctx.LPAREN() != nil && ctx.IDENTIFIER() == nil && ctx.QualifiedIdentifier() == nil {
 		return g.Visit(ctx.Expression())
 	}
 
-	// Handle Identifier or QualifiedIdentifier
 	var name string
 	var isQualified bool
 
@@ -372,7 +381,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	}
 
 	if name != "" {
-		// Check for function call syntax: IDENT(...) or QUAL.ID(...)
 		isCall := ctx.LPAREN() != nil && (ctx.IDENTIFIER() != nil || ctx.QualifiedIdentifier() != nil)
 		
 		var args []ir.Value
@@ -385,7 +393,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 			}
 
-			// Handle intrinsics/casts
 			if !isQualified {
 				if name == "cast" && len(args) == 1 {
 					if ga := ctx.GenericArgs(); ga != nil {
@@ -395,13 +402,29 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 						}
 					}
 				}
+				
+				// Handle alloca<T>(count)
+				if name == "alloca" {
+					if ga := ctx.GenericArgs(); ga != nil {
+						if gl := ga.GenericArgList(); gl != nil && len(gl.AllGenericArg()) > 0 {
+							elemType := g.resolveType(gl.GenericArg(0).Type_())
+                            var count ir.Value
+                            if len(args) > 0 {
+                                count = args[0]
+                            } else {
+                                count = g.ctx.Builder.ConstInt(types.I64, 1)
+                            }
+                            return g.ctx.Builder.CreateAllocaWithCount(elemType, count, "")
+						}
+					}
+				}
+
 				if intrinsicVal := g.GenerateIntrinsicCall(name, args); intrinsicVal != nil {
 					return intrinsicVal
 				}
 			}
 		}
 
-		// Resolve Symbol
 		var entity ir.Value
 		
 		if sym, ok := g.currentScope.Resolve(name); ok {
@@ -424,7 +447,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			}
 			entity = g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
 		} else {
-			// Not found
 			if isCall {
 				fmt.Printf("[IRGen] Error: Call to undefined function '%s'\n", name)
 			} else {
@@ -433,10 +455,8 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			return g.getZeroValue(types.I64)
 		}
 
-		// Generate Call
 		if isCall {
 			if fn, ok := entity.(*ir.Function); ok {
-				// Cast arguments to match function parameters
 				if len(args) == len(fn.FuncType.ParamTypes) || (fn.FuncType.Variadic && len(args) >= len(fn.FuncType.ParamTypes)) {
 					for i, paramType := range fn.FuncType.ParamTypes {
 						if i < len(args) {
@@ -482,7 +502,6 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 		return g.ctx.Builder.ConstInt(types.I1, val)
 	}
 	if ctx.STRING_LITERAL() != nil {
-		// Use strconv.Unquote to handle escape sequences (\n, \t, etc.)
 		unquoted, err := strconv.Unquote(txt)
 		if err != nil {
 			if len(txt) >= 2 {
@@ -495,7 +514,6 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 		var chars []ir.Constant
 		for _, b := range []byte(content) { chars = append(chars, g.ctx.Builder.ConstInt(types.I8, int64(b))) }
 		
-		// Use unique name to avoid linker collisions
 		strName := fmt.Sprintf(".str.%d", len(g.ctx.Module.Globals))
 		global := g.ctx.Builder.CreateGlobalConstant(strName, &ir.ConstantArray{BaseValue: ir.BaseValue{ValType: arrType}, Elements: chars})
 		

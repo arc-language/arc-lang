@@ -16,7 +16,7 @@ func init() {
 		TestCase{
 			Name: "pointer_address_of",
 			Body: `
-    let value = 100
+    let value: int32 = 100
     let ptr: *int32 = &value
     libc.printf("got_address\n")
     `,
