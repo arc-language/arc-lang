@@ -1,5 +1,0 @@
-namespace main
-
-func main() int32 {
-    return 0
-}

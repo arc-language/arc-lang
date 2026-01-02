@@ -35,42 +35,38 @@ func main() {
 	}
 	defer logFile.Close()
 
-	// First, make sure arc binary exists
+	// 1. Check for compiler binary
 	arcBinary := "./arc"
 	if _, err := os.Stat(arcBinary); os.IsNotExist(err) {
-		fmt.Fprintf(os.Stderr, "Error: 'arc' binary not found. Please build it first:\n")
-		fmt.Fprintf(os.Stderr, "  go build -o arc main.go\n")
-		logToFile("Error: 'arc' binary not found\n")
-		os.Exit(1)
+		fail("Error: 'arc' binary not found. Run: go build -o arc main.go")
 	}
 
-	testDir := "tests"
-	
-	// Find all .arc test files
-	arcFiles, err := filepath.Glob(filepath.Join(testDir, "test_*.arc"))
+	// 2. Setup Test Directory
+	testDir := filepath.Join("tests", "foundation")
+	if _, err := os.Stat(testDir); os.IsNotExist(err) {
+		os.MkdirAll(testDir, 0755)
+		fmt.Printf("Created test directory: %s\n", testDir)
+		fmt.Println("Please populate it with .arc files.")
+		return
+	}
+
+	// 3. Find Test Files
+	arcFiles, err := filepath.Glob(filepath.Join(testDir, "*.arc"))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error finding test files: %v\n", err)
-		logToFile(fmt.Sprintf("Error finding test files: %v\n", err))
-		os.Exit(1)
+		fail(fmt.Sprintf("Error searching for files: %v", err))
 	}
 
 	if len(arcFiles) == 0 {
-		fmt.Fprintf(os.Stderr, "No .arc test files found in %s/\n", testDir)
-		logToFile(fmt.Sprintf("No .arc test files found in %s/\n", testDir))
-		os.Exit(1)
+		fail(fmt.Sprintf("No .arc files found in %s", testDir))
 	}
 
-	header := "Arc Language Test Runner\n" + strings.Repeat("=", 70) + "\n"
-	fmt.Print(header)
-	logToFile(header)
-	
-	msg := fmt.Sprintf("Found %d test files\n\n", len(arcFiles))
-	fmt.Print(msg)
-	logToFile(msg)
+	// 4. Header
+	printHeader(len(arcFiles))
 
+	// 5. Run Tests
 	results := make([]TestResult, 0, len(arcFiles))
 	tempDir := filepath.Join(os.TempDir(), "arc_tests")
-	os.RemoveAll(tempDir) // Clean up from previous runs
+	os.RemoveAll(tempDir)
 	os.MkdirAll(tempDir, 0755)
 	defer os.RemoveAll(tempDir)
 
@@ -85,227 +81,132 @@ func main() {
 		result.Duration = time.Since(start)
 		results = append(results, result)
 
-		if result.Passed {
-			msg := fmt.Sprintf("✅ PASS (%.2fs)\n", result.Duration.Seconds())
-			fmt.Print(msg)
-			logToFile(msg)
-		} else {
-			msg := fmt.Sprintf("❌ FAIL (%.2fs)\n", result.Duration.Seconds())
-			fmt.Print(msg)
-			logToFile(msg)
-			
-			if !result.Compiled {
-				msg := "    Compilation failed\n"
-				fmt.Print(msg)
-				logToFile(msg)
-				logToFile(fmt.Sprintf("    Compile output:\n%s\n", indent(result.CompileLog)))
-			} else if !result.Linked {
-				msg := "    Linking failed\n"
-				fmt.Print(msg)
-				logToFile(msg)
-				logToFile(fmt.Sprintf("    Link output:\n%s\n", indent(result.LinkLog)))
-			} else {
-				msg := fmt.Sprintf("    Expected exit=%d, got exit=%d\n", result.Expected, result.ExitCode)
-				fmt.Print(msg)
-				logToFile(msg)
-				if result.RunLog != "" {
-					logToFile(fmt.Sprintf("    Run output:\n%s\n", indent(result.RunLog)))
-				}
-			}
-			if result.Error != "" && len(result.Error) < 200 {
-				msg := fmt.Sprintf("    %s\n", result.Error)
-				fmt.Print(msg)
-				logToFile(msg)
-			}
-		}
+		printResult(result)
 	}
 
-	// Print summary
-	fmt.Println()
-	logToFile("\n")
-	separator := strings.Repeat("=", 70) + "\n"
-	fmt.Print(separator)
-	logToFile(separator)
+	// 6. Summary
 	printSummary(results)
-	
-	logToFile("\nLog file written to: test.log\n")
 }
 
 func runTest(arcBinary, arcFile, testName, tempDir string) TestResult {
-	result := TestResult{
-		Name:     testName,
-		Expected: 0, // Default expected exit code
-	}
+	result := TestResult{Name: testName, Expected: 0}
 
-	logToFile(fmt.Sprintf("\n--- Testing: %s ---\n", testName))
-	logToFile(fmt.Sprintf("Source file: %s\n", arcFile))
-
-	// Check for expected exit code in filename (e.g., test_name_exit42.arc)
+	// Check filename for expected exit code (e.g. test_fail_exit1.arc)
 	if strings.Contains(testName, "_exit") {
 		parts := strings.Split(testName, "_exit")
 		if len(parts) == 2 {
 			fmt.Sscanf(parts[1], "%d", &result.Expected)
-			logToFile(fmt.Sprintf("Expected exit code: %d\n", result.Expected))
 		}
 	}
 
-	// Paths
 	objFile := filepath.Join(tempDir, testName+".o")
 	exeFile := filepath.Join(tempDir, testName)
 
-	logToFile(fmt.Sprintf("Object file: %s\n", objFile))
-	logToFile(fmt.Sprintf("Executable: %s\n", exeFile))
-
-	// Step 1: Compile .arc to .o using arc binary
-	logToFile("\nStep 1: Compiling to object file...\n")
+	// A. Compile (Arc -> Object)
 	cmd := exec.Command(arcBinary, "build", arcFile, "-o", objFile)
-	output, err := cmd.CombinedOutput()
-	result.CompileLog = string(output)
-	
+	out, err := cmd.CombinedOutput()
+	result.CompileLog = string(out)
 	if err != nil {
-		result.Error = strings.TrimSpace(string(output))
-		logToFile(fmt.Sprintf("Compilation failed: %v\n", err))
-		logToFile(fmt.Sprintf("Output:\n%s\n", output))
+		result.Error = "Compilation Error"
 		return result
 	}
-	
 	result.Compiled = true
-	logToFile("Compilation successful\n")
-	if len(output) > 0 {
-		logToFile(fmt.Sprintf("Compile output:\n%s\n", output))
-	}
 
-	// Step 2: Link with gcc
-	logToFile("\nStep 2: Linking with gcc...\n")
+	// B. Link (Object -> Exe using GCC/Clang for libc)
 	cmd = exec.Command("gcc", objFile, "-o", exeFile, "-no-pie")
-	output, err = cmd.CombinedOutput()
-	result.LinkLog = string(output)
-	
+	out, err = cmd.CombinedOutput()
+	result.LinkLog = string(out)
 	if err != nil {
-		result.Error = strings.TrimSpace(string(output))
-		logToFile(fmt.Sprintf("Linking failed: %v\n", err))
-		logToFile(fmt.Sprintf("Output:\n%s\n", output))
+		result.Error = "Linking Error"
 		return result
 	}
-	
 	result.Linked = true
-	logToFile("Linking successful\n")
-	if len(output) > 0 {
-		logToFile(fmt.Sprintf("Link output:\n%s\n", output))
-	}
 
-	// Step 3: Run the executable
-	logToFile("\nStep 3: Running executable...\n")
+	// C. Run
 	cmd = exec.Command(exeFile)
-	output, err = cmd.CombinedOutput()
-	result.RunLog = string(output)
-	result.ExitCode = 0
+	out, err = cmd.CombinedOutput()
+	result.RunLog = string(out)
 	
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			result.ExitCode = exitErr.ExitCode()
-			logToFile(fmt.Sprintf("Process exited with code: %d\n", result.ExitCode))
 		} else {
-			result.Error = fmt.Sprintf("Execution failed: %v", err)
-			logToFile(fmt.Sprintf("Execution error: %v\n", err))
+			result.Error = fmt.Sprintf("Execution Error: %v", err)
 			return result
 		}
-	} else {
-		logToFile("Process exited with code: 0\n")
-	}
-	
-	if len(output) > 0 {
-		logToFile(fmt.Sprintf("Program output:\n%s\n", output))
 	}
 
-	// Step 4: Check exit code matches expected
 	if result.ExitCode == result.Expected {
 		result.Passed = true
-		logToFile("✅ Test PASSED\n")
 	} else {
-		logToFile(fmt.Sprintf("❌ Test FAILED: expected exit=%d, got exit=%d\n", result.Expected, result.ExitCode))
-		if len(output) > 0 {
-			result.Error = fmt.Sprintf("Output: %s", strings.TrimSpace(string(output)))
-		}
+		result.Error = fmt.Sprintf("Wrong Exit Code: expected %d, got %d", result.Expected, result.ExitCode)
 	}
 
 	return result
 }
 
-func printSummary(results []TestResult) {
-	passed := 0
-	failed := 0
-	compileErrors := 0
-	linkErrors := 0
-	runtimeErrors := 0
-	totalDuration := time.Duration(0)
+func fail(msg string) {
+	fmt.Fprintln(os.Stderr, msg)
+	logToFile(msg + "\n")
+	os.Exit(1)
+}
 
-	for _, r := range results {
-		totalDuration += r.Duration
-		if r.Passed {
-			passed++
+func printHeader(count int) {
+	header := "\nArc Foundation Test Runner\n" + strings.Repeat("=", 60) + "\n"
+	fmt.Print(header)
+	logToFile(header)
+	fmt.Printf("Found %d tests in tests/foundation/\n\n", count)
+}
+
+func printResult(r TestResult) {
+	if r.Passed {
+		msg := fmt.Sprintf("✅ PASS (%.3fs)\n", r.Duration.Seconds())
+		fmt.Print(msg)
+		logToFile(msg)
+	} else {
+		msg := fmt.Sprintf("❌ FAIL (%.3fs)\n", r.Duration.Seconds())
+		fmt.Print(msg)
+		logToFile(msg)
+		
+		detail := ""
+		if !r.Compiled {
+			detail = fmt.Sprintf("   Compilation Failed:\n%s\n", indent(r.CompileLog))
+		} else if !r.Linked {
+			detail = fmt.Sprintf("   Linking Failed:\n%s\n", indent(r.LinkLog))
 		} else {
-			failed++
-			if !r.Compiled {
-				compileErrors++
-			} else if !r.Linked {
-				linkErrors++
-			} else {
-				runtimeErrors++
+			detail = fmt.Sprintf("   %s\n", r.Error)
+			if r.RunLog != "" {
+				detail += fmt.Sprintf("   Output:\n%s\n", indent(r.RunLog))
 			}
 		}
+		fmt.Print(detail)
+		logToFile(detail)
 	}
+}
 
-	summary := fmt.Sprintf("Total Tests:      %d\n", len(results))
-	summary += fmt.Sprintf("Passed:           %d (%.1f%%)\n", passed, float64(passed)/float64(len(results))*100)
-	summary += fmt.Sprintf("Failed:           %d\n", failed)
-	if failed > 0 {
-		summary += fmt.Sprintf("  Compile errors: %d\n", compileErrors)
-		summary += fmt.Sprintf("  Link errors:    %d\n", linkErrors)
-		summary += fmt.Sprintf("  Runtime errors: %d\n", runtimeErrors)
+func printSummary(results []TestResult) {
+	passed, failed := 0, 0
+	for _, r := range results {
+		if r.Passed { passed++ } else { failed++ }
 	}
-	summary += fmt.Sprintf("Total Duration:   %.2fs\n", totalDuration.Seconds())
-
+	
+	line := strings.Repeat("-", 60) + "\n"
+	fmt.Print(line)
+	logToFile(line)
+	
+	summary := fmt.Sprintf("Passed: %d | Failed: %d | Total: %d\n", passed, failed, len(results))
 	fmt.Print(summary)
 	logToFile(summary)
-
+	
 	if failed > 0 {
-		failList := "\nFailed Tests:\n"
-		for _, r := range results {
-			if !r.Passed {
-				status := "runtime"
-				if !r.Compiled {
-					status = "compile"
-				} else if !r.Linked {
-					status = "link"
-				}
-				failList += fmt.Sprintf("  ❌ %-40s (%s)\n", r.Name, status)
-			}
-		}
-		failList += "\n"
-		fmt.Print(failList)
-		logToFile(failList)
 		os.Exit(1)
-	} else {
-		success := "\n🎉 All tests passed!\n"
-		fmt.Print(success)
-		logToFile(success)
 	}
 }
 
 func logToFile(msg string) {
-	if logFile != nil {
-		logFile.WriteString(msg)
-	}
+	if logFile != nil { logFile.WriteString(msg) }
 }
 
 func indent(s string) string {
-	if s == "" {
-		return ""
-	}
-	lines := strings.Split(strings.TrimRight(s, "\n"), "\n")
-	for i, line := range lines {
-		lines[i] = "      " + line
-	}
-	return strings.Join(lines, "\n")
+	return "      " + strings.ReplaceAll(strings.TrimSpace(s), "\n", "\n      ")
 }
