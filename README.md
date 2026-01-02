@@ -1,7 +1,6 @@
 <h1 align="center">
-  <a href="https://github.com/arc-language/arc-lang"><img src="./.github/arc-logo.png" alt="Arc AI Language" width="200px"></a>
+  <a href="https://github.com/arc-language/arc-lang"><img src="./.github/arc_logo.jpeg" alt="Arc AI Language" width="200px"></a>
   <br>
-  Arc AI Language
   <br>
 </h1>
 <h4 align="center">A systems programming language for AI inference, training, and direct hardware control with zero-overhead abstractions</h4>
