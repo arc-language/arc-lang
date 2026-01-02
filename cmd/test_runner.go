@@ -74,7 +74,7 @@ func main() {
 		writeLog(logFile, fmt.Sprintf("\n--- Test: %s ---\n", test.Name))
 
 		start := time.Now()
-		err := runSingleTest(test, arcBinary, tempDir, logFile)
+		output, err := runSingleTest(test, arcBinary, tempDir, logFile)
 		duration := time.Since(start)
 
 		if err == nil {
@@ -88,6 +88,11 @@ func main() {
 			writeLog(logFile, fmt.Sprintf("Result: FAIL\nError: %v\n", err))
 			fmt.Printf("      Error: %v\n", err)
 			failed++
+		}
+
+		// Display execution output
+		if output != "" {
+			fmt.Printf("      Output: %s\n", strings.TrimSpace(output))
 		}
 	}
 
@@ -104,7 +109,7 @@ func main() {
 	}
 }
 
-func runSingleTest(tc TestCase, arcBinary, tempDir string, log *os.File) error {
+func runSingleTest(tc TestCase, arcBinary, tempDir string, log *os.File) (string, error) {
 	// 1. Construct Source Code
 	fullSource := fmt.Sprintf(`
 extern libc {
@@ -132,7 +137,7 @@ func main() int32 {
 
 	// 2. Write Source File
 	if err := os.WriteFile(srcPath, []byte(fullSource), 0644); err != nil {
-		return fmt.Errorf("write source failed: %v", err)
+		return "", fmt.Errorf("write source failed: %v", err)
 	}
 	writeLog(log, "Source Code:\n"+fullSource+"\n")
 
@@ -145,12 +150,12 @@ func main() int32 {
 	
 	if ctx.Err() == context.DeadlineExceeded {
 		writeLog(log, "Compile Output: TIMEOUT\n")
-		return fmt.Errorf("compile timeout (exceeded %v)", TEST_TIMEOUT)
+		return "", fmt.Errorf("compile timeout (exceeded %v)", TEST_TIMEOUT)
 	}
 	
 	if err != nil {
 		writeLog(log, "Compile Output:\n"+string(outCompile))
-		return fmt.Errorf("compile failed: %s", strings.TrimSpace(string(outCompile)))
+		return "", fmt.Errorf("compile failed: %s", strings.TrimSpace(string(outCompile)))
 	}
 
 	// 4. Link (Object -> Executable using GCC) with timeout
@@ -162,12 +167,12 @@ func main() int32 {
 	
 	if ctx.Err() == context.DeadlineExceeded {
 		writeLog(log, "Link Output: TIMEOUT\n")
-		return fmt.Errorf("link timeout (exceeded %v)", TEST_TIMEOUT)
+		return "", fmt.Errorf("link timeout (exceeded %v)", TEST_TIMEOUT)
 	}
 	
 	if err != nil {
 		writeLog(log, "Link Output:\n"+string(outLink))
-		return fmt.Errorf("link failed: %s", strings.TrimSpace(string(outLink)))
+		return "", fmt.Errorf("link failed: %s", strings.TrimSpace(string(outLink)))
 	}
 
 	// 5. Run Executable with timeout
@@ -181,7 +186,7 @@ func main() int32 {
 
 	// Check for timeout
 	if ctx.Err() == context.DeadlineExceeded {
-		return fmt.Errorf("execution timeout (exceeded %v) - possible infinite loop or hang", TEST_TIMEOUT)
+		return output, fmt.Errorf("execution timeout (exceeded %v) - possible infinite loop or hang", TEST_TIMEOUT)
 	}
 
 	// Check for runtime errors (crashes, segfaults, etc.)
@@ -189,18 +194,18 @@ func main() int32 {
 		// Try to determine if it was a crash vs normal error
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			if exitErr.ExitCode() != 0 {
-				return fmt.Errorf("runtime error (exit code %d)\nOutput: %s", exitErr.ExitCode(), output)
+				return output, fmt.Errorf("runtime error (exit code %d)\nOutput: %s", exitErr.ExitCode(), output)
 			}
 		}
-		return fmt.Errorf("runtime error: %v\nOutput: %s", err, output)
+		return output, fmt.Errorf("runtime error: %v\nOutput: %s", err, output)
 	}
 
 	// 6. Assert Expectations
 	if !strings.Contains(output, tc.Expected) {
-		return fmt.Errorf("assertion failed.\nExpected substring: %q\nGot output: %q", tc.Expected, output)
+		return output, fmt.Errorf("assertion failed.\nExpected substring: %q\nGot output: %q", tc.Expected, output)
 	}
 
-	return nil
+	return output, nil
 }
 
 func writeLog(f *os.File, msg string) {
