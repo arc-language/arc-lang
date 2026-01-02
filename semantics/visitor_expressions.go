@@ -27,9 +27,8 @@ func (a *Analyzer) VisitAdditiveExpression(ctx *parser.AdditiveExpressionContext
 			continue
 		}
 		
-		// Handle Pointer Arithmetic (int + ptr) - mostly for addition
+		// Handle Pointer Arithmetic (int + ptr)
 		if types.IsInteger(lhs) && types.IsPointer(rhs) {
-			// Result of int + ptr is ptr
 			lhs = rhs 
 			continue
 		}
@@ -62,16 +61,14 @@ func (a *Analyzer) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) inte
 		return a.Visit(ctx.PostfixExpression())
 	}
 	
-	// Handle Prefix Ops (- ! ~ * & ++ --)
+	// Handle Prefix Ops
 	if ctx.UnaryExpression() != nil {
 		valType := a.Visit(ctx.UnaryExpression()).(types.Type)
 		
-		// Address Of (&)
 		if ctx.AMP() != nil {
 			return types.NewPointer(valType)
 		}
 		
-		// Dereference (*)
 		if ctx.STAR() != nil {
 			if ptr, ok := valType.(*types.PointerType); ok {
 				return ptr.ElementType
@@ -81,12 +78,10 @@ func (a *Analyzer) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) inte
 			return types.Void
 		}
 
-		// Math/Logic Ops
 		if ctx.MINUS() != nil || ctx.NOT() != nil || ctx.BIT_NOT() != nil {
 			return valType
 		}
 
-		// Prefix Increment/Decrement (++i, --i)
 		if ctx.INCREMENT() != nil || ctx.DECREMENT() != nil {
 			if !types.IsInteger(valType) && !types.IsPointer(valType) {
 				a.bag.Report(a.file, ctx.GetStart().GetLine(), 0,
@@ -100,25 +95,21 @@ func (a *Analyzer) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) inte
 	return types.Void
 }
 
-// --- Postfix Expressions (Calls, Members, Indexing) ---
+// --- Postfix Expressions ---
 
 func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
-	// 1. Resolve Base (Primary Expression)
 	curr := a.Visit(ctx.PrimaryExpression()).(types.Type)
 
-	// 2. Iterate Ops (Left-to-Right)
 	for _, op := range ctx.AllPostfixOp() {
 		
-		// --- Function Call: foo(args) ---
+		// Function Call via Postfix Op
 		if op.LPAREN() != nil {
-			// Validate Arguments
 			if op.ArgumentList() != nil {
 				for _, arg := range op.ArgumentList().AllArgument() {
 					a.Visit(arg.Expression())
 				}
 			}
 			
-			// Resolve Return Type
 			if fn, ok := curr.(*types.FunctionType); ok {
 				curr = fn.ReturnType
 			} else {
@@ -128,17 +119,15 @@ func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) 
 			}
 		}
 
-		// --- Member Access: obj.field or obj.method ---
+		// Member Access
 		if op.DOT() != nil {
 			name := op.IDENTIFIER().GetText()
 			
-			// Auto-dereference pointers (obj->field in C, obj.field in Arc)
 			if ptr, ok := curr.(*types.PointerType); ok {
 				curr = ptr.ElementType
 			}
 
 			if st, ok := curr.(*types.StructType); ok {
-				// 1. Check Fields
 				if indices, ok := a.structIndices[st.Name]; ok {
 					if idx, ok := indices[name]; ok {
 						curr = st.Fields[idx]
@@ -146,7 +135,6 @@ func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) 
 					}
 				}
 				
-				// 2. Check Methods (Name Mangling: StructName_MethodName)
 				methodName := st.Name + "_" + name
 				if sym, ok := a.globalScope.Resolve(methodName); ok {
 					curr = sym.Type
@@ -154,7 +142,6 @@ func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) 
 				}
 			}
 
-			// Report Error (unless we already errored earlier)
 			if curr != types.Void {
 				a.bag.Report(a.file, op.GetStart().GetLine(), 0, 
 					"Type '%s' has no field or method '%s'", curr.String(), name)
@@ -162,19 +149,16 @@ func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) 
 			return types.Void
 		}
 
-		// --- Indexing: arr[i] ---
+		// Indexing
 		if op.LBRACKET() != nil {
-			// Validate Index Expression
 			idxType := a.Visit(op.Expression()).(types.Type)
 			if !types.IsInteger(idxType) {
 				a.bag.Report(a.file, op.GetStart().GetLine(), 0, 
 					"Index must be an integer, got '%s'", idxType.String())
 			}
 
-			// Dereference Collection
 			if ptr, ok := curr.(*types.PointerType); ok {
 				curr = ptr.ElementType
-				// If it was a pointer to array (*[N]T), dereference to element T
 				if arr, ok := curr.(*types.ArrayType); ok {
 					curr = arr.ElementType
 				}
@@ -186,7 +170,7 @@ func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) 
 			}
 		}
 
-		// --- Postfix Increment/Decrement: i++ ---
+		// Increment/Decrement
 		if op.INCREMENT() != nil || op.DECREMENT() != nil {
 			if !types.IsInteger(curr) && !types.IsPointer(curr) {
 				a.bag.Report(a.file, op.GetStart().GetLine(), 0,
@@ -204,29 +188,46 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 	if ctx.Literal() != nil { return a.Visit(ctx.Literal()) }
 	if ctx.StructLiteral() != nil { return a.Visit(ctx.StructLiteral()) }
 	
-	// 2. Compiler Keywords (Sizeof / Alignof)
+	// 2. Keywords
 	if ctx.SizeofExpression() != nil {
-		a.resolveType(ctx.SizeofExpression().Type_()) // Check type validity
+		a.resolveType(ctx.SizeofExpression().Type_())
 		return types.U64
 	}
 	if ctx.AlignofExpression() != nil {
-		a.resolveType(ctx.AlignofExpression().Type_()) // Check type validity
+		a.resolveType(ctx.AlignofExpression().Type_())
 		return types.U64
 	}
 
-	// 3. Identifiers (Variables, Functions, Intrinsics)
-	if ctx.IDENTIFIER() != nil {
-		name := ctx.IDENTIFIER().GetText()
+	// 3. Identifiers / Qualified
+	var name string
+	var isQualified bool
+	var hasParens bool = (ctx.LPAREN() != nil)
 
-		// Special handling for 'cast<T>', 'bit_cast<T>', 'alloca<T>'
-		if ctx.GenericArgs() != nil {
+	if ctx.QualifiedIdentifier() != nil {
+		q := ctx.QualifiedIdentifier()
+		for i, id := range q.AllIDENTIFIER() {
+			if i > 0 { name += "." }
+			name += id.GetText()
+		}
+		isQualified = true
+	} else if ctx.IDENTIFIER() != nil {
+		name = ctx.IDENTIFIER().GetText()
+	}
+
+	if name != "" {
+		// Handle Special Forms (cast, alloca, etc.)
+		if ctx.GenericArgs() != nil && !isQualified {
 			if name == "cast" || name == "bit_cast" {
 				gArgs := ctx.GenericArgs().GenericArgList()
 				if gArgs != nil && len(gArgs.AllGenericArg()) > 0 {
 					argCtx := gArgs.GenericArg(0)
 					if argCtx.Type_() != nil {
 						targetType := a.resolveType(argCtx.Type_())
-						// Return a synthetic function type: func(...) -> targetType
+						// If parens present, we are calling it -> returns T
+						if hasParens {
+							return targetType
+						}
+						// Otherwise returns func -> T
 						return types.NewFunction(targetType, nil, true)
 					}
 				}
@@ -238,41 +239,38 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 					argCtx := gArgs.GenericArg(0)
 					if argCtx.Type_() != nil {
 						targetType := a.resolveType(argCtx.Type_())
-						// alloca<T> returns *T
-						return types.NewPointer(targetType)
+						ptrType := types.NewPointer(targetType)
+						if hasParens {
+							return ptrType
+						}
+						return types.NewFunction(ptrType, nil, true)
 					}
 				}
 			}
 		}
 		
-		// Look up in scope
+		// Normal Symbol Resolution
 		if s, ok := a.currentScope.Resolve(name); ok {
-			return s.Type
+			typ := s.Type
+			// If it's a function and we have parens, return return type
+			if hasParens {
+				if fn, ok := typ.(*types.FunctionType); ok {
+					return fn.ReturnType
+				}
+				// If it's not a function type but has parens, might be error or call on value
+				// But VisitPostfixExpression handles postfix calls.
+				// This PrimaryExpression call syntax is for "func(args)" directly.
+				a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Called non-function '%s'", name)
+			}
+			return typ
 		}
 		
 		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Undefined identifier '%s'", name)
 		return types.Void
 	}
-	
-	// 4. Qualified Identifiers (e.g. io.print)
-	if ctx.QualifiedIdentifier() != nil {
-		q := ctx.QualifiedIdentifier()
-		var name string
-		for i, id := range q.AllIDENTIFIER() {
-			if i > 0 { name += "." }
-			name += id.GetText()
-		}
-		
-		if s, ok := a.currentScope.Resolve(name); ok {
-			return s.Type
-		}
-		
-		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Undefined qualified symbol '%s'", name)
-		return types.Void 
-	}
 
-	// 5. Parenthesized Expression
-	if ctx.Expression() != nil {
+	// 5. Parenthesized Expression ( expr )
+	if ctx.Expression() != nil && hasParens && name == "" {
 		return a.Visit(ctx.Expression())
 	}
 	
@@ -283,8 +281,6 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 
 func (a *Analyzer) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
-	
-	// Resolve Struct Type
 	sym, ok := a.currentScope.Resolve(name)
 	if !ok || sym.Kind != symbol.SymType {
 		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Unknown struct type '%s'", name)
@@ -327,8 +323,8 @@ func (a *Analyzer) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	if ctx.INTEGER_LITERAL() != nil { return types.I64 }
 	if ctx.FLOAT_LITERAL() != nil { return types.F64 }
 	if ctx.BOOLEAN_LITERAL() != nil { return types.I1 }
-	if ctx.STRING_LITERAL() != nil { return types.NewPointer(types.I8) } // C-String
-	if ctx.CHAR_LITERAL() != nil { return types.I32 } // Rune
+	if ctx.STRING_LITERAL() != nil { return types.NewPointer(types.I8) } 
+	if ctx.CHAR_LITERAL() != nil { return types.I32 } 
 	if ctx.NULL() != nil { return types.NewPointer(types.Void) }
 	
 	if ctx.InitializerList() != nil { 

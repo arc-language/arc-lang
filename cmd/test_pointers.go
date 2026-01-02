@@ -6,7 +6,7 @@ func init() {
 		TestCase{
 			Name: "pointer_basic_type",
 			Body: `
-    let x = 42
+	let x: int32 = 42
     let ptr: *int32 = &x
     libc.printf("pointer_created\n")
     `,
@@ -59,7 +59,7 @@ func init() {
 		TestCase{
 			Name: "pointer_non_null",
 			Body: `
-    let value = 42
+    let value: int32 = 42
     let ptr: *int32 = &value
     if ptr != null {
         libc.printf("not_null\n")
@@ -109,7 +109,7 @@ func init() {
 		TestCase{
 			Name: "pointer_void_type",
 			Body: `
-    let x = 42
+    let x: int32 = 42
     let vptr: *void = cast<*void>(&x)
     let iptr: *int32 = cast<*int32>(vptr)
     libc.printf("value=%d\n", *iptr)
@@ -120,7 +120,7 @@ func init() {
 		TestCase{
 			Name: "pointer_double_pointer",
 			Body: `
-    let value = 77
+    let value: int32 = 77
     let ptr: *int32 = &value
     let pptr: **int32 = &ptr
     libc.printf("value=%d\n", **pptr)
