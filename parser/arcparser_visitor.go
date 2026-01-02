@@ -44,14 +44,20 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#genericArgs.
 	VisitGenericArgs(ctx *GenericArgsContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#typeList.
-	VisitTypeList(ctx *TypeListContext) interface{}
+	// Visit a parse tree produced by ArcParser#genericArgList.
+	VisitGenericArgList(ctx *GenericArgListContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#genericArg.
+	VisitGenericArg(ctx *GenericArgContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#functionDecl.
 	VisitFunctionDecl(ctx *FunctionDeclContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#returnType.
 	VisitReturnType(ctx *ReturnTypeContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#typeList.
+	VisitTypeList(ctx *TypeListContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#parameterList.
 	VisitParameterList(ctx *ParameterListContext) interface{}
@@ -107,6 +113,9 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#type.
 	VisitType(ctx *TypeContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#functionType.
+	VisitFunctionType(ctx *FunctionTypeContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#qualifiedType.
 	VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
 
@@ -118,12 +127,6 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#referenceType.
 	VisitReferenceType(ctx *ReferenceTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#arrayType.
-	VisitArrayType(ctx *ArrayTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#arraySize.
-	VisitArraySize(ctx *ArraySizeContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#block.
 	VisitBlock(ctx *BlockContext) interface{}
@@ -233,6 +236,12 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
 	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#sizeofExpression.
+	VisitSizeofExpression(ctx *SizeofExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#alignofExpression.
+	VisitAlignofExpression(ctx *AlignofExpressionContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#literal.
 	VisitLiteral(ctx *LiteralContext) interface{}
 
@@ -257,6 +266,9 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#lambdaExpression.
 	VisitLambdaExpression(ctx *LambdaExpressionContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#anonymousFuncExpression.
+	VisitAnonymousFuncExpression(ctx *AnonymousFuncExpressionContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#lambdaParamList.
 	VisitLambdaParamList(ctx *LambdaParamListContext) interface{}
 
@@ -265,16 +277,4 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#tupleExpression.
 	VisitTupleExpression(ctx *TupleExpressionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#castExpression.
-	VisitCastExpression(ctx *CastExpressionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#allocaExpression.
-	VisitAllocaExpression(ctx *AllocaExpressionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#syscallExpression.
-	VisitSyscallExpression(ctx *SyscallExpressionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#intrinsicExpression.
-	VisitIntrinsicExpression(ctx *IntrinsicExpressionContext) interface{}
 }

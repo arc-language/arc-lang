@@ -92,7 +92,6 @@ genericArgList
     : genericArg (COMMA genericArg)*
     ;
 
-// Generic arguments can be types OR constant expressions (for array<T, N>)
 genericArg
     : type
     | expression
@@ -217,13 +216,27 @@ type
     : primitiveType
     | pointerType
     | referenceType
-    | qualifiedType
-    | IDENTIFIER genericArgs?  // Handles: array<T,N>, vector<T>, map<K,V>, custom types
+    | qualifiedType            // Matches 'pkg.Type' (Strict 1-dot limit)
+    | functionType             // Matches 'func(A) B'
+    | IDENTIFIER genericArgs?  // Matches 'Type' or 'Type<T>'
     | UNDERSCORE
     ;
 
+// STRICT RULE: Only allow One Dot for types (Namespace.Type)
+// Go-style rule: Users must import "std/io" as 'io', then use 'io.File'
+// Nested usage like 'std.io.File' is forbidden.
 qualifiedType
-    : IDENTIFIER (DOT IDENTIFIER)+ genericArgs?
+    : IDENTIFIER DOT IDENTIFIER genericArgs?
+    ;
+
+// Definition for a function TYPE (e.g. for variables/fields)
+functionType
+    : ASYNC? FUNC genericParams? LPAREN typeList? RPAREN returnType?
+    ;
+
+// Used in expressions (not types), allows infinite chaining: a.b.c
+qualifiedIdentifier
+    : IDENTIFIER (DOT IDENTIFIER)+
     ;
 
 primitiveType
@@ -253,20 +266,20 @@ block
     ;
 
 statement
-    : variableDecl
-    | constDecl
-    | assignmentStmt
-    | expressionStmt
+    : block
     | returnStmt
+    | breakStmt
+    | continueStmt
     | ifStmt
     | forStmt
     | switchStmt
     | tryStmt
     | throwStmt
-    | breakStmt
-    | continueStmt
     | deferStmt
-    | block
+    | variableDecl
+    | constDecl
+    | assignmentStmt
+    | expressionStmt
     ;
 
 assignmentStmt
@@ -418,7 +431,7 @@ relationalExpression
     ;
 
 shiftExpression
-    : rangeExpression ((LT LT | GT GT) rangeExpression)*  // Decomposed << and >>
+    : rangeExpression ((LT LT | GT GT) rangeExpression)*
     ;
 
 rangeExpression
@@ -434,7 +447,8 @@ multiplicativeExpression
     ;
 
 unaryExpression
-    : (MINUS | NOT | BIT_NOT | STAR | AMP | AWAIT) unaryExpression
+    : (MINUS | NOT | BIT_NOT | STAR | AMP) unaryExpression
+    | AWAIT (LPAREN expression RPAREN)? unaryExpression
     | INCREMENT unaryExpression
     | DECREMENT unaryExpression
     | postfixExpression
@@ -463,20 +477,17 @@ primaryExpression
     | sizeofExpression
     | alignofExpression
     | lambdaExpression
+    | anonymousFuncExpression
     | tupleExpression
     | LPAREN expression RPAREN
-    | qualifiedIdentifier genericArgs? (LPAREN argumentList? RPAREN)?
+    | qualifiedIdentifier genericArgs? (LPAREN argumentList? RPAREN)? // Allows func calls from namespace
     | IDENTIFIER genericArgs? (LPAREN argumentList? RPAREN)?
     | IDENTIFIER genericArgs?
     | qualifiedIdentifier genericArgs?
     ;
 
-qualifiedIdentifier
-    : IDENTIFIER (DOT IDENTIFIER)+
-    ;
-
 // =============================================================================
-// Sizeof/Alignof - Only operators with unique syntax
+// Sizeof/Alignof
 // =============================================================================
 
 sizeofExpression
@@ -501,8 +512,6 @@ literal
     | initializerList
     ;
 
-// Generic initializer list - used for arrays, vectors, maps, structs
-// Compiler determines actual type from context
 initializerList
     : LBRACE RBRACE
     | LBRACE expression (COMMA expression)* RBRACE
@@ -536,15 +545,20 @@ argumentList
 argument
     : expression
     | lambdaExpression
+    | anonymousFuncExpression
     ;
 
 // =============================================================================
-// Lambda Expression
+// Lambda & Anonymous Function Expressions
 // =============================================================================
 
 lambdaExpression
     : ASYNC? LPAREN lambdaParamList? RPAREN FAT_ARROW block
     | ASYNC? LPAREN lambdaParamList? RPAREN FAT_ARROW expression
+    ;
+
+anonymousFuncExpression
+    : (THREAD | PROCESS | CONTAINER | ASYNC)? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
     ;
 
 lambdaParamList

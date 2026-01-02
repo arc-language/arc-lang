@@ -1,5 +1,19 @@
 # arc Language Grammar (Version 1.2 - Core Syntax)
 
+Grammar rules:
+ * type declaration can only have one dot.
+
+Grammar to not add to the parser files:
+    * Empty initializer
+
+# Empty initializer
+You usually disallow "empty" initializer lists as statements. An array literal {1, 2, 3} on its own line does nothing anyway.
+```arc
+{ 
+    print("data") 
+}
+```
+
 ## Comments
 ```arc
 // Single-line comment
@@ -840,16 +854,16 @@ let name = "Alice"
 let age = 30
 
 // Basic variable interpolation
-let msg = "Hello, \(name)!"
+let msg = "Hello ${name}"
 
 // Expression interpolation
-let info = "You are \(age) years old, born in \(2025 - age)"
+let info = "You are ${age} years old, born in ${2025 - age}"
 
 // Complex expressions
-let result = "Sum: \(a + b), Product: \(a * b)"
+let result = "Sum: ${a + b}, Product: ${a * b}"
 
 // Nested function calls
-let upper = "Name: \(name.to_upper())"
+let upper = "Name: ${name.to_upper()}"
 ```
 
 ## Generics, struct, monomorphizes

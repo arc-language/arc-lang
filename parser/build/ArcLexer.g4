@@ -36,6 +36,11 @@ EXCEPT: 'except';
 FINALLY: 'finally';
 ENUM: 'enum';
 
+// Execution Context Keywords
+THREAD: 'thread';
+PROCESS: 'process';
+CONTAINER: 'container';
+
 // =============================================================================
 // Type Keywords
 // =============================================================================
@@ -151,7 +156,8 @@ FLOAT_LITERAL
 
 fragment EXPONENT: [eE] [+-]? DECIMAL_LITERAL;
 
-// String literal - interpolation \(...) handled by compiler
+// String literal accepting ${name} syntax.
+// Parser treats it as one token; Compiler handles the interpolation logic.
 STRING_LITERAL
     : '"' (~["\\\r\n] | ESCAPE_SEQUENCE)* '"'
     ;
@@ -161,7 +167,7 @@ CHAR_LITERAL
     ;
 
 fragment ESCAPE_SEQUENCE
-    : '\\' ['"\\nrt0()]
+    : '\\' ['"\\nrt0$]
     | '\\' 'x' HEX_DIGIT HEX_DIGIT
     | '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     | '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
