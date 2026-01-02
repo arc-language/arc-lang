@@ -63,6 +63,13 @@ CHAR: 'char';
 STRING: 'string';
 VOID: 'void';
 
+// GPU Specific Types
+FLOAT16: 'float16';
+BFLOAT16: 'bfloat16';
+VECTOR2: 'vector2';
+VECTOR4: 'vector4';
+MATRIX: 'matrix';
+
 // =============================================================================
 // Operators
 // =============================================================================
@@ -141,14 +148,12 @@ FLOAT_LITERAL
     ;
 fragment EXPONENT: [eE] [+-]? DECIMAL_LITERAL;
 
-// String Literal (Backend interpolation approach)
-// Allows ${...} to pass through the lexer as part of the string
 STRING_LITERAL: '"' (~["\\\r\n] | ESCAPE_SEQUENCE)* '"';
 
 CHAR_LITERAL: '\'' (~['\\\r\n] | ESCAPE_SEQUENCE) '\'';
 
 fragment ESCAPE_SEQUENCE
-    : '\\' ['"\\nrt0$] // $ allowed in escapes
+    : '\\' ['"\\nrt0$]
     | '\\' 'x' HEX_DIGIT HEX_DIGIT
     | '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     | '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT

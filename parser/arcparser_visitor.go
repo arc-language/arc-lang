@@ -119,6 +119,12 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#functionType.
 	VisitFunctionType(ctx *FunctionTypeContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#gpuVectorType.
+	VisitGpuVectorType(ctx *GpuVectorTypeContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#gpuMatrixType.
+	VisitGpuMatrixType(ctx *GpuMatrixTypeContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
 	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
 

@@ -80,32 +80,39 @@ tuplePattern: LPAREN IDENTIFIER (COMMA IDENTIFIER)+ RPAREN;
 tupleType: LPAREN typeList RPAREN;
 
 // =============================================================================
-// Type System
+// Type System (Updated with GPU Types)
 // =============================================================================
 
 type
     : primitiveType
     | pointerType
     | referenceType
-    | qualifiedType            // Strict 1-dot: io.File
-    | functionType             // func(A) B
-    | IDENTIFIER genericArgs?  // T or T<A>
+    | qualifiedType
+    | functionType
+    | gpuVectorType            // vector2<T>, vector4<T>
+    | gpuMatrixType            // matrix<T, M, N>
+    | IDENTIFIER genericArgs?
     | UNDERSCORE
     ;
 
-// Strict Namespace.Type
 qualifiedType: IDENTIFIER DOT IDENTIFIER genericArgs?;
 
-// Function Type: let cb: func(int) void
 functionType: ASYNC? FUNC genericParams? LPAREN typeList? RPAREN returnType?;
 
-// Infinite chain (for expressions): a.b.c
+// New GPU Vector types
+gpuVectorType: (VECTOR2 | VECTOR4) LT type GT;
+
+// New GPU Matrix type
+gpuMatrixType: MATRIX LT type COMMA expression COMMA expression GT;
+
 qualifiedIdentifier: IDENTIFIER (DOT IDENTIFIER)+;
 
 primitiveType
     : INT8 | INT16 | INT32 | INT64
     | UINT8 | UINT16 | UINT32 | UINT64
-    | USIZE | ISIZE | FLOAT32 | FLOAT64
+    | USIZE | ISIZE
+    | FLOAT32 | FLOAT64
+    | FLOAT16 | BFLOAT16       // Added Half Precision & BFloat16
     | BYTE | BOOL | CHAR | STRING | VOID
     ;
 
@@ -146,7 +153,6 @@ breakStmt: BREAK;
 continueStmt: CONTINUE;
 throwStmt: THROW expression;
 
-// Control Flow
 ifStmt: IF expression block (ELSE IF expression block)* (ELSE block)?;
 
 forStmt
@@ -157,7 +163,6 @@ forStmt
     | FOR IDENTIFIER COMMA IDENTIFIER IN expression block
     ;
 
-// Switch - Updated to support multiple comma-separated cases: case 1, 2, 3:
 switchStmt: SWITCH expression LBRACE switchCase* defaultCase? RBRACE;
 switchCase: CASE expression (COMMA expression)* COLON statement*;
 defaultCase: DEFAULT COLON statement*;

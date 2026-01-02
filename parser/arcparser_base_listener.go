@@ -243,6 +243,18 @@ func (s *BaseArcParserListener) EnterFunctionType(ctx *FunctionTypeContext) {}
 // ExitFunctionType is called when production functionType is exited.
 func (s *BaseArcParserListener) ExitFunctionType(ctx *FunctionTypeContext) {}
 
+// EnterGpuVectorType is called when production gpuVectorType is entered.
+func (s *BaseArcParserListener) EnterGpuVectorType(ctx *GpuVectorTypeContext) {}
+
+// ExitGpuVectorType is called when production gpuVectorType is exited.
+func (s *BaseArcParserListener) ExitGpuVectorType(ctx *GpuVectorTypeContext) {}
+
+// EnterGpuMatrixType is called when production gpuMatrixType is entered.
+func (s *BaseArcParserListener) EnterGpuMatrixType(ctx *GpuMatrixTypeContext) {}
+
+// ExitGpuMatrixType is called when production gpuMatrixType is exited.
+func (s *BaseArcParserListener) ExitGpuMatrixType(ctx *GpuMatrixTypeContext) {}
+
 // EnterQualifiedIdentifier is called when production qualifiedIdentifier is entered.
 func (s *BaseArcParserListener) EnterQualifiedIdentifier(ctx *QualifiedIdentifierContext) {}
 

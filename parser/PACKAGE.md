@@ -53,62 +53,67 @@ const (
 	ArcLexerCHAR            = 48
 	ArcLexerSTRING          = 49
 	ArcLexerVOID            = 50
-	ArcLexerSIZEOF          = 51
-	ArcLexerALIGNOF         = 52
-	ArcLexerARROW           = 53
-	ArcLexerRANGE           = 54
-	ArcLexerELLIPSIS        = 55
-	ArcLexerEQ              = 56
-	ArcLexerNE              = 57
-	ArcLexerLE              = 58
-	ArcLexerGE              = 59
-	ArcLexerAND             = 60
-	ArcLexerOR              = 61
-	ArcLexerPLUS_ASSIGN     = 62
-	ArcLexerMINUS_ASSIGN    = 63
-	ArcLexerSTAR_ASSIGN     = 64
-	ArcLexerSLASH_ASSIGN    = 65
-	ArcLexerPERCENT_ASSIGN  = 66
-	ArcLexerBIT_OR_ASSIGN   = 67
-	ArcLexerBIT_AND_ASSIGN  = 68
-	ArcLexerBIT_XOR_ASSIGN  = 69
-	ArcLexerINCREMENT       = 70
-	ArcLexerDECREMENT       = 71
-	ArcLexerFAT_ARROW       = 72
-	ArcLexerPLUS            = 73
-	ArcLexerMINUS           = 74
-	ArcLexerSTAR            = 75
-	ArcLexerSLASH           = 76
-	ArcLexerPERCENT         = 77
-	ArcLexerLT              = 78
-	ArcLexerGT              = 79
-	ArcLexerNOT             = 80
-	ArcLexerAMP             = 81
-	ArcLexerBIT_OR          = 82
-	ArcLexerBIT_XOR         = 83
-	ArcLexerBIT_NOT         = 84
-	ArcLexerAT              = 85
-	ArcLexerASSIGN          = 86
-	ArcLexerLPAREN          = 87
-	ArcLexerRPAREN          = 88
-	ArcLexerLBRACE          = 89
-	ArcLexerRBRACE          = 90
-	ArcLexerLBRACKET        = 91
-	ArcLexerRBRACKET        = 92
-	ArcLexerCOMMA           = 93
-	ArcLexerCOLON           = 94
-	ArcLexerSEMICOLON       = 95
-	ArcLexerDOT             = 96
-	ArcLexerUNDERSCORE      = 97
-	ArcLexerBOOLEAN_LITERAL = 98
-	ArcLexerINTEGER_LITERAL = 99
-	ArcLexerFLOAT_LITERAL   = 100
-	ArcLexerSTRING_LITERAL  = 101
-	ArcLexerCHAR_LITERAL    = 102
-	ArcLexerIDENTIFIER      = 103
-	ArcLexerWS              = 104
-	ArcLexerLINE_COMMENT    = 105
-	ArcLexerBLOCK_COMMENT   = 106
+	ArcLexerFLOAT16         = 51
+	ArcLexerBFLOAT16        = 52
+	ArcLexerVECTOR2         = 53
+	ArcLexerVECTOR4         = 54
+	ArcLexerMATRIX          = 55
+	ArcLexerSIZEOF          = 56
+	ArcLexerALIGNOF         = 57
+	ArcLexerARROW           = 58
+	ArcLexerRANGE           = 59
+	ArcLexerELLIPSIS        = 60
+	ArcLexerEQ              = 61
+	ArcLexerNE              = 62
+	ArcLexerLE              = 63
+	ArcLexerGE              = 64
+	ArcLexerAND             = 65
+	ArcLexerOR              = 66
+	ArcLexerPLUS_ASSIGN     = 67
+	ArcLexerMINUS_ASSIGN    = 68
+	ArcLexerSTAR_ASSIGN     = 69
+	ArcLexerSLASH_ASSIGN    = 70
+	ArcLexerPERCENT_ASSIGN  = 71
+	ArcLexerBIT_OR_ASSIGN   = 72
+	ArcLexerBIT_AND_ASSIGN  = 73
+	ArcLexerBIT_XOR_ASSIGN  = 74
+	ArcLexerINCREMENT       = 75
+	ArcLexerDECREMENT       = 76
+	ArcLexerFAT_ARROW       = 77
+	ArcLexerPLUS            = 78
+	ArcLexerMINUS           = 79
+	ArcLexerSTAR            = 80
+	ArcLexerSLASH           = 81
+	ArcLexerPERCENT         = 82
+	ArcLexerLT              = 83
+	ArcLexerGT              = 84
+	ArcLexerNOT             = 85
+	ArcLexerAMP             = 86
+	ArcLexerBIT_OR          = 87
+	ArcLexerBIT_XOR         = 88
+	ArcLexerBIT_NOT         = 89
+	ArcLexerAT              = 90
+	ArcLexerASSIGN          = 91
+	ArcLexerLPAREN          = 92
+	ArcLexerRPAREN          = 93
+	ArcLexerLBRACE          = 94
+	ArcLexerRBRACE          = 95
+	ArcLexerLBRACKET        = 96
+	ArcLexerRBRACKET        = 97
+	ArcLexerCOMMA           = 98
+	ArcLexerCOLON           = 99
+	ArcLexerSEMICOLON       = 100
+	ArcLexerDOT             = 101
+	ArcLexerUNDERSCORE      = 102
+	ArcLexerBOOLEAN_LITERAL = 103
+	ArcLexerINTEGER_LITERAL = 104
+	ArcLexerFLOAT_LITERAL   = 105
+	ArcLexerSTRING_LITERAL  = 106
+	ArcLexerCHAR_LITERAL    = 107
+	ArcLexerIDENTIFIER      = 108
+	ArcLexerWS              = 109
+	ArcLexerLINE_COMMENT    = 110
+	ArcLexerBLOCK_COMMENT   = 111
 )
     ArcLexer tokens.
 
@@ -164,62 +169,67 @@ const (
 	ArcParserCHAR            = 48
 	ArcParserSTRING          = 49
 	ArcParserVOID            = 50
-	ArcParserSIZEOF          = 51
-	ArcParserALIGNOF         = 52
-	ArcParserARROW           = 53
-	ArcParserRANGE           = 54
-	ArcParserELLIPSIS        = 55
-	ArcParserEQ              = 56
-	ArcParserNE              = 57
-	ArcParserLE              = 58
-	ArcParserGE              = 59
-	ArcParserAND             = 60
-	ArcParserOR              = 61
-	ArcParserPLUS_ASSIGN     = 62
-	ArcParserMINUS_ASSIGN    = 63
-	ArcParserSTAR_ASSIGN     = 64
-	ArcParserSLASH_ASSIGN    = 65
-	ArcParserPERCENT_ASSIGN  = 66
-	ArcParserBIT_OR_ASSIGN   = 67
-	ArcParserBIT_AND_ASSIGN  = 68
-	ArcParserBIT_XOR_ASSIGN  = 69
-	ArcParserINCREMENT       = 70
-	ArcParserDECREMENT       = 71
-	ArcParserFAT_ARROW       = 72
-	ArcParserPLUS            = 73
-	ArcParserMINUS           = 74
-	ArcParserSTAR            = 75
-	ArcParserSLASH           = 76
-	ArcParserPERCENT         = 77
-	ArcParserLT              = 78
-	ArcParserGT              = 79
-	ArcParserNOT             = 80
-	ArcParserAMP             = 81
-	ArcParserBIT_OR          = 82
-	ArcParserBIT_XOR         = 83
-	ArcParserBIT_NOT         = 84
-	ArcParserAT              = 85
-	ArcParserASSIGN          = 86
-	ArcParserLPAREN          = 87
-	ArcParserRPAREN          = 88
-	ArcParserLBRACE          = 89
-	ArcParserRBRACE          = 90
-	ArcParserLBRACKET        = 91
-	ArcParserRBRACKET        = 92
-	ArcParserCOMMA           = 93
-	ArcParserCOLON           = 94
-	ArcParserSEMICOLON       = 95
-	ArcParserDOT             = 96
-	ArcParserUNDERSCORE      = 97
-	ArcParserBOOLEAN_LITERAL = 98
-	ArcParserINTEGER_LITERAL = 99
-	ArcParserFLOAT_LITERAL   = 100
-	ArcParserSTRING_LITERAL  = 101
-	ArcParserCHAR_LITERAL    = 102
-	ArcParserIDENTIFIER      = 103
-	ArcParserWS              = 104
-	ArcParserLINE_COMMENT    = 105
-	ArcParserBLOCK_COMMENT   = 106
+	ArcParserFLOAT16         = 51
+	ArcParserBFLOAT16        = 52
+	ArcParserVECTOR2         = 53
+	ArcParserVECTOR4         = 54
+	ArcParserMATRIX          = 55
+	ArcParserSIZEOF          = 56
+	ArcParserALIGNOF         = 57
+	ArcParserARROW           = 58
+	ArcParserRANGE           = 59
+	ArcParserELLIPSIS        = 60
+	ArcParserEQ              = 61
+	ArcParserNE              = 62
+	ArcParserLE              = 63
+	ArcParserGE              = 64
+	ArcParserAND             = 65
+	ArcParserOR              = 66
+	ArcParserPLUS_ASSIGN     = 67
+	ArcParserMINUS_ASSIGN    = 68
+	ArcParserSTAR_ASSIGN     = 69
+	ArcParserSLASH_ASSIGN    = 70
+	ArcParserPERCENT_ASSIGN  = 71
+	ArcParserBIT_OR_ASSIGN   = 72
+	ArcParserBIT_AND_ASSIGN  = 73
+	ArcParserBIT_XOR_ASSIGN  = 74
+	ArcParserINCREMENT       = 75
+	ArcParserDECREMENT       = 76
+	ArcParserFAT_ARROW       = 77
+	ArcParserPLUS            = 78
+	ArcParserMINUS           = 79
+	ArcParserSTAR            = 80
+	ArcParserSLASH           = 81
+	ArcParserPERCENT         = 82
+	ArcParserLT              = 83
+	ArcParserGT              = 84
+	ArcParserNOT             = 85
+	ArcParserAMP             = 86
+	ArcParserBIT_OR          = 87
+	ArcParserBIT_XOR         = 88
+	ArcParserBIT_NOT         = 89
+	ArcParserAT              = 90
+	ArcParserASSIGN          = 91
+	ArcParserLPAREN          = 92
+	ArcParserRPAREN          = 93
+	ArcParserLBRACE          = 94
+	ArcParserRBRACE          = 95
+	ArcParserLBRACKET        = 96
+	ArcParserRBRACKET        = 97
+	ArcParserCOMMA           = 98
+	ArcParserCOLON           = 99
+	ArcParserSEMICOLON       = 100
+	ArcParserDOT             = 101
+	ArcParserUNDERSCORE      = 102
+	ArcParserBOOLEAN_LITERAL = 103
+	ArcParserINTEGER_LITERAL = 104
+	ArcParserFLOAT_LITERAL   = 105
+	ArcParserSTRING_LITERAL  = 106
+	ArcParserCHAR_LITERAL    = 107
+	ArcParserIDENTIFIER      = 108
+	ArcParserWS              = 109
+	ArcParserLINE_COMMENT    = 110
+	ArcParserBLOCK_COMMENT   = 111
 )
     ArcParser tokens.
 
@@ -261,59 +271,61 @@ const (
 	ArcParserRULE_type                     = 34
 	ArcParserRULE_qualifiedType            = 35
 	ArcParserRULE_functionType             = 36
-	ArcParserRULE_qualifiedIdentifier      = 37
-	ArcParserRULE_primitiveType            = 38
-	ArcParserRULE_pointerType              = 39
-	ArcParserRULE_referenceType            = 40
-	ArcParserRULE_block                    = 41
-	ArcParserRULE_statement                = 42
-	ArcParserRULE_assignmentStmt           = 43
-	ArcParserRULE_assignmentOp             = 44
-	ArcParserRULE_leftHandSide             = 45
-	ArcParserRULE_expressionStmt           = 46
-	ArcParserRULE_returnStmt               = 47
-	ArcParserRULE_ifStmt                   = 48
-	ArcParserRULE_forStmt                  = 49
-	ArcParserRULE_switchStmt               = 50
-	ArcParserRULE_switchCase               = 51
-	ArcParserRULE_defaultCase              = 52
-	ArcParserRULE_tryStmt                  = 53
-	ArcParserRULE_exceptClause             = 54
-	ArcParserRULE_finallyClause            = 55
-	ArcParserRULE_throwStmt                = 56
-	ArcParserRULE_breakStmt                = 57
-	ArcParserRULE_continueStmt             = 58
-	ArcParserRULE_deferStmt                = 59
-	ArcParserRULE_expression               = 60
-	ArcParserRULE_logicalOrExpression      = 61
-	ArcParserRULE_logicalAndExpression     = 62
-	ArcParserRULE_bitOrExpression          = 63
-	ArcParserRULE_bitXorExpression         = 64
-	ArcParserRULE_bitAndExpression         = 65
-	ArcParserRULE_equalityExpression       = 66
-	ArcParserRULE_relationalExpression     = 67
-	ArcParserRULE_shiftExpression          = 68
-	ArcParserRULE_rangeExpression          = 69
-	ArcParserRULE_additiveExpression       = 70
-	ArcParserRULE_multiplicativeExpression = 71
-	ArcParserRULE_unaryExpression          = 72
-	ArcParserRULE_postfixExpression        = 73
-	ArcParserRULE_postfixOp                = 74
-	ArcParserRULE_primaryExpression        = 75
-	ArcParserRULE_sizeofExpression         = 76
-	ArcParserRULE_alignofExpression        = 77
-	ArcParserRULE_literal                  = 78
-	ArcParserRULE_initializerList          = 79
-	ArcParserRULE_initializerEntry         = 80
-	ArcParserRULE_structLiteral            = 81
-	ArcParserRULE_fieldInit                = 82
-	ArcParserRULE_argumentList             = 83
-	ArcParserRULE_argument                 = 84
-	ArcParserRULE_lambdaExpression         = 85
-	ArcParserRULE_anonymousFuncExpression  = 86
-	ArcParserRULE_lambdaParamList          = 87
-	ArcParserRULE_lambdaParam              = 88
-	ArcParserRULE_tupleExpression          = 89
+	ArcParserRULE_gpuVectorType            = 37
+	ArcParserRULE_gpuMatrixType            = 38
+	ArcParserRULE_qualifiedIdentifier      = 39
+	ArcParserRULE_primitiveType            = 40
+	ArcParserRULE_pointerType              = 41
+	ArcParserRULE_referenceType            = 42
+	ArcParserRULE_block                    = 43
+	ArcParserRULE_statement                = 44
+	ArcParserRULE_assignmentStmt           = 45
+	ArcParserRULE_assignmentOp             = 46
+	ArcParserRULE_leftHandSide             = 47
+	ArcParserRULE_expressionStmt           = 48
+	ArcParserRULE_returnStmt               = 49
+	ArcParserRULE_deferStmt                = 50
+	ArcParserRULE_breakStmt                = 51
+	ArcParserRULE_continueStmt             = 52
+	ArcParserRULE_throwStmt                = 53
+	ArcParserRULE_ifStmt                   = 54
+	ArcParserRULE_forStmt                  = 55
+	ArcParserRULE_switchStmt               = 56
+	ArcParserRULE_switchCase               = 57
+	ArcParserRULE_defaultCase              = 58
+	ArcParserRULE_tryStmt                  = 59
+	ArcParserRULE_exceptClause             = 60
+	ArcParserRULE_finallyClause            = 61
+	ArcParserRULE_expression               = 62
+	ArcParserRULE_logicalOrExpression      = 63
+	ArcParserRULE_logicalAndExpression     = 64
+	ArcParserRULE_bitOrExpression          = 65
+	ArcParserRULE_bitXorExpression         = 66
+	ArcParserRULE_bitAndExpression         = 67
+	ArcParserRULE_equalityExpression       = 68
+	ArcParserRULE_relationalExpression     = 69
+	ArcParserRULE_shiftExpression          = 70
+	ArcParserRULE_rangeExpression          = 71
+	ArcParserRULE_additiveExpression       = 72
+	ArcParserRULE_multiplicativeExpression = 73
+	ArcParserRULE_unaryExpression          = 74
+	ArcParserRULE_postfixExpression        = 75
+	ArcParserRULE_postfixOp                = 76
+	ArcParserRULE_primaryExpression        = 77
+	ArcParserRULE_sizeofExpression         = 78
+	ArcParserRULE_alignofExpression        = 79
+	ArcParserRULE_literal                  = 80
+	ArcParserRULE_initializerList          = 81
+	ArcParserRULE_initializerEntry         = 82
+	ArcParserRULE_structLiteral            = 83
+	ArcParserRULE_fieldInit                = 84
+	ArcParserRULE_argumentList             = 85
+	ArcParserRULE_argument                 = 86
+	ArcParserRULE_lambdaExpression         = 87
+	ArcParserRULE_anonymousFuncExpression  = 88
+	ArcParserRULE_lambdaParamList          = 89
+	ArcParserRULE_lambdaParam              = 90
+	ArcParserRULE_tupleExpression          = 91
 )
     ArcParser rules.
 
@@ -398,6 +410,8 @@ func InitEmptyGenericArgListContext(p *GenericArgListContext)
 func InitEmptyGenericArgsContext(p *GenericArgsContext)
 func InitEmptyGenericParamListContext(p *GenericParamListContext)
 func InitEmptyGenericParamsContext(p *GenericParamsContext)
+func InitEmptyGpuMatrixTypeContext(p *GpuMatrixTypeContext)
+func InitEmptyGpuVectorTypeContext(p *GpuVectorTypeContext)
 func InitEmptyIfStmtContext(p *IfStmtContext)
 func InitEmptyImportDeclContext(p *ImportDeclContext)
 func InitEmptyImportSpecContext(p *ImportSpecContext)
@@ -661,6 +675,10 @@ func (p *ArcParser) GenericParamList() (localctx IGenericParamListContext)
 
 func (p *ArcParser) GenericParams() (localctx IGenericParamsContext)
 
+func (p *ArcParser) GpuMatrixType() (localctx IGpuMatrixTypeContext)
+
+func (p *ArcParser) GpuVectorType() (localctx IGpuVectorTypeContext)
+
 func (p *ArcParser) IfStmt() (localctx IIfStmtContext)
 
 func (p *ArcParser) ImportDecl() (localctx IImportDeclContext)
@@ -873,6 +891,12 @@ type ArcParserListener interface {
 	// EnterFunctionType is called when entering the functionType production.
 	EnterFunctionType(c *FunctionTypeContext)
 
+	// EnterGpuVectorType is called when entering the gpuVectorType production.
+	EnterGpuVectorType(c *GpuVectorTypeContext)
+
+	// EnterGpuMatrixType is called when entering the gpuMatrixType production.
+	EnterGpuMatrixType(c *GpuMatrixTypeContext)
+
 	// EnterQualifiedIdentifier is called when entering the qualifiedIdentifier production.
 	EnterQualifiedIdentifier(c *QualifiedIdentifierContext)
 
@@ -906,6 +930,18 @@ type ArcParserListener interface {
 	// EnterReturnStmt is called when entering the returnStmt production.
 	EnterReturnStmt(c *ReturnStmtContext)
 
+	// EnterDeferStmt is called when entering the deferStmt production.
+	EnterDeferStmt(c *DeferStmtContext)
+
+	// EnterBreakStmt is called when entering the breakStmt production.
+	EnterBreakStmt(c *BreakStmtContext)
+
+	// EnterContinueStmt is called when entering the continueStmt production.
+	EnterContinueStmt(c *ContinueStmtContext)
+
+	// EnterThrowStmt is called when entering the throwStmt production.
+	EnterThrowStmt(c *ThrowStmtContext)
+
 	// EnterIfStmt is called when entering the ifStmt production.
 	EnterIfStmt(c *IfStmtContext)
 
@@ -929,18 +965,6 @@ type ArcParserListener interface {
 
 	// EnterFinallyClause is called when entering the finallyClause production.
 	EnterFinallyClause(c *FinallyClauseContext)
-
-	// EnterThrowStmt is called when entering the throwStmt production.
-	EnterThrowStmt(c *ThrowStmtContext)
-
-	// EnterBreakStmt is called when entering the breakStmt production.
-	EnterBreakStmt(c *BreakStmtContext)
-
-	// EnterContinueStmt is called when entering the continueStmt production.
-	EnterContinueStmt(c *ContinueStmtContext)
-
-	// EnterDeferStmt is called when entering the deferStmt production.
-	EnterDeferStmt(c *DeferStmtContext)
 
 	// EnterExpression is called when entering the expression production.
 	EnterExpression(c *ExpressionContext)
@@ -1143,6 +1167,12 @@ type ArcParserListener interface {
 	// ExitFunctionType is called when exiting the functionType production.
 	ExitFunctionType(c *FunctionTypeContext)
 
+	// ExitGpuVectorType is called when exiting the gpuVectorType production.
+	ExitGpuVectorType(c *GpuVectorTypeContext)
+
+	// ExitGpuMatrixType is called when exiting the gpuMatrixType production.
+	ExitGpuMatrixType(c *GpuMatrixTypeContext)
+
 	// ExitQualifiedIdentifier is called when exiting the qualifiedIdentifier production.
 	ExitQualifiedIdentifier(c *QualifiedIdentifierContext)
 
@@ -1176,6 +1206,18 @@ type ArcParserListener interface {
 	// ExitReturnStmt is called when exiting the returnStmt production.
 	ExitReturnStmt(c *ReturnStmtContext)
 
+	// ExitDeferStmt is called when exiting the deferStmt production.
+	ExitDeferStmt(c *DeferStmtContext)
+
+	// ExitBreakStmt is called when exiting the breakStmt production.
+	ExitBreakStmt(c *BreakStmtContext)
+
+	// ExitContinueStmt is called when exiting the continueStmt production.
+	ExitContinueStmt(c *ContinueStmtContext)
+
+	// ExitThrowStmt is called when exiting the throwStmt production.
+	ExitThrowStmt(c *ThrowStmtContext)
+
 	// ExitIfStmt is called when exiting the ifStmt production.
 	ExitIfStmt(c *IfStmtContext)
 
@@ -1199,18 +1241,6 @@ type ArcParserListener interface {
 
 	// ExitFinallyClause is called when exiting the finallyClause production.
 	ExitFinallyClause(c *FinallyClauseContext)
-
-	// ExitThrowStmt is called when exiting the throwStmt production.
-	ExitThrowStmt(c *ThrowStmtContext)
-
-	// ExitBreakStmt is called when exiting the breakStmt production.
-	ExitBreakStmt(c *BreakStmtContext)
-
-	// ExitContinueStmt is called when exiting the continueStmt production.
-	ExitContinueStmt(c *ContinueStmtContext)
-
-	// ExitDeferStmt is called when exiting the deferStmt production.
-	ExitDeferStmt(c *DeferStmtContext)
 
 	// ExitExpression is called when exiting the expression production.
 	ExitExpression(c *ExpressionContext)
@@ -1419,6 +1449,12 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#functionType.
 	VisitFunctionType(ctx *FunctionTypeContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#gpuVectorType.
+	VisitGpuVectorType(ctx *GpuVectorTypeContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#gpuMatrixType.
+	VisitGpuMatrixType(ctx *GpuMatrixTypeContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
 	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
 
@@ -1452,6 +1488,18 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#returnStmt.
 	VisitReturnStmt(ctx *ReturnStmtContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#deferStmt.
+	VisitDeferStmt(ctx *DeferStmtContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#breakStmt.
+	VisitBreakStmt(ctx *BreakStmtContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#continueStmt.
+	VisitContinueStmt(ctx *ContinueStmtContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#throwStmt.
+	VisitThrowStmt(ctx *ThrowStmtContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#ifStmt.
 	VisitIfStmt(ctx *IfStmtContext) interface{}
 
@@ -1475,18 +1523,6 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#finallyClause.
 	VisitFinallyClause(ctx *FinallyClauseContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#throwStmt.
-	VisitThrowStmt(ctx *ThrowStmtContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#breakStmt.
-	VisitBreakStmt(ctx *BreakStmtContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#continueStmt.
-	VisitContinueStmt(ctx *ContinueStmtContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#deferStmt.
-	VisitDeferStmt(ctx *DeferStmtContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#expression.
 	VisitExpression(ctx *ExpressionContext) interface{}
@@ -1854,6 +1890,12 @@ func (s *BaseArcParserListener) EnterGenericParamList(ctx *GenericParamListConte
 func (s *BaseArcParserListener) EnterGenericParams(ctx *GenericParamsContext)
     EnterGenericParams is called when production genericParams is entered.
 
+func (s *BaseArcParserListener) EnterGpuMatrixType(ctx *GpuMatrixTypeContext)
+    EnterGpuMatrixType is called when production gpuMatrixType is entered.
+
+func (s *BaseArcParserListener) EnterGpuVectorType(ctx *GpuVectorTypeContext)
+    EnterGpuVectorType is called when production gpuVectorType is entered.
+
 func (s *BaseArcParserListener) EnterIfStmt(ctx *IfStmtContext)
     EnterIfStmt is called when production ifStmt is entered.
 
@@ -2139,6 +2181,12 @@ func (s *BaseArcParserListener) ExitGenericParamList(ctx *GenericParamListContex
 func (s *BaseArcParserListener) ExitGenericParams(ctx *GenericParamsContext)
     ExitGenericParams is called when production genericParams is exited.
 
+func (s *BaseArcParserListener) ExitGpuMatrixType(ctx *GpuMatrixTypeContext)
+    ExitGpuMatrixType is called when production gpuMatrixType is exited.
+
+func (s *BaseArcParserListener) ExitGpuVectorType(ctx *GpuVectorTypeContext)
+    ExitGpuVectorType is called when production gpuVectorType is exited.
+
 func (s *BaseArcParserListener) ExitIfStmt(ctx *IfStmtContext)
     ExitIfStmt is called when production ifStmt is exited.
 
@@ -2382,6 +2430,10 @@ func (v *BaseArcParserVisitor) VisitGenericArgs(ctx *GenericArgsContext) interfa
 func (v *BaseArcParserVisitor) VisitGenericParamList(ctx *GenericParamListContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitGenericParams(ctx *GenericParamsContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitGpuMatrixType(ctx *GpuMatrixTypeContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitGpuVectorType(ctx *GpuVectorTypeContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitIfStmt(ctx *IfStmtContext) interface{}
 
@@ -3565,6 +3617,78 @@ func (s *GenericParamsContext) LT() antlr.TerminalNode
 
 func (s *GenericParamsContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
+type GpuMatrixTypeContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyGpuMatrixTypeContext() *GpuMatrixTypeContext
+
+func NewGpuMatrixTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *GpuMatrixTypeContext
+
+func (s *GpuMatrixTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *GpuMatrixTypeContext) AllCOMMA() []antlr.TerminalNode
+
+func (s *GpuMatrixTypeContext) AllExpression() []IExpressionContext
+
+func (s *GpuMatrixTypeContext) COMMA(i int) antlr.TerminalNode
+
+func (s *GpuMatrixTypeContext) EnterRule(listener antlr.ParseTreeListener)
+
+func (s *GpuMatrixTypeContext) ExitRule(listener antlr.ParseTreeListener)
+
+func (s *GpuMatrixTypeContext) Expression(i int) IExpressionContext
+
+func (s *GpuMatrixTypeContext) GT() antlr.TerminalNode
+
+func (s *GpuMatrixTypeContext) GetParser() antlr.Parser
+
+func (s *GpuMatrixTypeContext) GetRuleContext() antlr.RuleContext
+
+func (*GpuMatrixTypeContext) IsGpuMatrixTypeContext()
+
+func (s *GpuMatrixTypeContext) LT() antlr.TerminalNode
+
+func (s *GpuMatrixTypeContext) MATRIX() antlr.TerminalNode
+
+func (s *GpuMatrixTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *GpuMatrixTypeContext) Type_() ITypeContext
+
+type GpuVectorTypeContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyGpuVectorTypeContext() *GpuVectorTypeContext
+
+func NewGpuVectorTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *GpuVectorTypeContext
+
+func (s *GpuVectorTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *GpuVectorTypeContext) EnterRule(listener antlr.ParseTreeListener)
+
+func (s *GpuVectorTypeContext) ExitRule(listener antlr.ParseTreeListener)
+
+func (s *GpuVectorTypeContext) GT() antlr.TerminalNode
+
+func (s *GpuVectorTypeContext) GetParser() antlr.Parser
+
+func (s *GpuVectorTypeContext) GetRuleContext() antlr.RuleContext
+
+func (*GpuVectorTypeContext) IsGpuVectorTypeContext()
+
+func (s *GpuVectorTypeContext) LT() antlr.TerminalNode
+
+func (s *GpuVectorTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *GpuVectorTypeContext) Type_() ITypeContext
+
+func (s *GpuVectorTypeContext) VECTOR2() antlr.TerminalNode
+
+func (s *GpuVectorTypeContext) VECTOR4() antlr.TerminalNode
+
 type IAdditiveExpressionContext interface {
 	antlr.ParserRuleContext
 
@@ -4293,6 +4417,45 @@ type IGenericParamsContext interface {
 }
     IGenericParamsContext is an interface to support dynamic dispatch.
 
+type IGpuMatrixTypeContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	MATRIX() antlr.TerminalNode
+	LT() antlr.TerminalNode
+	Type_() ITypeContext
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
+	AllExpression() []IExpressionContext
+	Expression(i int) IExpressionContext
+	GT() antlr.TerminalNode
+
+	// IsGpuMatrixTypeContext differentiates from other interfaces.
+	IsGpuMatrixTypeContext()
+}
+    IGpuMatrixTypeContext is an interface to support dynamic dispatch.
+
+type IGpuVectorTypeContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	LT() antlr.TerminalNode
+	Type_() ITypeContext
+	GT() antlr.TerminalNode
+	VECTOR2() antlr.TerminalNode
+	VECTOR4() antlr.TerminalNode
+
+	// IsGpuVectorTypeContext differentiates from other interfaces.
+	IsGpuVectorTypeContext()
+}
+    IGpuVectorTypeContext is an interface to support dynamic dispatch.
+
 type IIfStmtContext interface {
 	antlr.ParserRuleContext
 
@@ -4739,6 +4902,8 @@ type IPrimitiveTypeContext interface {
 	ISIZE() antlr.TerminalNode
 	FLOAT32() antlr.TerminalNode
 	FLOAT64() antlr.TerminalNode
+	FLOAT16() antlr.TerminalNode
+	BFLOAT16() antlr.TerminalNode
 	BYTE() antlr.TerminalNode
 	BOOL() antlr.TerminalNode
 	CHAR() antlr.TerminalNode
@@ -5016,8 +5181,11 @@ type ISwitchCaseContext interface {
 
 	// Getter signatures
 	CASE() antlr.TerminalNode
-	Expression() IExpressionContext
+	AllExpression() []IExpressionContext
+	Expression(i int) IExpressionContext
 	COLON() antlr.TerminalNode
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
 	AllStatement() []IStatementContext
 	Statement(i int) IStatementContext
 
@@ -5168,6 +5336,8 @@ type ITypeContext interface {
 	ReferenceType() IReferenceTypeContext
 	QualifiedType() IQualifiedTypeContext
 	FunctionType() IFunctionTypeContext
+	GpuVectorType() IGpuVectorTypeContext
+	GpuMatrixType() IGpuMatrixTypeContext
 	IDENTIFIER() antlr.TerminalNode
 	GenericArgs() IGenericArgsContext
 	UNDERSCORE() antlr.TerminalNode
@@ -6038,6 +6208,8 @@ func NewPrimitiveTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext
 
 func (s *PrimitiveTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
+func (s *PrimitiveTypeContext) BFLOAT16() antlr.TerminalNode
+
 func (s *PrimitiveTypeContext) BOOL() antlr.TerminalNode
 
 func (s *PrimitiveTypeContext) BYTE() antlr.TerminalNode
@@ -6047,6 +6219,8 @@ func (s *PrimitiveTypeContext) CHAR() antlr.TerminalNode
 func (s *PrimitiveTypeContext) EnterRule(listener antlr.ParseTreeListener)
 
 func (s *PrimitiveTypeContext) ExitRule(listener antlr.ParseTreeListener)
+
+func (s *PrimitiveTypeContext) FLOAT16() antlr.TerminalNode
 
 func (s *PrimitiveTypeContext) FLOAT32() antlr.TerminalNode
 
@@ -6569,17 +6743,23 @@ func NewSwitchCaseContext(parser antlr.Parser, parent antlr.ParserRuleContext, i
 
 func (s *SwitchCaseContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
+func (s *SwitchCaseContext) AllCOMMA() []antlr.TerminalNode
+
+func (s *SwitchCaseContext) AllExpression() []IExpressionContext
+
 func (s *SwitchCaseContext) AllStatement() []IStatementContext
 
 func (s *SwitchCaseContext) CASE() antlr.TerminalNode
 
 func (s *SwitchCaseContext) COLON() antlr.TerminalNode
 
+func (s *SwitchCaseContext) COMMA(i int) antlr.TerminalNode
+
 func (s *SwitchCaseContext) EnterRule(listener antlr.ParseTreeListener)
 
 func (s *SwitchCaseContext) ExitRule(listener antlr.ParseTreeListener)
 
-func (s *SwitchCaseContext) Expression() IExpressionContext
+func (s *SwitchCaseContext) Expression(i int) IExpressionContext
 
 func (s *SwitchCaseContext) GetParser() antlr.Parser
 
@@ -6852,6 +7032,10 @@ func (s *TypeContext) GenericArgs() IGenericArgsContext
 func (s *TypeContext) GetParser() antlr.Parser
 
 func (s *TypeContext) GetRuleContext() antlr.RuleContext
+
+func (s *TypeContext) GpuMatrixType() IGpuMatrixTypeContext
+
+func (s *TypeContext) GpuVectorType() IGpuVectorTypeContext
 
 func (s *TypeContext) IDENTIFIER() antlr.TerminalNode
 

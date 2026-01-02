@@ -156,6 +156,14 @@ func (v *BaseArcParserVisitor) VisitFunctionType(ctx *FunctionTypeContext) inter
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseArcParserVisitor) VisitGpuVectorType(ctx *GpuVectorTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitGpuMatrixType(ctx *GpuMatrixTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseArcParserVisitor) VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{} {
 	return v.VisitChildren(ctx)
 }
