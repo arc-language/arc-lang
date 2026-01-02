@@ -1,14 +1,39 @@
 # Arc Language Execution Model
 
-Arc separates **logic definition** from **execution context**. Write your code as inline functions, then choose where to run them: OS threads, isolated processes, or sandboxed containers.
+Arc separates **logic definition** from **execution context**. Write your code as inline functions, then choose where to run them: async event loop, OS threads, isolated processes, or sandboxed containers.
 
-This allows Arc to scale from parallel computation to security isolation—all with the same language and syntax.
+This allows Arc to scale from lightweight concurrency to security isolation—all with the same language and syntax.
 
 ---
 
-## The 3 Execution Models
+## The 4 Execution Models
 
-### 1. `thread` - OS Threads (Preemptive Multitasking)
+### 1. `async` - Async Functions (Cooperative Multitasking)
+
+**What:** Asynchronous functions that run on the event loop. Execution is cooperative and non-blocking.
+
+**When to use:**
+- High-concurrency I/O (web servers, 10k+ connections)
+- Network requests, file I/O
+- Tasks that yield frequently
+
+**Cost:** ~200ns context switch, minimal memory overhead
+
+**Syntax:**
+```arc
+let result = await async func(url: string) {
+    let data = await http.get(url)
+    return process(data)
+}("https://api.example.com")
+```
+
+**Restrictions:**
+- Must use non-blocking I/O (async APIs)
+- Cannot call blocking C functions (use `thread` instead)
+
+---
+
+### 2. `thread` - OS Threads (Preemptive Multitasking)
 
 **What:** Real OS threads managed by the kernel. Each thread has its own stack.
 
@@ -21,7 +46,6 @@ This allows Arc to scale from parallel computation to security isolation—all w
 
 **Syntax:**
 ```arc
-// Inline anonymous function only
 let handle = thread func(path: string) {
     let file = libc.fopen(path, "r")
     libc.sleep(1000)  // Blocks this thread only
@@ -33,7 +57,7 @@ handle.join()  // Wait for thread to finish
 
 ---
 
-### 2. `process` - OS Processes (Memory Isolation)
+### 3. `process` - OS Processes (Memory Isolation)
 
 **What:** Separate OS process with isolated memory space. Uses fork/clone syscall.
 
@@ -46,7 +70,6 @@ handle.join()  // Wait for thread to finish
 
 **Syntax:**
 ```arc
-// Inline anonymous function only
 let handle = process func(data: *byte) int32 {
     // If this crashes, parent process is safe
     let result = dangerous_computation(data)
@@ -67,7 +90,7 @@ if handle.exit_code() != 0 {
 
 ---
 
-### 3. `container` - Sandboxed Processes (Security Isolation)
+### 4. `container` - Sandboxed Processes (Security Isolation)
 
 **What:** Process with Linux namespaces and cgroups. Isolated network, filesystem, and PID view.
 
@@ -81,7 +104,6 @@ if handle.exit_code() != 0 {
 
 **Syntax:**
 ```arc
-// Inline anonymous function only
 let handle = container func(code: string) {
     // Isolated filesystem (chroot)
     // Isolated network (own network namespace)
@@ -115,6 +137,7 @@ let handle = container func() {
 
 | Model | Isolation | Concurrency | Use Case | Overhead |
 |-------|-----------|-------------|----------|----------|
+| `async` | Shared memory | Cooperative | I/O-bound, high concurrency | ~200ns |
 | `thread` | Shared memory | Preemptive | CPU-bound, blocking calls | ~5µs |
 | `process` | Separate memory | Full | Fault tolerance | ~1-10ms |
 | `container` | Sandboxed + limits | Full | Security, multi-tenant | ~10-50ms |
@@ -122,6 +145,32 @@ let handle = container func() {
 ---
 
 ## Examples
+
+### Web Server (async)
+```arc
+func main() {
+    let server = http.listen(":8080")
+    for req in server.accept() {
+        let response = await async func(r: Request) Response {
+            let data = await db.query("SELECT * FROM users")
+            return Response{body: data}
+        }(req)
+        
+        await req.send(response)
+    }
+}
+```
+
+### Parallel Async Operations (async)
+```arc
+let user_id = 42
+
+let results = await all([
+    async func() { return await fetch_user(user_id) }(),
+    async func() { return await fetch_posts(user_id) }(),
+    async func() { return await fetch_comments(user_id) }()
+])
+```
 
 ### Database Driver (thread)
 ```arc
@@ -178,8 +227,11 @@ For GPU/CUDA execution, see the separate **GPU Execution Model** documentation w
 ## Philosophy
 
 Arc's execution model gives you the right tool for every job:
-- **thread**: When you need real parallelism
-- **process**: When you need isolation
-- **container**: When you need security
+- **async**: Lightweight concurrency, I/O-bound
+- **thread**: Real parallelism, CPU-bound
+- **process**: Isolation and fault tolerance
+- **container**: Security and resource limits
 
 All with the same language, same syntax, same binary. No external dependencies, no frameworks, no runtime bloat.
+
+**All execution contexts use inline functions only** - making execution boundaries explicit, data flow clear, and preventing hidden complexity.
