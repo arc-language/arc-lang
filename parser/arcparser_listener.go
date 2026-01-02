@@ -152,6 +152,18 @@ type ArcParserListener interface {
 	// EnterReturnStmt is called when entering the returnStmt production.
 	EnterReturnStmt(c *ReturnStmtContext)
 
+	// EnterDeferStmt is called when entering the deferStmt production.
+	EnterDeferStmt(c *DeferStmtContext)
+
+	// EnterBreakStmt is called when entering the breakStmt production.
+	EnterBreakStmt(c *BreakStmtContext)
+
+	// EnterContinueStmt is called when entering the continueStmt production.
+	EnterContinueStmt(c *ContinueStmtContext)
+
+	// EnterThrowStmt is called when entering the throwStmt production.
+	EnterThrowStmt(c *ThrowStmtContext)
+
 	// EnterIfStmt is called when entering the ifStmt production.
 	EnterIfStmt(c *IfStmtContext)
 
@@ -175,18 +187,6 @@ type ArcParserListener interface {
 
 	// EnterFinallyClause is called when entering the finallyClause production.
 	EnterFinallyClause(c *FinallyClauseContext)
-
-	// EnterThrowStmt is called when entering the throwStmt production.
-	EnterThrowStmt(c *ThrowStmtContext)
-
-	// EnterBreakStmt is called when entering the breakStmt production.
-	EnterBreakStmt(c *BreakStmtContext)
-
-	// EnterContinueStmt is called when entering the continueStmt production.
-	EnterContinueStmt(c *ContinueStmtContext)
-
-	// EnterDeferStmt is called when entering the deferStmt production.
-	EnterDeferStmt(c *DeferStmtContext)
 
 	// EnterExpression is called when entering the expression production.
 	EnterExpression(c *ExpressionContext)
@@ -422,6 +422,18 @@ type ArcParserListener interface {
 	// ExitReturnStmt is called when exiting the returnStmt production.
 	ExitReturnStmt(c *ReturnStmtContext)
 
+	// ExitDeferStmt is called when exiting the deferStmt production.
+	ExitDeferStmt(c *DeferStmtContext)
+
+	// ExitBreakStmt is called when exiting the breakStmt production.
+	ExitBreakStmt(c *BreakStmtContext)
+
+	// ExitContinueStmt is called when exiting the continueStmt production.
+	ExitContinueStmt(c *ContinueStmtContext)
+
+	// ExitThrowStmt is called when exiting the throwStmt production.
+	ExitThrowStmt(c *ThrowStmtContext)
+
 	// ExitIfStmt is called when exiting the ifStmt production.
 	ExitIfStmt(c *IfStmtContext)
 
@@ -445,18 +457,6 @@ type ArcParserListener interface {
 
 	// ExitFinallyClause is called when exiting the finallyClause production.
 	ExitFinallyClause(c *FinallyClauseContext)
-
-	// ExitThrowStmt is called when exiting the throwStmt production.
-	ExitThrowStmt(c *ThrowStmtContext)
-
-	// ExitBreakStmt is called when exiting the breakStmt production.
-	ExitBreakStmt(c *BreakStmtContext)
-
-	// ExitContinueStmt is called when exiting the continueStmt production.
-	ExitContinueStmt(c *ContinueStmtContext)
-
-	// ExitDeferStmt is called when exiting the deferStmt production.
-	ExitDeferStmt(c *DeferStmtContext)
 
 	// ExitExpression is called when exiting the expression production.
 	ExitExpression(c *ExpressionContext)

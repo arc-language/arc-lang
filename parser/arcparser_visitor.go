@@ -152,6 +152,18 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#returnStmt.
 	VisitReturnStmt(ctx *ReturnStmtContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#deferStmt.
+	VisitDeferStmt(ctx *DeferStmtContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#breakStmt.
+	VisitBreakStmt(ctx *BreakStmtContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#continueStmt.
+	VisitContinueStmt(ctx *ContinueStmtContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#throwStmt.
+	VisitThrowStmt(ctx *ThrowStmtContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#ifStmt.
 	VisitIfStmt(ctx *IfStmtContext) interface{}
 
@@ -175,18 +187,6 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#finallyClause.
 	VisitFinallyClause(ctx *FinallyClauseContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#throwStmt.
-	VisitThrowStmt(ctx *ThrowStmtContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#breakStmt.
-	VisitBreakStmt(ctx *BreakStmtContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#continueStmt.
-	VisitContinueStmt(ctx *ContinueStmtContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#deferStmt.
-	VisitDeferStmt(ctx *DeferStmtContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#expression.
 	VisitExpression(ctx *ExpressionContext) interface{}

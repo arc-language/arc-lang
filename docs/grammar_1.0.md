@@ -583,12 +583,14 @@ switch status {
 }
 
 switch status {
-    case 0:
-        io.print("OK")
-    case 1:
-        io.print("Pending")
-    case 2:
-        io.print("Error")
+    // Runs if status is 1 OR 2 OR 3
+    case 1, 2, 3:
+        io.print("Active/Pending")
+
+    // Runs only if status is 4
+    case 4:
+        io.print("Completed")
+
     default:
         io.print("Unknown")
 }
