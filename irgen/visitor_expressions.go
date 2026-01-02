@@ -283,21 +283,27 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			// Standard Call
 			if curr != nil {
 				if fn, ok := curr.(*ir.Function); ok {
+					// DEBUG
+					fmt.Printf("[DEBUG] Creating call to %s with %d args\n", fn.Name(), len(args))
+					
 					// Cast arguments to match function parameters
 					if len(args) == len(fn.FuncType.ParamTypes) || (fn.FuncType.Variadic && len(args) >= len(fn.FuncType.ParamTypes)) {
 						for i, paramType := range fn.FuncType.ParamTypes {
-							args[i] = g.emitCast(args[i], paramType)
+							if i < len(args) {
+								args[i] = g.emitCast(args[i], paramType)
+							}
 						}
 					}
 
 					curr = g.ctx.Builder.CreateCall(fn, args, "")
 				} else {
 					// Indirect Call attempt
-					// Since CreateCall requires *ir.Function, we cannot emit this instruction safely
-					// without a CreateIndirectCall API. For this example, we skip/panic.
+					fmt.Printf("[DEBUG] Failed to call function. curr type: %T\n", curr)
 					panic(fmt.Sprintf("Indirect calls not supported by builder yet. Target: %v", curr))
 				}
 				currPtr = nil
+			} else {
+				fmt.Println("[DEBUG] curr is nil before call!")
 			}
 			continue
 		}
@@ -385,6 +391,9 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			if i > 0 { name += "." }
 			name += id.GetText()
 		}
+		
+		fmt.Printf("[DEBUG] Resolving QualifiedIdentifier: %s\n", name)
+		
 		if sym, ok := g.currentScope.Resolve(name); ok && sym.IRValue != nil {
 			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 				return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
@@ -392,6 +401,8 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			return sym.IRValue
 		}
 		if fn := g.ctx.Module.GetFunction(name); fn != nil { return fn }
+		
+		fmt.Printf("[DEBUG] Failed to resolve %s\n", name)
 		return g.getZeroValue(types.I64)
 	}
 
