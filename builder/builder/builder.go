@@ -1,6 +1,3 @@
-// --- START OF FILE builder/builder.go ---
-// Package builder provides the IR Builder pattern for constructing IR.
-// This is the main API users interact with to create IR.
 package builder
 
 import (
@@ -93,7 +90,6 @@ func (b *Builder) insert(inst ir.Instruction) {
 	if b.insertPoint < 0 {
 		b.currentBlock.AddInstruction(inst)
 	} else {
-		// Insert at specific position
 		insts := b.currentBlock.Instructions
 		newInsts := make([]ir.Instruction, len(insts)+1)
 		copy(newInsts, insts[:b.insertPoint])
@@ -109,7 +105,6 @@ func (b *Builder) insert(inst ir.Instruction) {
 // Module-level operations
 // ============================================================================
 
-// CreateFunction creates a new function in the module
 func (b *Builder) CreateFunction(name string, retType types.Type, params []types.Type, variadic bool) *ir.Function {
 	fnType := types.NewFunction(retType, params, variadic)
 	fn := ir.NewFunction(name, fnType)
@@ -120,7 +115,6 @@ func (b *Builder) CreateFunction(name string, retType types.Type, params []types
 	return fn
 }
 
-// DeclareFunction declares an external function
 func (b *Builder) DeclareFunction(name string, retType types.Type, params []types.Type, variadic bool) *ir.Function {
 	fnType := types.NewFunction(retType, params, variadic)
 	fn := ir.NewFunction(name, fnType)
@@ -131,13 +125,11 @@ func (b *Builder) DeclareFunction(name string, retType types.Type, params []type
 	return fn
 }
 
-// CreateGlobalVariable creates a global variable
 func (b *Builder) CreateGlobalVariable(name string, typ types.Type, initializer ir.Constant) *ir.Global {
 	g := &ir.Global{
 		Initializer: initializer,
 		Linkage:     ir.ExternalLinkage,
 	}
-	// Globals are pointers to the value
 	g.SetType(types.NewPointer(typ))
 	g.SetName(name)
 	if b.module != nil {
@@ -146,7 +138,6 @@ func (b *Builder) CreateGlobalVariable(name string, typ types.Type, initializer 
 	return g
 }
 
-// CreateGlobalConstant creates a global constant
 func (b *Builder) CreateGlobalConstant(name string, initializer ir.Constant) *ir.Global {
 	g := &ir.Global{
 		Initializer: initializer,
@@ -154,7 +145,6 @@ func (b *Builder) CreateGlobalConstant(name string, initializer ir.Constant) *ir
 		Linkage:     ir.ExternalLinkage,
 	}
 	g.SetName(name)
-	// Globals are pointers to the value
 	g.SetType(types.NewPointer(initializer.Type()))
 	if b.module != nil {
 		b.module.AddGlobal(g)
@@ -166,7 +156,6 @@ func (b *Builder) CreateGlobalConstant(name string, initializer ir.Constant) *ir
 // Basic Block operations
 // ============================================================================
 
-// CreateBlock creates a new basic block
 func (b *Builder) CreateBlock(name string) *ir.BasicBlock {
 	block := ir.NewBasicBlock(name)
 	if b.currentFunc != nil {
@@ -175,7 +164,6 @@ func (b *Builder) CreateBlock(name string) *ir.BasicBlock {
 	return block
 }
 
-// CreateBlockInFunction creates a block in a specific function
 func (b *Builder) CreateBlockInFunction(name string, fn *ir.Function) *ir.BasicBlock {
 	block := ir.NewBasicBlock(name)
 	fn.AddBlock(block)
@@ -186,7 +174,6 @@ func (b *Builder) CreateBlockInFunction(name string, fn *ir.Function) *ir.BasicB
 // Terminator instructions
 // ============================================================================
 
-// CreateRet creates a return instruction
 func (b *Builder) CreateRet(v ir.Value) *ir.RetInst {
 	inst := &ir.RetInst{}
 	inst.Op = ir.OpRet
@@ -197,7 +184,6 @@ func (b *Builder) CreateRet(v ir.Value) *ir.RetInst {
 	return inst
 }
 
-// CreateRetVoid creates a void return
 func (b *Builder) CreateRetVoid() *ir.RetInst {
 	inst := &ir.RetInst{}
 	inst.Op = ir.OpRet
@@ -205,18 +191,15 @@ func (b *Builder) CreateRetVoid() *ir.RetInst {
 	return inst
 }
 
-// CreateBr creates an unconditional branch
 func (b *Builder) CreateBr(target *ir.BasicBlock) *ir.BrInst {
 	inst := &ir.BrInst{Target: target}
 	inst.Op = ir.OpBr
 	b.insert(inst)
-	// Update CFG
 	b.currentBlock.Successors = append(b.currentBlock.Successors, target)
 	target.Predecessors = append(target.Predecessors, b.currentBlock)
 	return inst
 }
 
-// CreateCondBr creates a conditional branch
 func (b *Builder) CreateCondBr(cond ir.Value, trueBlock, falseBlock *ir.BasicBlock) *ir.CondBrInst {
 	inst := &ir.CondBrInst{
 		Condition:  cond,
@@ -225,14 +208,12 @@ func (b *Builder) CreateCondBr(cond ir.Value, trueBlock, falseBlock *ir.BasicBlo
 	}
 	inst.Op = ir.OpCondBr
 	b.insert(inst)
-	// Update CFG
 	b.currentBlock.Successors = append(b.currentBlock.Successors, trueBlock, falseBlock)
 	trueBlock.Predecessors = append(trueBlock.Predecessors, b.currentBlock)
 	falseBlock.Predecessors = append(falseBlock.Predecessors, b.currentBlock)
 	return inst
 }
 
-// CreateSwitch creates a switch instruction
 func (b *Builder) CreateSwitch(cond ir.Value, defaultBlock *ir.BasicBlock, numCases int) *ir.SwitchInst {
 	inst := &ir.SwitchInst{
 		Condition:    cond,
@@ -246,10 +227,8 @@ func (b *Builder) CreateSwitch(cond ir.Value, defaultBlock *ir.BasicBlock, numCa
 	return inst
 }
 
-// AddCase adds a case to a switch instruction
 func (b *Builder) AddCase(sw *ir.SwitchInst, val *ir.ConstantInt, block *ir.BasicBlock) {
 	sw.Cases = append(sw.Cases, ir.SwitchCase{Value: val, Block: block})
-	// Update CFG
 	parent := sw.Parent()
 	if parent != nil {
 		parent.Successors = append(parent.Successors, block)
@@ -257,7 +236,6 @@ func (b *Builder) AddCase(sw *ir.SwitchInst, val *ir.ConstantInt, block *ir.Basi
 	}
 }
 
-// CreateUnreachable creates an unreachable instruction
 func (b *Builder) CreateUnreachable() *ir.UnreachableInst {
 	inst := &ir.UnreachableInst{}
 	inst.Op = ir.OpUnreachable
@@ -278,90 +256,75 @@ func (b *Builder) createBinaryOp(op ir.Opcode, lhs, rhs ir.Value, name string) *
 	inst.SetName(name)
 	inst.SetOperand(0, lhs)
 	inst.SetOperand(1, rhs)
-	// Implicitly set type to LHS type (standard for binary ops)
 	inst.SetType(lhs.Type())
 	b.insert(inst)
 	return inst
 }
 
-// CreateAdd creates an add instruction
 func (b *Builder) CreateAdd(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	return b.createBinaryOp(ir.OpAdd, lhs, rhs, name)
 }
 
-// CreateNSWAdd creates an add with no signed wrap
 func (b *Builder) CreateNSWAdd(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	inst := b.createBinaryOp(ir.OpAdd, lhs, rhs, name)
 	inst.NoSignedWrap = true
 	return inst
 }
 
-// CreateNUWAdd creates an add with no unsigned wrap
 func (b *Builder) CreateNUWAdd(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	inst := b.createBinaryOp(ir.OpAdd, lhs, rhs, name)
 	inst.NoUnsignedWrap = true
 	return inst
 }
 
-// CreateSub creates a sub instruction
 func (b *Builder) CreateSub(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	return b.createBinaryOp(ir.OpSub, lhs, rhs, name)
 }
 
-// CreateNSWSub creates a sub with no signed wrap
 func (b *Builder) CreateNSWSub(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	inst := b.createBinaryOp(ir.OpSub, lhs, rhs, name)
 	inst.NoSignedWrap = true
 	return inst
 }
 
-// CreateMul creates a mul instruction
 func (b *Builder) CreateMul(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	return b.createBinaryOp(ir.OpMul, lhs, rhs, name)
 }
 
-// CreateNSWMul creates a mul with no signed wrap
 func (b *Builder) CreateNSWMul(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	inst := b.createBinaryOp(ir.OpMul, lhs, rhs, name)
 	inst.NoSignedWrap = true
 	return inst
 }
 
-// CreateUDiv creates an unsigned division
 func (b *Builder) CreateUDiv(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	return b.createBinaryOp(ir.OpUDiv, lhs, rhs, name)
 }
 
-// CreateExactUDiv creates an exact unsigned division
 func (b *Builder) CreateExactUDiv(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	inst := b.createBinaryOp(ir.OpUDiv, lhs, rhs, name)
 	inst.Exact = true
 	return inst
 }
 
-// CreateSDiv creates a signed division
 func (b *Builder) CreateSDiv(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	return b.createBinaryOp(ir.OpSDiv, lhs, rhs, name)
 }
 
-// CreateExactSDiv creates an exact signed division
 func (b *Builder) CreateExactSDiv(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	inst := b.createBinaryOp(ir.OpSDiv, lhs, rhs, name)
 	inst.Exact = true
 	return inst
 }
 
-// CreateURem creates unsigned remainder
 func (b *Builder) CreateURem(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	return b.createBinaryOp(ir.OpURem, lhs, rhs, name)
 }
 
-// CreateSRem creates signed remainder
 func (b *Builder) CreateSRem(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	return b.createBinaryOp(ir.OpSRem, lhs, rhs, name)
 }
 
-// Floating point operations
 func (b *Builder) CreateFAdd(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 	return b.createBinaryOp(ir.OpFAdd, lhs, rhs, name)
 }
@@ -414,7 +377,6 @@ func (b *Builder) CreateXor(lhs, rhs ir.Value, name string) *ir.BinaryInst {
 // Memory operations
 // ============================================================================
 
-// CreateAlloca creates a stack allocation
 func (b *Builder) CreateAlloca(typ types.Type, name string) *ir.AllocaInst {
 	if name == "" {
 		name = b.generateName()
@@ -429,7 +391,6 @@ func (b *Builder) CreateAlloca(typ types.Type, name string) *ir.AllocaInst {
 	return inst
 }
 
-// CreateAllocaWithCount creates an array allocation on stack
 func (b *Builder) CreateAllocaWithCount(typ types.Type, count ir.Value, name string) *ir.AllocaInst {
 	if name == "" {
 		name = b.generateName()
@@ -445,7 +406,6 @@ func (b *Builder) CreateAllocaWithCount(typ types.Type, count ir.Value, name str
 	return inst
 }
 
-// CreateLoad creates a load instruction
 func (b *Builder) CreateLoad(typ types.Type, ptr ir.Value, name string) *ir.LoadInst {
 	if name == "" {
 		name = b.generateName()
@@ -459,21 +419,18 @@ func (b *Builder) CreateLoad(typ types.Type, ptr ir.Value, name string) *ir.Load
 	return inst
 }
 
-// CreateVolatileLoad creates a volatile load
 func (b *Builder) CreateVolatileLoad(typ types.Type, ptr ir.Value, name string) *ir.LoadInst {
 	inst := b.CreateLoad(typ, ptr, name)
 	inst.Volatile = true
 	return inst
 }
 
-// CreateAlignedLoad creates an aligned load
 func (b *Builder) CreateAlignedLoad(typ types.Type, ptr ir.Value, align int, name string) *ir.LoadInst {
 	inst := b.CreateLoad(typ, ptr, name)
 	inst.Alignment = align
 	return inst
 }
 
-// CreateStore creates a store instruction
 func (b *Builder) CreateStore(val ir.Value, ptr ir.Value) *ir.StoreInst {
 	inst := &ir.StoreInst{}
 	inst.Op = ir.OpStore
@@ -483,21 +440,18 @@ func (b *Builder) CreateStore(val ir.Value, ptr ir.Value) *ir.StoreInst {
 	return inst
 }
 
-// CreateVolatileStore creates a volatile store
 func (b *Builder) CreateVolatileStore(val ir.Value, ptr ir.Value) *ir.StoreInst {
 	inst := b.CreateStore(val, ptr)
 	inst.Volatile = true
 	return inst
 }
 
-// CreateAlignedStore creates an aligned store
 func (b *Builder) CreateAlignedStore(val ir.Value, ptr ir.Value, align int) *ir.StoreInst {
 	inst := b.CreateStore(val, ptr)
 	inst.Alignment = align
 	return inst
 }
 
-// CreateGEP creates a getelementptr instruction
 func (b *Builder) CreateGEP(pointeeType types.Type, ptr ir.Value, indices []ir.Value, name string) *ir.GetElementPtrInst {
 	if name == "" {
 		name = b.generateName()
@@ -511,8 +465,38 @@ func (b *Builder) CreateGEP(pointeeType types.Type, ptr ir.Value, indices []ir.V
 	}
 	inst.Op = ir.OpGetElementPtr
 	inst.SetName(name)
-	// Simplified return type calculation
-	inst.SetType(types.NewPointer(pointeeType))
+	
+	// Better Return Type Calculation
+	// If first index is variable (pointer arithmetic), type stays *T.
+	// If subsequent indices exist, we drill down.
+	// Currently simplified logic assumes:
+	// - If len(indices) == 1: Result is *pointeeType
+	// - If len(indices) > 1: We must drill down into pointeeType.
+	
+	resultType := pointeeType
+	
+	// Skip the first index (pointer arithmetic)
+	// But only if we drill down (GEP on aggregate)
+	// If we just do ptr + N, result is *T.
+	// If we do ptr[0].field, result is *FieldType.
+	
+	if len(indices) > 1 {
+		// Iterate from 2nd index
+		for _, idxVal := range indices[1:] {
+			if st, ok := resultType.(*types.StructType); ok {
+				if cIdx, ok := idxVal.(*ir.ConstantInt); ok {
+					if int(cIdx.Value) < len(st.Fields) {
+						resultType = st.Fields[cIdx.Value]
+					}
+				}
+			} else if at, ok := resultType.(*types.ArrayType); ok {
+				resultType = at.ElementType
+			}
+		}
+	}
+	
+	inst.SetType(types.NewPointer(resultType))
+	
 	for i, op := range operands {
 		inst.SetOperand(i, op)
 	}
@@ -520,17 +504,16 @@ func (b *Builder) CreateGEP(pointeeType types.Type, ptr ir.Value, indices []ir.V
 	return inst
 }
 
-// CreateInBoundsGEP creates an inbounds GEP
 func (b *Builder) CreateInBoundsGEP(pointeeType types.Type, ptr ir.Value, indices []ir.Value, name string) *ir.GetElementPtrInst {
 	inst := b.CreateGEP(pointeeType, ptr, indices, name)
 	inst.InBounds = true
 	return inst
 }
 
-// CreateStructGEP creates a GEP to access a struct field
 func (b *Builder) CreateStructGEP(structType types.Type, ptr ir.Value, idx int, name string) *ir.GetElementPtrInst {
 	zero := b.ConstInt(types.I32, 0)
 	idxVal := b.ConstInt(types.I32, int64(idx))
+	// This calls CreateGEP, which now has fix for type calculation
 	return b.CreateGEP(structType, ptr, []ir.Value{zero, idxVal}, name)
 }
 
@@ -637,7 +620,6 @@ func (b *Builder) CreateFCmp(pred ir.FCmpPredicate, lhs, rhs ir.Value, name stri
 	return inst
 }
 
-// Convenience comparison methods
 func (b *Builder) CreateICmpEQ(lhs, rhs ir.Value, name string) *ir.ICmpInst {
 	return b.CreateICmp(ir.ICmpEQ, lhs, rhs, name)
 }
@@ -682,7 +664,6 @@ func (b *Builder) CreateICmpUGE(lhs, rhs ir.Value, name string) *ir.ICmpInst {
 // Other operations
 // ============================================================================
 
-// CreatePhi creates a phi node
 func (b *Builder) CreatePhi(typ types.Type, name string) *ir.PhiInst {
 	if name == "" {
 		name = b.generateName()
@@ -695,7 +676,6 @@ func (b *Builder) CreatePhi(typ types.Type, name string) *ir.PhiInst {
 	return inst
 }
 
-// CreateSelect creates a select instruction
 func (b *Builder) CreateSelect(cond ir.Value, trueVal, falseVal ir.Value, name string) *ir.SelectInst {
 	if name == "" {
 		name = b.generateName()
@@ -711,7 +691,6 @@ func (b *Builder) CreateSelect(cond ir.Value, trueVal, falseVal ir.Value, name s
 	return inst
 }
 
-// CreateCall creates a function call
 func (b *Builder) CreateCall(fn *ir.Function, args []ir.Value, name string) *ir.CallInst {
 	if name == "" && fn.FuncType.ReturnType.Kind() != types.VoidKind {
 		name = b.generateName()
@@ -729,7 +708,6 @@ func (b *Builder) CreateCall(fn *ir.Function, args []ir.Value, name string) *ir.
 	return inst
 }
 
-// CreateCallByName creates a call to a named function
 func (b *Builder) CreateCallByName(name string, retType types.Type, args []ir.Value, resultName string) *ir.CallInst {
 	if resultName == "" && retType.Kind() != types.VoidKind {
 		resultName = b.generateName()
@@ -747,7 +725,6 @@ func (b *Builder) CreateCallByName(name string, retType types.Type, args []ir.Va
 	return inst
 }
 
-// CreateSyscall creates a system call instruction
 func (b *Builder) CreateSyscall(args []ir.Value) *ir.SyscallInst {
 	if b.currentBlock == nil {
 		panic("no insertion block set")
@@ -756,7 +733,6 @@ func (b *Builder) CreateSyscall(args []ir.Value) *ir.SyscallInst {
 	inst := &ir.SyscallInst{}
 	inst.Op = ir.OpSyscall
 	inst.SetName(name)
-	// Syscalls generally return an integer result (machine word, typically i64)
 	inst.SetType(types.I64)
 	
 	for i, arg := range args {
@@ -766,7 +742,6 @@ func (b *Builder) CreateSyscall(args []ir.Value) *ir.SyscallInst {
 	return inst
 }
 
-// CreateExtractValue extracts a value from an aggregate
 func (b *Builder) CreateExtractValue(agg ir.Value, indices []int, name string) *ir.ExtractValueInst {
 	if name == "" {
 		name = b.generateName()
@@ -777,7 +752,6 @@ func (b *Builder) CreateExtractValue(agg ir.Value, indices []int, name string) *
 	inst.Op = ir.OpExtractValue
 	inst.SetName(name)
 	
-	// Calculate proper return type based on indices
 	typ := agg.Type()
 	for _, idx := range indices {
 		if st, ok := typ.(*types.StructType); ok {
@@ -795,7 +769,6 @@ func (b *Builder) CreateExtractValue(agg ir.Value, indices []int, name string) *
 	return inst
 }
 
-// CreateInsertValue inserts a value into an aggregate
 func (b *Builder) CreateInsertValue(agg ir.Value, val ir.Value, indices []int, name string) *ir.InsertValueInst {
 	if name == "" {
 		name = b.generateName()
@@ -816,7 +789,6 @@ func (b *Builder) CreateInsertValue(agg ir.Value, val ir.Value, indices []int, n
 // Constant creation
 // ============================================================================
 
-// ConstInt creates an integer constant
 func (b *Builder) ConstInt(typ *types.IntType, val int64) *ir.ConstantInt {
 	c := &ir.ConstantInt{
 		Value: val,
@@ -825,7 +797,6 @@ func (b *Builder) ConstInt(typ *types.IntType, val int64) *ir.ConstantInt {
 	return c
 }
 
-// ConstFloat creates a float constant
 func (b *Builder) ConstFloat(typ *types.FloatType, val float64) *ir.ConstantFloat {
 	c := &ir.ConstantFloat{
 		Value: val,
@@ -834,38 +805,32 @@ func (b *Builder) ConstFloat(typ *types.FloatType, val float64) *ir.ConstantFloa
 	return c
 }
 
-// ConstNull creates a null pointer constant
 func (b *Builder) ConstNull(ptrType *types.PointerType) *ir.ConstantNull {
 	c := &ir.ConstantNull{}
 	c.SetType(ptrType)
 	return c
 }
 
-// ConstUndef creates an undefined value
 func (b *Builder) ConstUndef(typ types.Type) *ir.ConstantUndef {
 	c := &ir.ConstantUndef{}
 	c.SetType(typ)
 	return c
 }
 
-// ConstZero creates a zero initializer
 func (b *Builder) ConstZero(typ types.Type) *ir.ConstantZero {
 	c := &ir.ConstantZero{}
 	c.SetType(typ)
 	return c
 }
 
-// True returns i1 1
 func (b *Builder) True() *ir.ConstantInt {
 	return b.ConstInt(types.I1, 1)
 }
 
-// False returns i1 0
 func (b *Builder) False() *ir.ConstantInt {
 	return b.ConstInt(types.I1, 0)
 }
 
-// CreateVaStart creates a va_start instruction
 func (b *Builder) CreateVaStart(vaList ir.Value) *ir.VaStartInst {
 	inst := &ir.VaStartInst{}
 	inst.Op = ir.OpVaStart
@@ -875,7 +840,6 @@ func (b *Builder) CreateVaStart(vaList ir.Value) *ir.VaStartInst {
 	return inst
 }
 
-// CreateVaArg creates a va_arg instruction
 func (b *Builder) CreateVaArg(vaList ir.Value, argType types.Type, name string) *ir.VaArgInst {
 	if name == "" {
 		name = b.generateName()
@@ -891,7 +855,6 @@ func (b *Builder) CreateVaArg(vaList ir.Value, argType types.Type, name string) 
 	return inst
 }
 
-// CreateVaEnd creates a va_end instruction
 func (b *Builder) CreateVaEnd(vaList ir.Value) *ir.VaEndInst {
 	inst := &ir.VaEndInst{}
 	inst.Op = ir.OpVaEnd
@@ -901,12 +864,10 @@ func (b *Builder) CreateVaEnd(vaList ir.Value) *ir.VaEndInst {
 	return inst
 }
 
-
 // ============================================================================
 // Intrinsic operations
 // ============================================================================
 
-// CreateSizeOf creates a sizeof intrinsic (compile-time constant size in bytes)
 func (b *Builder) CreateSizeOf(typ types.Type, name string) *ir.SizeOfInst {
 	if name == "" {
 		name = b.generateName()
@@ -916,13 +877,11 @@ func (b *Builder) CreateSizeOf(typ types.Type, name string) *ir.SizeOfInst {
 	}
 	inst.Op = ir.OpSizeOf
 	inst.SetName(name)
-	// sizeof returns usize (platform-dependent pointer-sized unsigned int)
-	inst.SetType(types.U64) // Could be platform-specific
+	inst.SetType(types.U64)
 	b.insert(inst)
 	return inst
 }
 
-// CreateAlignOf creates an alignof intrinsic (compile-time alignment requirement)
 func (b *Builder) CreateAlignOf(typ types.Type, name string) *ir.AlignOfInst {
 	if name == "" {
 		name = b.generateName()
@@ -932,13 +891,11 @@ func (b *Builder) CreateAlignOf(typ types.Type, name string) *ir.AlignOfInst {
 	}
 	inst.Op = ir.OpAlignOf
 	inst.SetName(name)
-	// alignof returns usize
 	inst.SetType(types.U64)
 	b.insert(inst)
 	return inst
 }
 
-// CreateMemSet creates a memset intrinsic: memset(dest, val, count)
 func (b *Builder) CreateMemSet(dest ir.Value, val ir.Value, count ir.Value) *ir.MemSetInst {
 	inst := &ir.MemSetInst{}
 	inst.Op = ir.OpMemSet
@@ -950,7 +907,6 @@ func (b *Builder) CreateMemSet(dest ir.Value, val ir.Value, count ir.Value) *ir.
 	return inst
 }
 
-// CreateMemCpy creates a memcpy intrinsic: memcpy(dest, src, count)
 func (b *Builder) CreateMemCpy(dest ir.Value, src ir.Value, count ir.Value) *ir.MemCpyInst {
 	inst := &ir.MemCpyInst{}
 	inst.Op = ir.OpMemCpy
@@ -962,7 +918,6 @@ func (b *Builder) CreateMemCpy(dest ir.Value, src ir.Value, count ir.Value) *ir.
 	return inst
 }
 
-// CreateMemMove creates a memmove intrinsic: memmove(dest, src, count)
 func (b *Builder) CreateMemMove(dest ir.Value, src ir.Value, count ir.Value) *ir.MemMoveInst {
 	inst := &ir.MemMoveInst{}
 	inst.Op = ir.OpMemMove
@@ -974,7 +929,6 @@ func (b *Builder) CreateMemMove(dest ir.Value, src ir.Value, count ir.Value) *ir
 	return inst
 }
 
-// CreateStrLen creates a strlen intrinsic: strlen(str) -> usize
 func (b *Builder) CreateStrLen(str ir.Value, name string) *ir.StrLenInst {
 	if name == "" {
 		name = b.generateName()
@@ -982,13 +936,12 @@ func (b *Builder) CreateStrLen(str ir.Value, name string) *ir.StrLenInst {
 	inst := &ir.StrLenInst{}
 	inst.Op = ir.OpStrLen
 	inst.SetName(name)
-	inst.SetType(types.U64) // usize
+	inst.SetType(types.U64)
 	inst.SetOperand(0, str)
 	b.insert(inst)
 	return inst
 }
 
-// CreateMemChr creates a memchr intrinsic: memchr(ptr, val, count) -> *void
 func (b *Builder) CreateMemChr(ptr ir.Value, val ir.Value, count ir.Value, name string) *ir.MemChrInst {
 	if name == "" {
 		name = b.generateName()
@@ -996,7 +949,7 @@ func (b *Builder) CreateMemChr(ptr ir.Value, val ir.Value, count ir.Value, name 
 	inst := &ir.MemChrInst{}
 	inst.Op = ir.OpMemChr
 	inst.SetName(name)
-	inst.SetType(types.NewPointer(types.Void)) // *void
+	inst.SetType(types.NewPointer(types.Void))
 	inst.SetOperand(0, ptr)
 	inst.SetOperand(1, val)
 	inst.SetOperand(2, count)
@@ -1004,7 +957,6 @@ func (b *Builder) CreateMemChr(ptr ir.Value, val ir.Value, count ir.Value, name 
 	return inst
 }
 
-// CreateMemCmp creates a memcmp intrinsic: memcmp(ptr1, ptr2, count) -> i32
 func (b *Builder) CreateMemCmp(ptr1 ir.Value, ptr2 ir.Value, count ir.Value, name string) *ir.MemCmpInst {
 	if name == "" {
 		name = b.generateName()
@@ -1020,7 +972,6 @@ func (b *Builder) CreateMemCmp(ptr1 ir.Value, ptr2 ir.Value, count ir.Value, nam
 	return inst
 }
 
-// CreateRaise creates a raise intrinsic for aborting execution
 func (b *Builder) CreateRaise(message ir.Value) *ir.RaiseInst {
 	inst := &ir.RaiseInst{}
 	inst.Op = ir.OpRaise
@@ -1034,7 +985,6 @@ func (b *Builder) CreateRaise(message ir.Value) *ir.RaiseInst {
 // Coroutine operations
 // ============================================================================
 
-// CreateCoroId creates a coroutine ID (start of coroutine)
 func (b *Builder) CreateCoroId(name string) *ir.CoroIdInst {
     if name == "" {
         name = b.generateName()
@@ -1042,13 +992,11 @@ func (b *Builder) CreateCoroId(name string) *ir.CoroIdInst {
     inst := &ir.CoroIdInst{}
     inst.Op = ir.OpCoroId
     inst.SetName(name)
-    // coro.id returns a token type (opaque handle)
-    inst.SetType(types.NewInt(64, false)) // Simplified - LLVM uses "token" type
+    inst.SetType(types.NewInt(64, false))
     b.insert(inst)
     return inst
 }
 
-// CreateCoroBegin creates coroutine begin (allocates frame)
 func (b *Builder) CreateCoroBegin(id ir.Value, name string) *ir.CoroBeginInst {
     if name == "" {
         name = b.generateName()
@@ -1056,13 +1004,12 @@ func (b *Builder) CreateCoroBegin(id ir.Value, name string) *ir.CoroBeginInst {
     inst := &ir.CoroBeginInst{}
     inst.Op = ir.OpCoroBegin
     inst.SetName(name)
-    inst.SetType(types.NewPointer(types.I8)) // Returns ptr to coroutine frame
+    inst.SetType(types.NewPointer(types.I8))
     inst.SetOperand(0, id)
     b.insert(inst)
     return inst
 }
 
-// CreateCoroSuspend creates a suspend point (await)
 func (b *Builder) CreateCoroSuspend(isFinal bool, name string) *ir.CoroSuspendInst {
     if name == "" {
         name = b.generateName()
@@ -1072,12 +1019,11 @@ func (b *Builder) CreateCoroSuspend(isFinal bool, name string) *ir.CoroSuspendIn
     }
     inst.Op = ir.OpCoroSuspend
     inst.SetName(name)
-    inst.SetType(types.I8) // Returns i8 (0=suspend, 1=resume, -1=destroy)
+    inst.SetType(types.I8)
     b.insert(inst)
     return inst
 }
 
-// CreateCoroEnd marks end of coroutine scope
 func (b *Builder) CreateCoroEnd(handle ir.Value) *ir.CoroEndInst {
     inst := &ir.CoroEndInst{}
     inst.Op = ir.OpCoroEnd
@@ -1087,7 +1033,6 @@ func (b *Builder) CreateCoroEnd(handle ir.Value) *ir.CoroEndInst {
     return inst
 }
 
-// CreateCoroFree gets the memory to free for coroutine
 func (b *Builder) CreateCoroFree(id ir.Value, handle ir.Value, name string) *ir.CoroFreeInst {
     if name == "" {
         name = b.generateName()
@@ -1102,9 +1047,6 @@ func (b *Builder) CreateCoroFree(id ir.Value, handle ir.Value, name string) *ir.
     return inst
 }
 
-// --- Append to builder/builder.go ---
-
-// CreateCoroResume creates a resume instruction
 func (b *Builder) CreateCoroResume(handle ir.Value) *ir.CoroResumeInst {
     inst := &ir.CoroResumeInst{}
     inst.Op = ir.OpCoroResume
@@ -1114,7 +1056,6 @@ func (b *Builder) CreateCoroResume(handle ir.Value) *ir.CoroResumeInst {
     return inst
 }
 
-// CreateCoroDestroy creates a destroy instruction
 func (b *Builder) CreateCoroDestroy(handle ir.Value) *ir.CoroDestroyInst {
     inst := &ir.CoroDestroyInst{}
     inst.Op = ir.OpCoroDestroy
@@ -1124,7 +1065,6 @@ func (b *Builder) CreateCoroDestroy(handle ir.Value) *ir.CoroDestroyInst {
     return inst
 }
 
-// CreateCoroPromise gets the promise address from a handle
 func (b *Builder) CreateCoroPromise(handle ir.Value, align int, fromStart bool, name string) *ir.CoroPromiseInst {
     if name == "" {
         name = b.generateName()
@@ -1132,7 +1072,7 @@ func (b *Builder) CreateCoroPromise(handle ir.Value, align int, fromStart bool, 
     inst := &ir.CoroPromiseInst{}
     inst.Op = ir.OpCoroPromise
     inst.SetName(name)
-    inst.SetType(types.NewPointer(types.I8)) // Returns raw pointer to promise
+    inst.SetType(types.NewPointer(types.I8))
     
     inst.SetOperand(0, handle)
     inst.SetOperand(1, b.ConstInt(types.I32, int64(align)))
@@ -1145,7 +1085,6 @@ func (b *Builder) CreateCoroPromise(handle ir.Value, align int, fromStart bool, 
     return inst
 }
 
-// CreateCoroDone checks if the coroutine is finished
 func (b *Builder) CreateCoroDone(handle ir.Value, name string) *ir.CoroDoneInst {
     if name == "" {
         name = b.generateName()

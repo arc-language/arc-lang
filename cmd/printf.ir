@@ -2,26 +2,27 @@
 
 declare external i32 @printf(ptr<u8>, ...)
 
-define external i32 @main_get(%Counter %self) {
+define external i32 @main_get(%Counter %c) {
 entry:
-  %self.addr = alloca %Counter
-  store %Counter %self, ptr<%Counter> %self.addr
-  %0 = trunc i64 0 to i32
-  ret i32 %0
+  %c.addr = alloca %Counter
+  store %Counter %c, ptr<%Counter> %c.addr
+  %0 = getelementptr %Counter, ptr<%Counter> %c.addr, i32 0, i32 0
+  %1 = load %Counter, ptr<%Counter> %0
+  ret %Counter %1
 }
 
 define external i32 @main() {
 entry:
   %counter.addr = alloca %Counter
-  %1 = trunc i64 77 to i32
-  %2 = insertvalue %Counter zeroinitializer, i32 %1, 0
-  store %Counter %2, ptr<%Counter> %counter.addr
+  %2 = trunc i64 77 to i32
+  %3 = insertvalue %Counter zeroinitializer, i32 %2, 0
+  store %Counter %3, ptr<%Counter> %counter.addr
   %val.addr = alloca i32
-  %3 = trunc i64 0 to i32
-  store i32 %3, ptr<i32> %val.addr
-  %4 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
-  %5 = load i32, ptr<i32> %val.addr
-  %6 = call i32 @printf(ptr<[10 x i8]> %4, i32 %5)
-  %7 = trunc i64 0 to i32
-  ret i32 %7
+  %4 = trunc i64 0 to i32
+  store i32 %4, ptr<i32> %val.addr
+  %5 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
+  %6 = load i32, ptr<i32> %val.addr
+  %7 = call i32 @printf(ptr<[10 x i8]> %5, i32 %6)
+  %8 = trunc i64 0 to i32
+  ret i32 %8
 }
