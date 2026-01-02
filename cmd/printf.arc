@@ -6,7 +6,12 @@ extern libc {
 
 func main() int32 {
 
-    libc.printf("Ok\n")
+    let x = 3
+    if x > 5 {
+        libc.printf("greater\n")
+    } else {
+        libc.printf("not_greater\n")
+    }
 
     return 0
 }

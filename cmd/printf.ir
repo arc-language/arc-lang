@@ -1,11 +1,24 @@
-@.str = external constant [5 x i8] [i8 79, i8 107, i8 92, i8 110, i8 0]
+@.str = external constant [9 x i8] [i8 103, i8 114, i8 101, i8 97, i8 116, i8 101, i8 114, i8 10, i8 0]
+@.str = external constant [13 x i8] [i8 110, i8 111, i8 116, i8 95, i8 103, i8 114, i8 101, i8 97, i8 116, i8 101, i8 114, i8 10, i8 0]
 
 declare external i32 @printf(ptr<u8>, ...)
 
 define external i32 @main() {
 entry:
-  %0 = getelementptr inbounds [5 x i8], ptr<[5 x i8]> @.str, i32 0, i32 0
-  %1 = call i32 @printf(ptr<[5 x i8]> %0)
-  %2 = trunc i64 0 to i32
-  ret i32 %2
+  %x.addr = alloca i64
+  store i64 3, ptr<i64> %x.addr
+  %0 = load i64, ptr<i64> %x.addr
+  %1 = icmp sgt i64 %0, 5
+  br i1 %1, label %if.then, label %if.else
+if.then:
+  %2 = getelementptr inbounds [9 x i8], ptr<[9 x i8]> @.str, i32 0, i32 0
+  %3 = call i32 @printf(ptr<[9 x i8]> %2)
+  br label %if.end
+if.end:
+  %6 = trunc i64 0 to i32
+  ret i32 %6
+if.else:
+  %4 = getelementptr inbounds [13 x i8], ptr<[13 x i8]> @.str, i32 0, i32 0
+  %5 = call i32 @printf(ptr<[13 x i8]> %4)
+  br label %if.end
 }

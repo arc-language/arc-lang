@@ -244,10 +244,8 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 		}
 	}
 
-	// If the primary expression was a call (e.g. foo()), curr might be the result.
-	// We iterate ops like .field, [index], etc.
 	for _, op := range ctx.AllPostfixOp() {
-		// Function Call via postfix op (unlikely if grammar puts calls in PrimaryExpression, but possible for func pointers)
+		// Function Call via postfix op
 		if op.LPAREN() != nil {
 			var args []ir.Value
 			if op.ArgumentList() != nil {
@@ -258,7 +256,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				}
 			}
 
-			// Standard Call via function pointer or resolved entity
 			if curr != nil {
 				if fn, ok := curr.(*ir.Function); ok {
 					// Cast arguments
@@ -271,8 +268,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					}
 					curr = g.ctx.Builder.CreateCall(fn, args, "")
 				} else {
-					// Indirect Call attempt (function pointer)
-					// Requires pointer-to-function type check
 					panic(fmt.Sprintf("Indirect calls not fully supported here. Target: %v", curr))
 				}
 				currPtr = nil
@@ -377,8 +372,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	}
 
 	if name != "" {
-		// 1. Check for function call syntax: IDENT(...) or QUAL.ID(...)
-		// The grammar has optional parens at the end of the identifier rules
+		// Check for function call syntax: IDENT(...) or QUAL.ID(...)
 		isCall := ctx.LPAREN() != nil && (ctx.IDENTIFIER() != nil || ctx.QualifiedIdentifier() != nil)
 		
 		var args []ir.Value
@@ -391,7 +385,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 			}
 
-			// Handle intrinsics/casts (mostly for simple identifiers)
+			// Handle intrinsics/casts
 			if !isQualified {
 				if name == "cast" && len(args) == 1 {
 					if ga := ctx.GenericArgs(); ga != nil {
@@ -407,7 +401,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			}
 		}
 
-		// 2. Resolve Symbol
+		// Resolve Symbol
 		var entity ir.Value
 		
 		if sym, ok := g.currentScope.Resolve(name); ok {
@@ -439,7 +433,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			return g.getZeroValue(types.I64)
 		}
 
-		// 3. Generate Call
+		// Generate Call
 		if isCall {
 			if fn, ok := entity.(*ir.Function); ok {
 				// Cast arguments to match function parameters
@@ -452,7 +446,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 				return g.ctx.Builder.CreateCall(fn, args, "")
 			} else {
-				// Indirect call support (simplified error for now)
 				panic(fmt.Sprintf("Indirect calls not fully implemented. Target: %s", name))
 			}
 		}
@@ -492,7 +485,6 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 		// Use strconv.Unquote to handle escape sequences (\n, \t, etc.)
 		unquoted, err := strconv.Unquote(txt)
 		if err != nil {
-			// Fallback if unquote fails (shouldn't happen if lexer is correct)
 			if len(txt) >= 2 {
 				unquoted = txt[1 : len(txt)-1]
 			}
@@ -502,7 +494,11 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 		arrType := types.NewArray(types.I8, int64(len(content)))
 		var chars []ir.Constant
 		for _, b := range []byte(content) { chars = append(chars, g.ctx.Builder.ConstInt(types.I8, int64(b))) }
-		global := g.ctx.Builder.CreateGlobalConstant(".str", &ir.ConstantArray{BaseValue: ir.BaseValue{ValType: arrType}, Elements: chars})
+		
+		// Use unique name to avoid linker collisions
+		strName := fmt.Sprintf(".str.%d", len(g.ctx.Module.Globals))
+		global := g.ctx.Builder.CreateGlobalConstant(strName, &ir.ConstantArray{BaseValue: ir.BaseValue{ValType: arrType}, Elements: chars})
+		
 		zero := g.ctx.Builder.ConstInt(types.I32, 0)
 		return g.ctx.Builder.CreateInBoundsGEP(arrType, global, []ir.Value{zero, zero}, "")
 	}
