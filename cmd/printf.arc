@@ -6,11 +6,15 @@ extern libc {
 
 func main() int32 {
 
-    let x = 3
-    if x > 5 {
-        libc.printf("greater\n")
+    let score = 75
+    if score >= 90 {
+        libc.printf("A\n")
+    } else if score >= 80 {
+        libc.printf("B\n")
+    } else if score >= 70 {
+        libc.printf("C\n")
     } else {
-        libc.printf("not_greater\n")
+        libc.printf("F\n")
     }
 
     return 0

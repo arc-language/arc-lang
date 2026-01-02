@@ -127,37 +127,77 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 }
 
 func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
-	cond := g.Visit(ctx.Expression(0)).(ir.Value)
+	// Grammar: IF expr block (ELSE IF expr block)* (ELSE block)?
 	
-	if cond.Type().BitSize() > 1 {
-		cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
-	}
-
-	thenBlock := g.ctx.Builder.CreateBlock("if.then")
 	mergeBlock := g.ctx.Builder.CreateBlock("if.end")
-	elseBlock := mergeBlock
-
-	if len(ctx.AllBlock()) > 1 {
-		elseBlock = g.ctx.Builder.CreateBlock("if.else")
-	}
-
-	g.ctx.Builder.CreateCondBr(cond, thenBlock, elseBlock)
-
-	g.ctx.SetInsertBlock(thenBlock)
-	g.Visit(ctx.Block(0))
-	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
-		g.ctx.Builder.CreateBr(mergeBlock)
-	}
-
-	if elseBlock != mergeBlock {
-		g.ctx.SetInsertBlock(elseBlock)
-		g.Visit(ctx.Block(1))
+	
+	// Count conditions (IF + ELSE IFs)
+	conditionCount := len(ctx.AllExpression())
+	
+	// Create blocks for the chain
+	// We need 'conditionCount' entry blocks (though the first is current block)
+	// And potentially entry blocks for the 'else' cases.
+	
+	// We iterate through each condition.
+	// For condition i:
+	//   Evaluate expr
+	//   Br i1 %cond, label %then_i, label %next_check_i
+	
+	var nextCheckBlock *ir.BasicBlock
+	
+	for i := 0; i < conditionCount; i++ {
+		// 1. Generate Condition
+		// If this is not the first iteration, we are in a 'next_check' block
+		if nextCheckBlock != nil {
+			g.ctx.SetInsertBlock(nextCheckBlock)
+		}
+		
+		cond := g.Visit(ctx.Expression(i)).(ir.Value)
+		if cond.Type().BitSize() > 1 {
+			cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
+		}
+		
+		thenBlock := g.ctx.Builder.CreateBlock(fmt.Sprintf("if.then.%d", i))
+		
+		// Determine the "Else" target for this condition
+		// It's either the next check, the final else block, or the merge block (if no else)
+		if i < conditionCount - 1 {
+			nextCheckBlock = g.ctx.Builder.CreateBlock(fmt.Sprintf("if.check.%d", i+1))
+		} else {
+			// Last condition
+			if len(ctx.AllBlock()) > conditionCount {
+				// Has final ELSE block
+				nextCheckBlock = g.ctx.Builder.CreateBlock("if.else")
+			} else {
+				// No ELSE block
+				nextCheckBlock = mergeBlock
+			}
+		}
+		
+		g.ctx.Builder.CreateCondBr(cond, thenBlock, nextCheckBlock)
+		
+		// 2. Generate Then Block
+		g.ctx.SetInsertBlock(thenBlock)
+		g.Visit(ctx.Block(i))
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			g.ctx.Builder.CreateBr(mergeBlock)
 		}
 	}
-
+	
+	// 3. Generate Final Else Block (if exists)
+	// If we had an ELSE block, 'nextCheckBlock' is pointing to it now.
+	// Check if the number of blocks > number of expressions.
+	if len(ctx.AllBlock()) > conditionCount {
+		g.ctx.SetInsertBlock(nextCheckBlock) // This is the "if.else" block created above
+		g.Visit(ctx.Block(conditionCount)) // Last block is the ELSE block
+		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
+			g.ctx.Builder.CreateBr(mergeBlock)
+		}
+	}
+	
+	// 4. Set insertion point to merge block
 	g.ctx.SetInsertBlock(mergeBlock)
+	
 	return nil
 }
 
