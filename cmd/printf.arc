@@ -4,17 +4,17 @@ extern libc {
     func printf(*byte, ...) int32
 }
 
+func divide(a: int32, b: int32) (int32, bool) {
+    if b == 0 {
+        return (0, false)
+    }
+    return (a / b, true)
+}
+
 func main() int32 {
 
-    let x = 2
-    switch x {
-        case 1:
-            libc.printf("one\n")
-        case 2:
-            libc.printf("two\n")
-        case 3:
-            libc.printf("three\n")
-    }
+    let (result, ok) = divide(10, 2)
+    libc.printf("result=%d ok=%d\n", result, ok)
 
     return 0
 }

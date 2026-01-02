@@ -1,35 +1,37 @@
-@.str.0 = external constant [5 x i8] [i8 111, i8 110, i8 101, i8 10, i8 0]
-@.str.1 = external constant [5 x i8] [i8 116, i8 119, i8 111, i8 10, i8 0]
-@.str.2 = external constant [7 x i8] [i8 116, i8 104, i8 114, i8 101, i8 101, i8 10, i8 0]
+@.str.0 = external constant [17 x i8] [i8 114, i8 101, i8 115, i8 117, i8 108, i8 116, i8 61, i8 37, i8 100, i8 32, i8 111, i8 107, i8 61, i8 37, i8 100, i8 10, i8 0]
 
 declare external i32 @printf(ptr<u8>, ...)
 
+define external { i32, i1 } @main_divide(i32 %a, i32 %b) {
+entry:
+  %a.addr = alloca i32
+  store i32 %a, ptr<i32> %a.addr
+  %b.addr = alloca i32
+  store i32 %b, ptr<i32> %b.addr
+  %0 = load i32, ptr<i32> %b.addr
+  %1 = icmp eq i32 %0, 0
+  br i1 %1, label %if.then.0, label %if.end
+if.end:
+  ret void
+if.then.0:
+  ret void
+}
+
 define external i32 @main() {
 entry:
-  %x.addr = alloca i64
-  store i64 2, ptr<i64> %x.addr
-  %0 = load i64, ptr<i64> %x.addr
-  %1 = icmp eq i64 %0, 1
-  br i1 %1, label %case.0, label %check.0
-switch.end:
-  br label %switch.end
-case.0:
-  %2 = getelementptr inbounds [5 x i8], ptr<[5 x i8]> @.str.0, i32 0, i32 0
-  %3 = call i32 @printf(ptr<[5 x i8]> %2)
-  br label %switch.end
-check.0:
-  %4 = icmp eq i64 %0, 2
-  br i1 %4, label %case.1, label %check.1
-case.1:
-  %5 = getelementptr inbounds [5 x i8], ptr<[5 x i8]> @.str.1, i32 0, i32 0
-  %6 = call i32 @printf(ptr<[5 x i8]> %5)
-  br label %switch.end
-check.1:
-  %7 = icmp eq i64 %0, 3
-  br i1 %7, label %case.2, label %switch.end
-case.2:
-  %8 = getelementptr inbounds [7 x i8], ptr<[7 x i8]> @.str.2, i32 0, i32 0
-  %9 = call i32 @printf(ptr<[7 x i8]> %8)
-  br label %switch.end
-check.2:
+  %2 = trunc i64 10 to i32
+  %3 = trunc i64 2 to i32
+  %4 = call { i32, i1 } @main_divide(i32 %2, i32 %3)
+  %5 = extractvalue { i32, i1 } %4, 0
+  %result.addr = alloca i32
+  store i32 %5, ptr<i32> %result.addr
+  %6 = extractvalue { i32, i1 } %4, 1
+  %ok.addr = alloca i1
+  store i1 %6, ptr<i1> %ok.addr
+  %7 = getelementptr inbounds [17 x i8], ptr<[17 x i8]> @.str.0, i32 0, i32 0
+  %8 = load i32, ptr<i32> %result.addr
+  %9 = load i1, ptr<i1> %ok.addr
+  %10 = call i32 @printf(ptr<[17 x i8]> %7, i32 %8, i1 %9)
+  %11 = trunc i64 0 to i32
+  ret i32 %11
 }

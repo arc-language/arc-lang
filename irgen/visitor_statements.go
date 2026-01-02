@@ -34,16 +34,45 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 	g.deferStack.Emit(g)
 
 	var val ir.Value
+	
+	// Handle single expression return
 	if ctx.Expression() != nil {
 		val = g.Visit(ctx.Expression()).(ir.Value)
+	} 
+	// Handle tuple return: return (a, b)
+	if ctx.TupleExpression() != nil {
+		// We need to construct a struct value from the tuple expressions
+		tupleCtx := ctx.TupleExpression()
+		var fieldVals []ir.Value
+		for _, expr := range tupleCtx.AllExpression() {
+			v := g.Visit(expr).(ir.Value)
+			fieldVals = append(fieldVals, v)
+		}
 		
+		// If current function return type is a struct (tuple), aggregate them
 		if g.ctx.CurrentFunction != nil {
-			targetType := g.ctx.CurrentFunction.FuncType.ReturnType
-			val = g.emitCast(val, targetType)
+			retType := g.ctx.CurrentFunction.FuncType.ReturnType
+			if st, ok := retType.(*types.StructType); ok {
+				// Start with zero/undef struct
+				var agg ir.Value = g.ctx.Builder.ConstZero(st)
+				for i, v := range fieldVals {
+					if i < len(st.Fields) {
+						// Cast if needed
+						v = g.emitCast(v, st.Fields[i])
+						agg = g.ctx.Builder.CreateInsertValue(agg, v, []int{i}, "")
+					}
+				}
+				val = agg
+			}
 		}
 	}
 
 	if val != nil {
+		// Cast final result if needed (e.g. for single expression)
+		if g.ctx.CurrentFunction != nil && ctx.TupleExpression() == nil {
+			targetType := g.ctx.CurrentFunction.FuncType.ReturnType
+			val = g.emitCast(val, targetType)
+		}
 		g.ctx.Builder.CreateRet(val)
 	} else {
 		g.ctx.Builder.CreateRetVoid()
@@ -277,8 +306,6 @@ func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 		caseBlock := g.ctx.Builder.CreateBlock(fmt.Sprintf("case.%d", i))
 		nextCheckBlock := g.ctx.Builder.CreateBlock(fmt.Sprintf("check.%d", i))
 		
-		// If this is the last case AND there is no default case,
-		// the "next check" is actually the end block (fallthrough/exit)
 		if i == len(ctx.AllSwitchCase())-1 && ctx.DefaultCase() == nil {
 			nextCheckBlock = endBlock
 		}
@@ -316,10 +343,6 @@ func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 	}
 
 	// Handle Default
-	// If we have a default case, prevBlock points to the last check failure.
-	// If we don't have a default case, prevBlock IS endBlock (set in loop above).
-	// We must only generate code if we are NOT already at endBlock.
-	
 	if prevBlock != endBlock {
 		g.ctx.SetInsertBlock(prevBlock)
 		
