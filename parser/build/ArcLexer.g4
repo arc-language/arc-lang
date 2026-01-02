@@ -2,7 +2,7 @@
 lexer grammar ArcLexer;
 
 // =============================================================================
-// Keywords - Control Flow & Declarations
+// Keywords
 // =============================================================================
 
 IMPORT: 'import';
@@ -36,13 +36,13 @@ EXCEPT: 'except';
 FINALLY: 'finally';
 ENUM: 'enum';
 
-// Execution Context Keywords
+// Execution Contexts
 THREAD: 'thread';
 PROCESS: 'process';
 CONTAINER: 'container';
 
 // =============================================================================
-// Type Keywords
+// Types
 // =============================================================================
 
 INT8: 'int8';
@@ -64,15 +64,11 @@ STRING: 'string';
 VOID: 'void';
 
 // =============================================================================
-// Operators with Unique Syntax (compile-time queries)
+// Operators
 // =============================================================================
 
-SIZEOF: 'sizeof';    // sizeof<T> - no parens
-ALIGNOF: 'alignof';  // alignof<T> - no parens
-
-// =============================================================================
-// Operators (multi-character first - ORDER MATTERS!)
-// =============================================================================
+SIZEOF: 'sizeof';
+ALIGNOF: 'alignof';
 
 ARROW: '->';
 RANGE: '..';
@@ -94,10 +90,6 @@ BIT_XOR_ASSIGN: '^=';
 INCREMENT: '++';
 DECREMENT: '--';
 FAT_ARROW: '=>';
-
-// =============================================================================
-// Single Character Operators
-// =============================================================================
 
 PLUS: '+';
 MINUS: '-';
@@ -136,13 +128,7 @@ UNDERSCORE: '_';
 
 BOOLEAN_LITERAL: 'true' | 'false';
 
-INTEGER_LITERAL
-    : DECIMAL_LITERAL
-    | HEX_LITERAL
-    | OCTAL_LITERAL
-    | BINARY_LITERAL
-    ;
-
+INTEGER_LITERAL: DECIMAL_LITERAL | HEX_LITERAL | OCTAL_LITERAL | BINARY_LITERAL;
 fragment DECIMAL_LITERAL: [0-9] [0-9_]*;
 fragment HEX_LITERAL: '0' [xX] [0-9a-fA-F] [0-9a-fA-F_]*;
 fragment OCTAL_LITERAL: '0' [oO] [0-7] [0-7_]*;
@@ -153,39 +139,23 @@ FLOAT_LITERAL
     | DECIMAL_LITERAL EXPONENT
     | '.' DECIMAL_LITERAL EXPONENT?
     ;
-
 fragment EXPONENT: [eE] [+-]? DECIMAL_LITERAL;
 
-// String literal accepting ${name} syntax.
-// Parser treats it as one token; Compiler handles the interpolation logic.
-STRING_LITERAL
-    : '"' (~["\\\r\n] | ESCAPE_SEQUENCE)* '"'
-    ;
+// String Literal (Backend interpolation approach)
+// Allows ${...} to pass through the lexer as part of the string
+STRING_LITERAL: '"' (~["\\\r\n] | ESCAPE_SEQUENCE)* '"';
 
-CHAR_LITERAL
-    : '\'' (~['\\\r\n] | ESCAPE_SEQUENCE) '\''
-    ;
+CHAR_LITERAL: '\'' (~['\\\r\n] | ESCAPE_SEQUENCE) '\'';
 
 fragment ESCAPE_SEQUENCE
-    : '\\' ['"\\nrt0$]
+    : '\\' ['"\\nrt0$] // $ allowed in escapes
     | '\\' 'x' HEX_DIGIT HEX_DIGIT
     | '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     | '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     ;
-
 fragment HEX_DIGIT: [0-9a-fA-F];
 
-// =============================================================================
-// Identifiers
-// =============================================================================
-
-IDENTIFIER
-    : [a-zA-Z_] [a-zA-Z0-9_]*
-    ;
-
-// =============================================================================
-// Whitespace and Comments
-// =============================================================================
+IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
 WS: [ \t\r\n]+ -> skip;
 LINE_COMMENT: '//' ~[\r\n]* -> skip;

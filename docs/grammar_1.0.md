@@ -581,6 +581,17 @@ switch status {
     default:
         io.print("Unknown")
 }
+
+switch status {
+    case 0:
+        io.print("OK")
+    case 1:
+        io.print("Pending")
+    case 2:
+        io.print("Error")
+    default:
+        io.print("Unknown")
+}
 ```
 
 ## Control Flow, try-except with throw
