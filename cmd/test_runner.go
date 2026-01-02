@@ -1,25 +1,30 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 )
 
 // TestCase defines a unit of work for the runner.
-// Tests are defined in separate files (e.g., tests_foundation.go) using init().
 type TestCase struct {
 	Name     string
+	Phase    int    // 1=Foundation, 2=Operators, 3=Control, etc.
 	Globals  string // Structs, global functions, imports
 	Body     string // Code inserted into the main() function
 	Expected string // Substring expected in standard output
 }
 
-// AllTests is populated by init() functions in other files in this package.
+// AllTests is populated by init() functions in other test files
 var AllTests []TestCase
+
+// Test execution timeout (per test)
+const TEST_TIMEOUT = 5 * time.Second
 
 func main() {
 	// 1. Setup Logging
@@ -33,7 +38,7 @@ func main() {
 	// 2. Check for Compiler Binary
 	arcBinary := "./arc"
 	if _, err := os.Stat(arcBinary); os.IsNotExist(err) {
-		fail(logFile, "Error: './arc' binary not found. Please build the compiler first (go build -o arc main.go).")
+		fail(logFile, "Error: './arc' binary not found. Please build the compiler first.")
 	}
 
 	// 3. Prepare Temp Directory
@@ -44,18 +49,27 @@ func main() {
 	}
 	defer os.RemoveAll(tempDir)
 
-	// 4. Run Header
-	header := fmt.Sprintf("Running %d tests...\n", len(AllTests))
+	// 4. Sort tests by Phase first, then Name within each phase
+	sort.Slice(AllTests, func(i, j int) bool {
+		if AllTests[i].Phase != AllTests[j].Phase {
+			return AllTests[i].Phase < AllTests[j].Phase
+		}
+		return AllTests[i].Name < AllTests[j].Name
+	})
+
+	// 5. Run Header
+	header := fmt.Sprintf("Arc Compiler Test Suite - Running %d tests...\n", len(AllTests))
 	fmt.Print(header)
+	fmt.Println(strings.Repeat("=", 60))
 	writeLog(logFile, header)
 
 	passed := 0
 	failed := 0
 	startTotal := time.Now()
 
-	// 5. Execute Tests
+	// 6. Execute Tests
 	for i, test := range AllTests {
-		prefix := fmt.Sprintf("[%d/%d] %-35s ", i+1, len(AllTests), test.Name)
+		prefix := fmt.Sprintf("[%d/%d] %-40s ", i+1, len(AllTests), test.Name)
 		fmt.Print(prefix)
 		writeLog(logFile, fmt.Sprintf("\n--- Test: %s ---\n", test.Name))
 
@@ -72,15 +86,14 @@ func main() {
 			msg := fmt.Sprintf("❌ FAIL (%.3fs)\n", duration.Seconds())
 			fmt.Print(msg)
 			writeLog(logFile, fmt.Sprintf("Result: FAIL\nError: %v\n", err))
-			// Print error to console lightly so we don't spam if it's huge
 			fmt.Printf("      Error: %v\n", err)
 			failed++
 		}
 	}
 
-	// 6. Summary
-	fmt.Println(strings.Repeat("-", 60))
-	summary := fmt.Sprintf("Passed: %d | Failed: %d | Total Time: %.2fs\n", 
+	// 7. Summary
+	fmt.Println(strings.Repeat("=", 60))
+	summary := fmt.Sprintf("Passed: %d | Failed: %d | Total Time: %.2fs\n",
 		passed, failed, time.Since(startTotal).Seconds())
 	fmt.Print(summary)
 	writeLog(logFile, "\n"+strings.Repeat("=", 60)+"\n")
@@ -93,15 +106,14 @@ func main() {
 
 func runSingleTest(tc TestCase, arcBinary, tempDir string, log *os.File) error {
 	// 1. Construct Source Code
-	// We inject standard libc definitions automatically to keep test cases clean.
 	fullSource := fmt.Sprintf(`
 extern libc {
-    func printf(fmt: *byte, ...) int32
-    func malloc(size: usize) *void
-    func free(ptr: *void)
-    func memcpy(dest: *void, src: *void, count: usize) *void
-    func memset(dest: *void, val: int32, count: usize) *void
-    func strlen(s: *byte) usize
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
 }
 
 // --- Test Globals ---
@@ -124,31 +136,62 @@ func main() int32 {
 	}
 	writeLog(log, "Source Code:\n"+fullSource+"\n")
 
-	// 3. Compile (Arc -> Object)
-	cmdCompile := exec.Command(arcBinary, "build", srcPath, "-o", objPath)
+	// 3. Compile (Arc -> Object) with timeout
+	ctx, cancel := context.WithTimeout(context.Background(), TEST_TIMEOUT)
+	defer cancel()
+
+	cmdCompile := exec.CommandContext(ctx, arcBinary, "build", srcPath, "-o", objPath)
 	outCompile, err := cmdCompile.CombinedOutput()
+	
+	if ctx.Err() == context.DeadlineExceeded {
+		writeLog(log, "Compile Output: TIMEOUT\n")
+		return fmt.Errorf("compile timeout (exceeded %v)", TEST_TIMEOUT)
+	}
+	
 	if err != nil {
 		writeLog(log, "Compile Output:\n"+string(outCompile))
 		return fmt.Errorf("compile failed: %s", strings.TrimSpace(string(outCompile)))
 	}
 
-	// 4. Link (Object -> Executable using GCC)
-	cmdLink := exec.Command("gcc", objPath, "-o", exePath, "-no-pie")
+	// 4. Link (Object -> Executable using GCC) with timeout
+	ctx, cancel = context.WithTimeout(context.Background(), TEST_TIMEOUT)
+	defer cancel()
+
+	cmdLink := exec.CommandContext(ctx, "gcc", objPath, "-o", exePath, "-no-pie")
 	outLink, err := cmdLink.CombinedOutput()
+	
+	if ctx.Err() == context.DeadlineExceeded {
+		writeLog(log, "Link Output: TIMEOUT\n")
+		return fmt.Errorf("link timeout (exceeded %v)", TEST_TIMEOUT)
+	}
+	
 	if err != nil {
 		writeLog(log, "Link Output:\n"+string(outLink))
 		return fmt.Errorf("link failed: %s", strings.TrimSpace(string(outLink)))
 	}
 
-	// 5. Run Executable
-	cmdRun := exec.Command(exePath)
+	// 5. Run Executable with timeout
+	ctx, cancel = context.WithTimeout(context.Background(), TEST_TIMEOUT)
+	defer cancel()
+
+	cmdRun := exec.CommandContext(ctx, exePath)
 	outRun, err := cmdRun.CombinedOutput()
 	output := string(outRun)
 	writeLog(log, "Run Output:\n"+output)
 
+	// Check for timeout
+	if ctx.Err() == context.DeadlineExceeded {
+		return fmt.Errorf("execution timeout (exceeded %v) - possible infinite loop or hang", TEST_TIMEOUT)
+	}
+
+	// Check for runtime errors (crashes, segfaults, etc.)
 	if err != nil {
-		// Differentiate between crash and non-zero exit if possible, 
-		// though usually we return 0 in main template.
+		// Try to determine if it was a crash vs normal error
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			if exitErr.ExitCode() != 0 {
+				return fmt.Errorf("runtime error (exit code %d)\nOutput: %s", exitErr.ExitCode(), output)
+			}
+		}
 		return fmt.Errorf("runtime error: %v\nOutput: %s", err, output)
 	}
 

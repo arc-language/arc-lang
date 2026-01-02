@@ -1,4 +1,5100 @@
-Running 0 tests...
+Arc Compiler Test Suite - Running 134 tests...
+
+--- Test: op_addition ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let a = 10
+    let b = 20
+    let sum = a + b
+    libc.printf("sum=%d\n", sum)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "sum=30"
+Got output: ""
+
+--- Test: op_bitwise_and ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = 0xF0 & 0x0F
+    libc.printf("and=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "and=0"
+Got output: ""
+
+--- Test: op_bitwise_not ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x: uint8 = 0x0F
+    let result = ~x
+    libc.printf("not=%u\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "not=240"
+Got output: ""
+
+--- Test: op_bitwise_or ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = 0xF0 | 0x0F
+    libc.printf("or=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "or=255"
+Got output: ""
+
+--- Test: op_bitwise_xor ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = 0xFF ^ 0x0F
+    libc.printf("xor=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "xor=240"
+Got output: ""
+
+--- Test: op_compound_add ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 10
+    x += 5
+    libc.printf("x=%d\n", x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=15"
+Got output: ""
+
+--- Test: op_compound_div ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 100
+    x /= 4
+    libc.printf("x=%d\n", x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=25"
+Got output: ""
+
+--- Test: op_compound_mod ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 17
+    x %= 5
+    libc.printf("x=%d\n", x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=2"
+Got output: ""
+
+--- Test: op_compound_mul ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 5
+    x *= 3
+    libc.printf("x=%d\n", x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=15"
+Got output: ""
+
+--- Test: op_compound_sub ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 20
+    x -= 7
+    libc.printf("x=%d\n", x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=13"
+Got output: ""
+
+--- Test: op_decrement_postfix ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 10
+    let old = x--
+    libc.printf("old=%d new=%d\n", old, x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "old=10 new=9"
+Got output: ""
+
+--- Test: op_decrement_prefix ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 10
+    let new_val = --x
+    libc.printf("new=%d\n", new_val)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "new=9"
+Got output: ""
+
+--- Test: op_division_signed ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let quot: int32 = -20 / 4
+    libc.printf("quot=%d\n", quot)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "quot=-5"
+Got output: ""
+
+--- Test: op_division_unsigned ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let quot: uint32 = 20 / 4
+    libc.printf("quot=%u\n", quot)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "quot=5"
+Got output: ""
+
+--- Test: op_equality ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = (42 == 42)
+    libc.printf("eq=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "eq=1"
+Got output: ""
+
+--- Test: op_greater_equal ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = (15 >= 15)
+    libc.printf("ge=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "ge=1"
+Got output: ""
+
+--- Test: op_greater_than ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = (20 > 10)
+    libc.printf("gt=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "gt=1"
+Got output: ""
+
+--- Test: op_increment_postfix ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 10
+    let old = x++
+    libc.printf("old=%d new=%d\n", old, x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "old=10 new=11"
+Got output: ""
+
+--- Test: op_increment_prefix ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 10
+    let new_val = ++x
+    libc.printf("new=%d\n", new_val)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "new=11"
+Got output: ""
+
+--- Test: op_inequality ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = (10 != 20)
+    libc.printf("ne=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "ne=1"
+Got output: ""
+
+--- Test: op_less_equal ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = (10 <= 10)
+    libc.printf("le=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "le=1"
+Got output: ""
+
+--- Test: op_less_than ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = (5 < 10)
+    libc.printf("lt=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "lt=1"
+Got output: ""
+
+--- Test: op_logical_and ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = true && true
+    libc.printf("and=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "and=1"
+Got output: ""
+
+--- Test: op_logical_not ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = !false
+    libc.printf("not=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "not=1"
+Got output: ""
+
+--- Test: op_logical_or ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = false || true
+    libc.printf("or=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "or=1"
+Got output: ""
+
+--- Test: op_modulo ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let rem = 17 % 5
+    libc.printf("rem=%d\n", rem)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "rem=2"
+Got output: ""
+
+--- Test: op_multiplication ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let prod = 7 * 8
+    libc.printf("prod=%d\n", prod)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "prod=56"
+Got output: ""
+
+--- Test: op_parentheses ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = (2 + 3) * 4
+    libc.printf("result=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "result=20"
+Got output: ""
+
+--- Test: op_precedence ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = 2 + 3 * 4
+    libc.printf("result=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "result=14"
+Got output: ""
+
+--- Test: op_shift_left ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = 1 << 4
+    libc.printf("shl=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "shl=16"
+Got output: ""
+
+--- Test: op_shift_right_arithmetic ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x: int32 = -64
+    let result = x >> 2
+    libc.printf("shr=%d\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "shr=-16"
+Got output: ""
+
+--- Test: op_shift_right_logical ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x: uint32 = 64
+    let result = x >> 2
+    libc.printf("shr=%u\n", result)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "shr=16"
+Got output: ""
+
+--- Test: op_subtraction ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let diff = 50 - 15
+    libc.printf("diff=%d\n", diff)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "diff=35"
+Got output: ""
+
+--- Test: op_unary_negation ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 100
+    let neg = -x
+    libc.printf("neg=%d\n", neg)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "neg=-100"
+Got output: ""
+
+--- Test: control_defer_function ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func cleanup() {
+        libc.printf("cleanup_called\n")
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    libc.printf("start\n")
+    defer cleanup()
+    libc.printf("end\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "start\nend\ncleanup_called"
+Got output: ""
+
+--- Test: control_defer_multiple ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    defer libc.printf("first\n")
+    defer libc.printf("second\n")
+    defer libc.printf("third\n")
+    libc.printf("main\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "main\nthird\nsecond\nfirst"
+Got output: ""
+
+--- Test: control_defer_single ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    libc.printf("before\n")
+    defer libc.printf("deferred\n")
+    libc.printf("after\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "before\nafter\ndeferred"
+Got output: ""
+
+--- Test: control_for_continue ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let sum = 0
+    for let i = 0; i < 10; i++ {
+        if i % 2 == 0 {
+            continue
+        }
+        sum += i
+    }
+    libc.printf("sum_odd=%d\n", sum)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "sum_odd=25"
+Got output: ""
+
+--- Test: control_for_cstyle ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let sum = 0
+    for let i = 0; i < 5; i++ {
+        sum += i
+    }
+    libc.printf("sum=%d\n", sum)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "sum=10"
+Got output: ""
+
+--- Test: control_for_infinite_break ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let i = 0
+    for {
+        i++
+        if i >= 5 {
+            break
+        }
+    }
+    libc.printf("i=%d\n", i)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "i=5"
+Got output: ""
+
+--- Test: control_for_nested ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let product = 0
+    for let i = 1; i <= 3; i++ {
+        for let j = 1; j <= 2; j++ {
+            product = i * j
+        }
+    }
+    libc.printf("product=%d\n", product)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "product=6"
+Got output: ""
+
+--- Test: control_for_while ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let count = 0
+    for count < 3 {
+        count++
+    }
+    libc.printf("count=%d\n", count)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "count=3"
+Got output: ""
+
+--- Test: control_if_basic ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 10
+    if x > 5 {
+        libc.printf("condition_true\n")
+    }
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "condition_true"
+Got output: ""
+
+--- Test: control_if_else ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 3
+    if x > 5 {
+        libc.printf("greater\n")
+    } else {
+        libc.printf("not_greater\n")
+    }
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "not_greater"
+Got output: ""
+
+--- Test: control_if_elseif ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let score = 75
+    if score >= 90 {
+        libc.printf("A\n")
+    } else if score >= 80 {
+        libc.printf("B\n")
+    } else if score >= 70 {
+        libc.printf("C\n")
+    } else {
+        libc.printf("F\n")
+    }
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "C"
+Got output: ""
+
+--- Test: control_if_nested ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 10
+    let y = 20
+    if x > 5 {
+        if y > 15 {
+            libc.printf("both_true\n")
+        }
+    }
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "both_true"
+Got output: ""
+
+--- Test: control_return_value ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func get_value() int32 {
+        return 42
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = get_value()
+    libc.printf("value=%d\n", x)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @get_value() {
+	entry:
+	  %0 = trunc i64 42 to i32
+	  ret i32 %0
+	} (get_value) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0000a5008?, {0x69c7a0, 0xc0001d9d00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004fba58, 0x0, {0x69c7a0, 0xc0001d9d00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004fba58, {0x6a21c0, 0xc0004185a0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:154 +0x10ea
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004fba58, 0xc0001d9d80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffdffc3454a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @get_value() {
+	entry:
+	  %0 = trunc i64 42 to i32
+	  ret i32 %0
+	} (get_value) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0000a5008?, {0x69c7a0, 0xc0001d9d00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004fba58, 0x0, {0x69c7a0, 0xc0001d9d00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004fba58, {0x6a21c0, 0xc0004185a0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:154 +0x10ea
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004fba58, 0xc0001d9d80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffdffc3454a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+
+--- Test: control_return_void ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func test_return() {
+        libc.printf("before_return\n")
+        return
+        libc.printf("after_return\n")
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    test_return()
+    libc.printf("done\n")
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:15:0: Return type mismatch: expected void, got i32
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:15:0: Return type mismatch: expected void, got i32
+
+--- Test: control_switch_default ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 99
+    switch x {
+        case 1:
+            libc.printf("one\n")
+        case 2:
+            libc.printf("two\n")
+        default:
+            libc.printf("other\n")
+    }
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "other"
+Got output: ""
+
+--- Test: control_switch_multi ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 3
+    switch x {
+        case 1, 2, 3:
+            libc.printf("low\n")
+        case 4, 5, 6:
+            libc.printf("mid\n")
+        default:
+            libc.printf("high\n")
+    }
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "low"
+Got output: ""
+
+--- Test: control_switch_simple ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 2
+    switch x {
+        case 1:
+            libc.printf("one\n")
+        case 2:
+            libc.printf("two\n")
+        case 3:
+            libc.printf("three\n")
+    }
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: execution timeout (exceeded 5s) - possible infinite loop or hang
+
+--- Test: extern_libc_malloc ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let ptr = libc.malloc(64)
+    if ptr != null {
+        libc.printf("malloc_success\n")
+    }
+    libc.free(ptr)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (7 functions)
+panic: Value declare external ptr<void> @malloc(u64) (malloc) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69c7a0, 0xc000408b00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00057ba58, 0x0, {0x69c7a0, 0xc000408b00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00057ba58, {0x6a21c0, 0xc0002bd380})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:154 +0x10ea
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00057ba58, 0xc000408d80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fffbe08454a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (7 functions)
+panic: Value declare external ptr<void> @malloc(u64) (malloc) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69c7a0, 0xc000408b00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00057ba58, 0x0, {0x69c7a0, 0xc000408b00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00057ba58, {0x6a21c0, 0xc0002bd380})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:154 +0x10ea
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00057ba58, 0xc000408d80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fffbe08454a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+
+--- Test: extern_libc_printf ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    libc.printf("extern_test\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "extern_test"
+Got output: ""
+
+--- Test: func_early_return ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func check_positive(x: int32) int32 {
+        if x < 0 {
+            return 0
+        }
+        return x
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = check_positive(-5)
+    libc.printf("result=%d\n", result)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @check_positive(i32 %x) {
+	entry:
+	  %x.addr = alloca i32
+	  store i32 %x, ptr<i32> %x.addr
+	  %0 = load i32, ptr<i32> %x.addr
+	  %1 = icmp slt i32 %0, 0
+	  br i1 %1, label %if.then, label %if.end
+	if.then:
+	  %2 = trunc i64 0 to i32
+	  ret i32 %2
+	if.end:
+	  %3 = load i32, ptr<i32> %x.addr
+	  ret i32 %3
+	} (check_positive) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69c7a0, 0xc00018a080})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc000297a58, 0x0, {0x69c7a0, 0xc00018a080})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000297a58, {0x6a21c0, 0xc000175740})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:154 +0x10ea
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000297a58, 0xc00018a180)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc3209a54a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @check_positive(i32 %x) {
+	entry:
+	  %x.addr = alloca i32
+	  store i32 %x, ptr<i32> %x.addr
+	  %0 = load i32, ptr<i32> %x.addr
+	  %1 = icmp slt i32 %0, 0
+	  br i1 %1, label %if.then, label %if.end
+	if.then:
+	  %2 = trunc i64 0 to i32
+	  ret i32 %2
+	if.end:
+	  %3 = load i32, ptr<i32> %x.addr
+	  ret i32 %3
+	} (check_positive) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69c7a0, 0xc00018a080})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc000297a58, 0x0, {0x69c7a0, 0xc00018a080})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000297a58, {0x6a21c0, 0xc000175740})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:154 +0x10ea
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000297a58, 0xc00018a180)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc3209a54a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+
+--- Test: func_multiple_return ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func divide(a: int32, b: int32) (int32, bool) {
+        if b == 0 {
+            return (0, false)
+        }
+        return (a / b, true)
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let (result, ok) = divide(10, 2)
+    libc.printf("result=%d ok=%d\n", result, ok)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "result=5 ok=1"
+Got output: ""
+
+--- Test: func_nested_calls ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func double(x: int32) int32 {
+        return x * 2
+    }
+    func triple(x: int32) int32 {
+        return x * 3
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = double(triple(5))
+    libc.printf("result=%d\n", result)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (9 functions)
+panic: Value define external i32 @double(i32 %x) {
+	entry:
+	  %x.addr = alloca i32
+	  store i32 %x, ptr<i32> %x.addr
+	  %0 = load i32, ptr<i32> %x.addr
+	  %1 = mul i32 %0, 2
+	  ret i32 %1
+	} (double) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69c7a0, 0xc000150200})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00059fa58, 0x0, {0x69c7a0, 0xc000150200})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00059fa58, {0x6a21c0, 0xc000351560})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:154 +0x10ea
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00059fa58, 0xc000150400)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffff498e54a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (9 functions)
+panic: Value define external i32 @double(i32 %x) {
+	entry:
+	  %x.addr = alloca i32
+	  store i32 %x, ptr<i32> %x.addr
+	  %0 = load i32, ptr<i32> %x.addr
+	  %1 = mul i32 %0, 2
+	  ret i32 %1
+	} (double) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69c7a0, 0xc000150200})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00059fa58, 0x0, {0x69c7a0, 0xc000150200})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00059fa58, {0x6a21c0, 0xc000351560})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:154 +0x10ea
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00059fa58, 0xc000150400)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffff498e54a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+
+--- Test: func_no_params_void ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func greet() {
+        libc.printf("hello\n")
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    greet()
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "hello"
+Got output: ""
+
+--- Test: func_pass_by_value ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func modify(x: int32) {
+        x = 99
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let original = 10
+    modify(original)
+    libc.printf("original=%d\n", original)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "original=10"
+Got output: ""
+
+--- Test: func_recursive_factorial ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func factorial(n: int32) int32 {
+        if n <= 1 {
+            return 1
+        }
+        return n * factorial(n - 1)
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = factorial(5)
+    libc.printf("factorial=%d\n", result)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @factorial(i32 %n) {
+	entry:
+	  %n.addr = alloca i32
+	  store i32 %n, ptr<i32> %n.addr
+	  %0 = load i32, ptr<i32> %n.addr
+	  %1 = icmp sle i32 %0, 1
+	  br i1 %1, label %if.then, label %if.end
+	if.then:
+	  %2 = trunc i64 1 to i32
+	  ret i32 %2
+	if.end:
+	  %3 = load i32, ptr<i32> %n.addr
+	  %4 = mul i32 %3, %factorial
+	  ret i32 %4
+	} (factorial) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003dd520?, {0x69c7a0, 0xc00055cb80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00059fa58, 0x1, {0x69c7a0, 0xc00055cb80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00059fa58, {0x6a22a0, 0xc0002ea550})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:26 +0x645
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00059fa58, 0xc00055cb80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffddea0854a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @factorial(i32 %n) {
+	entry:
+	  %n.addr = alloca i32
+	  store i32 %n, ptr<i32> %n.addr
+	  %0 = load i32, ptr<i32> %n.addr
+	  %1 = icmp sle i32 %0, 1
+	  br i1 %1, label %if.then, label %if.end
+	if.then:
+	  %2 = trunc i64 1 to i32
+	  ret i32 %2
+	if.end:
+	  %3 = load i32, ptr<i32> %n.addr
+	  %4 = mul i32 %3, %factorial
+	  ret i32 %4
+	} (factorial) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003dd520?, {0x69c7a0, 0xc00055cb80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00059fa58, 0x1, {0x69c7a0, 0xc00055cb80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00059fa58, {0x6a22a0, 0xc0002ea550})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:26 +0x645
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00059fa58, 0xc00055cb80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffddea0854a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+
+--- Test: func_recursive_fibonacci ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func fib(n: int32) int32 {
+        if n <= 1 {
+            return n
+        }
+        return fib(n - 1) + fib(n - 2)
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = fib(7)
+    libc.printf("fib=%d\n", result)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @fib(i32 %n) {
+	entry:
+	  %n.addr = alloca i32
+	  store i32 %n, ptr<i32> %n.addr
+	  %0 = load i32, ptr<i32> %n.addr
+	  %1 = icmp sle i32 %0, 1
+	  br i1 %1, label %if.then, label %if.end
+	if.then:
+	  %2 = load i32, ptr<i32> %n.addr
+	  ret i32 %2
+	if.end:
+	  %3 = add fn(i32) -> i32 %fib, %fib
+	  ret fn(i32) -> i32 %3
+	} (fib) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003d8f40?, {0x69c7a0, 0xc0002afc00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00051fa58, 0x0, {0x69c7a0, 0xc0002afc00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00051fa58, {0x6a22a0, 0xc000361540})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:13 +0x485
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00051fa58, 0xc0002afc00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffefa2b954a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @fib(i32 %n) {
+	entry:
+	  %n.addr = alloca i32
+	  store i32 %n, ptr<i32> %n.addr
+	  %0 = load i32, ptr<i32> %n.addr
+	  %1 = icmp sle i32 %0, 1
+	  br i1 %1, label %if.then, label %if.end
+	if.then:
+	  %2 = load i32, ptr<i32> %n.addr
+	  ret i32 %2
+	if.end:
+	  %3 = add fn(i32) -> i32 %fib, %fib
+	  ret fn(i32) -> i32 %3
+	} (fib) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003d8f40?, {0x69c7a0, 0xc0002afc00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00051fa58, 0x0, {0x69c7a0, 0xc0002afc00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00051fa58, {0x6a22a0, 0xc000361540})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:13 +0x485
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00051fa58, 0xc0002afc00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffefa2b954a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+
+--- Test: func_with_params_void ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func print_sum(a: int32, b: int32) {
+        libc.printf("sum=%d\n", a + b)
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    print_sum(10, 20)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "sum=30"
+Got output: ""
+
+--- Test: func_with_return ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func add(a: int32, b: int32) int32 {
+        return a + b
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = add(15, 25)
+    libc.printf("result=%d\n", result)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @add(i32 %a, i32 %b) {
+	entry:
+	  %a.addr = alloca i32
+	  store i32 %a, ptr<i32> %a.addr
+	  %b.addr = alloca i32
+	  store i32 %b, ptr<i32> %b.addr
+	  %0 = load i32, ptr<i32> %a.addr
+	  %1 = load i32, ptr<i32> %b.addr
+	  %2 = add i32 %0, %1
+	  ret i32 %2
+	} (add) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69c7a0, 0xc000284700})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00059da58, 0x0, {0x69c7a0, 0xc000284700})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00059da58, {0x6a21c0, 0xc000271e60})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:154 +0x10ea
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00059da58, 0xc000284800)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffe56e2754a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @add(i32 %a, i32 %b) {
+	entry:
+	  %a.addr = alloca i32
+	  store i32 %a, ptr<i32> %a.addr
+	  %b.addr = alloca i32
+	  store i32 %b, ptr<i32> %b.addr
+	  %0 = load i32, ptr<i32> %a.addr
+	  %1 = load i32, ptr<i32> %b.addr
+	  %2 = add i32 %0, %1
+	  ret i32 %2
+	} (add) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69c7a0, 0xc000284700})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00059da58, 0x0, {0x69c7a0, 0xc000284700})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00059da58, {0x6a21c0, 0xc000271e60})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:154 +0x10ea
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00059da58, 0xc000284800)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffe56e2754a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+
+--- Test: pointer_address_of ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let value = 100
+    let ptr: *int32 = &value
+    libc.printf("got_address\n")
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+
+--- Test: pointer_arithmetic_add ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let arr = alloca(int32, 5)
+    arr[0] = 10
+    arr[1] = 20
+    let ptr: *int32 = arr
+    let next = ptr + 1
+    libc.printf("value=%d\n", *next)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+
+--- Test: pointer_arithmetic_sub ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let arr = alloca(int32, 5)
+    arr[0] = 10
+    arr[1] = 20
+    let ptr: *int32 = arr + 1
+    let prev = ptr - 1
+    libc.printf("value=%d\n", *prev)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+
+--- Test: pointer_array_indexing ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let arr = alloca(int32, 3)
+    arr[0] = 100
+    arr[1] = 200
+    arr[2] = 300
+    libc.printf("arr[1]=%d\n", arr[1])
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+
+--- Test: pointer_basic_type ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 42
+    let ptr: *int32 = &x
+    libc.printf("pointer_created\n")
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+
+--- Test: pointer_deref_read ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let value = 50
+    let ptr: *int32 = &value
+    let retrieved = *ptr
+    libc.printf("value=%d\n", retrieved)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+
+--- Test: pointer_deref_write ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let value = 10
+    let ptr: *int32 = &value
+    *ptr = 99
+    libc.printf("value=%d\n", value)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+
+--- Test: pointer_double_pointer ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let value = 77
+    let ptr: *int32 = &value
+    let pptr: **int32 = &ptr
+    libc.printf("value=%d\n", **pptr)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+
+--- Test: pointer_non_null ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let value = 42
+    let ptr: *int32 = &value
+    if ptr != null {
+        libc.printf("not_null\n")
+    }
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+
+--- Test: pointer_null_check ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let ptr: *int32 = null
+    if ptr == null {
+        libc.printf("is_null\n")
+    }
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "is_null"
+Got output: ""
+
+--- Test: pointer_pass_to_function ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func modify_value(ptr: *int32) {
+        *ptr = 888
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 10
+    modify_value(&x)
+    libc.printf("x=%d\n", x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=888"
+Got output: ""
+
+--- Test: pointer_void_type ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 42
+    let vptr: *void = cast<*void>(&x)
+    let iptr: *int32 = cast<*int32>(vptr)
+    libc.printf("value=%d\n", *iptr)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'vptr': expected ptr<void>, got fn(...) -> ptr<void>
+/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'iptr': expected ptr<i32>, got fn(...) -> ptr<i32>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'vptr': expected ptr<void>, got fn(...) -> ptr<void>
+/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'iptr': expected ptr<i32>, got fn(...) -> ptr<i32>
+
+--- Test: struct_definition ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Point {
+        x: int32
+        y: int32
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    libc.printf("struct_defined\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "struct_defined"
+Got output: ""
+
+--- Test: struct_field_read ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Rectangle {
+        width: int32
+        height: int32
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let rect = Rectangle{width: 100, height: 50}
+    libc.printf("width=%d\n", rect.width)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "width=100"
+Got output: ""
+
+--- Test: struct_field_write ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Point {
+        x: int32
+        y: int32
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let p = Point{x: 5, y: 10}
+    p.x = 99
+    libc.printf("x=%d\n", p.x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=99"
+Got output: ""
+
+--- Test: struct_init_default ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Point {
+        x: int32
+        y: int32
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let p: Point = Point{}
+    libc.printf("x=%d y=%d\n", p.x, p.y)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=0 y=0"
+Got output: ""
+
+--- Test: struct_init_named ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Point {
+        x: int32
+        y: int32
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let p: Point = Point{x: 10, y: 20}
+    libc.printf("x=%d y=%d\n", p.x, p.y)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=10 y=20"
+Got output: ""
+
+--- Test: struct_method_flat ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Counter {
+        value: int32
+    }
+    
+    func get(self c: Counter) int32 {
+        return c.value
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let counter = Counter{value: 77}
+    let val = counter.get()
+    libc.printf("value=%d\n", val)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Undefined qualified symbol 'c.value'
+/tmp/arc_test_env/test.arc:18:0: Return type mismatch: expected i32, got void
+/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.get'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Undefined qualified symbol 'c.value'
+/tmp/arc_test_env/test.arc:18:0: Return type mismatch: expected i32, got void
+/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.get'
+
+--- Test: struct_method_inline ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Counter {
+        value: int32
+        
+        func get(self c: Counter) int32 {
+            return c.value
+        }
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let counter = Counter{value: 42}
+    let val = counter.get()
+    libc.printf("value=%d\n", val)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Undefined qualified symbol 'c.value'
+/tmp/arc_test_env/test.arc:17:0: Return type mismatch: expected i32, got void
+/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.get'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Undefined qualified symbol 'c.value'
+/tmp/arc_test_env/test.arc:17:0: Return type mismatch: expected i32, got void
+/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.get'
+
+--- Test: struct_multiple_fields ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Person {
+        age: int32
+        height: int32
+        weight: int32
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let person = Person{age: 30, height: 180, weight: 75}
+    libc.printf("age=%d height=%d\n", person.age, person.height)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "age=30 height=180"
+Got output: ""
+
+--- Test: struct_mutating_method ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Counter {
+        count: int32
+        
+        mutating increment(self c: *Counter) {
+            c.count++
+        }
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let counter = Counter{count: 10}
+    counter.increment()
+    libc.printf("count=%d\n", counter.count)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.increment'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.increment'
+
+--- Test: struct_nested ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Point {
+        x: int32
+        y: int32
+    }
+    struct Line {
+        start: Point
+        end: Point
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let line = Line{
+        start: Point{x: 0, y: 0},
+        end: Point{x: 10, y: 10}
+    }
+    libc.printf("end_x=%d\n", line.end.x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "end_x=10"
+Got output: ""
+
+--- Test: struct_pass_by_pointer ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Point {
+        x: int32
+        y: int32
+    }
+    
+    func move_point(p: *Point, dx: int32, dy: int32) {
+        p.x += dx
+        p.y += dy
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let pt = Point{x: 0, y: 0}
+    move_point(&pt, 5, 10)
+    libc.printf("x=%d y=%d\n", pt.x, pt.y)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=5 y=10"
+Got output: ""
+
+--- Test: struct_pass_by_value ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Point {
+        x: int32
+        y: int32
+    }
+    
+    func print_point(p: Point) {
+        libc.printf("x=%d y=%d\n", p.x, p.y)
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let pt = Point{x: 5, y: 10}
+    print_point(pt)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=5 y=10"
+Got output: ""
+
+--- Test: struct_pointer_field ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Point {
+        x: int32
+        y: int32
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let p = Point{x: 15, y: 25}
+    let ptr: *Point = &p
+    libc.printf("x=%d\n", ptr.x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "x=15"
+Got output: ""
+
+--- Test: array_2d ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let matrix: array<array<int32, 2>, 2> = {
+        {1, 2},
+        {3, 4}
+    }
+    libc.printf("matrix[1][1]=%d\n", matrix[1][1])
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:8: Syntax Error: no viable alternative at input 'letmatrix'
+/tmp/arc_test_env/test.arc:17:22: Syntax Error: no viable alternative at input 'array'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:8: Syntax Error: no viable alternative at input 'letmatrix'
+/tmp/arc_test_env/test.arc:17:22: Syntax Error: no viable alternative at input 'array'
+
+--- Test: array_element_assign ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let arr: array<int32, 3> = {1, 2, 3}
+    arr[1] = 99
+    libc.printf("arr[1]=%d\n", arr[1])
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
+
+--- Test: array_fixed_size ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let arr: array<int32, 3> = {10, 20, 30}
+    libc.printf("arr[1]=%d\n", arr[1])
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
+
+--- Test: array_iteration_cstyle ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let arr: array<int32, 4> = {1, 2, 3, 4}
+    let sum = 0
+    for let i: usize = 0; i < 4; i++ {
+        sum += arr[i]
+    }
+    libc.printf("sum=%d\n", sum)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [4 x i64]
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [4 x i64]
+
+--- Test: array_ptr_first ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let arr: array<int32, 3> = {100, 200, 300}
+    let ptr: *int32 = &arr[0]
+    libc.printf("first=%d\n", *ptr)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
+
+--- Test: array_zero_init ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let arr: array<int32, 5> = {}
+    libc.printf("arr[0]=%d\n", arr[0])
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "arr[0]=0"
+Got output: ""
+
+--- Test: map_placeholder ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    libc.printf("map_placeholder\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "map_placeholder"
+Got output: ""
+
+--- Test: vector_placeholder ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    libc.printf("vector_placeholder\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "vector_placeholder"
+Got output: ""
+
+--- Test: cast_float_to_int ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let f: float32 = 3.9
+    let i: int32 = cast<int32>(f)
+    libc.printf("int=%d\n", i)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'i': expected i32, got fn(...) -> i32
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'i': expected i32, got fn(...) -> i32
+
+--- Test: cast_int_to_float ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let i: int32 = 42
+    let f: float32 = cast<float32>(i)
+    libc.printf("float=%.1f\n", f)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'f': expected f32, got fn(...) -> f32
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'f': expected f32, got fn(...) -> f32
+
+--- Test: cast_int_to_ptr ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let addr: uint64 = 0x1000
+    let ptr: *int32 = cast<*int32>(addr)
+    libc.printf("ptr_created\n")
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got fn(...) -> ptr<i32>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got fn(...) -> ptr<i32>
+
+--- Test: cast_int_truncate ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let large: int32 = 1000
+    let small: int8 = cast<int8>(large)
+    libc.printf("small=%d\n", small)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'small': expected i8, got fn(...) -> i8
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'small': expected i8, got fn(...) -> i8
+
+--- Test: cast_int_widen ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let small: int8 = 100
+    let large: int32 = cast<int32>(small)
+    libc.printf("large=%d\n", large)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'large': expected i32, got fn(...) -> i32
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'large': expected i32, got fn(...) -> i32
+
+--- Test: cast_ptr_to_int ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x: int32 = 99
+    let ptr: *int32 = &x
+    let addr: uint64 = cast<uint64>(ptr)
+    libc.printf("addr_non_zero=%d\n", addr != 0)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'addr': expected u64, got fn(...) -> u64
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'addr': expected u64, got fn(...) -> u64
+
+--- Test: cast_ptr_to_ptr ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x: int32 = 42
+    let iptr: *int32 = &x
+    let vptr: *void = cast<*void>(iptr)
+    let back: *int32 = cast<*int32>(vptr)
+    libc.printf("value=%d\n", *back)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'vptr': expected ptr<void>, got fn(...) -> ptr<void>
+/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'back': expected ptr<i32>, got fn(...) -> ptr<i32>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'vptr': expected ptr<void>, got fn(...) -> ptr<void>
+/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'back': expected ptr<i32>, got fn(...) -> ptr<i32>
+
+--- Test: cast_signed_to_unsigned ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let neg: int32 = -1
+    let pos: uint32 = cast<uint32>(neg)
+    libc.printf("unsigned=%u\n", pos)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'pos': expected u32, got fn(...) -> u32
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'pos': expected u32, got fn(...) -> u32
+
+--- Test: cast_unsigned_to_signed ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let big: uint32 = 4294967295
+    let neg: int32 = cast<int32>(big)
+    libc.printf("signed=%d\n", neg)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'neg': expected i32, got fn(...) -> i32
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'neg': expected i32, got fn(...) -> i32
+
+--- Test: intrinsic_alignof ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let align = alignof<int64>
+    libc.printf("align=%zu\n", align)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "align=8"
+Got output: ""
+
+--- Test: intrinsic_alloca_array ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let buffer = alloca(int32, 5)
+    buffer[0] = 10
+    buffer[1] = 20
+    buffer[2] = 30
+    libc.printf("buffer[1]=%d\n", buffer[1])
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:24: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:17:32: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:24: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:17:32: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+
+--- Test: intrinsic_alloca_single ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let ptr = alloca(int32)
+    *ptr = 777
+    libc.printf("value=%d\n", *ptr)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
+
+--- Test: intrinsic_bitcast ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let f: float32 = 1.0
+    let bits = bit_cast<uint32>(f)
+    libc.printf("bits=%u\n", bits)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (7 functions)
+Error: Object generation failed: in function main: unknown opcode: fptrunc
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (7 functions)
+Error: Object generation failed: in function main: unknown opcode: fptrunc
+
+--- Test: intrinsic_memcpy ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let src = alloca(int32, 3)
+    src[0] = 100
+    src[1] = 200
+    src[2] = 300
+    
+    let dest = alloca(int32, 3)
+    libc.memcpy(dest, src, 12)
+    
+    libc.printf("dest[1]=%d\n", dest[1])
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+/tmp/arc_test_env/test.arc:22:22: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:22:30: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+/tmp/arc_test_env/test.arc:22:22: Syntax Error: no viable alternative at input '(int32'
+/tmp/arc_test_env/test.arc:22:30: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+
+--- Test: intrinsic_memset ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let buffer = alloca(byte, 10)
+    memset(buffer, 0x42, 10)
+    libc.printf("buffer[5]=%d\n", buffer[5])
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:24: Syntax Error: no viable alternative at input '(byte'
+/tmp/arc_test_env/test.arc:17:32: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:24: Syntax Error: no viable alternative at input '(byte'
+/tmp/arc_test_env/test.arc:17:32: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
+
+--- Test: intrinsic_sizeof_int32 ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let size = sizeof<int32>
+    libc.printf("size=%zu\n", size)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "size=4"
+Got output: ""
+
+--- Test: intrinsic_sizeof_int64 ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let size = sizeof<int64>
+    libc.printf("size=%zu\n", size)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "size=8"
+Got output: ""
+
+--- Test: intrinsic_sizeof_struct ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Pair {
+        a: int32
+        b: int32
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let size = sizeof<Pair>
+    libc.printf("size=%zu\n", size)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "size=8"
+Got output: ""
+
+--- Test: intrinsic_strlen ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let str: *byte = "hello"
+    let len = libc.strlen(str)
+    libc.printf("len=%zu\n", len)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'str': expected ptr<u8>, got ptr<i8>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'str': expected ptr<u8>, got ptr<i8>
+
+--- Test: enum_basic ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    enum Status {
+        OK
+        ERROR
+        PENDING
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let s: Status = Status.OK
+    libc.printf("status=%d\n", s)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Undefined qualified symbol 'Status.OK'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Undefined qualified symbol 'Status.OK'
+
+--- Test: enum_explicit_values ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    enum HttpCode {
+        OK = 200
+        NOT_FOUND = 404
+        SERVER_ERROR = 500
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let code: HttpCode = HttpCode.NOT_FOUND
+    libc.printf("code=%d\n", code)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Undefined qualified symbol 'HttpCode.NOT_FOUND'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Undefined qualified symbol 'HttpCode.NOT_FOUND'
+
+--- Test: exec_async_placeholder ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    libc.printf("async_placeholder\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "async_placeholder"
+Got output: ""
+
+--- Test: exec_thread_placeholder ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    libc.printf("thread_placeholder\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "thread_placeholder"
+Got output: ""
+
+--- Test: for_in_range ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let sum = 0
+    for i in 0..5 {
+        sum += i
+    }
+    libc.printf("sum=%d\n", sum)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "sum=10"
+Got output: ""
+
+--- Test: generic_func_def ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func identity<T>(x: T) T {
+        return x
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = identity<int32>(99)
+    libc.printf("result=%d\n", result)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
+/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
+/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
+
+--- Test: generic_struct_def ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Box<T> {
+        value: T
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let b: Box<int32> = Box<int32>{value: 42}
+    libc.printf("value=%d\n", b.value)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:14:0: Unknown type 'T'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:14:0: Unknown type 'T'
+
+--- Test: generic_swap ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func swap<T>(a: *T, b: *T) {
+        let tmp: T = *a
+        *a = *b
+        *b = tmp
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 10
+    let y = 20
+    swap<int32>(&x, &y)
+    libc.printf("x=%d y=%d\n", x, y)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
+/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
+/tmp/arc_test_env/test.arc:14:0: Unknown type 'T'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
+/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
+/tmp/arc_test_env/test.arc:14:0: Unknown type 'T'
+
+--- Test: string_interpolation ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let name = "Alice"
+    let age = 30
+    let msg = "Hello ${name}, age ${age}"
+    libc.printf("%s\n", msg)
+    
+    return 0
+}
+
+Link Output:
+/usr/bin/ld: /tmp/arc_test_env/test.o:(.data+0x8): multiple definition of `.str'; /tmp/arc_test_env/test.o:(.data+0x0): first defined here
+/usr/bin/ld: warning: /tmp/arc_test_env/test.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+collect2: error: ld returned 1 exit status
+Result: FAIL
+Error: link failed: /usr/bin/ld: /tmp/arc_test_env/test.o:(.data+0x8): multiple definition of `.str'; /tmp/arc_test_env/test.o:(.data+0x0): first defined here
+/usr/bin/ld: warning: /tmp/arc_test_env/test.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+collect2: error: ld returned 1 exit status
+
+--- Test: try_except_placeholder ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    libc.printf("exception_placeholder\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "exception_placeholder"
+Got output: ""
+
+--- Test: edge_deep_recursion ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func countdown(n: int32) int32 {
+        if n <= 0 {
+            return 0
+        }
+        return countdown(n - 1) + 1
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = countdown(100)
+    libc.printf("depth=%d\n", result)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @countdown(i32 %n) {
+	entry:
+	  %n.addr = alloca i32
+	  store i32 %n, ptr<i32> %n.addr
+	  %0 = load i32, ptr<i32> %n.addr
+	  %1 = icmp sle i32 %0, 0
+	  br i1 %1, label %if.then, label %if.end
+	if.then:
+	  %2 = trunc i64 0 to i32
+	  ret i32 %2
+	if.end:
+	  %3 = add fn(i32) -> i32 %countdown, 1
+	  ret fn(i32) -> i32 %3
+	} (countdown) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003b4d20?, {0x69c7a0, 0xc000176e80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005e1a58, 0x0, {0x69c7a0, 0xc000176e80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005e1a58, {0x6a22a0, 0xc0002bcd20})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:13 +0x485
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005e1a58, 0xc000176e80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc1127054a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @countdown(i32 %n) {
+	entry:
+	  %n.addr = alloca i32
+	  store i32 %n, ptr<i32> %n.addr
+	  %0 = load i32, ptr<i32> %n.addr
+	  %1 = icmp sle i32 %0, 0
+	  br i1 %1, label %if.then, label %if.end
+	if.then:
+	  %2 = trunc i64 0 to i32
+	  ret i32 %2
+	if.end:
+	  %3 = add fn(i32) -> i32 %countdown, 1
+	  ret fn(i32) -> i32 %3
+	} (countdown) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003b4d20?, {0x69c7a0, 0xc000176e80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005e1a58, 0x0, {0x69c7a0, 0xc000176e80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005e1a58, {0x6a22a0, 0xc0002bcd20})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:13 +0x485
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005e1a58, 0xc000176e80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc1127054a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+
+--- Test: edge_div_zero_skip ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x = 10
+    let y = 0
+    libc.printf("divzero_skipped\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "divzero_skipped"
+Got output: ""
+
+--- Test: edge_eval_order ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    func side_effect(x: int32) int32 {
+        libc.printf("eval_%d ", x)
+        return x
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let result = side_effect(1) + side_effect(2) * side_effect(3)
+    libc.printf("result=%d\n", result)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @side_effect(i32 %x) {
+	entry:
+	  %x.addr = alloca i32
+	  store i32 %x, ptr<i32> %x.addr
+	  %0 = load i32, ptr<i32> %x.addr
+	  ret i32 %0
+	} (side_effect) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x85e660?, {0x69c7a0, 0xc000498d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc000503a58, 0x0, {0x69c7a0, 0xc000498d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000503a58, {0x6a22a0, 0xc0005063c0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:25 +0x609
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000503a58, 0xc000498e00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffddf8b554a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (8 functions)
+panic: Value define external i32 @side_effect(i32 %x) {
+	entry:
+	  %x.addr = alloca i32
+	  store i32 %x, ptr<i32> %x.addr
+	  %0 = load i32, ptr<i32> %x.addr
+	  ret i32 %0
+	} (side_effect) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x85e660?, {0x69c7a0, 0xc000498d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc000503a58, 0x0, {0x69c7a0, 0xc000498d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000503a58, {0x6a22a0, 0xc0005063c0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/ops.go:25 +0x609
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000503a58, 0xc000498e00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffddf8b554a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102070701-be708545ea74/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+
+--- Test: edge_function_pointer_placeholder ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    libc.printf("func_ptr_placeholder\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "func_ptr_placeholder"
+Got output: ""
+
+--- Test: edge_int_overflow ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let x: int8 = 127
+    x = x + 1
+    libc.printf("overflow=%d\n", x)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "overflow=-128"
+Got output: ""
+
+--- Test: edge_large_stack_array ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let arr: array<int32, 1000> = {}
+    arr[999] = 555
+    libc.printf("last=%d\n", arr[999])
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "last=555"
+Got output: ""
+
+--- Test: edge_null_deref_skip ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let ptr: *int32 = null
+    libc.printf("null_deref_skipped\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "null_deref_skipped"
+Got output: ""
+
+--- Test: edge_pointer_lifetime ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let stack_value = 42
+    let ptr: *int32 = &stack_value
+    libc.printf("value=%d\n", *ptr)
+    
+    return 0
+}
+
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+
+--- Test: edge_struct_padding ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+    struct Padded {
+        a: int8
+        b: int64
+        c: int8
+    }
+    
+
+func main() int32 {
+    // --- Test Body ---
+
+    let size = sizeof<Padded>
+    libc.printf("size=%zu\n", size)
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "size=24"
+Got output: ""
+
+--- Test: edge_zero_sized_array ---
+Source Code:
+
+extern libc {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+    func memcpy(*void, *void, usize) *void
+    func memset(*void, int32, usize) *void
+    func strlen(*byte) usize
+}
+
+// --- Test Globals ---
+
+
+func main() int32 {
+    // --- Test Body ---
+
+    let arr: array<int32, 0> = {}
+    libc.printf("zero_array_ok\n")
+    
+    return 0
+}
+
+Run Output:
+Result: FAIL
+Error: assertion failed.
+Expected substring: "zero_array_ok"
+Got output: ""
 
 ============================================================
-Passed: 0 | Failed: 0 | Total Time: 0.00s
+Passed: 0 | Failed: 134 | Total Time: 13.32s
