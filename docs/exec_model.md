@@ -2,22 +2,40 @@
 
 Arc separates **logic definition** from **execution context**. Write your code as inline functions, then choose where to run them: async event loop, OS threads, isolated processes, or sandboxed containers.
 
-This allows Arc to scale from lightweight concurrency to security isolation—all with the same language and syntax.
+---
+
+## Configuration Pattern
+
+Execution contexts support **config-first arguments** (except `async`):
+
+```arc
+context func(params) { body }(Config{...}, args...)
+```
+
+**The compiler detects config at compile time:**
+- If first argument is the config type → use it as config
+- If first argument matches first parameter type → use default config
+- Zero runtime overhead
+
+```arc
+// With custom config
+thread func(x: int) { work(x) }(ThreadConfig{stack_size: 8_MB}, 42)
+
+// With default config
+thread func(x: int) { work(x) }(42)
+```
+
+**Note:** `async` has no config - arguments always map directly to parameters.
 
 ---
 
 ## The 4 Execution Models
 
-### 1. `async` - Async Functions (Cooperative Multitasking)
+### 1. `async` - Async Functions
 
-**What:** Asynchronous functions that run on the event loop. Execution is cooperative and non-blocking.
+**When to use:** High-concurrency I/O, network requests, non-blocking operations
 
-**When to use:**
-- High-concurrency I/O (web servers, 10k+ connections)
-- Network requests, file I/O
-- Tasks that yield frequently
-
-**Cost:** ~200ns context switch, minimal memory overhead
+**Cost:** ~200ns context switch
 
 **Syntax:**
 ```arc
@@ -27,211 +45,182 @@ let result = await async func(url: string) {
 }("https://api.example.com")
 ```
 
-**Restrictions:**
-- Must use non-blocking I/O (async APIs)
-- Cannot call blocking C functions (use `thread` instead)
+**No config available** - always uses event loop defaults.
 
 ---
 
-### 2. `thread` - OS Threads (Preemptive Multitasking)
+### 2. `thread` - OS Threads
 
-**What:** Real OS threads managed by the kernel. Each thread has its own stack.
-
-**When to use:**
-- Blocking C library calls (libc, database drivers)
-- CPU-intensive work
-- True parallel computation on multiple cores
+**When to use:** Blocking C calls, CPU-intensive work, parallel computation
 
 **Cost:** ~5µs switching, ~1MB stack
 
 **Syntax:**
 ```arc
+// Default config
 let handle = thread func(path: string) {
     let file = libc.fopen(path, "r")
-    libc.sleep(1000)  // Blocks this thread only
     libc.fclose(file)
 }("/tmp/data.txt")
 
-handle.join()  // Wait for thread to finish
+handle.join()
+
+// Custom config
+let handle = thread func(data: array<int>) {
+    compute(data)
+}(ThreadConfig{stack_size: 8_MB, cpu_affinity: array<int>{0, 1}}, dataset)
+```
+
+**Config:**
+```arc
+struct ThreadConfig {
+    stack_size: usize
+    cpu_affinity: array<int>
+    priority: int
+    name: string
+}
 ```
 
 ---
 
-### 3. `process` - OS Processes (Memory Isolation)
+### 3. `process` - OS Processes
 
-**What:** Separate OS process with isolated memory space. Uses fork/clone syscall.
+**When to use:** Fault tolerance, plugins, memory isolation
 
-**When to use:**
-- Fault tolerance (crashes don't affect parent)
-- Plugins or untrusted code (limited isolation)
-- Tasks that need complete memory separation
-
-**Cost:** Milliseconds setup, copy-on-write memory
+**Cost:** ~1-10ms setup
 
 **Syntax:**
 ```arc
+// Default config
 let handle = process func(data: *byte) int32 {
-    // If this crashes, parent process is safe
-    let result = dangerous_computation(data)
-    return result
+    return dangerous_computation(data)
 }(data_ptr)
 
-let result = handle.wait()  // Blocks until process exits
+let result = handle.wait()
 
-// Check exit status
-if handle.exit_code() != 0 {
-    io.printf("Process crashed\n")
-}
+// Custom config
+let handle = process func(script: string) {
+    run_script(script)
+}(ProcessConfig{env: map<string, string>{"PATH": "/bin"}, stdout: log_file}, script_path)
 ```
 
-**Communication:**
-- Processes share nothing (no shared heap)
-- Use pipes, sockets, or shared memory for IPC
+**Config:**
+```arc
+struct ProcessConfig {
+    env: map<string, string>
+    working_dir: string
+    stdin: FileDescriptor
+    stdout: FileDescriptor
+    stderr: FileDescriptor
+    rlimits: RLimits
+}
+```
 
 ---
 
-### 4. `container` - Sandboxed Processes (Security Isolation)
+### 4. `container` - Sandboxed Processes
 
-**What:** Process with Linux namespaces and cgroups. Isolated network, filesystem, and PID view.
+**When to use:** Security-critical tasks, multi-tenant execution, resource limits
 
-**When to use:**
-- Security-critical tasks (user-submitted code)
-- Multi-tenant execution
-- "Serverless" functions inside your binary
-- Limiting resource usage (CPU, memory, network)
-
-**Cost:** Milliseconds setup
+**Cost:** ~10-50ms setup
 
 **Syntax:**
 ```arc
+// Default config
 let handle = container func(code: string) {
-    // Isolated filesystem (chroot)
-    // Isolated network (own network namespace)
-    // CPU/memory limits enforced by cgroups
-    let result = eval(code)
-    return result
-}("user_code_here")
+    eval(code)
+}(user_code)
 
-// Configure container limits
-let config = ContainerConfig{
-    cpu_limit: 50,        // 50% of one core
+// Custom config
+let handle = container func(code: string) {
+    eval(code)
+}(ContainerConfig{
+    cpu_limit: 50,
     memory_limit: 128_MB,
-    network: false,       // No network access
-    readonly_fs: true
-}
-
-let handle = container func() {
-    // Sandboxed execution
-}(config)
+    network: false
+}, user_code)
 ```
 
-**Isolation provided:**
-- Filesystem (chroot/pivot_root)
-- Network (separate network namespace)
-- PIDs (appears as PID 1 inside container)
-- Resource limits (cgroups)
+**Config:**
+```arc
+struct ContainerConfig {
+    cpu_limit: int
+    memory_limit: usize
+    network: bool
+    readonly_fs: bool
+    timeout: int
+    allowed_syscalls: array<int>
+}
+```
+
+**Isolation:** filesystem, network, PIDs, resource limits
 
 ---
 
 ## Quick Comparison
 
-| Model | Isolation | Concurrency | Use Case | Overhead |
-|-------|-----------|-------------|----------|----------|
-| `async` | Shared memory | Cooperative | I/O-bound, high concurrency | ~200ns |
-| `thread` | Shared memory | Preemptive | CPU-bound, blocking calls | ~5µs |
-| `process` | Separate memory | Full | Fault tolerance | ~1-10ms |
-| `container` | Sandboxed + limits | Full | Security, multi-tenant | ~10-50ms |
+| Model | Isolation | Use Case | Overhead | Config |
+|-------|-----------|----------|----------|--------|
+| `async` | Shared memory | I/O-bound | ~200ns | No |
+| `thread` | Shared memory | CPU-bound, blocking | ~5µs | Optional |
+| `process` | Separate memory | Fault tolerance | ~1-10ms | Optional |
+| `container` | Sandboxed | Security, limits | ~10-50ms | Optional |
 
 ---
 
 ## Examples
 
-### Web Server (async)
+**Web Server (async)**
 ```arc
-func main() {
-    let server = http.listen(":8080")
-    for req in server.accept() {
-        let response = await async func(r: Request) Response {
-            let data = await db.query("SELECT * FROM users")
-            return Response{body: data}
-        }(req)
-        
-        await req.send(response)
-    }
+let server = http.listen(":8080")
+for req in server.accept() {
+    let response = await async func(r: Request) Response {
+        let data = await db.query("SELECT * FROM users")
+        return Response{body: data}
+    }(req)
 }
 ```
 
-### Parallel Async Operations (async)
+**Parallel Computation (thread)**
 ```arc
-let user_id = 42
+let h1 = thread func(data: array<int>) { return compute(data) }(dataset_a)
+let h2 = thread func(data: array<int>) { return compute(data) }(dataset_b)
 
-let results = await all([
-    async func() { return await fetch_user(user_id) }(),
-    async func() { return await fetch_posts(user_id) }(),
-    async func() { return await fetch_comments(user_id) }()
-])
+let result = h1.join() + h2.join()
 ```
 
-### Database Driver (thread)
-```arc
-let handle = thread func(sql: string) Result {
-    let conn = libc.connect_db()  // Blocking C call
-    let result = libc.execute(conn, sql)  // Blocks
-    return result
-}("SELECT * FROM large_table")
-
-let result = handle.join()
-```
-
-### Plugin System (process)
+**Plugin System (process)**
 ```arc
 let handle = process func(path: string) {
     let plugin = load_library(path)
     plugin.run()
 }("/path/to/plugin.so")
 
-// If plugin crashes, main process continues
 if handle.wait() != 0 {
     io.printf("Plugin crashed\n")
 }
 ```
 
-### Multi-Tenant Execution (container)
+**Untrusted Code (container)**
 ```arc
-let config = ContainerConfig{
-    cpu_limit: 10,           // 10% CPU
-    memory_limit: 64_MB,
-    timeout: 5_000,          // 5 seconds
-    network: false
-}
-
 let handle = container func(code: string) {
-    eval_and_run(code)
-}(user_code).with_config(config)
+    eval(code)
+}(ContainerConfig{
+    cpu_limit: 10,
+    memory_limit: 64_MB,
+    network: false
+}, user_code)
 
-let result = handle.wait_timeout(5_000)
+let result = handle.wait()
 ```
-
----
-
-## GPU Execution
-
-For GPU/CUDA execution, see the separate **GPU Execution Model** documentation which covers:
-- `async func<gpu>` syntax for GPU kernels
-- `await` and `await(device)` for device selection
-- Multi-GPU programming
-- PTX compilation and CUDA Driver API integration
 
 ---
 
 ## Philosophy
 
-Arc's execution model gives you the right tool for every job:
-- **async**: Lightweight concurrency, I/O-bound
-- **thread**: Real parallelism, CPU-bound
-- **process**: Isolation and fault tolerance
-- **container**: Security and resource limits
+- **async**: Lightweight concurrency
+- **thread**: Real parallelism  
+- **process**: Isolation
+- **container**: Security
 
-All with the same language, same syntax, same binary. No external dependencies, no frameworks, no runtime bloat.
-
-**All execution contexts use inline functions only** - making execution boundaries explicit, data flow clear, and preventing hidden complexity.
+All inline functions. Config when needed. Zero overhead. Same language, same syntax.
