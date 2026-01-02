@@ -244,15 +244,10 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 		}
 	}
 
-	// DEBUG LOG
-	ops := ctx.AllPostfixOp()
-	fmt.Printf("[DEBUG] VisitPostfixExpression: Found %d ops\n", len(ops))
-
-	for i, op := range ops {
-		fmt.Printf("[DEBUG] Op %d: LPAREN=%v DOT=%v LBRACKET=%v\n", 
-			i, op.LPAREN() != nil, op.DOT() != nil, op.LBRACKET() != nil)
-
-		// Function Call
+	// If the primary expression was a call (e.g. foo()), curr might be the result.
+	// We iterate ops like .field, [index], etc.
+	for _, op := range ctx.AllPostfixOp() {
+		// Function Call via postfix op (unlikely if grammar puts calls in PrimaryExpression, but possible for func pointers)
 		if op.LPAREN() != nil {
 			var args []ir.Value
 			if op.ArgumentList() != nil {
@@ -263,37 +258,10 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				}
 			}
 
-			// Handle intrinsics/generics like cast<T>(val)
-			if ctx.PrimaryExpression().IDENTIFIER() != nil {
-				funcName := ctx.PrimaryExpression().IDENTIFIER().GetText()
-				
-				// cast<T>(val) handling
-				if funcName == "cast" && len(args) == 1 {
-					// Check for generic type args
-					if ga := ctx.PrimaryExpression().GenericArgs(); ga != nil {
-						if gl := ga.GenericArgList(); gl != nil && len(gl.AllGenericArg()) > 0 {
-							targetType := g.resolveType(gl.GenericArg(0).Type_())
-							curr = g.emitCast(args[0], targetType)
-							currPtr = nil
-							continue
-						}
-					}
-				}
-
-				if intrinsicVal := g.GenerateIntrinsicCall(funcName, args); intrinsicVal != nil {
-					curr = intrinsicVal
-					currPtr = nil
-					continue
-				}
-			}
-
-			// Standard Call
+			// Standard Call via function pointer or resolved entity
 			if curr != nil {
 				if fn, ok := curr.(*ir.Function); ok {
-					// DEBUG
-					fmt.Printf("[DEBUG] Creating call to %s with %d args\n", fn.Name(), len(args))
-					
-					// Cast arguments to match function parameters
+					// Cast arguments
 					if len(args) == len(fn.FuncType.ParamTypes) || (fn.FuncType.Variadic && len(args) >= len(fn.FuncType.ParamTypes)) {
 						for i, paramType := range fn.FuncType.ParamTypes {
 							if i < len(args) {
@@ -301,16 +269,13 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 							}
 						}
 					}
-
 					curr = g.ctx.Builder.CreateCall(fn, args, "")
 				} else {
-					// Indirect Call attempt
-					fmt.Printf("[DEBUG] Failed to call function. curr type: %T\n", curr)
-					panic(fmt.Sprintf("Indirect calls not supported by builder yet. Target: %v", curr))
+					// Indirect Call attempt (function pointer)
+					// Requires pointer-to-function type check
+					panic(fmt.Sprintf("Indirect calls not fully supported here. Target: %v", curr))
 				}
 				currPtr = nil
-			} else {
-				fmt.Println("[DEBUG] curr is nil before call!")
 			}
 			continue
 		}
@@ -391,49 +356,125 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		return g.ctx.Builder.CreateAlignOf(t, "")
 	}
 
+	// Parenthesized Expression: ( expr )
+	// Grammar: LPAREN expression RPAREN (without args/identifier)
+	// But grammar says: LPAREN expression RPAREN is a top-level alt.
+	// Also qualified/IDENTIFIER alts have (LPAREN argumentList? RPAREN)?
+	if ctx.Expression() != nil && ctx.LPAREN() != nil && ctx.IDENTIFIER() == nil && ctx.QualifiedIdentifier() == nil {
+		return g.Visit(ctx.Expression())
+	}
+
+	// Handle Identifier or QualifiedIdentifier
+	var name string
+	var isQualified bool
+
 	if ctx.QualifiedIdentifier() != nil {
 		q := ctx.QualifiedIdentifier()
-		var name string
 		for i, id := range q.AllIDENTIFIER() {
 			if i > 0 { name += "." }
 			name += id.GetText()
 		}
-		
-		fmt.Printf("[DEBUG] Resolving QualifiedIdentifier: %s\n", name)
-		
-		if sym, ok := g.currentScope.Resolve(name); ok && sym.IRValue != nil {
-			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
-				return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
-			}
-			return sym.IRValue
-		}
-		if fn := g.ctx.Module.GetFunction(name); fn != nil { return fn }
-		
-		fmt.Printf("[DEBUG] Failed to resolve %s\n", name)
-		return g.getZeroValue(types.I64)
+		isQualified = true
+	} else if ctx.IDENTIFIER() != nil {
+		name = ctx.IDENTIFIER().GetText()
 	}
 
-	if ctx.IDENTIFIER() != nil {
-		name := ctx.IDENTIFIER().GetText()
+	if name != "" {
+		// 1. Check for function call syntax: IDENT(...) or QUAL.ID(...)
+		// The grammar has optional parens at the end of the identifier rules
+		isCall := ctx.LPAREN() != nil && (ctx.IDENTIFIER() != nil || ctx.QualifiedIdentifier() != nil)
+		
+		var args []ir.Value
+		if isCall {
+			if ctx.ArgumentList() != nil {
+				for _, arg := range ctx.ArgumentList().AllArgument() {
+					if v := g.Visit(arg.Expression()); v != nil { 
+						args = append(args, v.(ir.Value)) 
+					}
+				}
+			}
+
+			// Handle intrinsics/casts (mostly for simple identifiers)
+			if !isQualified {
+				if name == "cast" && len(args) == 1 {
+					if ga := ctx.GenericArgs(); ga != nil {
+						if gl := ga.GenericArgList(); gl != nil && len(gl.AllGenericArg()) > 0 {
+							targetType := g.resolveType(gl.GenericArg(0).Type_())
+							return g.emitCast(args[0], targetType)
+						}
+					}
+				}
+				if intrinsicVal := g.GenerateIntrinsicCall(name, args); intrinsicVal != nil {
+					return intrinsicVal
+				}
+			}
+		}
+
+		// 2. Resolve Symbol
+		var entity ir.Value
 		
 		if sym, ok := g.currentScope.Resolve(name); ok {
-			// If Intrinsic placeholder
 			if sym.Kind == symbol.SymFunc && sym.IRValue == nil {
+				// Intrinsic placeholder or undefined forward decl
 				return nil
 			}
+			// If it's a variable and we are NOT calling it, load the value.
+			// If we ARE calling it, we might be loading a func ptr, or calling the IR Function directly.
 			if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
-				return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
+				if !isCall {
+					return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
+				}
+				// Call to variable (func ptr)
+				entity = g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
+			} else {
+				// Likely *ir.Function or Global
+				entity = sym.IRValue
 			}
-			return sym.IRValue
+		} else if fn := g.ctx.Module.GetFunction(name); fn != nil {
+			entity = fn
+		} else if glob := g.ctx.Module.GetGlobal(name); glob != nil {
+			if !isCall {
+				return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
+			}
+			// Global function pointer not loaded yet? 
+			// If Global is a function declaration, it's covered by GetFunction usually.
+			// If Global is a variable holding a func ptr:
+			entity = g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
+		} else {
+			// Not found
+			if isCall {
+				fmt.Printf("[IRGen] Error: Call to undefined function '%s'\n", name)
+			} else {
+				fmt.Printf("[IRGen] Error: Undefined identifier '%s'\n", name)
+			}
+			return g.getZeroValue(types.I64)
 		}
-		if fn := g.ctx.Module.GetFunction(name); fn != nil { return fn }
-		if glob := g.ctx.Module.GetGlobal(name); glob != nil {
-			return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
+
+		// 3. Generate Call
+		if isCall {
+			if fn, ok := entity.(*ir.Function); ok {
+				// Cast arguments to match function parameters
+				if len(args) == len(fn.FuncType.ParamTypes) || (fn.FuncType.Variadic && len(args) >= len(fn.FuncType.ParamTypes)) {
+					for i, paramType := range fn.FuncType.ParamTypes {
+						if i < len(args) {
+							args[i] = g.emitCast(args[i], paramType)
+						}
+					}
+				}
+				return g.ctx.Builder.CreateCall(fn, args, "")
+			} else {
+				// Indirect call (pointer to function)
+				// Simplified: assume entity is the function pointer value
+				// In a real implementation, we'd check the type of entity to ensure it's a function pointer
+				// and extract the return type.
+				// For this fix, we simply error as indirect calls need more builder support.
+				panic(fmt.Sprintf("Indirect calls not fully implemented. Target: %s", name))
+			}
 		}
+
+		return entity
 	}
 
-	if ctx.Expression() != nil { return g.Visit(ctx.Expression()) }
-	
 	return g.getZeroValue(types.I64)
 }
 
