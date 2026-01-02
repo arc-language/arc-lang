@@ -1326,11 +1326,8 @@ func main() int32 {
 }
 
 Run Output:
-B
-Result: FAIL
-Error: assertion failed.
-Expected substring: "C"
-Got output: "B\n"
+C
+Result: PASS
 
 --- Test: control_if_nested ---
 Source Code:
@@ -1405,18 +1402,18 @@ panic: Value define external i32 @get_value() {
 	} (get_value) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69da80, 0xc0005f3c80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00048da58, 0x0, {0x69da80, 0xc0005f3c80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00048da58, {0x6a34a0, 0xc000278e40})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00048da58, 0xc0005f3d00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69ebc0, 0xc000195f00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004e5a58, 0x0, {0x69ebc0, 0xc000195f00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004e5a58, {0x6a45e0, 0xc000328420})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004e5a58, 0xc000334000)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fffcc5a254a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fff0ad2554a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
 main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
@@ -1433,18 +1430,18 @@ panic: Value define external i32 @get_value() {
 	} (get_value) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69da80, 0xc0005f3c80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00048da58, 0x0, {0x69da80, 0xc0005f3c80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00048da58, {0x6a34a0, 0xc000278e40})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00048da58, 0xc0005f3d00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69ebc0, 0xc000195f00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004e5a58, 0x0, {0x69ebc0, 0xc000195f00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004e5a58, {0x6a45e0, 0xc000328420})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004e5a58, 0xc000334000)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fffcc5a254a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fff0ad2554a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
 main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
@@ -1694,29 +1691,29 @@ panic: Value define external i32 @check_positive(i32 %x) {
 	  store i32 %x, ptr<i32> %x.addr
 	  %0 = load i32, ptr<i32> %x.addr
 	  %1 = icmp slt i32 %0, 0
-	  br i1 %1, label %if.then, label %if.end
-	if.then:
-	  %2 = trunc i64 0 to i32
-	  ret i32 %2
+	  br i1 %1, label %if.then.0, label %if.end
 	if.end:
 	  %3 = load i32, ptr<i32> %x.addr
 	  ret i32 %3
+	if.then.0:
+	  %2 = trunc i64 0 to i32
+	  ret i32 %2
 	} (check_positive) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69da80, 0xc000229280})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc000557a58, 0x0, {0x69da80, 0xc000229280})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000557a58, {0x6a34a0, 0xc00033aba0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000557a58, 0xc000229b00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fff7489354a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc0004e7b00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc000531a58, 0x0, {0x69ebc0, 0xc0004e7b00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000531a58, {0x6a45e0, 0xc000344360})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000531a58, 0xc0004e7c00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffd3406f54a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
 	/workspaces/arc-lang/cmd/main.go:24 +0xad
@@ -1731,29 +1728,29 @@ panic: Value define external i32 @check_positive(i32 %x) {
 	  store i32 %x, ptr<i32> %x.addr
 	  %0 = load i32, ptr<i32> %x.addr
 	  %1 = icmp slt i32 %0, 0
-	  br i1 %1, label %if.then, label %if.end
-	if.then:
-	  %2 = trunc i64 0 to i32
-	  ret i32 %2
+	  br i1 %1, label %if.then.0, label %if.end
 	if.end:
 	  %3 = load i32, ptr<i32> %x.addr
 	  ret i32 %3
+	if.then.0:
+	  %2 = trunc i64 0 to i32
+	  ret i32 %2
 	} (check_positive) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69da80, 0xc000229280})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc000557a58, 0x0, {0x69da80, 0xc000229280})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000557a58, {0x6a34a0, 0xc00033aba0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000557a58, 0xc000229b00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fff7489354a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc0004e7b00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc000531a58, 0x0, {0x69ebc0, 0xc0004e7b00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc000531a58, {0x6a45e0, 0xc000344360})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc000531a58, 0xc0004e7c00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffd3406f54a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
 	/workspaces/arc-lang/cmd/main.go:24 +0xad
@@ -1790,11 +1787,11 @@ func main() int32 {
 }
 
 Run Output:
-result=-1364717168 ok=144
+result=490576960 ok=64
 Result: FAIL
 Error: assertion failed.
 Expected substring: "result=5 ok=1"
-Got output: "result=-1364717168 ok=144\n"
+Got output: "result=490576960 ok=64\n"
 
 --- Test: func_nested_calls ---
 Source Code:
@@ -1842,18 +1839,18 @@ panic: Value define external i32 @double(i32 %x) {
 	} (double) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69da80, 0xc000602600})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00051da58, 0x0, {0x69da80, 0xc000602600})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00051da58, {0x6a34a0, 0xc0005fe4e0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00051da58, 0xc000602800)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc000498500})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004d1a58, 0x0, {0x69ebc0, 0xc000498500})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004d1a58, {0x6a45e0, 0xc000244ae0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004d1a58, 0xc000498700)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffca647e54a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc4296854a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
 main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
@@ -1873,18 +1870,18 @@ panic: Value define external i32 @double(i32 %x) {
 	} (double) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69da80, 0xc000602600})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00051da58, 0x0, {0x69da80, 0xc000602600})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00051da58, {0x6a34a0, 0xc0005fe4e0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00051da58, 0xc000602800)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc000498500})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004d1a58, 0x0, {0x69ebc0, 0xc000498500})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004d1a58, {0x6a45e0, 0xc000244ae0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004d1a58, 0xc000498700)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffca647e54a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc4296854a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
 main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
@@ -1998,30 +1995,30 @@ panic: Value define external i32 @factorial(i32 %n) {
 	  store i32 %n, ptr<i32> %n.addr
 	  %0 = load i32, ptr<i32> %n.addr
 	  %1 = icmp sle i32 %0, 1
-	  br i1 %1, label %if.then, label %if.end
-	if.then:
-	  %2 = trunc i64 1 to i32
-	  ret i32 %2
+	  br i1 %1, label %if.then.0, label %if.end
 	if.end:
 	  %3 = load i32, ptr<i32> %n.addr
 	  %4 = mul i32 %3, %factorial
 	  ret i32 %4
+	if.then.0:
+	  %2 = trunc i64 1 to i32
+	  ret i32 %2
 	} (factorial) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003afbe0?, {0x69da80, 0xc0005b9980})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00029fa58, 0x1, {0x69da80, 0xc0005b9980})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00029fa58, {0x6a3580, 0xc0002b2e10})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:26 +0x645
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00029fa58, 0xc0005b9980)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffe80cad54a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00033a540?, {0x69ebc0, 0xc000664d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005efa58, 0x1, {0x69ebc0, 0xc000664d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005efa58, {0x6a46c0, 0xc0001c0190})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:26 +0x645
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005efa58, 0xc000664d80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffda8a1854a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
 	/workspaces/arc-lang/cmd/main.go:24 +0xad
@@ -2036,30 +2033,30 @@ panic: Value define external i32 @factorial(i32 %n) {
 	  store i32 %n, ptr<i32> %n.addr
 	  %0 = load i32, ptr<i32> %n.addr
 	  %1 = icmp sle i32 %0, 1
-	  br i1 %1, label %if.then, label %if.end
-	if.then:
-	  %2 = trunc i64 1 to i32
-	  ret i32 %2
+	  br i1 %1, label %if.then.0, label %if.end
 	if.end:
 	  %3 = load i32, ptr<i32> %n.addr
 	  %4 = mul i32 %3, %factorial
 	  ret i32 %4
+	if.then.0:
+	  %2 = trunc i64 1 to i32
+	  ret i32 %2
 	} (factorial) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003afbe0?, {0x69da80, 0xc0005b9980})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00029fa58, 0x1, {0x69da80, 0xc0005b9980})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00029fa58, {0x6a3580, 0xc0002b2e10})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:26 +0x645
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00029fa58, 0xc0005b9980)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffe80cad54a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00033a540?, {0x69ebc0, 0xc000664d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005efa58, 0x1, {0x69ebc0, 0xc000664d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005efa58, {0x6a46c0, 0xc0001c0190})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:26 +0x645
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005efa58, 0xc000664d80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffda8a1854a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
 	/workspaces/arc-lang/cmd/main.go:24 +0xad
@@ -2106,28 +2103,28 @@ panic: Value define external i32 @fib(i32 %n) {
 	  store i32 %n, ptr<i32> %n.addr
 	  %0 = load i32, ptr<i32> %n.addr
 	  %1 = icmp sle i32 %0, 1
-	  br i1 %1, label %if.then, label %if.end
-	if.then:
-	  %2 = load i32, ptr<i32> %n.addr
-	  ret i32 %2
+	  br i1 %1, label %if.then.0, label %if.end
 	if.end:
 	  %3 = add fn(i32) -> i32 %fib, %fib
 	  ret fn(i32) -> i32 %3
+	if.then.0:
+	  %2 = load i32, ptr<i32> %n.addr
+	  ret i32 %2
 	} (fib) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00054c120?, {0x69da80, 0xc000571c00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00046fa58, 0x0, {0x69da80, 0xc000571c00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00046fa58, {0x6a3580, 0xc0000c5810})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:13 +0x485
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00046fa58, 0xc000571c00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc000493aa0?, {0x69ebc0, 0xc00057dc00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00054ba58, 0x0, {0x69ebc0, 0xc00057dc00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00054ba58, {0x6a46c0, 0xc00023a8c0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:13 +0x485
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00054ba58, 0xc00057dc00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc58ed254a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffe3790654a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
 main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
@@ -2143,28 +2140,28 @@ panic: Value define external i32 @fib(i32 %n) {
 	  store i32 %n, ptr<i32> %n.addr
 	  %0 = load i32, ptr<i32> %n.addr
 	  %1 = icmp sle i32 %0, 1
-	  br i1 %1, label %if.then, label %if.end
-	if.then:
-	  %2 = load i32, ptr<i32> %n.addr
-	  ret i32 %2
+	  br i1 %1, label %if.then.0, label %if.end
 	if.end:
 	  %3 = add fn(i32) -> i32 %fib, %fib
 	  ret fn(i32) -> i32 %3
+	if.then.0:
+	  %2 = load i32, ptr<i32> %n.addr
+	  ret i32 %2
 	} (fib) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00054c120?, {0x69da80, 0xc000571c00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00046fa58, 0x0, {0x69da80, 0xc000571c00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00046fa58, {0x6a3580, 0xc0000c5810})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:13 +0x485
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00046fa58, 0xc000571c00)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc000493aa0?, {0x69ebc0, 0xc00057dc00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00054ba58, 0x0, {0x69ebc0, 0xc00057dc00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00054ba58, {0x6a46c0, 0xc00023a8c0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:13 +0x485
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00054ba58, 0xc00057dc00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc58ed254a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffe3790654a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
 main.handleBuild({0xc000022070?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
@@ -2249,19 +2246,19 @@ panic: Value define external i32 @add(i32 %a, i32 %b) {
 	} (add) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69da80, 0xc0003cd580})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005a1a58, 0x0, {0x69da80, 0xc0003cd580})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005a1a58, {0x6a34a0, 0xc0003117a0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005a1a58, 0xc0003cd680)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc0925c54a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc0003e9580})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00054da58, 0x0, {0x69ebc0, 0xc0003e9580})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00054da58, {0x6a45e0, 0xc0004d79e0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00054da58, 0xc0003e9680)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffd1d4a154a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
 	/workspaces/arc-lang/cmd/main.go:24 +0xad
@@ -2283,19 +2280,19 @@ panic: Value define external i32 @add(i32 %a, i32 %b) {
 	} (add) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69da80, 0xc0003cd580})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005a1a58, 0x0, {0x69da80, 0xc0003cd580})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005a1a58, {0x6a34a0, 0xc0003117a0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:164 +0x12d4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005a1a58, 0xc0003cd680)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc0925c54a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005a808?, {0x69ebc0, 0xc0003e9580})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00054da58, 0x0, {0x69ebc0, 0xc0003e9580})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00054da58, {0x6a45e0, 0xc0004d79e0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:164 +0x12d4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00054da58, 0xc0003e9680)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffd1d4a154a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
 	/workspaces/arc-lang/cmd/main.go:24 +0xad
@@ -4537,29 +4534,29 @@ panic: Value define external i32 @countdown(i32 %n) {
 	  store i32 %n, ptr<i32> %n.addr
 	  %0 = load i32, ptr<i32> %n.addr
 	  %1 = icmp sle i32 %0, 0
-	  br i1 %1, label %if.then, label %if.end
-	if.then:
-	  %2 = trunc i64 0 to i32
-	  ret i32 %2
+	  br i1 %1, label %if.then.0, label %if.end
 	if.end:
 	  %3 = add fn(i32) -> i32 %countdown, 1
 	  ret fn(i32) -> i32 %3
+	if.then.0:
+	  %2 = trunc i64 0 to i32
+	  ret i32 %2
 	} (countdown) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x100?, {0x69da80, 0xc000620d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004c5a58, 0x0, {0x69da80, 0xc000620d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004c5a58, {0x6a3580, 0xc00015b9f0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:13 +0x485
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004c5a58, 0xc000620d80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc820bb54a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc000076c00?, {0x69ebc0, 0xc0000c2400})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005ada58, 0x0, {0x69ebc0, 0xc0000c2400})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005ada58, {0x6a46c0, 0xc0002a3ef0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:13 +0x485
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005ada58, 0xc0000c2400)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc03a5954a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
 	/workspaces/arc-lang/cmd/main.go:24 +0xad
@@ -4574,29 +4571,29 @@ panic: Value define external i32 @countdown(i32 %n) {
 	  store i32 %n, ptr<i32> %n.addr
 	  %0 = load i32, ptr<i32> %n.addr
 	  %1 = icmp sle i32 %0, 0
-	  br i1 %1, label %if.then, label %if.end
-	if.then:
-	  %2 = trunc i64 0 to i32
-	  ret i32 %2
+	  br i1 %1, label %if.then.0, label %if.end
 	if.end:
 	  %3 = add fn(i32) -> i32 %countdown, 1
 	  ret fn(i32) -> i32 %3
+	if.then.0:
+	  %2 = trunc i64 0 to i32
+	  ret i32 %2
 	} (countdown) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0x100?, {0x69da80, 0xc000620d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004c5a58, 0x0, {0x69da80, 0xc000620d80})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004c5a58, {0x6a3580, 0xc00015b9f0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:13 +0x485
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004c5a58, 0xc000620d80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
-github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc00009b570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc820bb54a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
-main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc000076c00?, {0x69ebc0, 0xc0000c2400})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0005ada58, 0x0, {0x69ebc0, 0xc0000c2400})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0005ada58, {0x6a46c0, 0xc0002a3ef0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:13 +0x485
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0005ada58, 0xc0000c2400)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc03a5954a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
 	/workspaces/arc-lang/cmd/main.go:24 +0xad
@@ -4676,18 +4673,18 @@ panic: Value define external i32 @side_effect(i32 %x) {
 	} (side_effect) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69da80, 0xc000205d00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00040fa58, 0x0, {0x69da80, 0xc000205d00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00040fa58, {0x6a3580, 0xc00024b5e0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:25 +0x609
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00040fa58, 0xc000205e80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0000c9808?, {0x69ebc0, 0xc0002a0d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00049fa58, 0x0, {0x69ebc0, 0xc0002a0d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00049fa58, {0x6a46c0, 0xc0003cab40})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:25 +0x609
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00049fa58, 0xc0002a0f00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc7e98354a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc332f454a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
 main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
@@ -4709,18 +4706,18 @@ panic: Value define external i32 @side_effect(i32 %x) {
 	} (side_effect) not allocated in stack map
 
 goroutine 1 [running]:
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00005b008?, {0x69da80, 0xc000205d00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:188 +0xd4
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00040fa58, 0x0, {0x69da80, 0xc000205d00})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:207 +0x1e5
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00040fa58, {0x6a3580, 0xc00024b5e0})
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/ops.go:25 +0x609
-github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00040fa58, 0xc000205e80)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:166 +0x625
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0000c9808?, {0x69ebc0, 0xc0002a0d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:188 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00049fa58, 0x0, {0x69ebc0, 0xc0002a0d80})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:207 +0x1e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00049fa58, {0x6a46c0, 0xc0003cab40})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/ops.go:25 +0x609
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00049fa58, 0xc0002a0f00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:166 +0x625
 github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/arch/amd64/compiler.go:72 +0x33b
-github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc7e98354a?)
-	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102103447-fb749a8db546/codegen/codegen/codegen.go:17 +0x25
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc332f454a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260102104155-cdb307c796ef/codegen/codegen/codegen.go:17 +0x25
 main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
 	/workspaces/arc-lang/cmd/main.go:96 +0x465
 main.main()
@@ -4811,11 +4808,11 @@ func main() int32 {
 }
 
 Run Output:
-last=1920295727
+last=1701670760
 Result: FAIL
 Error: assertion failed.
 Expected substring: "last=555"
-Got output: "last=1920295727\n"
+Got output: "last=1701670760\n"
 
 --- Test: edge_null_deref_skip ---
 Source Code:
@@ -4942,4 +4939,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 67 | Failed: 67 | Total Time: 13.55s
+Passed: 68 | Failed: 66 | Total Time: 13.32s

@@ -123,17 +123,6 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 				}
 				offset += allocSize
 				if offset % 16 != 0 { offset += 16 - (offset%16) }
-				
-				// Map the alloca instruction to the offset of the allocated data
-				// Note: stackMap entry for the inst itself (the pointer) was handled above
-				// We need a separate way to track the data block, but for now 
-				// we assume the 'alloca' instruction *value* resolves to the pointer slot,
-				// and we calculate the data address relative to RBP using this offset
-				// when handling OpAlloca.
-				
-				// Actually, `OpAlloca` in ops.go uses `c.stackMap[inst]`.
-				// If we overwrite it here, we lose the pointer slot (if we allocated one).
-				// Optimization: Don't allocate a pointer slot for AllocaInst. Just use the calculated offset.
 				c.stackMap[ir.Value(alloca)] = -offset
 			}
 		}
@@ -200,6 +189,9 @@ func (c *compiler) load(dst Register, src ir.Value) {
 		c.asm.Xor(RegOp(dst), RegOp(dst))
 	case *ir.Global:
 		c.asm.LeaRel(dst, v.Name())
+	case *ir.Function:
+		// Function pointer load
+		c.asm.LeaRel(dst, v.Name())
 	case *ir.AllocaInst:
 		off := c.stackMap[v]
 		c.asm.Lea(dst, NewMem(RBP, off))
@@ -238,7 +230,6 @@ func (c *compiler) emitConstant(k ir.Constant) error {
 	switch v := k.(type) {
 	case *ir.ConstantInt:
 		size := SizeOf(v.Type())
-		// Removed unused 'buf' variable here
 		val := uint64(v.Value)
 		for i := 0; i < size; i++ {
 			c.data.WriteByte(byte(val))
