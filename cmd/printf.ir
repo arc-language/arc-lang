@@ -1,0 +1,7 @@
+declare external i32 @printf(ptr<u8>, ...)
+
+define external i32 @main() {
+entry:
+  %0 = trunc i64 0 to i32
+  ret i32 %0
+}

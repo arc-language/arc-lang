@@ -283,6 +283,13 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			// Standard Call
 			if curr != nil {
 				if fn, ok := curr.(*ir.Function); ok {
+					// Cast arguments to match function parameters
+					if len(args) == len(fn.FuncType.ParameterTypes) || (fn.FuncType.Variadic && len(args) >= len(fn.FuncType.ParameterTypes)) {
+						for i, paramType := range fn.FuncType.ParameterTypes {
+							args[i] = g.emitCast(args[i], paramType)
+						}
+					}
+
 					curr = g.ctx.Builder.CreateCall(fn, args, "")
 				} else {
 					// Indirect Call attempt
