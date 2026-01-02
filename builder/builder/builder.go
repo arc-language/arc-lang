@@ -470,7 +470,7 @@ func (b *Builder) CreateGEP(pointeeType types.Type, ptr ir.Value, indices []ir.V
 	
 	if len(indices) > 1 {
 		// Iterate from 2nd index
-		for i, idxVal := range indices[1:] {
+		for _, idxVal := range indices[1:] {
 			// Debug
 			// fmt.Printf("GEP Drilling: %s, idx: %v\n", resultType, idxVal)
 			
