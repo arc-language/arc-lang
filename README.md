@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://github.com/arc-language/arc-lang"><img src="./.github/arc-logo.jpeg" alt="Arc AI Language" height="150px"></a>
+  <a href="https://github.com/arc-language/arc-lang"><img src="./.github/arc-logo.png" alt="Arc AI Language" width="200px"></a>
   <br>
   Arc AI Language
   <br>
