@@ -109,10 +109,7 @@ func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) 
 			if fn, ok := curr.(*types.FunctionType); ok {
 				curr = fn.ReturnType
 			} else {
-				// If it's not a function type, it might be a method call resolved in the previous step
-				// or an error.
-				// Note: Intrinsics (alloca, memset) defined in builtins.go are SymFunc,
-				// so they will appear as FunctionTypes here.
+				// Special case: 'cast<T>' returns a function type constructed in VisitPrimaryExpression
 				a.bag.Report(a.file, op.GetStart().GetLine(), 0, 
 					"Cannot call non-function type '%s'", curr.String())
 				curr = types.Void
@@ -138,11 +135,8 @@ func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) 
 				}
 				
 				// 2. Check Methods (Name Mangling: StructName_MethodName)
-				// This allows types.I64 or vector<T> to have methods if defined in global scope
 				methodName := st.Name + "_" + name
 				if sym, ok := a.globalScope.Resolve(methodName); ok {
-					// We found a method! The result of this DOT operation is the function type.
-					// The next iteration of the loop should be an LPAREN to call it.
 					curr = sym.Type
 					continue
 				}
@@ -208,12 +202,26 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 		return types.U64
 	}
 
-	// 3. Casts
-	if ctx.CastExpression() != nil { return a.Visit(ctx.CastExpression()) }
-
-	// 4. Identifiers (Variables, Functions, Intrinsics)
+	// 3. Identifiers (Variables, Functions, Intrinsics)
 	if ctx.IDENTIFIER() != nil {
 		name := ctx.IDENTIFIER().GetText()
+
+		// Special handling for 'cast<T>' or 'bit_cast<T>'
+		// These behave like functions that return T.
+		if (name == "cast" || name == "bit_cast") && ctx.GenericArgs() != nil {
+			// Extract target type T from generic args
+			gArgs := ctx.GenericArgs().GenericArgList()
+			if gArgs != nil && len(gArgs.AllGenericArg()) > 0 {
+				argCtx := gArgs.GenericArg(0)
+				// resolveType expects ITypeContext, usually in GenericArg
+				if argCtx.Type_() != nil {
+					targetType := a.resolveType(argCtx.Type_())
+					// Return a synthetic function type: func(...) -> targetType
+					// Params are checked loosely here or could be strict
+					return types.NewFunction(targetType, nil, true)
+				}
+			}
+		}
 		
 		// Look up in scope
 		if s, ok := a.currentScope.Resolve(name); ok {
@@ -224,7 +232,7 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 		return types.Void
 	}
 	
-	// 5. Qualified Identifiers (e.g. io.print)
+	// 4. Qualified Identifiers (e.g. io.print)
 	if ctx.QualifiedIdentifier() != nil {
 		q := ctx.QualifiedIdentifier()
 		var name string
@@ -237,13 +245,11 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 			return s.Type
 		}
 		
-		// Externs might not be fully defined in Pass 1 if headers missing,
-		// but we should strictly check in Pass 2.
 		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Undefined qualified symbol '%s'", name)
 		return types.Void 
 	}
 
-	// 6. Parenthesized Expression
+	// 5. Parenthesized Expression
 	if ctx.Expression() != nil {
 		return a.Visit(ctx.Expression())
 	}
@@ -269,10 +275,8 @@ func (a *Analyzer) VisitStructLiteral(ctx *parser.StructLiteralContext) interfac
 		return types.Void
 	}
 
-	// Check fields
 	indices, hasIndices := a.structIndices[name]
 	if !hasIndices {
-		// Struct declared but fields not processed yet (shouldn't happen in Pass 2)
 		return sym.Type
 	}
 
@@ -317,10 +321,8 @@ func (a *Analyzer) VisitInitializerList(ctx *parser.InitializerListContext) inte
 		return types.Void 
 	}
 	
-	// Infer array type from first element
 	elemType := a.Visit(ctx.Expression(0)).(types.Type)
 	
-	// Validate consistency
 	for i := 1; i < len(ctx.AllExpression()); i++ {
 		t := a.Visit(ctx.Expression(i)).(types.Type)
 		if !areTypesCompatible(t, elemType) {
@@ -330,15 +332,6 @@ func (a *Analyzer) VisitInitializerList(ctx *parser.InitializerListContext) inte
 	}
 	
 	return types.NewArray(elemType, int64(len(ctx.AllExpression())))
-}
-
-// --- Casts ---
-
-func (a *Analyzer) VisitCastExpression(ctx *parser.CastExpressionContext) interface{} {
-	// Cast: cast<Type>(Expr)
-	a.Visit(ctx.Expression()) // Check expr validity
-	targetType := a.resolveType(ctx.Type_())
-	return targetType
 }
 
 // --- Passthroughs for Precedence Rules ---
