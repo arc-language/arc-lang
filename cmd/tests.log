@@ -2012,8 +2012,11 @@ func main() int32 {
 }
 
 Run Output:
-arr[1]=200
-Result: PASS
+arr[1]=1816410248
+Result: FAIL
+Error: assertion failed.
+Expected substring: "arr[1]=200"
+Got output: "arr[1]=1816410248\n"
 
 --- Test: pointer_basic_type ---
 Source Code:
@@ -2467,11 +2470,8 @@ func main() int32 {
 }
 
 Run Output:
-value=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "value=77"
-Got output: "value=0\n"
+value=77
+Result: PASS
 
 --- Test: struct_method_inline ---
 Source Code:
@@ -2548,11 +2548,11 @@ func main() int32 {
 }
 
 Run Output:
-age=30 height=32766
+age=30 height=32764
 Result: FAIL
 Error: assertion failed.
 Expected substring: "age=30 height=180"
-Got output: "age=30 height=32766\n"
+Got output: "age=30 height=32764\n"
 
 --- Test: struct_mutating_method ---
 Source Code:
@@ -2633,11 +2633,11 @@ func main() int32 {
 }
 
 Run Output:
-end_x=0
+end_x=1231018736
 Result: FAIL
 Error: assertion failed.
 Expected substring: "end_x=10"
-Got output: "end_x=0\n"
+Got output: "end_x=1231018736\n"
 
 --- Test: struct_pass_by_pointer ---
 Source Code:
@@ -2958,9 +2958,8 @@ func main() int32 {
 }
 
 Run Output:
-Result: FAIL
-Error: runtime error (exit code -1)
-Output: 
+arr[0]=0
+Result: PASS
 
 --- Test: map_placeholder ---
 Source Code:
@@ -4308,4 +4307,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 100 | Failed: 34 | Total Time: 9.57s
+Passed: 101 | Failed: 33 | Total Time: 9.31s
