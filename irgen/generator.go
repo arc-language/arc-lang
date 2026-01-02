@@ -1,7 +1,6 @@
 package irgen
 
 import (
-
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/context"
@@ -42,9 +41,6 @@ func Generate(tree parser.ICompilationUnitContext, moduleName string, analysis *
 func (g *Generator) enterScope(ctx antlr.ParserRuleContext) {
 	if s, ok := g.analysis.Scopes[ctx]; ok {
 		g.currentScope = s
-	} else {
-		// Fallback/Debug: If scope is missing, we might be in trouble
-		// fmt.Printf("[IRGen] Warning: No scope found for context %T. Staying in current scope.\n", ctx)
 	}
 }
 
@@ -54,10 +50,6 @@ func (g *Generator) exitScope() {
 	}
 }
 
-// Visit implements the visitor dispatch. 
-// CRITICAL: We must manually dispatch to g.Visit* methods or call tree.Accept(g).
-// Calling g.BaseArcParserVisitor.Visit(tree) is WRONG because it passes the Base visitor 
-// to Accept(), bypassing all our overrides.
 func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil { return nil }
 
@@ -71,11 +63,14 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.StructDeclContext: return g.VisitStructDecl(ctx)
 	case *parser.ClassDeclContext: return g.VisitClassDecl(ctx)
 	case *parser.EnumDeclContext: return g.VisitEnumDecl(ctx)
+	case *parser.ConstDeclContext: return g.VisitConstDecl(ctx)
 	case *parser.BlockContext: return g.VisitBlock(ctx)
+	case *parser.NamespaceDeclContext: return g.VisitNamespaceDecl(ctx)
 	
 	// Statements
 	case *parser.StatementContext:
 		if ctx.VariableDecl() != nil { return g.VisitVariableDecl(ctx.VariableDecl().(*parser.VariableDeclContext)) }
+		if ctx.ConstDecl() != nil { return g.VisitConstDecl(ctx.ConstDecl().(*parser.ConstDeclContext)) }
 		if ctx.ReturnStmt() != nil { return g.VisitReturnStmt(ctx.ReturnStmt().(*parser.ReturnStmtContext)) }
 		if ctx.IfStmt() != nil { return g.VisitIfStmt(ctx.IfStmt().(*parser.IfStmtContext)) }
 		if ctx.ForStmt() != nil { return g.VisitForStmt(ctx.ForStmt().(*parser.ForStmtContext)) }
@@ -122,12 +117,8 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	// Terminals/Literals
 	case *parser.LiteralContext: return g.VisitLiteral(ctx)
 	case *parser.StructLiteralContext: return g.VisitStructLiteral(ctx)
-	case *parser.CastExpressionContext: return g.VisitCastExpression(ctx)
-	case *parser.SyscallExpressionContext: return g.VisitSyscallExpression(ctx)
-	case *parser.IntrinsicExpressionContext: return g.VisitIntrinsicExpression(ctx)
 		
 	default:
-		// Fix: Use Accept(g) instead of BaseArcParserVisitor.Visit
 		return tree.Accept(g)
 	}
 }
