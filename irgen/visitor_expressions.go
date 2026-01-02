@@ -244,7 +244,14 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 		}
 	}
 
-	for _, op := range ctx.AllPostfixOp() {
+	// DEBUG LOG
+	ops := ctx.AllPostfixOp()
+	fmt.Printf("[DEBUG] VisitPostfixExpression: Found %d ops\n", len(ops))
+
+	for i, op := range ops {
+		fmt.Printf("[DEBUG] Op %d: LPAREN=%v DOT=%v LBRACKET=%v\n", 
+			i, op.LPAREN() != nil, op.DOT() != nil, op.LBRACKET() != nil)
+
 		// Function Call
 		if op.LPAREN() != nil {
 			var args []ir.Value
