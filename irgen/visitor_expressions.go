@@ -284,8 +284,8 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			if curr != nil {
 				if fn, ok := curr.(*ir.Function); ok {
 					// Cast arguments to match function parameters
-					if len(args) == len(fn.FuncType.Params) || (fn.FuncType.Variadic && len(args) >= len(fn.FuncType.Params)) {
-						for i, paramType := range fn.FuncType.Params {
+					if len(args) == len(fn.FuncType.ParamTypes) || (fn.FuncType.Variadic && len(args) >= len(fn.FuncType.ParamTypes)) {
+						for i, paramType := range fn.FuncType.ParamTypes {
 							args[i] = g.emitCast(args[i], paramType)
 						}
 					}
