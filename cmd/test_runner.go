@@ -9,204 +9,165 @@ import (
 	"time"
 )
 
-type TestResult struct {
-	Name       string
-	Passed     bool
-	Error      string
-	Duration   time.Duration
-	ExitCode   int
-	Expected   int
-	Compiled   bool
-	Linked     bool
-	CompileLog string
-	LinkLog    string
-	RunLog     string
+// TestCase defines a unit of work for the runner.
+// Tests are defined in separate files (e.g., tests_foundation.go) using init().
+type TestCase struct {
+	Name     string
+	Globals  string // Structs, global functions, imports
+	Body     string // Code inserted into the main() function
+	Expected string // Substring expected in standard output
 }
 
-var logFile *os.File
+// AllTests is populated by init() functions in other files in this package.
+var AllTests []TestCase
 
 func main() {
-	// Open log file
-	var err error
-	logFile, err = os.Create("test.log")
+	// 1. Setup Logging
+	logFile, err := os.Create("tests.log")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating log file: %v\n", err)
 		os.Exit(1)
 	}
 	defer logFile.Close()
 
-	// 1. Check for compiler binary
+	// 2. Check for Compiler Binary
 	arcBinary := "./arc"
 	if _, err := os.Stat(arcBinary); os.IsNotExist(err) {
-		fail("Error: 'arc' binary not found. Run: go build -o arc main.go")
+		fail(logFile, "Error: './arc' binary not found. Please build the compiler first (go build -o arc main.go).")
 	}
 
-	// 2. Setup Test Directory
-	testDir := filepath.Join("tests", "foundation")
-	if _, err := os.Stat(testDir); os.IsNotExist(err) {
-		os.MkdirAll(testDir, 0755)
-		fmt.Printf("Created test directory: %s\n", testDir)
-		fmt.Println("Please populate it with .arc files.")
-		return
+	// 3. Prepare Temp Directory
+	tempDir := filepath.Join(os.TempDir(), "arc_test_env")
+	os.RemoveAll(tempDir) // Clean start
+	if err := os.MkdirAll(tempDir, 0755); err != nil {
+		fail(logFile, fmt.Sprintf("Error creating temp dir: %v", err))
 	}
-
-	// 3. Find Test Files
-	arcFiles, err := filepath.Glob(filepath.Join(testDir, "*.arc"))
-	if err != nil {
-		fail(fmt.Sprintf("Error searching for files: %v", err))
-	}
-
-	if len(arcFiles) == 0 {
-		fail(fmt.Sprintf("No .arc files found in %s", testDir))
-	}
-
-	// 4. Header
-	printHeader(len(arcFiles))
-
-	// 5. Run Tests
-	results := make([]TestResult, 0, len(arcFiles))
-	tempDir := filepath.Join(os.TempDir(), "arc_tests")
-	os.RemoveAll(tempDir)
-	os.MkdirAll(tempDir, 0755)
 	defer os.RemoveAll(tempDir)
 
-	for i, arcFile := range arcFiles {
-		testName := strings.TrimSuffix(filepath.Base(arcFile), ".arc")
-		msg := fmt.Sprintf("[%d/%d] %-45s ", i+1, len(arcFiles), testName)
-		fmt.Print(msg)
-		logToFile(msg)
-		
-		start := time.Now()
-		result := runTest(arcBinary, arcFile, testName, tempDir)
-		result.Duration = time.Since(start)
-		results = append(results, result)
+	// 4. Run Header
+	header := fmt.Sprintf("Running %d tests...\n", len(AllTests))
+	fmt.Print(header)
+	writeLog(logFile, header)
 
-		printResult(result)
+	passed := 0
+	failed := 0
+	startTotal := time.Now()
+
+	// 5. Execute Tests
+	for i, test := range AllTests {
+		prefix := fmt.Sprintf("[%d/%d] %-35s ", i+1, len(AllTests), test.Name)
+		fmt.Print(prefix)
+		writeLog(logFile, fmt.Sprintf("\n--- Test: %s ---\n", test.Name))
+
+		start := time.Now()
+		err := runSingleTest(test, arcBinary, tempDir, logFile)
+		duration := time.Since(start)
+
+		if err == nil {
+			msg := fmt.Sprintf("✅ PASS (%.3fs)\n", duration.Seconds())
+			fmt.Print(msg)
+			writeLog(logFile, "Result: PASS\n")
+			passed++
+		} else {
+			msg := fmt.Sprintf("❌ FAIL (%.3fs)\n", duration.Seconds())
+			fmt.Print(msg)
+			writeLog(logFile, fmt.Sprintf("Result: FAIL\nError: %v\n", err))
+			// Print error to console lightly so we don't spam if it's huge
+			fmt.Printf("      Error: %v\n", err)
+			failed++
+		}
 	}
 
 	// 6. Summary
-	printSummary(results)
-}
-
-func runTest(arcBinary, arcFile, testName, tempDir string) TestResult {
-	result := TestResult{Name: testName, Expected: 0}
-
-	// Check filename for expected exit code (e.g. test_fail_exit1.arc)
-	if strings.Contains(testName, "_exit") {
-		parts := strings.Split(testName, "_exit")
-		if len(parts) == 2 {
-			fmt.Sscanf(parts[1], "%d", &result.Expected)
-		}
-	}
-
-	objFile := filepath.Join(tempDir, testName+".o")
-	exeFile := filepath.Join(tempDir, testName)
-
-	// A. Compile (Arc -> Object)
-	cmd := exec.Command(arcBinary, "build", arcFile, "-o", objFile)
-	out, err := cmd.CombinedOutput()
-	result.CompileLog = string(out)
-	if err != nil {
-		result.Error = "Compilation Error"
-		return result
-	}
-	result.Compiled = true
-
-	// B. Link (Object -> Exe using GCC/Clang for libc)
-	cmd = exec.Command("gcc", objFile, "-o", exeFile, "-no-pie")
-	out, err = cmd.CombinedOutput()
-	result.LinkLog = string(out)
-	if err != nil {
-		result.Error = "Linking Error"
-		return result
-	}
-	result.Linked = true
-
-	// C. Run
-	cmd = exec.Command(exeFile)
-	out, err = cmd.CombinedOutput()
-	result.RunLog = string(out)
-	
-	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			result.ExitCode = exitErr.ExitCode()
-		} else {
-			result.Error = fmt.Sprintf("Execution Error: %v", err)
-			return result
-		}
-	}
-
-	if result.ExitCode == result.Expected {
-		result.Passed = true
-	} else {
-		result.Error = fmt.Sprintf("Wrong Exit Code: expected %d, got %d", result.Expected, result.ExitCode)
-	}
-
-	return result
-}
-
-func fail(msg string) {
-	fmt.Fprintln(os.Stderr, msg)
-	logToFile(msg + "\n")
-	os.Exit(1)
-}
-
-func printHeader(count int) {
-	header := "\nArc Foundation Test Runner\n" + strings.Repeat("=", 60) + "\n"
-	fmt.Print(header)
-	logToFile(header)
-	fmt.Printf("Found %d tests in tests/foundation/\n\n", count)
-}
-
-func printResult(r TestResult) {
-	if r.Passed {
-		msg := fmt.Sprintf("✅ PASS (%.3fs)\n", r.Duration.Seconds())
-		fmt.Print(msg)
-		logToFile(msg)
-	} else {
-		msg := fmt.Sprintf("❌ FAIL (%.3fs)\n", r.Duration.Seconds())
-		fmt.Print(msg)
-		logToFile(msg)
-		
-		detail := ""
-		if !r.Compiled {
-			detail = fmt.Sprintf("   Compilation Failed:\n%s\n", indent(r.CompileLog))
-		} else if !r.Linked {
-			detail = fmt.Sprintf("   Linking Failed:\n%s\n", indent(r.LinkLog))
-		} else {
-			detail = fmt.Sprintf("   %s\n", r.Error)
-			if r.RunLog != "" {
-				detail += fmt.Sprintf("   Output:\n%s\n", indent(r.RunLog))
-			}
-		}
-		fmt.Print(detail)
-		logToFile(detail)
-	}
-}
-
-func printSummary(results []TestResult) {
-	passed, failed := 0, 0
-	for _, r := range results {
-		if r.Passed { passed++ } else { failed++ }
-	}
-	
-	line := strings.Repeat("-", 60) + "\n"
-	fmt.Print(line)
-	logToFile(line)
-	
-	summary := fmt.Sprintf("Passed: %d | Failed: %d | Total: %d\n", passed, failed, len(results))
+	fmt.Println(strings.Repeat("-", 60))
+	summary := fmt.Sprintf("Passed: %d | Failed: %d | Total Time: %.2fs\n", 
+		passed, failed, time.Since(startTotal).Seconds())
 	fmt.Print(summary)
-	logToFile(summary)
-	
+	writeLog(logFile, "\n"+strings.Repeat("=", 60)+"\n")
+	writeLog(logFile, summary)
+
 	if failed > 0 {
 		os.Exit(1)
 	}
 }
 
-func logToFile(msg string) {
-	if logFile != nil { logFile.WriteString(msg) }
+func runSingleTest(tc TestCase, arcBinary, tempDir string, log *os.File) error {
+	// 1. Construct Source Code
+	// We inject standard libc definitions automatically to keep test cases clean.
+	fullSource := fmt.Sprintf(`
+extern libc {
+    func printf(fmt: *byte, ...) int32
+    func malloc(size: usize) *void
+    func free(ptr: *void)
+    func memcpy(dest: *void, src: *void, count: usize) *void
+    func memset(dest: *void, val: int32, count: usize) *void
+    func strlen(s: *byte) usize
 }
 
-func indent(s string) string {
-	return "      " + strings.ReplaceAll(strings.TrimSpace(s), "\n", "\n      ")
+// --- Test Globals ---
+%s
+
+func main() int32 {
+    // --- Test Body ---
+%s
+    return 0
+}
+`, tc.Globals, tc.Body)
+
+	srcPath := filepath.Join(tempDir, "test.arc")
+	objPath := filepath.Join(tempDir, "test.o")
+	exePath := filepath.Join(tempDir, "test_exe")
+
+	// 2. Write Source File
+	if err := os.WriteFile(srcPath, []byte(fullSource), 0644); err != nil {
+		return fmt.Errorf("write source failed: %v", err)
+	}
+	writeLog(log, "Source Code:\n"+fullSource+"\n")
+
+	// 3. Compile (Arc -> Object)
+	cmdCompile := exec.Command(arcBinary, "build", srcPath, "-o", objPath)
+	outCompile, err := cmdCompile.CombinedOutput()
+	if err != nil {
+		writeLog(log, "Compile Output:\n"+string(outCompile))
+		return fmt.Errorf("compile failed: %s", strings.TrimSpace(string(outCompile)))
+	}
+
+	// 4. Link (Object -> Executable using GCC)
+	cmdLink := exec.Command("gcc", objPath, "-o", exePath, "-no-pie")
+	outLink, err := cmdLink.CombinedOutput()
+	if err != nil {
+		writeLog(log, "Link Output:\n"+string(outLink))
+		return fmt.Errorf("link failed: %s", strings.TrimSpace(string(outLink)))
+	}
+
+	// 5. Run Executable
+	cmdRun := exec.Command(exePath)
+	outRun, err := cmdRun.CombinedOutput()
+	output := string(outRun)
+	writeLog(log, "Run Output:\n"+output)
+
+	if err != nil {
+		// Differentiate between crash and non-zero exit if possible, 
+		// though usually we return 0 in main template.
+		return fmt.Errorf("runtime error: %v\nOutput: %s", err, output)
+	}
+
+	// 6. Assert Expectations
+	if !strings.Contains(output, tc.Expected) {
+		return fmt.Errorf("assertion failed.\nExpected substring: %q\nGot output: %q", tc.Expected, output)
+	}
+
+	return nil
+}
+
+func writeLog(f *os.File, msg string) {
+	if f != nil {
+		f.WriteString(msg)
+	}
+}
+
+func fail(log *os.File, msg string) {
+	fmt.Fprintln(os.Stderr, msg)
+	writeLog(log, msg+"\n")
+	os.Exit(1)
 }
