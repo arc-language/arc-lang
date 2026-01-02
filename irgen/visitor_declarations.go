@@ -174,41 +174,50 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
-	// Also check if 'self' param exists to treat as method (for name mangling if implemented)
-	// But IRGen uses name from Symbol, or just constructs it.
-	// For now, respect scoping.
-
 	if isMethod {
 		irName = parentName + "_" + name
 	} else if g.currentNamespace != "" && name != "main" {
 		irName = g.currentNamespace + "_" + name
 	}
 
-	sym, _ := g.currentScope.Resolve(name)
-	
+	// Resolve Parameters to check for 'self'
 	var paramTypes []types.Type
 	var paramNames []string
+	var selfType types.Type
 	
 	if ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
-			// Even if SELF is present, we use the identifier
 			pName := param.IDENTIFIER().GetText()
 			paramNames = append(paramNames, pName)
 			
-			// Resolve type
+			pType := g.resolveType(param.Type_())
+			paramTypes = append(paramTypes, pType)
+			
 			if param.SELF() != nil {
-				// Self handling: use resolved type from symbol or helper
-				// Assuming resolveType works for explicit type, 
-				// or if implicit need to lookup struct.
-				// But parser rule says: SELF? IDENTIFIER COLON type
-				// So type is always explicit in current grammar.
-				paramTypes = append(paramTypes, g.resolveType(param.Type_()))
-			} else {
-				paramTypes = append(paramTypes, g.resolveType(param.Type_()))
+				selfType = pType
 			}
 		}
 	}
+	
+	// If 'self' exists, this is a method defined outside struct block.
+	// Semantic analyzer mangles this to "Struct_Method".
+	// We must look up that symbol.
+	lookupName := name
+	if selfType != nil {
+		// Extract struct name
+		base := selfType
+		if ptr, ok := base.(*types.PointerType); ok {
+			base = ptr.ElementType
+		}
+		if st, ok := base.(*types.StructType); ok {
+			lookupName = st.Name + "_" + name
+		}
+	} else if isMethod {
+		lookupName = parentName + "_" + name
+	}
 
+	sym, _ := g.currentScope.Resolve(lookupName)
+	
 	var retType types.Type = types.Void
 	if ctx.ReturnType() != nil {
 		if ctx.ReturnType().Type_() != nil {
