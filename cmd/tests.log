@@ -26,9 +26,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-sum=30
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
 
 --- Test: op_bitwise_and ---
 Source Code:
@@ -54,9 +59,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-and=0
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_bitwise_not ---
 Source Code:
@@ -83,9 +93,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-not=240
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_bitwise_or ---
 Source Code:
@@ -111,9 +126,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-or=255
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_bitwise_xor ---
 Source Code:
@@ -139,9 +159,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-xor=240
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_compound_add ---
 Source Code:
@@ -168,9 +193,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-x=15
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_compound_div ---
 Source Code:
@@ -197,9 +227,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-x=25
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_compound_mod ---
 Source Code:
@@ -226,9 +261,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-x=2
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_compound_mul ---
 Source Code:
@@ -255,9 +295,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-x=15
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_compound_sub ---
 Source Code:
@@ -284,9 +329,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-x=13
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_decrement_postfix ---
 Source Code:
@@ -313,9 +363,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-old=10 new=9
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_decrement_prefix ---
 Source Code:
@@ -342,9 +397,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-new=9
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_division_signed ---
 Source Code:
@@ -370,9 +430,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-quot=-5
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_division_unsigned ---
 Source Code:
@@ -398,9 +463,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-quot=5
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_equality ---
 Source Code:
@@ -426,9 +496,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-eq=1
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_greater_equal ---
 Source Code:
@@ -454,9 +529,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-ge=1
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_greater_than ---
 Source Code:
@@ -482,9 +562,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-gt=1
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_increment_postfix ---
 Source Code:
@@ -511,9 +596,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-old=10 new=11
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_increment_prefix ---
 Source Code:
@@ -540,9 +630,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-new=11
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_inequality ---
 Source Code:
@@ -568,9 +663,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-ne=1
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_less_equal ---
 Source Code:
@@ -596,9 +696,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-le=1
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_less_than ---
 Source Code:
@@ -624,9 +729,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-lt=1
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_logical_and ---
 Source Code:
@@ -652,9 +762,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-and=1
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_logical_not ---
 Source Code:
@@ -680,9 +795,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-not=1
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_logical_or ---
 Source Code:
@@ -708,9 +828,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-or=1
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_modulo ---
 Source Code:
@@ -736,9 +861,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-rem=2
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_multiplication ---
 Source Code:
@@ -764,9 +894,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-prod=56
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_parentheses ---
 Source Code:
@@ -792,9 +927,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-result=20
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_precedence ---
 Source Code:
@@ -820,9 +960,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-result=14
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_shift_left ---
 Source Code:
@@ -848,9 +993,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-shl=16
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_shift_right_arithmetic ---
 Source Code:
@@ -877,9 +1027,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-shr=-16
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_shift_right_logical ---
 Source Code:
@@ -906,9 +1061,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-shr=16
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: op_subtraction ---
 Source Code:
@@ -934,9 +1094,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-diff=35
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:18:0: Called non-function 'libc.printf'
 
 --- Test: op_unary_negation ---
 Source Code:
@@ -963,9 +1128,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-neg=-100
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: control_defer_function ---
 Source Code:
@@ -996,11 +1166,18 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-start
-end
-cleanup_called
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:14:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:14:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
 
 --- Test: control_defer_multiple ---
 Source Code:
@@ -1028,12 +1205,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-main
-third
-second
-first
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
 
 --- Test: control_defer_single ---
 Source Code:
@@ -1060,11 +1239,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-before
-after
-deferred
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: control_for_continue ---
 Source Code:
@@ -1096,9 +1280,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-sum_odd=25
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'libc.printf'
 
 --- Test: control_for_cstyle ---
 Source Code:
@@ -1127,9 +1316,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-sum=10
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
 
 --- Test: control_for_infinite_break ---
 Source Code:
@@ -1161,9 +1355,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-i=5
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'libc.printf'
 
 --- Test: control_for_nested ---
 Source Code:
@@ -1194,9 +1393,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-product=6
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
 
 --- Test: control_for_while ---
 Source Code:
@@ -1225,9 +1429,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-count=3
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
 
 --- Test: control_if_basic ---
 Source Code:
@@ -1255,9 +1464,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-condition_true
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: control_if_else ---
 Source Code:
@@ -1287,9 +1501,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-not_greater
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
 
 --- Test: control_if_elseif ---
 Source Code:
@@ -1323,9 +1544,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-C
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
 
 --- Test: control_if_nested ---
 Source Code:
@@ -1356,9 +1584,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-both_true
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
 
 --- Test: control_return_value ---
 Source Code:
@@ -1388,9 +1621,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-value=42
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'get_value'
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'get_value'
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'libc.printf'
 
 --- Test: control_return_void ---
 Source Code:
@@ -1421,10 +1661,18 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-before_return
-done
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:14:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'test_return'
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:14:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'test_return'
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
 
 --- Test: control_switch_default ---
 Source Code:
@@ -1558,9 +1806,18 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-malloc_success
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'libc.malloc'
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.free'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'libc.malloc'
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.free'
 
 --- Test: extern_libc_printf ---
 Source Code:
@@ -1585,9 +1842,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-extern_test
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'libc.printf'
 
 --- Test: func_early_return ---
 Source Code:
@@ -1620,9 +1882,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-result=0
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'check_positive'
+/tmp/arc_test_env/test.arc:25:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'check_positive'
+/tmp/arc_test_env/test.arc:25:0: Called non-function 'libc.printf'
 
 --- Test: func_multiple_return ---
 Source Code:
@@ -1655,9 +1924,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-result=5 ok=1
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'divide'
+/tmp/arc_test_env/test.arc:25:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'divide'
+/tmp/arc_test_env/test.arc:25:0: Called non-function 'libc.printf'
 
 --- Test: func_nested_calls ---
 Source Code:
@@ -1690,9 +1966,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-result=30
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'double'
+/tmp/arc_test_env/test.arc:25:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'double'
+/tmp/arc_test_env/test.arc:25:0: Called non-function 'libc.printf'
 
 --- Test: func_no_params_void ---
 Source Code:
@@ -1721,9 +2004,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-hello
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:14:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'greet'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:14:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'greet'
 
 --- Test: func_pass_by_value ---
 Source Code:
@@ -1754,9 +2044,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-original=10
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'modify'
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'modify'
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
 
 --- Test: func_recursive_factorial ---
 Source Code:
@@ -1789,9 +2086,18 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-factorial=120
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'factorial'
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'factorial'
+/tmp/arc_test_env/test.arc:25:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'factorial'
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'factorial'
+/tmp/arc_test_env/test.arc:25:0: Called non-function 'libc.printf'
 
 --- Test: func_recursive_fibonacci ---
 Source Code:
@@ -1824,9 +2130,20 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-fib=13
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'fib'
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'fib'
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'fib'
+/tmp/arc_test_env/test.arc:25:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'fib'
+/tmp/arc_test_env/test.arc:17:0: Called non-function 'fib'
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'fib'
+/tmp/arc_test_env/test.arc:25:0: Called non-function 'libc.printf'
 
 --- Test: func_with_params_void ---
 Source Code:
@@ -1855,9 +2172,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-sum=30
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:14:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'print_sum'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:14:0: Called non-function 'libc.printf'
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'print_sum'
 
 --- Test: func_with_return ---
 Source Code:
@@ -1887,9 +2211,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-result=40
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'add'
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'add'
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'libc.printf'
 
 --- Test: pointer_address_of ---
 Source Code:
@@ -1916,9 +2247,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-got_address
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: pointer_arithmetic_add ---
 Source Code:
@@ -1948,9 +2284,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-value=20
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'libc.printf'
 
 --- Test: pointer_arithmetic_sub ---
 Source Code:
@@ -1980,9 +2321,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-value=10
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'libc.printf'
 
 --- Test: pointer_array_indexing ---
 Source Code:
@@ -2011,9 +2357,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-arr[1]=200
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:21:0: Called non-function 'libc.printf'
 
 --- Test: pointer_basic_type ---
 Source Code:
@@ -2040,9 +2391,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-pointer_created
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: pointer_deref_read ---
 Source Code:
@@ -2074,10 +2430,12 @@ Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
 /tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
 /tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
 
 --- Test: pointer_deref_write ---
 Source Code:
@@ -2109,10 +2467,12 @@ Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
 /tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
 /tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
 
 --- Test: pointer_double_pointer ---
 Source Code:
@@ -2140,9 +2500,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-value=77
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
 
 --- Test: pointer_non_null ---
 Source Code:
@@ -2171,9 +2536,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-not_null
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
 
 --- Test: pointer_null_check ---
 Source Code:
@@ -2201,9 +2571,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-is_null
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:19:0: Called non-function 'libc.printf'
 
 --- Test: pointer_pass_to_function ---
 Source Code:
@@ -2234,9 +2609,16 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-x=888
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'modify_value'
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'modify_value'
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
 
 --- Test: pointer_void_type ---
 Source Code:
@@ -2267,13 +2649,11 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'vptr': expected ptr<void>, got fn(...) -> ptr<void>
-/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'iptr': expected ptr<i32>, got fn(...) -> ptr<i32>
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'vptr': expected ptr<void>, got fn(...) -> ptr<void>
-/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'iptr': expected ptr<i32>, got fn(...) -> ptr<i32>
+/tmp/arc_test_env/test.arc:20:0: Called non-function 'libc.printf'
 
 --- Test: struct_definition ---
 Source Code:
@@ -2303,9 +2683,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-struct_defined
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:22:0: Called non-function 'libc.printf'
 
 --- Test: struct_field_read ---
 Source Code:
@@ -2336,12 +2721,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-width=0
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
 Result: FAIL
-Error: assertion failed.
-Expected substring: "width=100"
-Got output: "width=0\n"
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
 
 --- Test: struct_field_write ---
 Source Code:
@@ -2373,12 +2760,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-x=0
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'libc.printf'
 Result: FAIL
-Error: assertion failed.
-Expected substring: "x=99"
-Got output: "x=0\n"
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'libc.printf'
 
 --- Test: struct_init_default ---
 Source Code:
@@ -2409,9 +2798,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-x=0 y=0
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
 
 --- Test: struct_init_named ---
 Source Code:
@@ -2442,12 +2836,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-x=0 y=0
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
 Result: FAIL
-Error: assertion failed.
-Expected substring: "x=10 y=20"
-Got output: "x=0 y=0\n"
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:23:0: Called non-function 'libc.printf'
 
 --- Test: struct_method_flat ---
 Source Code:
@@ -2485,15 +2881,17 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Undefined qualified symbol 'c.value'
+/tmp/arc_test_env/test.arc:18:0: Undefined identifier 'c.value'
 /tmp/arc_test_env/test.arc:18:0: Return type mismatch: expected i32, got void
-/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.get'
+/tmp/arc_test_env/test.arc:26:0: Undefined identifier 'counter.get'
+/tmp/arc_test_env/test.arc:27:0: Called non-function 'libc.printf'
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Undefined qualified symbol 'c.value'
+/tmp/arc_test_env/test.arc:18:0: Undefined identifier 'c.value'
 /tmp/arc_test_env/test.arc:18:0: Return type mismatch: expected i32, got void
-/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.get'
+/tmp/arc_test_env/test.arc:26:0: Undefined identifier 'counter.get'
+/tmp/arc_test_env/test.arc:27:0: Called non-function 'libc.printf'
 
 --- Test: struct_method_inline ---
 Source Code:
@@ -2531,15 +2929,17 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Undefined qualified symbol 'c.value'
+/tmp/arc_test_env/test.arc:17:0: Undefined identifier 'c.value'
 /tmp/arc_test_env/test.arc:17:0: Return type mismatch: expected i32, got void
-/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.get'
+/tmp/arc_test_env/test.arc:26:0: Undefined identifier 'counter.get'
+/tmp/arc_test_env/test.arc:27:0: Called non-function 'libc.printf'
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Undefined qualified symbol 'c.value'
+/tmp/arc_test_env/test.arc:17:0: Undefined identifier 'c.value'
 /tmp/arc_test_env/test.arc:17:0: Return type mismatch: expected i32, got void
-/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.get'
+/tmp/arc_test_env/test.arc:26:0: Undefined identifier 'counter.get'
+/tmp/arc_test_env/test.arc:27:0: Called non-function 'libc.printf'
 
 --- Test: struct_multiple_fields ---
 Source Code:
@@ -2571,12 +2971,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-age=0 height=0
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'libc.printf'
 Result: FAIL
-Error: assertion failed.
-Expected substring: "age=30 height=180"
-Got output: "age=0 height=0\n"
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:24:0: Called non-function 'libc.printf'
 
 --- Test: struct_mutating_method ---
 Source Code:
@@ -2614,11 +3016,13 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.increment'
+/tmp/arc_test_env/test.arc:26:0: Undefined identifier 'counter.increment'
+/tmp/arc_test_env/test.arc:27:0: Called non-function 'libc.printf'
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:26:0: Undefined qualified symbol 'counter.increment'
+/tmp/arc_test_env/test.arc:26:0: Undefined identifier 'counter.increment'
+/tmp/arc_test_env/test.arc:27:0: Called non-function 'libc.printf'
 
 --- Test: struct_nested ---
 Source Code:
@@ -2656,12 +3060,14 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-end_x=0
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:30:0: Called non-function 'libc.printf'
 Result: FAIL
-Error: assertion failed.
-Expected substring: "end_x=10"
-Got output: "end_x=0\n"
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+/tmp/arc_test_env/test.arc:30:0: Called non-function 'libc.printf'
 
 --- Test: struct_pass_by_pointer ---
 Source Code:
@@ -2698,1661 +3104,3 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-x=0 y=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "x=5 y=10"
-Got output: "x=0 y=0\n"
-
---- Test: struct_pass_by_value ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-    struct Point {
-        x: int32
-        y: int32
-    }
-    
-    func print_point(p: Point) {
-        libc.printf("x=%d y=%d\n", p.x, p.y)
-    }
-    
-
-func main() int32 {
-    // --- Test Body ---
-
-    let pt = Point{x: 5, y: 10}
-    print_point(pt)
-    
-    return 0
-}
-
-Run Output:
-x=0 y=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "x=5 y=10"
-Got output: "x=0 y=0\n"
-
---- Test: struct_pointer_field ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-    struct Point {
-        x: int32
-        y: int32
-    }
-    
-
-func main() int32 {
-    // --- Test Body ---
-
-    let p = Point{x: 15, y: 25}
-    let ptr: *Point = &p
-    libc.printf("x=%d\n", ptr.x)
-    
-    return 0
-}
-
-Run Output:
-x=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "x=15"
-Got output: "x=0\n"
-
---- Test: array_2d ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let matrix: array<array<int32, 2>, 2> = {
-        {1, 2},
-        {3, 4}
-    }
-    libc.printf("matrix[1][1]=%d\n", matrix[1][1])
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:8: Syntax Error: no viable alternative at input 'letmatrix'
-/tmp/arc_test_env/test.arc:17:22: Syntax Error: no viable alternative at input 'array'
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:8: Syntax Error: no viable alternative at input 'letmatrix'
-/tmp/arc_test_env/test.arc:17:22: Syntax Error: no viable alternative at input 'array'
-
---- Test: array_element_assign ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let arr: array<int32, 3> = {1, 2, 3}
-    arr[1] = 99
-    libc.printf("arr[1]=%d\n", arr[1])
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
-
---- Test: array_fixed_size ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let arr: array<int32, 3> = {10, 20, 30}
-    libc.printf("arr[1]=%d\n", arr[1])
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
-
---- Test: array_iteration_cstyle ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let arr: array<int32, 4> = {1, 2, 3, 4}
-    let sum = 0
-    for let i: usize = 0; i < 4; i++ {
-        sum += arr[i]
-    }
-    libc.printf("sum=%d\n", sum)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [4 x i64]
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [4 x i64]
-
---- Test: array_ptr_first ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let arr: array<int32, 3> = {100, 200, 300}
-    let ptr: *int32 = &arr[0]
-    libc.printf("first=%d\n", *ptr)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
-
---- Test: array_zero_init ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let arr: array<int32, 5> = {}
-    libc.printf("arr[0]=%d\n", arr[0])
-    
-    return 0
-}
-
-Run Output:
-Result: FAIL
-Error: runtime error (exit code -1)
-Output: 
-
---- Test: map_placeholder ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    libc.printf("map_placeholder\n")
-    
-    return 0
-}
-
-Run Output:
-map_placeholder
-Result: PASS
-
---- Test: vector_placeholder ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    libc.printf("vector_placeholder\n")
-    
-    return 0
-}
-
-Run Output:
-vector_placeholder
-Result: PASS
-
---- Test: cast_float_to_int ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let f: float32 = 3.9
-    let i: int32 = cast<int32>(f)
-    libc.printf("int=%d\n", i)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'i': expected i32, got fn(...) -> i32
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'i': expected i32, got fn(...) -> i32
-
---- Test: cast_int_to_float ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let i: int32 = 42
-    let f: float32 = cast<float32>(i)
-    libc.printf("float=%.1f\n", f)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'f': expected f32, got fn(...) -> f32
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'f': expected f32, got fn(...) -> f32
-
---- Test: cast_int_to_ptr ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let addr: uint64 = 0x1000
-    let ptr: *int32 = cast<*int32>(addr)
-    libc.printf("ptr_created\n")
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got fn(...) -> ptr<i32>
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got fn(...) -> ptr<i32>
-
---- Test: cast_int_truncate ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let large: int32 = 1000
-    let small: int8 = cast<int8>(large)
-    libc.printf("small=%d\n", small)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'small': expected i8, got fn(...) -> i8
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'small': expected i8, got fn(...) -> i8
-
---- Test: cast_int_widen ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let small: int8 = 100
-    let large: int32 = cast<int32>(small)
-    libc.printf("large=%d\n", large)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'large': expected i32, got fn(...) -> i32
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'large': expected i32, got fn(...) -> i32
-
---- Test: cast_ptr_to_int ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let x: int32 = 99
-    let ptr: *int32 = &x
-    let addr: uint64 = cast<uint64>(ptr)
-    libc.printf("addr_non_zero=%d\n", addr != 0)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'addr': expected u64, got fn(...) -> u64
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'addr': expected u64, got fn(...) -> u64
-
---- Test: cast_ptr_to_ptr ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let x: int32 = 42
-    let iptr: *int32 = &x
-    let vptr: *void = cast<*void>(iptr)
-    let back: *int32 = cast<*int32>(vptr)
-    libc.printf("value=%d\n", *back)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'vptr': expected ptr<void>, got fn(...) -> ptr<void>
-/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'back': expected ptr<i32>, got fn(...) -> ptr<i32>
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:19:0: Type mismatch in variable 'vptr': expected ptr<void>, got fn(...) -> ptr<void>
-/tmp/arc_test_env/test.arc:20:0: Type mismatch in variable 'back': expected ptr<i32>, got fn(...) -> ptr<i32>
-
---- Test: cast_signed_to_unsigned ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let neg: int32 = -1
-    let pos: uint32 = cast<uint32>(neg)
-    libc.printf("unsigned=%u\n", pos)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'pos': expected u32, got fn(...) -> u32
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'pos': expected u32, got fn(...) -> u32
-
---- Test: cast_unsigned_to_signed ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let big: uint32 = 4294967295
-    let neg: int32 = cast<int32>(big)
-    libc.printf("signed=%d\n", neg)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'neg': expected i32, got fn(...) -> i32
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'neg': expected i32, got fn(...) -> i32
-
---- Test: intrinsic_alignof ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let align = alignof<int64>
-    libc.printf("align=%zu\n", align)
-    
-    return 0
-}
-
-Run Output:
-align=8
-Result: PASS
-
---- Test: intrinsic_alloca_array ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let buffer = alloca(int32, 5)
-    buffer[0] = 10
-    buffer[1] = 20
-    buffer[2] = 30
-    libc.printf("buffer[1]=%d\n", buffer[1])
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:24: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:17:32: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:24: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:17:32: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
-
---- Test: intrinsic_alloca_single ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let ptr = alloca(int32)
-    *ptr = 777
-    libc.printf("value=%d\n", *ptr)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
-
---- Test: intrinsic_bitcast ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let f: float32 = 1.0
-    let bits = bit_cast<uint32>(f)
-    libc.printf("bits=%u\n", bits)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (7 functions)
-Error: Object generation failed: in function main: unknown opcode: fptrunc
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (7 functions)
-Error: Object generation failed: in function main: unknown opcode: fptrunc
-
---- Test: intrinsic_memcpy ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let src = alloca(int32, 3)
-    src[0] = 100
-    src[1] = 200
-    src[2] = 300
-    
-    let dest = alloca(int32, 3)
-    libc.memcpy(dest, src, 12)
-    
-    libc.printf("dest[1]=%d\n", dest[1])
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
-/tmp/arc_test_env/test.arc:22:22: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:22:30: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:21: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:17:29: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
-/tmp/arc_test_env/test.arc:22:22: Syntax Error: no viable alternative at input '(int32'
-/tmp/arc_test_env/test.arc:22:30: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
-
---- Test: intrinsic_memset ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let buffer = alloca(byte, 10)
-    memset(buffer, 0x42, 10)
-    libc.printf("buffer[5]=%d\n", buffer[5])
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:24: Syntax Error: no viable alternative at input '(byte'
-/tmp/arc_test_env/test.arc:17:32: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:24: Syntax Error: no viable alternative at input '(byte'
-/tmp/arc_test_env/test.arc:17:32: Syntax Error: extraneous input ')' expecting {'let', 'const', 'func', 'async', 'await', 'return', 'if', 'for', 'break', 'continue', 'defer', 'null', 'switch', 'try', 'throw', 'thread', 'process', 'container', 'sizeof', 'alignof', '++', '--', '-', '*', '!', '&', '~', '(', '{', '}', BOOLEAN_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL, STRING_LITERAL, CHAR_LITERAL, IDENTIFIER}
-
---- Test: intrinsic_sizeof_int32 ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let size = sizeof<int32>
-    libc.printf("size=%zu\n", size)
-    
-    return 0
-}
-
-Run Output:
-size=4
-Result: PASS
-
---- Test: intrinsic_sizeof_int64 ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let size = sizeof<int64>
-    libc.printf("size=%zu\n", size)
-    
-    return 0
-}
-
-Run Output:
-size=8
-Result: PASS
-
---- Test: intrinsic_sizeof_struct ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-    struct Pair {
-        a: int32
-        b: int32
-    }
-    
-
-func main() int32 {
-    // --- Test Body ---
-
-    let size = sizeof<Pair>
-    libc.printf("size=%zu\n", size)
-    
-    return 0
-}
-
-Run Output:
-size=8
-Result: PASS
-
---- Test: intrinsic_strlen ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let str: *byte = "hello"
-    let len = libc.strlen(str)
-    libc.printf("len=%zu\n", len)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'str': expected ptr<u8>, got ptr<i8>
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'str': expected ptr<u8>, got ptr<i8>
-
---- Test: enum_basic ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-    enum Status {
-        OK
-        ERROR
-        PENDING
-    }
-    
-
-func main() int32 {
-    // --- Test Body ---
-
-    let s: Status = Status.OK
-    libc.printf("status=%d\n", s)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:23:0: Undefined qualified symbol 'Status.OK'
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:23:0: Undefined qualified symbol 'Status.OK'
-
---- Test: enum_explicit_values ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-    enum HttpCode {
-        OK = 200
-        NOT_FOUND = 404
-        SERVER_ERROR = 500
-    }
-    
-
-func main() int32 {
-    // --- Test Body ---
-
-    let code: HttpCode = HttpCode.NOT_FOUND
-    libc.printf("code=%d\n", code)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:23:0: Undefined qualified symbol 'HttpCode.NOT_FOUND'
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:23:0: Undefined qualified symbol 'HttpCode.NOT_FOUND'
-
---- Test: exec_async_placeholder ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    libc.printf("async_placeholder\n")
-    
-    return 0
-}
-
-Run Output:
-async_placeholder
-Result: PASS
-
---- Test: exec_thread_placeholder ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    libc.printf("thread_placeholder\n")
-    
-    return 0
-}
-
-Run Output:
-thread_placeholder
-Result: PASS
-
---- Test: for_in_range ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let sum = 0
-    for i in 0..5 {
-        sum += i
-    }
-    libc.printf("sum=%d\n", sum)
-    
-    return 0
-}
-
-Run Output:
-sum=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "sum=10"
-Got output: "sum=0\n"
-
---- Test: generic_func_def ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-    func identity<T>(x: T) T {
-        return x
-    }
-    
-
-func main() int32 {
-    // --- Test Body ---
-
-    let result = identity<int32>(99)
-    libc.printf("result=%d\n", result)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
-/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
-/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
-
---- Test: generic_struct_def ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-    struct Box<T> {
-        value: T
-    }
-    
-
-func main() int32 {
-    // --- Test Body ---
-
-    let b: Box<int32> = Box<int32>{value: 42}
-    libc.printf("value=%d\n", b.value)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:14:0: Unknown type 'T'
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:14:0: Unknown type 'T'
-
---- Test: generic_swap ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-    func swap<T>(a: *T, b: *T) {
-        let tmp: T = *a
-        *a = *b
-        *b = tmp
-    }
-    
-
-func main() int32 {
-    // --- Test Body ---
-
-    let x = 10
-    let y = 20
-    swap<int32>(&x, &y)
-    libc.printf("x=%d y=%d\n", x, y)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
-/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
-/tmp/arc_test_env/test.arc:14:0: Unknown type 'T'
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
-/tmp/arc_test_env/test.arc:13:0: Unknown type 'T'
-/tmp/arc_test_env/test.arc:14:0: Unknown type 'T'
-
---- Test: string_interpolation ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let name = "Alice"
-    let age = 30
-    let msg = "Hello ${name}, age ${age}"
-    libc.printf("%s\n", msg)
-    
-    return 0
-}
-
-Run Output:
-Hello ${name}, age ${age}
-Result: FAIL
-Error: assertion failed.
-Expected substring: "Hello Alice, age 30"
-Got output: "Hello ${name}, age ${age}\n"
-
---- Test: try_except_placeholder ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    libc.printf("exception_placeholder\n")
-    
-    return 0
-}
-
-Run Output:
-exception_placeholder
-Result: PASS
-
---- Test: edge_deep_recursion ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-    func countdown(n: int32) int32 {
-        if n <= 0 {
-            return 0
-        }
-        return countdown(n - 1) + 1
-    }
-    
-
-func main() int32 {
-    // --- Test Body ---
-
-    let result = countdown(100)
-    libc.printf("depth=%d\n", result)
-    
-    return 0
-}
-
-Run Output:
-depth=100
-Result: PASS
-
---- Test: edge_div_zero_skip ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let x = 10
-    let y = 0
-    libc.printf("divzero_skipped\n")
-    
-    return 0
-}
-
-Run Output:
-divzero_skipped
-Result: PASS
-
---- Test: edge_eval_order ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-    func side_effect(x: int32) int32 {
-        libc.printf("eval_%d ", x)
-        return x
-    }
-    
-
-func main() int32 {
-    // --- Test Body ---
-
-    let result = side_effect(1) + side_effect(2) * side_effect(3)
-    libc.printf("result=%d\n", result)
-    
-    return 0
-}
-
-Run Output:
-eval_1 eval_2 eval_3 result=7
-Result: PASS
-
---- Test: edge_function_pointer_placeholder ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    libc.printf("func_ptr_placeholder\n")
-    
-    return 0
-}
-
-Run Output:
-func_ptr_placeholder
-Result: PASS
-
---- Test: edge_int_overflow ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let x: int8 = 127
-    x = x + 1
-    libc.printf("overflow=%d\n", x)
-    
-    return 0
-}
-
-Run Output:
-overflow=128
-Result: FAIL
-Error: assertion failed.
-Expected substring: "overflow=-128"
-Got output: "overflow=128\n"
-
---- Test: edge_large_stack_array ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let arr: array<int32, 1000> = {}
-    arr[999] = 555
-    libc.printf("last=%d\n", arr[999])
-    
-    return 0
-}
-
-Run Output:
-Result: FAIL
-Error: runtime error (exit code -1)
-Output: 
-
---- Test: edge_null_deref_skip ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let ptr: *int32 = null
-    libc.printf("null_deref_skipped\n")
-    
-    return 0
-}
-
-Run Output:
-null_deref_skipped
-Result: PASS
-
---- Test: edge_pointer_lifetime ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let stack_value = 42
-    let ptr: *int32 = &stack_value
-    libc.printf("value=%d\n", *ptr)
-    
-    return 0
-}
-
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i64>
-
---- Test: edge_struct_padding ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-    struct Padded {
-        a: int8
-        b: int64
-        c: int8
-    }
-    
-
-func main() int32 {
-    // --- Test Body ---
-
-    let size = sizeof<Padded>
-    libc.printf("size=%zu\n", size)
-    
-    return 0
-}
-
-Run Output:
-size=24
-Result: PASS
-
---- Test: edge_zero_sized_array ---
-Source Code:
-
-extern libc {
-    func printf(*byte, ...) int32
-    func malloc(usize) *void
-    func free(*void)
-    func memcpy(*void, *void, usize) *void
-    func memset(*void, int32, usize) *void
-    func strlen(*byte) usize
-}
-
-// --- Test Globals ---
-
-
-func main() int32 {
-    // --- Test Body ---
-
-    let arr: array<int32, 0> = {}
-    libc.printf("zero_array_ok\n")
-    
-    return 0
-}
-
-Run Output:
-zero_array_ok
-Result: PASS
-
-============================================================
-Passed: 89 | Failed: 45 | Total Time: 8.97s

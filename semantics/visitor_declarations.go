@@ -45,11 +45,29 @@ func (a *Analyzer) VisitExternDecl(ctx *parser.ExternDeclContext) interface{} {
 	for _, member := range ctx.AllExternMember() {
 		if fnCtx := member.ExternFunctionDecl(); fnCtx != nil {
 			name := fnCtx.IDENTIFIER().GetText()
+			
+			// Resolve Return Type
 			var retType types.Type = types.Void
 			if fnCtx.Type_() != nil { retType = a.resolveType(fnCtx.Type_()) }
+			
+			// Resolve Parameter Types
+			var paramTypes []types.Type
+			variadic := false
+			if fnCtx.ExternParameterList() != nil {
+				if fnCtx.ExternParameterList().ELLIPSIS() != nil {
+					variadic = true
+				}
+				for _, t := range fnCtx.ExternParameterList().AllType_() {
+					paramTypes = append(paramTypes, a.resolveType(t))
+				}
+			}
+			
+			// Create Function Type
+			fnType := types.NewFunction(retType, paramTypes, variadic)
+			
 			lookupName := name
 			if ns != "" { lookupName = ns + "." + name }
-			a.currentScope.Define(lookupName, symbol.SymFunc, retType)
+			a.currentScope.Define(lookupName, symbol.SymFunc, fnType)
 		}
 	}
 	return nil
@@ -57,6 +75,8 @@ func (a *Analyzer) VisitExternDecl(ctx *parser.ExternDeclContext) interface{} {
 
 func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
+	
+	// Resolve Return Type
 	var retType types.Type = types.Void
 	if ctx.ReturnType() != nil && ctx.ReturnType().Type_() != nil {
 		retType = a.resolveType(ctx.ReturnType().Type_())
@@ -70,7 +90,25 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		retType = types.NewStruct("", tupleTypes, false)
 	}
 
-	a.currentScope.Define(name, symbol.SymFunc, retType)
+	// Resolve Parameter Types
+	var paramTypes []types.Type
+	if ctx.ParameterList() != nil {
+		for _, param := range ctx.ParameterList().AllParameter() {
+			if param.SELF() != nil { 
+				// Handle Self (placeholder for now, pointer to struct)
+				paramTypes = append(paramTypes, types.NewPointer(types.Void)) 
+				continue 
+			}
+			paramTypes = append(paramTypes, a.resolveType(param.Type_()))
+		}
+	}
+	
+	// Create Function Type
+	fnType := types.NewFunction(retType, paramTypes, false)
+
+	a.currentScope.Define(name, symbol.SymFunc, fnType)
+	
+	// Scope Analysis
 	a.currentFuncRetType = retType
 	a.pushScope(ctx)
 	defer func() { a.popScope(); a.currentFuncRetType = nil }()
