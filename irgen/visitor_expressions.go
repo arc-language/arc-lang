@@ -318,13 +318,23 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 
 			if basePtr != nil {
 				ptrType := basePtr.Type().(*types.PointerType)
+				
 				var elemPtr ir.Value
 				
+				// Case A: Pointer to Array
 				if _, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
 					zero := g.ctx.Builder.ConstInt(types.I32, 0)
 					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{zero, idx}, "")
 				} else {
-					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{idx}, "")
+					// Case B: Pointer to Pointer (or Pointer to Value)
+					actualBase := basePtr
+					if ptrToPtr, ok := ptrType.ElementType.(*types.PointerType); ok {
+						_ = ptrToPtr
+						actualBase = g.ctx.Builder.CreateLoad(ptrType.ElementType, basePtr, "")
+						ptrType = ptrType.ElementType.(*types.PointerType)
+					}
+					
+					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, actualBase, []ir.Value{idx}, "")
 				}
 				
 				currPtr = elemPtr
@@ -369,10 +379,10 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	// 1. Resolve Name
 	var name string
 	var isQualified bool
-	var qCtx *parser.QualifiedIdentifierContext
+	var qCtx *parser.QualifiedIdentifierContext // Declared here
 
 	if ctx.QualifiedIdentifier() != nil {
-		qCtx = ctx.QualifiedIdentifier()
+		qCtx = ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext) // Type assertion here
 		for i, id := range qCtx.AllIDENTIFIER() {
 			if i > 0 { name += "." }
 			name += id.GetText()
@@ -446,15 +456,9 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			entity = g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
 		} else if isQualified {
 			// Handle Member Access via QualifiedIdentifier: `rect.width`
-			// We need to resolve `rect` then access `width`
-			// The QualifiedIdentifier `rect.width` failed to resolve as a whole symbol.
-			// So we must try to resolve `rect` and treat `width` as a field.
-			// Currently simplified to handle ONE level of dot access for struct fields.
-			
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
 			
-			// Resolve base
 			var basePtr ir.Value
 			if sym, ok := g.currentScope.Resolve(baseName); ok {
 				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
@@ -465,7 +469,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			}
 			
 			if basePtr != nil {
-				// Iterate remaining parts
 				currPtr := basePtr
 				valid := true
 				
@@ -486,7 +489,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 				
 				if valid {
-					// Found it! Load the value (since it's an expression)
 					ptrType := currPtr.Type().(*types.PointerType)
 					entity = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 				}
