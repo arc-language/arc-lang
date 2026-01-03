@@ -1,6 +1,6 @@
 # Arc Language Execution Model
 
-Arc separates **logic definition** from **execution context**. Write your code as inline functions, then choose where to run them: async event loop, OS threads, isolated processes, or sandboxed containers.
+Arc separates **logic definition** from **execution context**. Write your code as inline functions, then choose where to run them: async event loop, OS threads, isolated processes, sandboxed containers, or distributed cloud instances.
 
 ---
 
@@ -29,7 +29,7 @@ thread func(x: int) { work(x) }(42)
 
 ---
 
-## The 4 Execution Models
+## The 5 Execution Models
 
 ### 1. `async` - Async Functions
 
@@ -126,12 +126,7 @@ struct ProcessConfig {
 
 **Syntax:**
 ```arc
-// Default config
-let handle = container func(code: string) {
-    eval(code)
-}(user_code)
-
-// Custom config
+// Custom config with resource limits
 let handle = container func(code: string) {
     eval(code)
 }(ContainerConfig{
@@ -148,12 +143,59 @@ struct ContainerConfig {
     memory_limit: usize
     network: bool
     readonly_fs: bool
-    timeout: int
     allowed_syscalls: array<int>
 }
 ```
 
-**Isolation:** filesystem, network, PIDs, resource limits
+**Isolation:** filesystem, network, PIDs, resource limits (cgroups/namespaces).
+
+---
+
+### 5. `cloud` - Distributed & GPU Computing
+
+**When to use:** Massive parallelism, GPU training, accessing private VPCs, self-deploying infrastructure.
+
+**Cost:** ~1-3s setup (cold), <100ms (warm/p2p)
+
+**Mechanism:**
+- **Ad-hoc:** Compiles closure + captured vars + Arc runtime to a micro-payload.
+- **WebRTC:** Uses Data Channels for bidirectional streaming (logs/results) without opening firewalls (NAT traversal).
+- **Detached:** Allows "deploy and die" patterns.
+
+**Syntax:**
+```arc
+// 1. GPU Compute (RPC style)
+let model = cloud func(data: bytes) Model {
+    return ai.train(data)
+}(CloudConfig{ 
+    provider: "gcp", 
+    hardware: "nvidia-a100",
+    transport: "webrtc" // No SSH keys needed
+}, dataset)
+
+// 2. Self-Deploying Server (Detached)
+cloud func() {
+    let s = http.listen(":80")
+    s.start() // Runs forever in the cloud
+}(CloudConfig{ 
+    provider: "aws", 
+    region: "us-east-1", 
+    detached: true // Program exits, server stays up
+})
+```
+
+**Config:**
+```arc
+struct CloudConfig {
+    provider: string     // "aws", "gcp", "digitalocean", "ssh"
+    region: string
+    hardware: string     // "cpu-basic", "gpu-t4", "ram-128gb"
+    detached: bool       // If true, local process disconnects after launch
+    transport: string    // "webrtc", "http", "ssh"
+    auth: AuthConfig     // SigV4, OIDC, or Keys
+    vpc: string          // Target private network
+}
+```
 
 ---
 
@@ -163,8 +205,9 @@ struct ContainerConfig {
 |-------|-----------|----------|----------|--------|
 | `async` | Shared memory | I/O-bound | ~200ns | No |
 | `thread` | Shared memory | CPU-bound, blocking | ~5µs | Optional |
-| `process` | Separate memory | Fault tolerance | ~1-10ms | Optional |
-| `container` | Sandboxed | Security, limits | ~10-50ms | Optional |
+| `process` | Separate memory | Fault tolerance | ~5ms | Optional |
+| `container` | Sandboxed | Security, limits | ~50ms | Optional |
+| `cloud` | **Physical/VM** | **GPU, Deploy, Scale** | **~2s** | **Required** |
 
 ---
 
@@ -185,33 +228,36 @@ for req in server.accept() {
 ```arc
 let h1 = thread func(data: array<int>) { return compute(data) }(dataset_a)
 let h2 = thread func(data: array<int>) { return compute(data) }(dataset_b)
-
 let result = h1.join() + h2.join()
 ```
 
-**Plugin System (process)**
+**Distributed "Botnet" Loop (cloud)**
 ```arc
-let handle = process func(path: string) {
-    let plugin = load_library(path)
-    plugin.run()
-}("/path/to/plugin.so")
-
-if handle.wait() != 0 {
-    io.printf("Plugin crashed\n")
+// Implicit Massive Parallelism
+// Spawns 1000 serverless instances instantly
+for chunk in dataset.split(1000) {
+    cloud func(data) { 
+        // Built-in modules (math/media) available instantly
+        return heavy_math.process(data) 
+    }(CloudConfig{ provider: "aws_lambda" }, chunk)
 }
 ```
 
-**Untrusted Code (container)**
+**Self-Deploying Infrastructure (cloud detached)**
 ```arc
-let handle = container func(code: string) {
-    eval(code)
-}(ContainerConfig{
-    cpu_limit: 10,
-    memory_limit: 64_MB,
-    network: false
-}, user_code)
-
-let result = handle.wait()
+func deploy() {
+    print("Deploying to production...")
+    
+    cloud func() {
+        // This runs on a remote VM forever
+        app.start_server()
+    }(CloudConfig{ 
+        detached: true, 
+        name: "prod-api-v1" 
+    })
+    
+    print("Deployed. Exiting.")
+}
 ```
 
 ---
@@ -222,5 +268,6 @@ let result = handle.wait()
 - **thread**: Real parallelism  
 - **process**: Isolation
 - **container**: Security
+- **cloud**: Infinite Scale & Deployment
 
-All inline functions. Config when needed. Zero overhead. Same language, same syntax.
+All inline functions. Zero boilerplate. From a single core to a global cluster with one syntax.
