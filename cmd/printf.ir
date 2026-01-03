@@ -1,27 +1,33 @@
-%Counter = type { i32 }
-
-@.str.0 = external constant [10 x i8] [i8 99, i8 111, i8 117, i8 110, i8 116, i8 61, i8 37, i8 100, i8 10, i8 0]
+@.str.0 = external constant [10 x i8] [i8 118, i8 97, i8 108, i8 117, i8 101, i8 61, i8 37, i8 100, i8 10, i8 0]
 
 declare external i32 @printf(ptr<u8>, ...)
 
-define external void @Counter_increment(ptr<%Counter> %c) {
-entry:
-  %c.addr = alloca ptr<%Counter>
-  store ptr<%Counter> %c, ptr<ptr<%Counter>> %c.addr
-  ret void
-}
-
 define external i32 @main() {
 entry:
-  %counter.addr = alloca %Counter
-  %0 = trunc i64 10 to i32
-  %1 = insertvalue %Counter zeroinitializer, i32 %0, 0
-  store %Counter %1, ptr<%Counter> %counter.addr
-  call void @Counter_increment(ptr<%Counter> %counter.addr)
-  %2 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
-  %3 = getelementptr %Counter, ptr<%Counter> %counter.addr, i32 0, i32 0
-  %4 = load i32, ptr<i32> %3
-  %5 = call i32 @printf(ptr<i8> %2, i32 %4)
-  %6 = trunc i64 0 to i32
-  ret i32 %6
+  %arr.addr = alloca ptr<i32>
+  %0 = alloca i32, i64 5
+  store ptr<i32> %0, ptr<ptr<i32>> %arr.addr
+  %1 = load ptr<i32>, ptr<ptr<i32>> %arr.addr
+  %2 = getelementptr inbounds i32, ptr<i32> %1, i64 0
+  %3 = trunc i64 10 to i32
+  store i32 %3, ptr<i32> %2
+  %4 = load ptr<i32>, ptr<ptr<i32>> %arr.addr
+  %5 = getelementptr inbounds i32, ptr<i32> %4, i64 1
+  %6 = trunc i64 20 to i32
+  store i32 %6, ptr<i32> %5
+  %ptr.addr = alloca ptr<i32>
+  %7 = load ptr<i32>, ptr<ptr<i32>> %arr.addr
+  %8 = load i32, ptr<i32> %7
+  store i32 %8, ptr<ptr<i32>> %ptr.addr
+  %next.addr = alloca ptr<i32>
+  %9 = load ptr<i32>, ptr<ptr<i32>> %ptr.addr
+  %10 = load i32, ptr<i32> %9
+  %11 = add i32 %10, 1
+  store i32 %11, ptr<ptr<i32>> %next.addr
+  %12 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
+  %13 = load ptr<i32>, ptr<ptr<i32>> %next.addr
+  %14 = load i32, ptr<i32> %13
+  %15 = call i32 @printf(ptr<i8> %12, i32 %14)
+  %16 = trunc i64 0 to i32
+  ret i32 %16
 }

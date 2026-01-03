@@ -118,6 +118,8 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		if ctx.LBRACKET() != nil {
 			idxVal := g.Visit(ctx.Expression()).(ir.Value)
 			base := g.getLValue(ctx.PostfixExpression())
+			
+			// If not LValue, use pointer value
 			if base == nil {
 				val := g.Visit(ctx.PostfixExpression()).(ir.Value)
 				if types.IsPointer(val.Type()) {
@@ -126,8 +128,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 			} else {
 				// If variable load, might need deref
 				ptrType := base.Type().(*types.PointerType)
-				if ptrToPtr, ok := ptrType.ElementType.(*types.PointerType); ok {
-					_ = ptrToPtr
+				if _, ok := ptrType.ElementType.(*types.PointerType); ok {
 					base = g.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
 				}
 			}

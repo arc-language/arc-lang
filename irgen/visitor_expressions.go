@@ -240,20 +240,12 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	var curr ir.Value
 
 	if currPtr != nil {
-		// If it's a variable holding a pointer (like 'self'), load the pointer value
-		// to resolve fields on the pointee.
-		if ptrType, ok := currPtr.Type().(*types.PointerType); ok {
-			if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
-				// currPtr is **T (stack slot for parameter *T)
-				// We load it to get *T, which is the base for field access
-				currPtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
-			}
-		}
-		
 		if _, isFn := currPtr.(*ir.Function); isFn {
 			curr = currPtr
 			currPtr = nil
 		} else if ptrType, ok := currPtr.Type().(*types.PointerType); ok {
+			// Just load. We don't auto-deref **T here, as we might need the *T value itself
+			// (e.g. for pointer arithmetic). Auto-deref for fields happens in DOT.
 			curr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 		} else {
 			curr = currPtr
@@ -306,6 +298,14 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			}
 
 			if basePtr != nil {
+				// Handle auto-dereference if basePtr is **T (variable holding pointer)
+				// We need *T (address of struct) to do StructGEP
+				if ptrType, ok := basePtr.Type().(*types.PointerType); ok {
+					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
+						basePtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, basePtr, "")
+					}
+				}
+
 				ptrType := basePtr.Type().(*types.PointerType)
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
 					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
@@ -321,24 +321,20 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 		if op.LBRACKET() != nil {
 			idx := g.Visit(op.Expression()).(ir.Value)
 			
-			var basePtr ir.Value
+			var basePtr ir.Value = currPtr
 			
-			// Decide on base pointer
-			if currPtr != nil {
-				ptrType := currPtr.Type().(*types.PointerType)
-				if _, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
-					basePtr = currPtr
-				}
-			}
-			
-			// If not an array LValue, try to use the pointer value
+			// If not an LValue, try to use the pointer value
 			if basePtr == nil && curr != nil && types.IsPointer(curr.Type()) {
 				basePtr = curr
 			}
 			
-			// Fallback
-			if basePtr == nil && currPtr != nil {
-				basePtr = currPtr
+			// Auto-dereference if **T (e.g. variable holding pointer)
+			if basePtr != nil {
+				if ptrType, ok := basePtr.Type().(*types.PointerType); ok {
+					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
+						basePtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, basePtr, "")
+					}
+				}
 			}
 
 			if basePtr != nil {
@@ -519,7 +515,13 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 									
 									// If method expects a pointer to struct (*T)
 									if _, isPtrParam := firstParam.(*types.PointerType); isPtrParam {
-										// Pass currPtr (which is *T)
+										// Check if we need to pass currPtr directly or load it
+										// currPtr is usually the address of the struct (*T) here after deref logic above.
+										// But if basePtr was originally a variable (**T) and we loaded it to *T...
+										
+										// If basePtr (variable) is **T. 
+										// Logic above: `currPtr = load(**T) -> *T`.
+										// We pass `*T`.
 										newArgs := []ir.Value{currPtr}
 										newArgs = append(newArgs, args...)
 										argsToPass = newArgs

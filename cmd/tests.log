@@ -1558,9 +1558,54 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-malloc_success
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (7 functions)
+panic: Value %3 = load void, ptr<void> %2 (3) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003eb4c8?, {0x6ab3d0, 0xc00026c0c0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:183 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0003eba58, 0x0, {0x6ab3d0, 0xc00026c0c0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:205 +0x205
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0003eba58, {0x6ae250, 0xc000240dc0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/ops.go:304 +0x15e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0003eba58, 0xc0004ece00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:161 +0x5f6
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffefdc8f54a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (7 functions)
+panic: Value %3 = load void, ptr<void> %2 (3) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0003eb4c8?, {0x6ab3d0, 0xc00026c0c0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:183 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0003eba58, 0x0, {0x6ab3d0, 0xc00026c0c0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:205 +0x205
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0003eba58, {0x6ae250, 0xc000240dc0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/ops.go:304 +0x15e5
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0003eba58, 0xc0004ece00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:161 +0x5f6
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffefdc8f54a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
 
 --- Test: extern_libc_printf ---
 Source Code:
@@ -1949,8 +1994,9 @@ func main() int32 {
 }
 
 Run Output:
-value=20
-Result: PASS
+Result: FAIL
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: pointer_arithmetic_sub ---
 Source Code:
@@ -1981,8 +2027,9 @@ func main() int32 {
 }
 
 Run Output:
-value=10
-Result: PASS
+Result: FAIL
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: pointer_array_indexing ---
 Source Code:
@@ -2141,8 +2188,9 @@ func main() int32 {
 }
 
 Run Output:
-value=77
-Result: PASS
+Result: FAIL
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: pointer_non_null ---
 Source Code:
@@ -2202,8 +2250,9 @@ func main() int32 {
 }
 
 Run Output:
-is_null
-Result: PASS
+Result: FAIL
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: pointer_pass_to_function ---
 Source Code:
@@ -2234,9 +2283,74 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-x=888
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+panic: interface conversion: types.Type is *types.IntType, not *types.PointerType
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitAssignmentStmt(0xc0003b13b0, 0xc000259e00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/visitor_statements.go:151 +0x510
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0xc0003b13b0, {0x6ad6e8?, 0xc000259c00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:82 +0x1d47
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitBlock(0xc0003b13b0, 0xc000259b80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/visitor_statements.go:25 +0x305
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x85aa40?, {0x6ad618?, 0xc000259b80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:68 +0x852
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitFunctionDecl(0xc0003b13b0, 0xc000259780)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/visitor_declarations.go:252 +0xd6f
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x859c40?, {0x6ad2d8?, 0xc000259780})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:60 +0x106
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitTopLevelDecl(0xc0003b13b0, 0xc000259700)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/visitor_declarations.go:23 +0x1c8d
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x859b60?, {0x6ad270?, 0xc000259700?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:59 +0x6d1
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitCompilationUnit(0xc0003b13b0, 0xc00015eb80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/visitor_declarations.go:17 +0x2d1
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x857b80?, {0x6ad208?, 0xc00015eb80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:58 +0x705
+github.com/arc-language/arc-lang/irgen.Generate({0x6b8ff0, 0xc00015eb80}, {0x7ffd8049a528, 0x8}, 0xc0001102e0)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:37 +0x245
+github.com/arc-language/arc-lang/compiler.(*Compiler).CompileFile(0xc0003adec8, {0x7ffd8049a516?, 0x65b7fc?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/compiler/compiler.go:68 +0x2ab
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:72 +0x329
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+panic: interface conversion: types.Type is *types.IntType, not *types.PointerType
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitAssignmentStmt(0xc0003b13b0, 0xc000259e00)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/visitor_statements.go:151 +0x510
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0xc0003b13b0, {0x6ad6e8?, 0xc000259c00})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:82 +0x1d47
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitBlock(0xc0003b13b0, 0xc000259b80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/visitor_statements.go:25 +0x305
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x85aa40?, {0x6ad618?, 0xc000259b80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:68 +0x852
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitFunctionDecl(0xc0003b13b0, 0xc000259780)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/visitor_declarations.go:252 +0xd6f
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x859c40?, {0x6ad2d8?, 0xc000259780})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:60 +0x106
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitTopLevelDecl(0xc0003b13b0, 0xc000259700)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/visitor_declarations.go:23 +0x1c8d
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x859b60?, {0x6ad270?, 0xc000259700?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:59 +0x6d1
+github.com/arc-language/arc-lang/irgen.(*Generator).VisitCompilationUnit(0xc0003b13b0, 0xc00015eb80)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/visitor_declarations.go:17 +0x2d1
+github.com/arc-language/arc-lang/irgen.(*Generator).Visit(0x857b80?, {0x6ad208?, 0xc00015eb80?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:58 +0x705
+github.com/arc-language/arc-lang/irgen.Generate({0x6b8ff0, 0xc00015eb80}, {0x7ffd8049a528, 0x8}, 0xc0001102e0)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/irgen/generator.go:37 +0x245
+github.com/arc-language/arc-lang/compiler.(*Compiler).CompileFile(0xc0003adec8, {0x7ffd8049a516?, 0x65b7fc?})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/compiler/compiler.go:68 +0x2ab
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:72 +0x329
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
 
 --- Test: pointer_void_type ---
 Source Code:
@@ -2264,9 +2378,58 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-value=42
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (7 functions)
+panic: Value %2 = load void, ptr<void> %1 (2) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0004ad428?, {0x6ab3d0, 0xc0002f4300})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:183 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004ada58, 0x0, {0x6ab3d0, 0xc0002f4300})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:205 +0x205
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).moveValue(0xc0004ada58, 0x1, 0x0, {0x6ab3d0, 0xc0002f4300})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/ops.go:381 +0x232
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004ada58, {0x6b0f60, 0xc0002f4360})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/ops.go:149 +0x11e7
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004ada58, 0xc000259680)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:161 +0x5f6
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fff9a15b54a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (7 functions)
+panic: Value %2 = load void, ptr<void> %1 (2) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc0004ad428?, {0x6ab3d0, 0xc0002f4300})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:183 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc0004ada58, 0x0, {0x6ab3d0, 0xc0002f4300})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:205 +0x205
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).moveValue(0xc0004ada58, 0x1, 0x0, {0x6ab3d0, 0xc0002f4300})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/ops.go:381 +0x232
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc0004ada58, {0x6b0f60, 0xc0002f4360})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/ops.go:149 +0x11e7
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc0004ada58, 0xc000259680)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:161 +0x5f6
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000b7570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7fff9a15b54a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc0000a8020?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
 
 --- Test: struct_definition ---
 Source Code:
@@ -2575,11 +2738,8 @@ func main() int32 {
 }
 
 Run Output:
-count=10
-Result: FAIL
-Error: assertion failed.
-Expected substring: "count=11"
-Got output: "count=10\n"
+count=11
+Result: PASS
 
 --- Test: struct_nested ---
 Source Code:
@@ -2657,11 +2817,8 @@ func main() int32 {
 }
 
 Run Output:
-x=0 y=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "x=5 y=10"
-Got output: "x=0 y=0\n"
+x=5 y=10
+Result: PASS
 
 --- Test: struct_pass_by_value ---
 Source Code:
@@ -2731,11 +2888,8 @@ func main() int32 {
 }
 
 Run Output:
-x=0
-Result: FAIL
-Error: assertion failed.
-Expected substring: "x=15"
-Got output: "x=0\n"
+x=15
+Result: PASS
 
 --- Test: array_2d ---
 Source Code:
@@ -3221,9 +3375,58 @@ func main() int32 {
     return 0
 }
 
-Run Output:
-value=42
-Result: PASS
+Compile Output:
+Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (7 functions)
+panic: Value %4 = load void, ptr<void> %3 (4) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00057b428?, {0x6ab3d0, 0xc0000c90e0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:183 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00057ba58, 0x0, {0x6ab3d0, 0xc0000c90e0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:205 +0x205
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).moveValue(0xc00057ba58, 0x1, 0x0, {0x6ab3d0, 0xc0000c90e0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/ops.go:381 +0x232
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00057ba58, {0x6b0f60, 0xc0000c9140})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/ops.go:149 +0x11e7
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00057ba58, 0xc0004fb080)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:161 +0x5f6
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000ab570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc3113554a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
+Result: FAIL
+Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
+[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
+[Driver] [INFO] Compilation successful. Module 'test.arc' created.
+✓ Module 'test.arc' compiled (7 functions)
+panic: Value %4 = load void, ptr<void> %3 (4) not allocated in stack map
+
+goroutine 1 [running]:
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).getStackSlot(0xc00057b428?, {0x6ab3d0, 0xc0000c90e0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:183 +0xd4
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).load(0xc00057ba58, 0x0, {0x6ab3d0, 0xc0000c90e0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:205 +0x205
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).moveValue(0xc00057ba58, 0x1, 0x0, {0x6ab3d0, 0xc0000c90e0})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/ops.go:381 +0x232
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileInst(0xc00057ba58, {0x6b0f60, 0xc0000c9140})
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/ops.go:149 +0x11e7
+github.com/arc-language/arc-lang/codegen/arch/amd64.(*compiler).compileFunction(0xc00057ba58, 0xc0004fb080)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:161 +0x5f6
+github.com/arc-language/arc-lang/codegen/arch/amd64.Compile(0xc0000ab570)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/arch/amd64/compiler.go:72 +0x33b
+github.com/arc-language/arc-lang/codegen/codegen.GenerateObject(0x7ffc3113554a?)
+	/go/pkg/mod/github.com/arc-language/arc-lang@v0.0.0-20260103013044-716b39613706/codegen/codegen/codegen.go:17 +0x25
+main.handleBuild({0xc000022070?, 0x0?, 0x0?})
+	/workspaces/arc-lang/cmd/main.go:96 +0x465
+main.main()
+	/workspaces/arc-lang/cmd/main.go:24 +0xad
 
 --- Test: cast_signed_to_unsigned ---
 Source Code:
@@ -3946,11 +4149,9 @@ func main() int32 {
 }
 
 Run Output:
-Hello ${name}, age ${age}
 Result: FAIL
-Error: assertion failed.
-Expected substring: "Hello Alice, age 30"
-Got output: "Hello ${name}, age ${age}\n"
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: try_except_placeholder ---
 Source Code:
@@ -4290,4 +4491,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 104 | Failed: 30 | Total Time: 9.49s
+Passed: 99 | Failed: 35 | Total Time: 9.93s
