@@ -36,7 +36,28 @@ func main() {
 }
 ```
 
+## Use as a template for builder pipelines, example C++ 
+```arc 
+// libs/builder.arc
+struct CppBuilder<compute> {
+    // ... wrapper around docker.Container ...
+    init(..., commands: []string) {
+        // ... pre-installs cmake/gcc ...
+        // ... runs user commands ...
+    }
+}
 
+// build.arc
+import "libs/builder"
+
+func main() {
+    // already has c++ install
+    // Looks like a local function, runs in isolated Docker
+    CppBuilder func() {
+        sys.exec("make", "release")
+    }()
+}
+```
 
 ## Compute Templates, basic definition
 
