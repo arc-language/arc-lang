@@ -2,6 +2,16 @@
 
 Arc structs are **already binary-compatible** with C++ POD (Plain Old Data) types. Since Arc compiles to `.o` files with proper ABI-compliant struct layouts, you can pass Arc structs directly to C++ functions without conversion.
 
+## Usage
+```arc
+import "windows/directx/d3d11"
+
+func main() {
+    let device = d3d11.create_device()
+    // Just works - no C++ compiler needed!
+}
+```
+
 ## What Works Now ✅
 
 ### Struct Layout Compatibility
