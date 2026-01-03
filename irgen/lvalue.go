@@ -89,9 +89,6 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		if ctx.DOT() != nil {
 			base := g.getLValue(ctx.PostfixExpression())
 			if base == nil {
-				// If base is not an l-value (e.g. function call return), we can't assign to field?
-				// Actually, we might be able to if we loaded it? No, assignments require address.
-				// Try visiting to get the pointer value if it's a pointer type?
 				val := g.Visit(ctx.PostfixExpression()).(ir.Value)
 				if types.IsPointer(val.Type()) {
 					base = val
@@ -99,6 +96,13 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 			}
 			
 			if base != nil {
+				// Handle auto-dereference if base is **T
+				if ptrType, ok := base.Type().(*types.PointerType); ok {
+					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
+						base = g.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
+					}
+				}
+
 				fieldName := ctx.IDENTIFIER().GetText()
 				ptrType := base.Type().(*types.PointerType)
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
@@ -113,34 +117,19 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		// postfixExpression LBRACKET expression RBRACKET
 		if ctx.LBRACKET() != nil {
 			idxVal := g.Visit(ctx.Expression()).(ir.Value)
-			
-			// Get the base address.
-			// 1. Try getLValue (if it's an array variable)
 			base := g.getLValue(ctx.PostfixExpression())
-			
-			// 2. If nil, try Visit (if it's a pointer value, e.g. from function call or pointer variable)
 			if base == nil {
 				val := g.Visit(ctx.PostfixExpression()).(ir.Value)
 				if types.IsPointer(val.Type()) {
-					// It's a pointer value, so that IS the base address
 					base = val
 				}
 			} else {
-				// If we got an l-value, we need to load it if it's a pointer variable (double pointer)
-				// OR if it's an array, decay it.
-				// `getLValue` returns the address of the variable.
-				// If `arr` is `*i32` (variable), `getLValue` returns `**i32`.
-				// If `arr` is `[5 x i32]`, `getLValue` returns `*[5 x i32]`.
-				
+				// If variable load, might need deref
 				ptrType := base.Type().(*types.PointerType)
-				
-				// Case A: Variable holding a pointer (*int32)
 				if ptrToPtr, ok := ptrType.ElementType.(*types.PointerType); ok {
 					_ = ptrToPtr
-					// Load the actual pointer value
 					base = g.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
 				}
-				// Case B: Array (don't load, just GEP)
 			}
 
 			if base != nil {
@@ -167,6 +156,50 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		if ctx.Expression() != nil {
 			return g.getLValue(ctx.Expression())
 		}
+		
+		// Qualified Identifier L-Value Support
+		if ctx.QualifiedIdentifier() != nil {
+			qCtx := ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
+			ids := qCtx.AllIDENTIFIER()
+			baseName := ids[0].GetText()
+			
+			var addr ir.Value
+			// Resolve base
+			if sym, ok := g.currentScope.Resolve(baseName); ok {
+				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
+					addr = alloca
+				} else if glob := g.ctx.Module.GetGlobal(baseName); glob != nil {
+					addr = glob
+				} else {
+					addr = sym.IRValue
+				}
+			}
+			
+			if addr == nil { return nil }
+
+			// Auto-dereference if it's **T (e.g. mutating self param)
+			if ptrType, ok := addr.Type().(*types.PointerType); ok {
+				if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
+					addr = g.ctx.Builder.CreateLoad(ptrType.ElementType, addr, "")
+				}
+			}
+
+			for i := 1; i < len(ids); i++ {
+				fieldName := ids[i].GetText()
+				ptrType, isPtr := addr.Type().(*types.PointerType)
+				if !isPtr { return nil }
+				
+				if st, ok := ptrType.ElementType.(*types.StructType); ok {
+					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
+						addr = g.ctx.Builder.CreateStructGEP(st, addr, idx, "")
+						continue
+					}
+				}
+				return nil
+			}
+			return addr
+		}
+
 		if ctx.IDENTIFIER() != nil {
 			name := ctx.IDENTIFIER().GetText()
 			if sym, ok := g.currentScope.Resolve(name); ok {
@@ -200,6 +233,13 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		addr := g.getLValue(baseExpr)
 		
 		if addr == nil { return nil }
+		
+		// Auto-dereference base if **T
+		if ptrType, ok := addr.Type().(*types.PointerType); ok {
+			if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
+				addr = g.ctx.Builder.CreateLoad(ptrType.ElementType, addr, "")
+			}
+		}
 
 		for _, op := range ctx.AllPostfixOp() {
 			if op.DOT() != nil {

@@ -17,12 +17,11 @@ entry:
   %0 = trunc i64 10 to i32
   %1 = insertvalue %Counter zeroinitializer, i32 %0, 0
   store %Counter %1, ptr<%Counter> %counter.addr
-  %2 = load %Counter, ptr<%Counter> %counter.addr
-  call void @Counter_increment(%Counter %2)
-  %3 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
-  %4 = getelementptr %Counter, ptr<%Counter> %counter.addr, i32 0, i32 0
-  %5 = load i32, ptr<i32> %4
-  %6 = call i32 @printf(ptr<i8> %3, i32 %5)
-  %7 = trunc i64 0 to i32
-  ret i32 %7
+  call void @Counter_increment(ptr<%Counter> %counter.addr)
+  %2 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
+  %3 = getelementptr %Counter, ptr<%Counter> %counter.addr, i32 0, i32 0
+  %4 = load i32, ptr<i32> %3
+  %5 = call i32 @printf(ptr<i8> %2, i32 %4)
+  %6 = trunc i64 0 to i32
+  ret i32 %6
 }

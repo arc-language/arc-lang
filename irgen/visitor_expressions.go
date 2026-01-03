@@ -484,6 +484,14 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			
 			if basePtr != nil {
 				currPtr := basePtr
+				
+				// Handle auto-dereference if basePtr is **T (e.g. mutating method param)
+				if ptrType, ok := currPtr.Type().(*types.PointerType); ok {
+					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
+						currPtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
+					}
+				}
+
 				valid := true
 				
 				for i := 1; i < len(ids); i++ {
@@ -506,17 +514,12 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 								entity = methodSym.IRValue
 								
 								// Determine if we need to pass address (for mutating/pointer receiver) or value
-								// Check the first parameter type of the function
 								if fn, ok := entity.(*ir.Function); ok && len(fn.FuncType.ParamTypes) > 0 {
 									firstParam := fn.FuncType.ParamTypes[0]
 									
 									// If method expects a pointer to struct (*T)
 									if _, isPtrParam := firstParam.(*types.PointerType); isPtrParam {
-										// We pass currPtr (which is *T)
-										// BUT: If currPtr is **T (from variable load), we might need logic.
-										// Assuming currPtr is the address of the struct.
-										
-										// Important: If basePtr came from a variable 'counter', currPtr is its address.
+										// Pass currPtr (which is *T)
 										newArgs := []ir.Value{currPtr}
 										newArgs = append(newArgs, args...)
 										argsToPass = newArgs
