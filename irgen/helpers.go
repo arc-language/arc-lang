@@ -69,6 +69,32 @@ func (g *Generator) emitCast(val ir.Value, target types.Type) ir.Value {
 	src := val.Type()
 	if src.Equal(target) { return val }
 	
+	// Constant Folding
+	if cInt, ok := val.(*ir.ConstantInt); ok {
+		if tInt, ok := target.(*types.IntType); ok {
+			// Integer -> Integer
+			// Masking handles truncation and extension implicitly for 2's complement
+			// except for sign extension if we care about the Go int64 value
+			return g.ctx.Builder.ConstInt(tInt, cInt.Value)
+		}
+		if tFloat, ok := target.(*types.FloatType); ok {
+			// Integer -> Float
+			return g.ctx.Builder.ConstFloat(tFloat, float64(cInt.Value))
+		}
+	}
+	
+	if cFloat, ok := val.(*ir.ConstantFloat); ok {
+		if tInt, ok := target.(*types.IntType); ok {
+			// Float -> Integer
+			return g.ctx.Builder.ConstInt(tInt, int64(cFloat.Value))
+		}
+		if tFloat, ok := target.(*types.FloatType); ok {
+			// Float -> Float
+			return g.ctx.Builder.ConstFloat(tFloat, cFloat.Value)
+		}
+	}
+
+	// Runtime Casting
 	if types.IsInteger(src) && types.IsInteger(target) {
 		if src.BitSize() > target.BitSize() { return g.ctx.Builder.CreateTrunc(val, target, "") }
 		return g.ctx.Builder.CreateSExt(val, target, "")
