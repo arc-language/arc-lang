@@ -2503,16 +2503,9 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Undefined identifier 'c.value'
-/tmp/arc_test_env/test.arc:17:0: Return type mismatch: expected i32, got void
-Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Undefined identifier 'c.value'
-/tmp/arc_test_env/test.arc:17:0: Return type mismatch: expected i32, got void
+Run Output:
+value=42
+Result: PASS
 
 --- Test: struct_multiple_fields ---
 Source Code:
@@ -2630,11 +2623,11 @@ func main() int32 {
 }
 
 Run Output:
-end_x=1322298096
+end_x=416930544
 Result: FAIL
 Error: assertion failed.
 Expected substring: "end_x=10"
-Got output: "end_x=1322298096\n"
+Got output: "end_x=416930544\n"
 
 --- Test: struct_pass_by_pointer ---
 Source Code:
@@ -4305,4 +4298,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 101 | Failed: 33 | Total Time: 9.19s
+Passed: 102 | Failed: 32 | Total Time: 9.52s

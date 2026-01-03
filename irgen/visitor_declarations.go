@@ -108,6 +108,13 @@ func (g *Generator) visitExternFunctionDecl(ctx *parser.ExternFunctionDeclContex
 }
 
 func (g *Generator) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
+	name := ctx.IDENTIFIER().GetText()
+	if sym, ok := g.currentScope.Resolve(name); ok {
+		if st, ok := sym.Type.(*types.StructType); ok {
+			g.ctx.Builder.DefineStruct(st)
+		}
+	}
+
 	for _, member := range ctx.AllStructMember() {
 		if member.FunctionDecl() != nil {
 			g.Visit(member.FunctionDecl())
@@ -117,6 +124,13 @@ func (g *Generator) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 }
 
 func (g *Generator) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
+	name := ctx.IDENTIFIER().GetText()
+	if sym, ok := g.currentScope.Resolve(name); ok {
+		if st, ok := sym.Type.(*types.StructType); ok {
+			g.ctx.Builder.DefineStruct(st)
+		}
+	}
+
 	for _, member := range ctx.AllClassMember() {
 		if member.FunctionDecl() != nil {
 			g.Visit(member.FunctionDecl())

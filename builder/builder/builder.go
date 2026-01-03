@@ -125,6 +125,12 @@ func (b *Builder) DeclareFunction(name string, retType types.Type, params []type
 	return fn
 }
 
+func (b *Builder) DefineStruct(st *types.StructType) {
+	if b.module != nil && st.Name != "" {
+		b.module.Types[st.Name] = st
+	}
+}
+
 func (b *Builder) CreateGlobalVariable(name string, typ types.Type, initializer ir.Constant) *ir.Global {
 	g := &ir.Global{
 		Initializer: initializer,

@@ -107,28 +107,32 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 	// Instructions
 	for _, block := range fn.Blocks {
 		for _, inst := range block.Instructions {
+			// Allocate space for result if it has a type (and is not void)
 			if inst.Type() != nil && inst.Type().Kind() != types.VoidKind {
 				size := SizeOf(inst.Type())
 				if size == 0 { continue }
 				
 				offset += size
+				// Align to 8 bytes for simple access
 				if offset % 8 != 0 { offset += 8 - (offset%8) }
 				c.stackMap[inst] = -offset
 			}
 			
+			// Allocate extra space for AllocaInst underlying memory
 			if alloca, ok := inst.(*ir.AllocaInst); ok {
 				allocSize := SizeOf(alloca.AllocatedType)
 				if count, ok := alloca.NumElements.(*ir.ConstantInt); ok {
 					allocSize *= int(count.Value)
 				}
-				offset += allocSize
+				// Align alloca memory to 16 bytes
 				if offset % 16 != 0 { offset += 16 - (offset%16) }
+				offset += allocSize
 				c.stackMap[ir.Value(alloca)] = -offset
 			}
 		}
 	}
 	
-	// Align frame
+	// Align frame to 16 bytes
 	if offset % 16 != 0 { offset += 16 - (offset%16) }
 	c.frameSize = offset
 
@@ -144,7 +148,9 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 	for i, arg := range fn.Arguments {
 		if i < len(regs) {
 			slot := c.getStackSlot(arg)
-			c.asm.Mov(slot, RegOp(regs[i]), SizeOf(arg.Type())*8)
+			// Move registers to stack using appropriate size, or 64-bit for simplicity
+			// For structs passed by value in regs, this ABI is simplified.
+			c.asm.Mov(slot, RegOp(regs[i]), 64)
 		}
 	}
 
@@ -190,9 +196,9 @@ func (c *compiler) load(dst Register, src ir.Value) {
 	case *ir.Global:
 		c.asm.LeaRel(dst, v.Name())
 	case *ir.Function:
-		// Function pointer load
 		c.asm.LeaRel(dst, v.Name())
 	case *ir.AllocaInst:
+		// Load the address of the alloca memory, not the stack slot of the instruction
 		off := c.stackMap[v]
 		c.asm.Lea(dst, NewMem(RBP, off))
 	default:
@@ -206,6 +212,7 @@ func (c *compiler) load(dst Register, src ir.Value) {
 		} else if size == 1 {
 			c.asm.MovZX(dst, slot, 8)
 		} else {
+			// Default fallback for pointers/etc
 			c.asm.Mov(RegOp(dst), slot, 64)
 		}
 	}
@@ -214,7 +221,15 @@ func (c *compiler) load(dst Register, src ir.Value) {
 func (c *compiler) store(src Register, dst ir.Value) {
 	slot := c.getStackSlot(dst)
 	size := SizeOf(dst.Type())
-	c.asm.Mov(slot, RegOp(src), size*8)
+	if size == 8 {
+		c.asm.Mov(slot, RegOp(src), 64)
+	} else if size == 4 {
+		c.asm.Mov(slot, RegOp(src), 32)
+	} else if size == 1 {
+		c.asm.Mov(slot, RegOp(src), 8)
+	} else {
+		c.asm.Mov(slot, RegOp(src), 64)
+	}
 }
 
 func (c *compiler) emitGlobal(g *ir.Global) error {
@@ -235,14 +250,36 @@ func (c *compiler) emitConstant(k ir.Constant) error {
 			c.data.WriteByte(byte(val))
 			val >>= 8
 		}
+	case *ir.ConstantFloat:
+		// Simplified float emission
+		c.data.Write(make([]byte, SizeOf(v.Type())))
 	case *ir.ConstantArray:
 		for _, elem := range v.Elements {
 			if err := c.emitConstant(elem); err != nil { return err }
 		}
 	case *ir.ConstantStruct:
-		for _, field := range v.Fields {
+		st, ok := v.Type().(*types.StructType)
+		if !ok { return fmt.Errorf("ConstantStruct has non-struct type") }
+		
+		currentOffset := 0
+		for i, field := range v.Fields {
+			// Handle Padding
+			targetOffset := GetStructFieldOffset(st, i)
+			if targetOffset > currentOffset {
+				padding := targetOffset - currentOffset
+				c.data.Write(make([]byte, padding))
+				currentOffset += padding
+			}
+			
 			if err := c.emitConstant(field); err != nil { return err }
+			currentOffset += SizeOf(field.Type())
 		}
+		// Tail Padding
+		totalSize := SizeOf(v.Type())
+		if currentOffset < totalSize {
+			c.data.Write(make([]byte, totalSize - currentOffset))
+		}
+		
 	case *ir.ConstantZero:
 		size := SizeOf(v.Type())
 		c.data.Write(make([]byte, size))

@@ -5,20 +5,17 @@ extern libc {
 }
 
 
-struct Counter {
-    value: int32
-    
-    func get(self c: Counter) int32 {
-        return c.value
-    }
+struct Person {
+    age: int32
+    height: int32
+    weight: int32
 }
 
 
 func main() int32 {
 
-    let counter = Counter{value: 42}
-    let val = counter.get()
-    libc.printf("value=%d\n", val)
+    let person = Person{age: 30, height: 180, weight: 75}
+    libc.printf("age=%d height=%d\n", person.age, person.height)
 
     return 0
 }
