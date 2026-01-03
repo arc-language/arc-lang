@@ -35,7 +35,7 @@ func (a *Analyzer) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface{
 	if ctx.StructDecl() != nil { return a.Visit(ctx.StructDecl()) }
 	if ctx.ClassDecl() != nil { return a.Visit(ctx.ClassDecl()) }
 	if ctx.ExternDecl() != nil { return a.Visit(ctx.ExternDecl()) }
-	if ctx.ConstDecl() != nil { return a.Visit(ctx.ConstDecl()) } // Added
+	if ctx.ConstDecl() != nil { return a.Visit(ctx.ConstDecl()) }
 	return nil
 }
 
@@ -212,17 +212,33 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 	sym, _ := a.currentScope.Resolve(name)
 	if sym == nil { return nil }
 	st := sym.Type.(*types.StructType)
+	
 	var fields []types.Type
 	indices := make(map[string]int)
-	for i, member := range ctx.AllStructMember() {
+	fieldCount := 0
+
+	// Pass 1: Collect Fields
+	for _, member := range ctx.AllStructMember() {
 		if f := member.StructField(); f != nil {
 			fields = append(fields, a.resolveType(f.Type_()))
-			indices[f.IDENTIFIER().GetText()] = i
+			indices[f.IDENTIFIER().GetText()] = fieldCount
+			fieldCount++
 		}
-		if m := member.FunctionDecl(); m != nil { a.Visit(m) }
 	}
+	
+	// Update Struct definition immediately so methods can resolve fields
 	st.Fields = fields
 	a.structIndices[name] = indices
+	
+	// Pass 2: Analyze Methods
+	for _, member := range ctx.AllStructMember() {
+		if m := member.FunctionDecl(); m != nil { 
+			a.Visit(m) 
+		}
+		if m := member.MutatingDecl(); m != nil {
+			a.Visit(m)
+		}
+	}
 	return nil
 }
 
@@ -231,17 +247,33 @@ func (a *Analyzer) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 	sym, _ := a.currentScope.Resolve(name)
 	if sym == nil { return nil }
 	st := sym.Type.(*types.StructType)
+	
 	var fields []types.Type
 	indices := make(map[string]int)
-	for i, member := range ctx.AllClassMember() {
+	fieldCount := 0
+
+	// Pass 1: Collect Fields
+	for _, member := range ctx.AllClassMember() {
 		if f := member.ClassField(); f != nil {
 			fields = append(fields, a.resolveType(f.Type_()))
-			indices[f.IDENTIFIER().GetText()] = i
+			indices[f.IDENTIFIER().GetText()] = fieldCount
+			fieldCount++
 		}
-		if m := member.FunctionDecl(); m != nil { a.Visit(m) }
 	}
+	
+	// Update Class/Struct definition immediately
 	st.Fields = fields
 	a.structIndices[name] = indices
+
+	// Pass 2: Analyze Methods
+	for _, member := range ctx.AllClassMember() {
+		if m := member.FunctionDecl(); m != nil { 
+			a.Visit(m) 
+		}
+		if d := member.DeinitDecl(); d != nil {
+			a.Visit(d)
+		}
+	}
 	return nil
 }
 

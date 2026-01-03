@@ -4,13 +4,21 @@ extern libc {
     func printf(*byte, ...) int32
 }
 
+
+struct Counter {
+    value: int32
+    
+    func get(self c: Counter) int32 {
+        return c.value
+    }
+}
+
+
 func main() int32 {
 
-    let arr = alloca<int32>(3)
-    arr[0] = 100
-    arr[1] = 200
-    arr[2] = 300
-    libc.printf("arr[1]=%d\n", arr[1])
+    let counter = Counter{value: 42}
+    let val = counter.get()
+    libc.printf("value=%d\n", val)
 
     return 0
 }
