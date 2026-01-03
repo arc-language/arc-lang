@@ -544,3 +544,34 @@ func (a *Assembler) LeaRel(dst Register, symbol string) {
 	})
 	a.emitInt32(0)
 }
+
+func (a *Assembler) Cvttss2si(dst Register, src MemOp) {
+	// F3 0F 2C /r (CVTTSS2SI r32, xmm2/m32)
+	// Note: destination is GPR (r32/r64), source is Memory (float)
+	a.emitByte(0xF3)
+	a.encodeRex(false, dst, NoReg, src.Base) // W=0 for 32-bit dest int
+	a.emitByte(0x0F)
+	a.emitByte(0x2C)
+	a.encodeModRM(dst, src)
+}
+
+func (a *Assembler) Cvtsi2ss(dst Register, src MemOp) {
+	// F3 0F 2A /r (CVTSI2SS xmm1, r32/m32)
+	// Destination is XMM, but we use 'dst' register index as placeholder for XMM0-15
+	// Source is Memory (int)
+	a.emitByte(0xF3)
+	a.encodeRex(false, dst, NoReg, src.Base)
+	a.emitByte(0x0F)
+	a.emitByte(0x2A)
+	a.encodeModRM(dst, src)
+}
+
+func (a *Assembler) Movss(dst MemOp, src Register) {
+	// F3 0F 11 /r (MOVSS xmm2/m32, xmm1)
+	// Store XMM (src) to Memory (dst)
+	a.emitByte(0xF3)
+	a.encodeRex(false, src, NoReg, dst.Base)
+	a.emitByte(0x0F)
+	a.emitByte(0x11)
+	a.encodeModRM(src, dst)
+}

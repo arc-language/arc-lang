@@ -6,10 +6,9 @@ extern libc {
 
 func main() int32 {
 
-    let value: int32 = 77
-    let ptr: *int32 = &value
-    let pptr: **int32 = &ptr
-    libc.printf("value=%d\n", **pptr)
+    let f: float32 = 3.9
+    let i: int32 = cast<int32>(f)
+    libc.printf("int=%d\n", i)
 
     return 0
 }
