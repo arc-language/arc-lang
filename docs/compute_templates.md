@@ -17,6 +17,10 @@ func main() {
 
     // Usage: Namespace.Type func()
     let job = mydocker2.Container func(x: int) int {
+
+        let x = channel<*byte>
+        x.send(...)
+
         
         // This code runs INSIDE the container
         // Dependencies linked in the binary are available automatically
