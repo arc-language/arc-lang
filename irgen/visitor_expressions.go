@@ -311,9 +311,26 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 		if op.LBRACKET() != nil {
 			idx := g.Visit(op.Expression()).(ir.Value)
 			
-			var basePtr ir.Value = currPtr
+			var basePtr ir.Value
+			
+			// Decide on base pointer
+			if currPtr != nil {
+				// Only use currPtr if it points to an Array (e.g. [N]T)
+				// If it points to a pointer (e.g. *T), we must use the value (curr) instead
+				ptrType := currPtr.Type().(*types.PointerType)
+				if _, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
+					basePtr = currPtr
+				}
+			}
+			
+			// If not an array LValue, try to use the pointer value
 			if basePtr == nil && curr != nil && types.IsPointer(curr.Type()) {
 				basePtr = curr
+			}
+			
+			// Fallback (unlikely if semantic analysis passed)
+			if basePtr == nil && currPtr != nil {
+				basePtr = currPtr
 			}
 
 			if basePtr != nil {

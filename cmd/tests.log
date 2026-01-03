@@ -2012,11 +2012,11 @@ func main() int32 {
 }
 
 Run Output:
-arr[1]=1816410248
+arr[1]=1458461544
 Result: FAIL
 Error: assertion failed.
 Expected substring: "arr[1]=200"
-Got output: "arr[1]=1816410248\n"
+Got output: "arr[1]=1458461544\n"
 
 --- Test: pointer_basic_type ---
 Source Code:
@@ -2633,11 +2633,8 @@ func main() int32 {
 }
 
 Run Output:
-end_x=1231018736
-Result: FAIL
-Error: assertion failed.
-Expected substring: "end_x=10"
-Got output: "end_x=1231018736\n"
+end_x=1019087600
+Result: PASS
 
 --- Test: struct_pass_by_pointer ---
 Source Code:
@@ -4307,4 +4304,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 101 | Failed: 33 | Total Time: 9.31s
+Passed: 102 | Failed: 32 | Total Time: 10.49s
