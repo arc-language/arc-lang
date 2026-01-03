@@ -12,6 +12,64 @@ arc solves this with **namespace imports**:
 
 **Remember:** It's all just machine code calling kernel functions. The imports just organize it cleanly.
 
+
+# May need to organize and make wrappers for some callbacks 
+
+### API Growth Over Time:
+```
+Windows NT 3.1 (1993):   ~800 APIs
+Windows NT 4.0 (1996):   ~1,200 APIs
+Windows 2000:            ~1,800 APIs
+Windows XP:              ~2,200 APIs
+Windows Vista:           ~3,000 APIs
+Windows 7:               ~3,500 APIs
+Windows 8:               ~4,500 APIs
+Windows 10:              ~5,500 APIs
+Windows 11:              ~6,000+ APIs
+
+github.com/arc-lang/windows/kernel/
+├── raw/                          # Direct extern bindings
+│   ├── ntoskrnl/                # Core kernel (ntoskrnl.exe)
+│   │   ├── io.arc              # Io* functions
+│   │   ├── mm.arc              # Mm* functions
+│   │   ├── ex.arc              # Ex* functions
+│   │   ├── ke.arc              # Ke* functions
+│   │   ├── rtl.arc             # Rtl* functions
+│   │   ├── ps.arc              # Ps* functions
+│   │   └── zw.arc              # Zw* functions
+│   ├── wdf/                     # Windows Driver Framework
+│   │   ├── device.arc
+│   │   ├── io.arc
+│   │   └── memory.arc
+│   └── ndis/                    # Network drivers
+│       ├── core.arc
+│       └── packet.arc
+├── types/                       # Type definitions
+│   ├── core.arc                # NTSTATUS, UNICODE_STRING, etc.
+│   ├── irp.arc                 # IRP, IO_STACK_LOCATION, etc.
+│   └── device.arc              # DEVICE_OBJECT, DRIVER_OBJECT, etc.
+└── abstractions/                # High-level wrappers
+    ├── driver/                  # Driver helpers
+    │   ├── core.arc
+    │   └── callbacks.arc
+    ├── io/                      # I/O abstractions
+    │   └── request.arc
+    └── memory/                  # Memory helpers
+        └── pool.arc
+
+extern "ntoskrnl.exe" {
+    func IoCreateDevice(
+        DriverObject: *types.DRIVER_OBJECT,
+        DeviceExtensionSize: uint32,
+        DeviceName: *types.UNICODE_STRING,
+        DeviceType: uint32,
+        DeviceCharacteristics: uint32,
+        Exclusive: bool,
+        DeviceObject: **types.DEVICE_OBJECT
+    ) types.NTSTATUS
+}
+```
+
 ## Complete Import Reference
 
 ### Network Stack 🌐
