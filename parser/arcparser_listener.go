@@ -119,12 +119,6 @@ type ArcParserListener interface {
 	// EnterFunctionType is called when entering the functionType production.
 	EnterFunctionType(c *FunctionTypeContext)
 
-	// EnterGpuVectorType is called when entering the gpuVectorType production.
-	EnterGpuVectorType(c *GpuVectorTypeContext)
-
-	// EnterGpuMatrixType is called when entering the gpuMatrixType production.
-	EnterGpuMatrixType(c *GpuMatrixTypeContext)
-
 	// EnterQualifiedIdentifier is called when entering the qualifiedIdentifier production.
 	EnterQualifiedIdentifier(c *QualifiedIdentifierContext)
 
@@ -394,12 +388,6 @@ type ArcParserListener interface {
 
 	// ExitFunctionType is called when exiting the functionType production.
 	ExitFunctionType(c *FunctionTypeContext)
-
-	// ExitGpuVectorType is called when exiting the gpuVectorType production.
-	ExitGpuVectorType(c *GpuVectorTypeContext)
-
-	// ExitGpuMatrixType is called when exiting the gpuMatrixType production.
-	ExitGpuMatrixType(c *GpuMatrixTypeContext)
 
 	// ExitQualifiedIdentifier is called when exiting the qualifiedIdentifier production.
 	ExitQualifiedIdentifier(c *QualifiedIdentifierContext)

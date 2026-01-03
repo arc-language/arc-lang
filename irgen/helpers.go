@@ -1,6 +1,8 @@
 package irgen
 
 import (
+	"strconv"
+
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
@@ -16,13 +18,13 @@ func (g *Generator) resolveType(ctx parser.ITypeContext) types.Type {
 		case "int16": return types.I16
 		case "int32": return types.I32
 		case "int64": return types.I64
-		case "isize": return types.I64 // Platform specific usually
+		case "isize": return types.I64 
 		
 		case "uint8", "byte": return types.U8
 		case "uint16": return types.U16
 		case "uint32": return types.U32
 		case "uint64": return types.U64
-		case "usize": return types.U64 // Platform specific usually
+		case "usize": return types.U64 
 		
 		case "float": return types.F64
 		case "float32": return types.F32
@@ -35,8 +37,32 @@ func (g *Generator) resolveType(ctx parser.ITypeContext) types.Type {
 	if tc.PointerType() != nil {
 		return types.NewPointer(g.resolveType(tc.PointerType().Type_()))
 	}
+	
+	// Generics / Arrays
 	if tc.IDENTIFIER() != nil {
 		name := tc.IDENTIFIER().GetText()
+		
+		if name == "array" && tc.GenericArgs() != nil {
+			args := tc.GenericArgs().GenericArgList().AllGenericArg()
+			if len(args) == 2 {
+				// Type
+				var elemType types.Type
+				if tCtx := args[0].Type_(); tCtx != nil {
+					elemType = g.resolveType(tCtx)
+				}
+				// Size
+				var length int64
+				if exprCtx := args[1].Expression(); exprCtx != nil {
+					if val, err := strconv.ParseInt(exprCtx.GetText(), 0, 64); err == nil {
+						length = val
+					}
+				}
+				if elemType != nil && length > 0 {
+					return types.NewArray(elemType, length)
+				}
+			}
+		}
+
 		if s, ok := g.currentScope.Resolve(name); ok { return s.Type }
 	}
 	return types.I64

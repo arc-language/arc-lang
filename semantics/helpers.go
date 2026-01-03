@@ -1,6 +1,7 @@
 package semantics
 
 import (
+	"strconv"
 
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
@@ -31,7 +32,6 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 
 	// 3. References
 	if tc.ReferenceType() != nil {
-		// Treat as pointer for now in type system
 		return types.NewPointer(a.resolveType(tc.ReferenceType().Type_()))
 	}
 
@@ -41,7 +41,6 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 		var genericArgs parser.IGenericArgsContext
 
 		if tc.QualifiedType() != nil {
-			// Handle: io.Writer or vector<int>
 			qt := tc.QualifiedType()
 			for i, id := range qt.AllIDENTIFIER() {
 				if i > 0 { name += "." }
@@ -62,20 +61,34 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 
 		// Handle Generics
 		if genericArgs != nil {
-			// This is a simplified Generic handling.
-			// In a full compiler, we would instantiate a new StructType specific to these args.
-			// For now, we return a special formatted name or the generic base for placeholders.
-			if name == "vector" {
-				// return types.NewVector(innerType) - requires builder update
-				// For now, mapping to a struct pointer placeholder
-				return types.NewPointer(types.I8) 
-			}
+			// array<T, N>
 			if name == "array" {
-				// array<T, Size>
-				// Parsing arguments for array is tricky here as array size is an Expression, not just Type
-				// Implementation skipped for brevity, defaults to pointer
-				return types.NewPointer(types.I8)
+				args := genericArgs.GenericArgList().AllGenericArg()
+				if len(args) == 2 {
+					// Arg 0: Type
+					var elemType types.Type
+					if tCtx := args[0].Type_(); tCtx != nil {
+						elemType = a.resolveType(tCtx)
+					}
+					
+					// Arg 1: Size (Expression)
+					var length int64
+					if exprCtx := args[1].Expression(); exprCtx != nil {
+						if lit := exprCtx.GetText(); lit != "" {
+							if val, err := strconv.ParseInt(lit, 0, 64); err == nil {
+								length = val
+							}
+						}
+					}
+					
+					if elemType != nil && length > 0 {
+						return types.NewArray(elemType, length)
+					}
+				}
 			}
+			
+			// Fallback for other generics
+			return types.NewPointer(types.I8) 
 		}
 
 		return s.Type

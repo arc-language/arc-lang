@@ -1,4 +1,3 @@
-// ArcLexer.g4
 lexer grammar ArcLexer;
 
 // =============================================================================
@@ -63,12 +62,9 @@ CHAR: 'char';
 STRING: 'string';
 VOID: 'void';
 
-// GPU Specific Types
+// GPU Specific Types (Now Identifiers)
 FLOAT16: 'float16';
 BFLOAT16: 'bfloat16';
-VECTOR2: 'vector2';
-VECTOR4: 'vector4';
-MATRIX: 'matrix';
 
 // =============================================================================
 // Operators

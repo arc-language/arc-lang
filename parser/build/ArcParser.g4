@@ -1,4 +1,3 @@
-// ArcParser.g4
 parser grammar ArcParser;
 
 options {
@@ -80,7 +79,7 @@ tuplePattern: LPAREN IDENTIFIER (COMMA IDENTIFIER)+ RPAREN;
 tupleType: LPAREN typeList RPAREN;
 
 // =============================================================================
-// Type System (Updated with GPU Types)
+// Type System
 // =============================================================================
 
 type
@@ -89,8 +88,6 @@ type
     | referenceType
     | qualifiedType
     | functionType
-    | gpuVectorType            // vector2<T>, vector4<T>
-    | gpuMatrixType            // matrix<T, M, N>
     | IDENTIFIER genericArgs?
     | UNDERSCORE
     ;
@@ -99,12 +96,6 @@ qualifiedType: IDENTIFIER DOT IDENTIFIER genericArgs?;
 
 functionType: ASYNC? FUNC genericParams? LPAREN typeList? RPAREN returnType?;
 
-// New GPU Vector types
-gpuVectorType: (VECTOR2 | VECTOR4) LT type GT;
-
-// New GPU Matrix type
-gpuMatrixType: MATRIX LT type COMMA expression COMMA expression GT;
-
 qualifiedIdentifier: IDENTIFIER (DOT IDENTIFIER)+;
 
 primitiveType
@@ -112,7 +103,7 @@ primitiveType
     | UINT8 | UINT16 | UINT32 | UINT64
     | USIZE | ISIZE
     | FLOAT32 | FLOAT64
-    | FLOAT16 | BFLOAT16       // Added Half Precision & BFloat16
+    | FLOAT16 | BFLOAT16
     | BYTE | BOOL | CHAR | STRING | VOID
     ;
 

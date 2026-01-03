@@ -25,41 +25,25 @@ func InitGlobalScope(s *Scope) {
 	s.Define("string", SymType, types.NewPointer(types.I8))
 
 	// --- Collections (Generic Placeholders) ---
-	// Note: In a real implementation, these would be backed by actual StructTypes
-	// loaded from the stdlib. For now, we define them so resolution succeeds.
-	s.Define("vector", SymType, types.Void) // Placeholder for generic logic
+	s.Define("vector", SymType, types.Void)
 	s.Define("map", SymType, types.Void)
 	s.Define("array", SymType, types.Void)
+	
+	// --- GPU Types (Previously Keywords) ---
+	s.Define("matrix", SymType, types.Void)
+	s.Define("vector2", SymType, types.Void)
+	s.Define("vector4", SymType, types.Void)
 
 	// --- Intrinsics (Compiler built-ins) ---
-	// Pointers usually represented as *i8 (void*) for generic intrinsics here
-
-	// Stack Allocation
-	// func alloca<T>(count: usize = 1) *T
-	s.Define("alloca", SymFunc, types.NewPointer(types.I8)) // Return type dynamic in compiler
-
-	// Memory Ops
-	// func memset(dest: *void, val: byte, count: usize)
+	s.Define("alloca", SymFunc, types.NewPointer(types.I8))
 	s.Define("memset", SymFunc, types.Void)
-	// func memcpy(dest: *void, src: *void, count: usize)
 	s.Define("memcpy", SymFunc, types.Void)
-	// func memmove(dest: *void, src: *void, count: usize)
 	s.Define("memmove", SymFunc, types.Void)
-	// func memcmp(ptr1: *void, ptr2: *void, count: usize) int32
 	s.Define("memcmp", SymFunc, types.I32)
-
-	// String Ops
-	// func strlen(str: *byte) usize
 	s.Define("strlen", SymFunc, types.U64)
-
-	// Variadic / System
-	// func syscall(number: usize, ...) usize
 	s.Define("syscall", SymFunc, types.U64)
-	// func raise(msg: string)
 	s.Define("raise", SymFunc, types.Void)
-	
-	// Variadic Helper (simplification)
 	s.Define("va_start", SymFunc, types.NewPointer(types.I8))
 	s.Define("va_end", SymFunc, types.Void)
-	s.Define("va_arg", SymFunc, types.Void) // Generic return
+	s.Define("va_arg", SymFunc, types.Void)
 }
