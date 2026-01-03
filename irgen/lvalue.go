@@ -118,8 +118,6 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		if ctx.LBRACKET() != nil {
 			idxVal := g.Visit(ctx.Expression()).(ir.Value)
 			base := g.getLValue(ctx.PostfixExpression())
-			
-			// If not LValue, use pointer value
 			if base == nil {
 				val := g.Visit(ctx.PostfixExpression()).(ir.Value)
 				if types.IsPointer(val.Type()) {
@@ -178,14 +176,18 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 			
 			if addr == nil { return nil }
 
-			// Auto-dereference if it's **T (e.g. mutating self param)
-			if ptrType, ok := addr.Type().(*types.PointerType); ok {
-				if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
-					addr = g.ctx.Builder.CreateLoad(ptrType.ElementType, addr, "")
-				}
-			}
-
+			// Only auto-deref if we are traversing fields
+			// If we are just resolving 'base.field', we need to check the base type
+			
+			// Note: QualifiedIdentifier drills down immediately here
 			for i := 1; i < len(ids); i++ {
+				// Auto-deref before accessing field
+				if ptrType, ok := addr.Type().(*types.PointerType); ok {
+					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
+						addr = g.ctx.Builder.CreateLoad(ptrType.ElementType, addr, "")
+					}
+				}
+
 				fieldName := ids[i].GetText()
 				ptrType, isPtr := addr.Type().(*types.PointerType)
 				if !isPtr { return nil }
@@ -235,14 +237,17 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		
 		if addr == nil { return nil }
 		
-		// Auto-dereference base if **T
-		if ptrType, ok := addr.Type().(*types.PointerType); ok {
-			if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
-				addr = g.ctx.Builder.CreateLoad(ptrType.ElementType, addr, "")
-			}
-		}
-
+		// Only auto-dereference if we actually have postfix operations (fields/indices)
+		// If just 'ptr' (no ops), we return 'ptr.addr' directly.
+		
 		for _, op := range ctx.AllPostfixOp() {
+			// Auto-dereference base if **T before applying operation
+			if ptrType, ok := addr.Type().(*types.PointerType); ok {
+				if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
+					addr = g.ctx.Builder.CreateLoad(ptrType.ElementType, addr, "")
+				}
+			}
+
 			if op.DOT() != nil {
 				fieldName := op.IDENTIFIER().GetText()
 				ptrType, isPtr := addr.Type().(*types.PointerType)

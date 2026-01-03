@@ -26,7 +26,7 @@ func init() {
 		TestCase{
 			Name: "pointer_deref_read",
 			Body: `
-    let value = 50
+    let value: int32 = 50
     let ptr: *int32 = &value
     let retrieved = *ptr
     libc.printf("value=%d\n", retrieved)
@@ -37,7 +37,7 @@ func init() {
 		TestCase{
 			Name: "pointer_deref_write",
 			Body: `
-    let value = 10
+    let value: int32 = 10
     let ptr: *int32 = &value
     *ptr = 99
     libc.printf("value=%d\n", value)

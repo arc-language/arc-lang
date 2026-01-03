@@ -4,30 +4,17 @@ declare external i32 @printf(ptr<u8>, ...)
 
 define external i32 @main() {
 entry:
-  %arr.addr = alloca ptr<i32>
-  %0 = alloca i32, i64 5
-  store ptr<i32> %0, ptr<ptr<i32>> %arr.addr
-  %1 = load ptr<i32>, ptr<ptr<i32>> %arr.addr
-  %2 = getelementptr inbounds i32, ptr<i32> %1, i64 0
-  %3 = trunc i64 10 to i32
-  store i32 %3, ptr<i32> %2
-  %4 = load ptr<i32>, ptr<ptr<i32>> %arr.addr
-  %5 = getelementptr inbounds i32, ptr<i32> %4, i64 1
-  %6 = trunc i64 20 to i32
-  store i32 %6, ptr<i32> %5
+  %value.addr = alloca i32
+  store i32 77, ptr<i32> %value.addr
   %ptr.addr = alloca ptr<i32>
-  %7 = load ptr<i32>, ptr<ptr<i32>> %arr.addr
-  %8 = load i32, ptr<i32> %7
-  store i32 %8, ptr<ptr<i32>> %ptr.addr
-  %next.addr = alloca ptr<i32>
-  %9 = load ptr<i32>, ptr<ptr<i32>> %ptr.addr
-  %10 = load i32, ptr<i32> %9
-  %11 = add i32 %10, 1
-  store i32 %11, ptr<ptr<i32>> %next.addr
-  %12 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
-  %13 = load ptr<i32>, ptr<ptr<i32>> %next.addr
-  %14 = load i32, ptr<i32> %13
-  %15 = call i32 @printf(ptr<i8> %12, i32 %14)
-  %16 = trunc i64 0 to i32
-  ret i32 %16
+  store ptr<i32> %value.addr, ptr<ptr<i32>> %ptr.addr
+  %pptr.addr = alloca ptr<ptr<i32>>
+  %0 = load ptr<i32>, ptr<ptr<i32>> %ptr.addr
+  store ptr<i32> %0, ptr<ptr<ptr<i32>>> %pptr.addr
+  %1 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
+  %2 = load ptr<ptr<i32>>, ptr<ptr<ptr<i32>>> %pptr.addr
+  %3 = load ptr<i32>, ptr<ptr<i32>> %2
+  %4 = load i32, ptr<i32> %3
+  %5 = call i32 @printf(ptr<i8> %1, i32 %4)
+  ret i32 0
 }
