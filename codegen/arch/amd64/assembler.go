@@ -206,6 +206,57 @@ func (a *Assembler) Mov(dst, src Operand, size int) {
 		}
 	}
 
+	// Case 5: MOV Mem, Imm
+	if d, ok := dst.(MemOp); ok {
+		if imm, ok := src.(ImmOp); ok {
+			// MOV r/m, imm
+			
+			if size == 8 {
+				// C6 /0 ib
+				a.encodeRex(false, 0, NoReg, d.Base)
+				a.emitByte(0xC6)
+				a.encodeModRM(0, d)
+				a.emitByte(byte(imm))
+				return
+			}
+			
+			if size == 16 {
+				// 66 C7 /0 iw
+				a.emitByte(0x66)
+				a.encodeRex(false, 0, NoReg, d.Base)
+				a.emitByte(0xC7)
+				a.encodeModRM(0, d)
+				// Emit 16-bit imm
+				v := uint16(imm)
+				a.emitByte(byte(v))
+				a.emitByte(byte(v >> 8))
+				return
+			}
+			
+			if size == 32 {
+				// C7 /0 id
+				a.encodeRex(false, 0, NoReg, d.Base)
+				a.emitByte(0xC7)
+				a.encodeModRM(0, d)
+				a.emitInt32(int32(imm))
+				return
+			}
+			
+			if size == 64 {
+				// REX.W + C7 /0 id
+				// Immediate must fit in 32 bits signed
+				if int64(int32(imm)) != int64(imm) {
+					panic(fmt.Sprintf("MOV Mem64, Imm requires 32-bit signed immediate, got %d", imm))
+				}
+				a.encodeRex(true, 0, NoReg, d.Base)
+				a.emitByte(0xC7)
+				a.encodeModRM(0, d)
+				a.emitInt32(int32(imm))
+				return
+			}
+		}
+	}
+
 	panic(fmt.Sprintf("Unsupported MOV combination: %T -> %T", src, dst))
 }
 
