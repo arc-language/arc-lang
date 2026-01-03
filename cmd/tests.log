@@ -1949,8 +1949,9 @@ func main() int32 {
 }
 
 Run Output:
-value=20
-Result: PASS
+Result: FAIL
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: pointer_arithmetic_sub ---
 Source Code:
@@ -1981,8 +1982,9 @@ func main() int32 {
 }
 
 Run Output:
-value=10
-Result: PASS
+Result: FAIL
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: pointer_array_indexing ---
 Source Code:
@@ -2012,8 +2014,9 @@ func main() int32 {
 }
 
 Run Output:
-arr[1]=200
-Result: PASS
+Result: FAIL
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: pointer_basic_type ---
 Source Code:
@@ -2141,8 +2144,9 @@ func main() int32 {
 }
 
 Run Output:
-value=77
-Result: PASS
+Result: FAIL
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: pointer_non_null ---
 Source Code:
@@ -2265,8 +2269,9 @@ func main() int32 {
 }
 
 Run Output:
-value=42
-Result: PASS
+Result: FAIL
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: struct_definition ---
 Source Code:
@@ -2538,11 +2543,8 @@ func main() int32 {
 }
 
 Run Output:
-age=30 height=32765
-Result: FAIL
-Error: assertion failed.
-Expected substring: "age=30 height=180"
-Got output: "age=30 height=32765\n"
+age=30 height=180
+Result: PASS
 
 --- Test: struct_mutating_method ---
 Source Code:
@@ -2623,11 +2625,8 @@ func main() int32 {
 }
 
 Run Output:
-end_x=416930544
-Result: FAIL
-Error: assertion failed.
-Expected substring: "end_x=10"
-Got output: "end_x=416930544\n"
+end_x=10
+Result: PASS
 
 --- Test: struct_pass_by_pointer ---
 Source Code:
@@ -3230,8 +3229,9 @@ func main() int32 {
 }
 
 Run Output:
-value=42
-Result: PASS
+Result: FAIL
+Error: runtime error (exit code -1)
+Output: 
 
 --- Test: cast_signed_to_unsigned ---
 Source Code:
@@ -4298,4 +4298,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 102 | Failed: 32 | Total Time: 9.52s
+Passed: 98 | Failed: 36 | Total Time: 10.06s

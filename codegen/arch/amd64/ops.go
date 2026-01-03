@@ -112,7 +112,12 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.store(RAX, inst)
 
 	// --- Casts ---
-	case ir.OpTrunc, ir.OpBitcast:
+	case ir.OpTrunc:
+		// Truncate by loading full size and storing small size
+		c.load(RAX, inst.Operands()[0])
+		c.store(RAX, inst)
+
+	case ir.OpBitcast:
 		c.moveValue(RBP, c.stackMap[inst], inst.Operands()[0])
 
 	case ir.OpZExt:
@@ -131,19 +136,8 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	case ir.OpAlloca:
 		offset := c.stackMap[inst.(*ir.AllocaInst)]
 		c.asm.Lea(RAX, NewMem(RBP, offset))
-		// Note: Alloca returns a pointer. But the instruction result is a value containing that address.
-		// We can't store RAX to inst's slot if the slot IS the memory.
-		// Actually, stackMap[inst] points to the backing memory.
-		// Does inst need a separate slot for the pointer?
-		// In my compiler.go, stackMap[inst] points to the backing memory.
-		// BUT if we treat %ptr = alloca as a value, it's a pointer value.
-		// For simplicity, we assume the backing memory IS the value for AllocaInst in this ABI?
-		// No, `alloca` returns a pointer. We should probably return LEA RBP+off.
-		// However, standard LLVM uses alloca as the address.
-		// We'll skip storing for alloca, assume users use LEA logic in `load`.
 
 	case ir.OpLoad:
-		// Load aggregate-safe
 		ptr := inst.Operands()[0]
 		c.load(RCX, ptr) // RCX = Source Address
 		c.moveFromMem(RBP, c.stackMap[inst], RCX, 0, SizeOf(inst.Type()))
@@ -348,6 +342,14 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 
 // moveValue copies 'src' Value to [dstBase + dstDisp] handling any size
 func (c *compiler) moveValue(dstBase Register, dstDisp int, src ir.Value) {
+	// Case: AllocaInst (Pointer R-Value)
+	if alloca, ok := src.(*ir.AllocaInst); ok {
+		off := c.stackMap[alloca]
+		c.asm.Lea(RAX, NewMem(RBP, off))
+		c.asm.Mov(NewMem(dstBase, dstDisp), RegOp(RAX), 64)
+		return
+	}
+
 	size := SizeOf(src.Type())
 
 	if cInt, ok := src.(*ir.ConstantInt); ok {
@@ -379,8 +381,6 @@ func (c *compiler) moveValue(dstBase Register, dstDisp int, src ir.Value) {
 		c.load(RAX, src)
 		c.asm.Mov(NewMem(dstBase, dstDisp), RegOp(RAX), size*8)
 	} else {
-		// For Globals > 8 bytes, assuming c.load puts address in RAX?
-		// c.load implementation for Global: LEA Rel. So RAX is pointer.
 		if g, ok := src.(*ir.Global); ok {
 			c.asm.LeaRel(RCX, g.Name())
 			c.moveFromMem(dstBase, dstDisp, RCX, 0, size)
