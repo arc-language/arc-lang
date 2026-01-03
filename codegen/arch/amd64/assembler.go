@@ -488,6 +488,7 @@ func (a *Assembler) MovZX(dst Register, src Operand, srcSize int) {
 			a.emitByte(0x0F); a.emitByte(0xB6)
 			a.encodeModRM(dst, src)
 		} else if s, ok := src.(RegOp); ok {
+			// MOVZX r64, r8
 			a.encodeRex(true, dst, NoReg, Register(s))
 			a.emitByte(0x0F); a.emitByte(0xB6)
 			a.encodeModRM(dst, src)
@@ -581,4 +582,23 @@ func (a *Assembler) Movss(dst MemOp, src Register) {
 	a.emitByte(0x0F)
 	a.emitByte(0x11)
 	a.encodeModRM(src, dst)
+}
+
+func (a *Assembler) Movd(dst Register, src Register) {
+	// 66 0F 6E /r (MOVD xmm, r32/m32) - GPR to XMM
+	// We assume dst is XMM index, src is GPR
+	a.emitByte(0x66)
+	a.encodeRex(false, dst, NoReg, src)
+	a.emitByte(0x0F)
+	a.emitByte(0x6E)
+	a.encodeModRM(dst, RegOp(src))
+}
+
+func (a *Assembler) Movq(dst Register, src Register) {
+	// 66 REX.W 0F 6E /r (MOVQ xmm, r64/m64) - GPR64 to XMM
+	a.emitByte(0x66)
+	a.encodeRex(true, dst, NoReg, src)
+	a.emitByte(0x0F)
+	a.emitByte(0x6E)
+	a.encodeModRM(dst, RegOp(src))
 }

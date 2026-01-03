@@ -132,7 +132,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		if srcSize == 4 { 
 			c.asm.Movsxd(RAX, RAX) 
 		} else if srcSize == 1 { 
-			// FIX: Wrap RAX in RegOp()
 			c.asm.Movsx(RAX, RegOp(RAX), 8) 
 		}
 		c.store(RAX, inst)
@@ -226,8 +225,10 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		val := iv.Operands()[1]
 		destOff := c.stackMap[inst]
 
+		// 1. Copy entire Aggregate
 		c.moveValue(RBP, destOff, agg)
 
+		// 2. Calculate offset
 		currentType := agg.Type()
 		offset := 0
 		for _, idx := range iv.Indices {
@@ -240,6 +241,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			}
 		}
 
+		// 3. Write new value
 		c.moveValue(RBP, destOff+offset, val)
 
 	case ir.OpExtractValue:
@@ -258,6 +260,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			}
 		}
 		
+		// Copy from Agg[Offset] to Dest
 		if srcSlot, ok := c.stackMap[agg]; ok {
 			c.moveFromMem(RBP, c.stackMap[inst], RBP, srcSlot+offset, SizeOf(inst.Type()))
 		}
@@ -286,10 +289,41 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 
 	case ir.OpCall:
 		call := inst.(*ir.CallInst)
-		regs := []Register{RDI, RSI, RDX, RCX, R8, R9}
-		for i, arg := range call.Operands() {
-			if i < len(regs) { c.load(regs[i], arg) }
+		
+		// GPR registers: RDI, RSI, RDX, RCX, R8, R9
+		gprRegs := []Register{RDI, RSI, RDX, RCX, R8, R9}
+		// XMM registers: XMM0-XMM7 (using indices 0-7)
+		xmmRegs := []Register{0, 1, 2, 3, 4, 5, 6, 7}
+		
+		gprIdx := 0
+		xmmIdx := 0
+		
+		for _, arg := range call.Operands() {
+			if arg == nil { continue }
+			if types.IsFloat(arg.Type()) {
+				if xmmIdx < len(xmmRegs) {
+					// Load float bits into RAX
+					c.load(RAX, arg)
+					// Move RAX to XMM[xmmIdx]
+					// If 64-bit float, use MOVQ. If 32-bit, MOVD.
+					if arg.Type().BitSize() == 64 {
+						c.asm.Movq(xmmRegs[xmmIdx], RAX)
+					} else {
+						c.asm.Movd(xmmRegs[xmmIdx], RAX)
+					}
+					xmmIdx++
+				}
+			} else {
+				if gprIdx < len(gprRegs) {
+					c.load(gprRegs[gprIdx], arg)
+					gprIdx++
+				}
+			}
 		}
+		
+		// Set AL to number of XMM registers used (for varargs)
+		c.asm.Mov(RegOp(RAX), ImmOp(int64(xmmIdx)), 8)
+		
 		name := call.CalleeName
 		if call.Callee != nil { name = call.Callee.Name() }
 		c.asm.CallRelative(name)
@@ -403,6 +437,7 @@ func (c *compiler) moveValue(dstBase Register, dstDisp int, src ir.Value) {
 		return
 	}
 
+	// --- Recursively handle Aggregate Constants ---
 	if cArr, ok := src.(*ir.ConstantArray); ok {
 		elemSize := SizeOf(cArr.Type().(*types.ArrayType).ElementType)
 		for i, elem := range cArr.Elements {
@@ -420,11 +455,13 @@ func (c *compiler) moveValue(dstBase Register, dstDisp int, src ir.Value) {
 		return
 	}
 
+	// Memory to Memory copy
 	if srcSlot, ok := c.stackMap[src]; ok {
 		c.moveFromMem(dstBase, dstDisp, RBP, srcSlot, size)
 		return
 	}
 
+	// Fallback to load/store for scalars or globals
 	if size <= 8 {
 		c.load(RAX, src)
 		c.asm.Mov(NewMem(dstBase, dstDisp), RegOp(RAX), size*8)
@@ -438,6 +475,7 @@ func (c *compiler) moveValue(dstBase Register, dstDisp int, src ir.Value) {
 	}
 }
 
+// moveFromMem copies 'size' bytes from [srcBase+srcDisp] to [dstBase+dstDisp] using RAX
 func (c *compiler) moveFromMem(dstBase Register, dstDisp int, srcBase Register, srcDisp int, size int) {
 	offset := 0
 	for offset+8 <= size {

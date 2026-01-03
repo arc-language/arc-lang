@@ -3065,11 +3065,8 @@ func main() int32 {
 }
 
 Run Output:
-small=232
-Result: FAIL
-Error: assertion failed.
-Expected substring: "small=-24"
-Got output: "small=232\n"
+small=-24
+Result: PASS
 
 --- Test: cast_int_widen ---
 Source Code:
@@ -4061,11 +4058,8 @@ func main() int32 {
 }
 
 Run Output:
-overflow=128
-Result: FAIL
-Error: assertion failed.
-Expected substring: "overflow=-128"
-Got output: "overflow=128\n"
+overflow=-128
+Result: PASS
 
 --- Test: edge_large_stack_array ---
 Source Code:
@@ -4221,4 +4215,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 117 | Failed: 17 | Total Time: 9.24s
+Passed: 119 | Failed: 15 | Total Time: 9.41s

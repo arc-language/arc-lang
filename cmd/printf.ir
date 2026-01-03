@@ -1,17 +1,17 @@
-@.str.0 = external constant [10 x i8] [i8 115, i8 109, i8 97, i8 108, i8 108, i8 61, i8 37, i8 100, i8 10, i8 0]
+@.str.0 = external constant [12 x i8] [i8 102, i8 108, i8 111, i8 97, i8 116, i8 61, i8 37, i8 46, i8 49, i8 102, i8 10, i8 0]
 
 declare external i32 @printf(ptr<u8>, ...)
 
 define external i32 @main() {
 entry:
-  %large.addr = alloca i32
-  store i32 1000, ptr<i32> %large.addr
-  %small.addr = alloca i8
-  %0 = load i32, ptr<i32> %large.addr
-  %1 = trunc i32 %0 to i8
-  store i8 %1, ptr<i8> %small.addr
-  %2 = getelementptr inbounds [10 x i8], ptr<[10 x i8]> @.str.0, i32 0, i32 0
-  %3 = load i8, ptr<i8> %small.addr
-  %4 = call i32 @printf(ptr<i8> %2, i8 %3)
+  %i.addr = alloca i32
+  store i32 42, ptr<i32> %i.addr
+  %f.addr = alloca f32
+  %0 = load i32, ptr<i32> %i.addr
+  %1 = sitofp i32 %0 to f32
+  store f32 %1, ptr<f32> %f.addr
+  %2 = getelementptr inbounds [12 x i8], ptr<[12 x i8]> @.str.0, i32 0, i32 0
+  %3 = load f32, ptr<f32> %f.addr
+  %4 = call i32 @printf(ptr<i8> %2, f32 %3)
   ret i32 0
 }
