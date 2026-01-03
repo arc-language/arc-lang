@@ -6,9 +6,9 @@ extern libc {
 
 func main() int32 {
 
-    let f: float32 = 3.9
-    let i: int32 = cast<int32>(f)
-    libc.printf("int=%d\n", i)
+    let large: int32 = 1000
+    let small: int8 = cast<int8>(large)
+    libc.printf("small=%d\n", small)
 
     return 0
 }

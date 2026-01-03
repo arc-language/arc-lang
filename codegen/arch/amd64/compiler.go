@@ -148,8 +148,6 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 	for i, arg := range fn.Arguments {
 		if i < len(regs) {
 			slot := c.getStackSlot(arg)
-			// Move registers to stack using appropriate size, or 64-bit for simplicity
-			// For structs passed by value in regs, this ABI is simplified.
 			c.asm.Mov(slot, RegOp(regs[i]), 64)
 		}
 	}
@@ -198,21 +196,30 @@ func (c *compiler) load(dst Register, src ir.Value) {
 	case *ir.Function:
 		c.asm.LeaRel(dst, v.Name())
 	case *ir.AllocaInst:
-		// Load the address of the alloca memory, not the stack slot of the instruction
 		off := c.stackMap[v]
 		c.asm.Lea(dst, NewMem(RBP, off))
 	default:
 		slot := c.getStackSlot(v)
-		size := SizeOf(v.Type())
+		typ := v.Type()
+		size := SizeOf(typ)
 		
 		if size == 8 {
 			c.asm.Mov(RegOp(dst), slot, 64)
 		} else if size == 4 {
 			c.asm.Mov(RegOp(dst), slot, 32)
 		} else if size == 1 {
-			c.asm.MovZX(dst, slot, 8)
+			// Check if signed
+			isSigned := false
+			if intTy, ok := typ.(*types.IntType); ok && intTy.Signed {
+				isSigned = true
+			}
+			
+			if isSigned {
+				c.asm.Movsx(dst, slot, 8)
+			} else {
+				c.asm.MovZX(dst, slot, 8)
+			}
 		} else {
-			// Default fallback for pointers/etc
 			c.asm.Mov(RegOp(dst), slot, 64)
 		}
 	}
@@ -251,7 +258,6 @@ func (c *compiler) emitConstant(k ir.Constant) error {
 			val >>= 8
 		}
 	case *ir.ConstantFloat:
-		// Simplified float emission
 		c.data.Write(make([]byte, SizeOf(v.Type())))
 	case *ir.ConstantArray:
 		for _, elem := range v.Elements {
@@ -263,7 +269,6 @@ func (c *compiler) emitConstant(k ir.Constant) error {
 		
 		currentOffset := 0
 		for i, field := range v.Fields {
-			// Handle Padding
 			targetOffset := GetStructFieldOffset(st, i)
 			if targetOffset > currentOffset {
 				padding := targetOffset - currentOffset
@@ -274,7 +279,6 @@ func (c *compiler) emitConstant(k ir.Constant) error {
 			if err := c.emitConstant(field); err != nil { return err }
 			currentOffset += SizeOf(field.Type())
 		}
-		// Tail Padding
 		totalSize := SizeOf(v.Type())
 		if currentOffset < totalSize {
 			c.data.Write(make([]byte, totalSize - currentOffset))

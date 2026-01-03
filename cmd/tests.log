@@ -2975,11 +2975,8 @@ func main() int32 {
 }
 
 Run Output:
-int=1081711002
-Result: FAIL
-Error: assertion failed.
-Expected substring: "int=3"
-Got output: "int=1081711002\n"
+int=3
+Result: PASS
 
 --- Test: cast_int_to_float ---
 Source Code:
@@ -3006,18 +3003,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (7 functions)
-Error: Object generation failed: in function main: unknown opcode: sitofp
+Run Output:
+float=0.0
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-[Driver] [INFO] Compilation successful. Module 'test.arc' created.
-✓ Module 'test.arc' compiled (7 functions)
-Error: Object generation failed: in function main: unknown opcode: sitofp
+Error: assertion failed.
+Expected substring: "float=42.0"
+Got output: "float=0.0\n"
 
 --- Test: cast_int_to_ptr ---
 Source Code:
@@ -3354,8 +3345,11 @@ func main() int32 {
 }
 
 Run Output:
-bits=1065353216
-Result: PASS
+bits=1
+Result: FAIL
+Error: assertion failed.
+Expected substring: "bits=1065353216"
+Got output: "bits=1\n"
 
 --- Test: intrinsic_memcpy ---
 Source Code:
@@ -4227,4 +4221,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 117 | Failed: 17 | Total Time: 9.49s
+Passed: 117 | Failed: 17 | Total Time: 9.24s
