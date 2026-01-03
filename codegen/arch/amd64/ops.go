@@ -113,7 +113,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 
 	// --- Casts ---
 	case ir.OpTrunc:
-		// Truncate by loading full size and storing small size
 		c.load(RAX, inst.Operands()[0])
 		c.store(RAX, inst)
 
@@ -353,7 +352,6 @@ func (c *compiler) moveValue(dstBase Register, dstDisp int, src ir.Value) {
 	size := SizeOf(src.Type())
 
 	if cInt, ok := src.(*ir.ConstantInt); ok {
-		// Only supports up to 64-bit constants
 		if size <= 4 || (cInt.Value >= -2147483648 && cInt.Value <= 2147483647) {
 			c.asm.Mov(NewMem(dstBase, dstDisp), ImmOp(cInt.Value), size*8)
 		} else {
@@ -366,6 +364,24 @@ func (c *compiler) moveValue(dstBase Register, dstDisp int, src ir.Value) {
 	if _, ok := src.(*ir.ConstantZero); ok {
 		for i := 0; i < size; i++ {
 			c.asm.Mov(NewMem(dstBase, dstDisp+i), ImmOp(0), 8)
+		}
+		return
+	}
+
+	// --- Recursively handle Aggregate Constants ---
+	if cArr, ok := src.(*ir.ConstantArray); ok {
+		elemSize := SizeOf(cArr.Type().(*types.ArrayType).ElementType)
+		for i, elem := range cArr.Elements {
+			c.moveValue(dstBase, dstDisp + (i * elemSize), elem)
+		}
+		return
+	}
+
+	if cStruct, ok := src.(*ir.ConstantStruct); ok {
+		st := cStruct.Type().(*types.StructType)
+		for i, field := range cStruct.Fields {
+			offset := GetStructFieldOffset(st, i)
+			c.moveValue(dstBase, dstDisp + offset, field)
 		}
 		return
 	}
