@@ -2574,14 +2574,12 @@ func main() int32 {
     return 0
 }
 
-Compile Output:
-Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:26:0: Undefined identifier 'counter.increment'
+Run Output:
+count=10
 Result: FAIL
-Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
-[Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:26:0: Undefined identifier 'counter.increment'
+Error: assertion failed.
+Expected substring: "count=11"
+Got output: "count=10\n"
 
 --- Test: struct_nested ---
 Source Code:
@@ -4292,4 +4290,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 104 | Failed: 30 | Total Time: 9.23s
+Passed: 104 | Failed: 30 | Total Time: 9.49s

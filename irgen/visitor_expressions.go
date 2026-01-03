@@ -240,6 +240,16 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	var curr ir.Value
 
 	if currPtr != nil {
+		// If it's a variable holding a pointer (like 'self'), load the pointer value
+		// to resolve fields on the pointee.
+		if ptrType, ok := currPtr.Type().(*types.PointerType); ok {
+			if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
+				// currPtr is **T (stack slot for parameter *T)
+				// We load it to get *T, which is the base for field access
+				currPtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
+			}
+		}
+		
 		if _, isFn := currPtr.(*ir.Function); isFn {
 			curr = currPtr
 			currPtr = nil
@@ -315,8 +325,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			
 			// Decide on base pointer
 			if currPtr != nil {
-				// Only use currPtr if it points to an Array (e.g. [N]T)
-				// If it points to a pointer (e.g. *T), we must use the value (curr) instead
 				ptrType := currPtr.Type().(*types.PointerType)
 				if _, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
 					basePtr = currPtr
@@ -328,7 +336,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				basePtr = curr
 			}
 			
-			// Fallback (unlikely if semantic analysis passed)
+			// Fallback
 			if basePtr == nil && currPtr != nil {
 				basePtr = currPtr
 			}
@@ -496,20 +504,32 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 							methodName := st.Name + "_" + fieldName
 							if methodSym, ok := g.currentScope.Resolve(methodName); ok {
 								entity = methodSym.IRValue
-								// If it's a method, we must pass 'self' (the current struct/pointer) as first argument
-								// Check if 'currPtr' needs to be loaded if 'self' is passed by value
 								
-								// For now, assume 'self' is passed by value (since struct args are byval in our simple ABI)
-								// Load the struct value from currPtr
-								selfVal := g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
+								// Determine if we need to pass address (for mutating/pointer receiver) or value
+								// Check the first parameter type of the function
+								if fn, ok := entity.(*ir.Function); ok && len(fn.FuncType.ParamTypes) > 0 {
+									firstParam := fn.FuncType.ParamTypes[0]
+									
+									// If method expects a pointer to struct (*T)
+									if _, isPtrParam := firstParam.(*types.PointerType); isPtrParam {
+										// We pass currPtr (which is *T)
+										// BUT: If currPtr is **T (from variable load), we might need logic.
+										// Assuming currPtr is the address of the struct.
+										
+										// Important: If basePtr came from a variable 'counter', currPtr is its address.
+										newArgs := []ir.Value{currPtr}
+										newArgs = append(newArgs, args...)
+										argsToPass = newArgs
+									} else {
+										// Method expects value (T). Pass *currPtr (load it).
+										selfVal := g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
+										newArgs := []ir.Value{selfVal}
+										newArgs = append(newArgs, args...)
+										argsToPass = newArgs
+									}
+								}
 								
-								// Prepend to args
-								newArgs := []ir.Value{selfVal}
-								newArgs = append(newArgs, args...)
-								argsToPass = newArgs
-								
-								// We found the method, stop iteration
-								valid = true // marked valid so we don't zero it out
+								valid = true 
 								break
 							}
 						}
