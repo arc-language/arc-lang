@@ -38,19 +38,16 @@ func (g *Generator) resolveType(ctx parser.ITypeContext) types.Type {
 		return types.NewPointer(g.resolveType(tc.PointerType().Type_()))
 	}
 	
-	// Generics / Arrays
 	if tc.IDENTIFIER() != nil {
 		name := tc.IDENTIFIER().GetText()
 		
 		if name == "array" && tc.GenericArgs() != nil {
 			args := tc.GenericArgs().GenericArgList().AllGenericArg()
 			if len(args) == 2 {
-				// Type
 				var elemType types.Type
 				if tCtx := args[0].Type_(); tCtx != nil {
 					elemType = g.resolveType(tCtx)
 				}
-				// Size
 				var length int64
 				if exprCtx := args[1].Expression(); exprCtx != nil {
 					if val, err := strconv.ParseInt(exprCtx.GetText(), 0, 64); err == nil {
@@ -82,6 +79,29 @@ func (g *Generator) emitCast(val ir.Value, target types.Type) ir.Value {
 	}
 	if types.IsInteger(src) && types.IsFloat(target) { return g.ctx.Builder.CreateSIToFP(val, target, "") }
 	if types.IsFloat(src) && types.IsInteger(target) { return g.ctx.Builder.CreateFPToSI(val, target, "") }
+	
+	// Array Constant Casting (Recursive)
+	if srcArr, ok := src.(*types.ArrayType); ok {
+		if targetArr, ok := target.(*types.ArrayType); ok {
+			if srcArr.Length == targetArr.Length {
+				if cArr, ok := val.(*ir.ConstantArray); ok {
+					var newElems []ir.Constant
+					for _, elem := range cArr.Elements {
+						casted := g.emitCast(elem, targetArr.ElementType)
+						if cCasted, ok := casted.(ir.Constant); ok {
+							newElems = append(newElems, cCasted)
+						} else {
+							panic("Cast of constant array element resulted in non-constant")
+						}
+					}
+					return &ir.ConstantArray{
+						BaseValue: ir.BaseValue{ValType: target},
+						Elements:  newElems,
+					}
+				}
+			}
+		}
+	}
 	
 	return val
 }

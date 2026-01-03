@@ -2759,13 +2759,11 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:8: Syntax Error: no viable alternative at input 'letmatrix'
-/tmp/arc_test_env/test.arc:17:22: Syntax Error: no viable alternative at input 'array'
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'matrix': expected [2 x [2 x i32]], got [2 x [2 x i64]]
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:8: Syntax Error: no viable alternative at input 'letmatrix'
-/tmp/arc_test_env/test.arc:17:22: Syntax Error: no viable alternative at input 'array'
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'matrix': expected [2 x [2 x i32]], got [2 x [2 x i64]]
 
 --- Test: array_element_assign ---
 Source Code:
@@ -2795,11 +2793,11 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected [3 x i32], got [3 x i64]
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected [3 x i32], got [3 x i64]
 
 --- Test: array_fixed_size ---
 Source Code:
@@ -2828,11 +2826,11 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected [3 x i32], got [3 x i64]
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected [3 x i32], got [3 x i64]
 
 --- Test: array_iteration_cstyle ---
 Source Code:
@@ -2865,11 +2863,11 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [4 x i64]
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected [4 x i32], got [4 x i64]
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [4 x i64]
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected [4 x i32], got [4 x i64]
 
 --- Test: array_ptr_first ---
 Source Code:
@@ -2899,13 +2897,11 @@ func main() int32 {
 Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected [3 x i32], got [3 x i64]
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
-/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected ptr<i8>, got [3 x i64]
-/tmp/arc_test_env/test.arc:18:0: Type mismatch in variable 'ptr': expected ptr<i32>, got ptr<i8>
+/tmp/arc_test_env/test.arc:17:0: Type mismatch in variable 'arr': expected [3 x i32], got [3 x i64]
 
 --- Test: array_zero_init ---
 Source Code:
@@ -2932,9 +2928,8 @@ func main() int32 {
 }
 
 Run Output:
-Result: FAIL
-Error: runtime error (exit code -1)
-Output: 
+arr[0]=0
+Result: PASS
 
 --- Test: map_placeholder ---
 Source Code:
@@ -3857,10 +3852,12 @@ Compile Output:
 Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
 /tmp/arc_test_env/test.arc:14:0: Unknown type 'T'
+/tmp/arc_test_env/test.arc:21:0: Type mismatch in variable 'b': expected ptr<i8>, got %Box
 Result: FAIL
 Error: compile failed: Compiling /tmp/arc_test_env/test.arc...
 [Driver] [INFO] Compiling file: /tmp/arc_test_env/test.arc
 /tmp/arc_test_env/test.arc:14:0: Unknown type 'T'
+/tmp/arc_test_env/test.arc:21:0: Type mismatch in variable 'b': expected ptr<i8>, got %Box
 
 --- Test: generic_swap ---
 Source Code:
@@ -4153,9 +4150,8 @@ func main() int32 {
 }
 
 Run Output:
-Result: FAIL
-Error: runtime error (exit code -1)
-Output: 
+last=555
+Result: PASS
 
 --- Test: edge_null_deref_skip ---
 Source Code:
@@ -4282,4 +4278,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 106 | Failed: 28 | Total Time: 9.81s
+Passed: 108 | Failed: 26 | Total Time: 9.43s

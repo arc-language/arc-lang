@@ -244,8 +244,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			curr = currPtr
 			currPtr = nil
 		} else if ptrType, ok := currPtr.Type().(*types.PointerType); ok {
-			// Just load. We don't auto-deref **T here, as we might need the *T value itself
-			// (e.g. for pointer arithmetic). Auto-deref for fields happens in DOT.
 			curr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 		} else {
 			curr = currPtr
@@ -298,8 +296,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			}
 
 			if basePtr != nil {
-				// Handle auto-dereference if basePtr is **T (variable holding pointer)
-				// We need *T (address of struct) to do StructGEP
+				// Handle auto-dereference if basePtr is **T
 				if ptrType, ok := basePtr.Type().(*types.PointerType); ok {
 					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 						basePtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, basePtr, "")
@@ -323,12 +320,10 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			
 			var basePtr ir.Value = currPtr
 			
-			// If not an LValue, try to use the pointer value
 			if basePtr == nil && curr != nil && types.IsPointer(curr.Type()) {
 				basePtr = curr
 			}
 			
-			// Auto-dereference if **T (e.g. variable holding pointer)
 			if basePtr != nil {
 				if ptrType, ok := basePtr.Type().(*types.PointerType); ok {
 					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
@@ -465,7 +460,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			if !isCall { return g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "") }
 			entity = g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
 		} else if isQualified {
-			// Handle Member Access via QualifiedIdentifier: `rect.width` or `counter.get`
+			// Handle Member Access via QualifiedIdentifier
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
 			
@@ -480,8 +475,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			
 			if basePtr != nil {
 				currPtr := basePtr
-				
-				// Handle auto-dereference if basePtr is **T (e.g. mutating method param)
 				if ptrType, ok := currPtr.Type().(*types.PointerType); ok {
 					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 						currPtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
@@ -496,44 +489,29 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					if !isPtr { valid = false; break }
 					
 					if st, ok := ptrType.ElementType.(*types.StructType); ok {
-						// Field Check
 						if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
 							currPtr = g.ctx.Builder.CreateStructGEP(st, currPtr, idx, "")
 							continue
 						}
 						
-						// Method Check
-						// Only valid if this is the last element
 						if i == len(ids) - 1 {
 							methodName := st.Name + "_" + fieldName
 							if methodSym, ok := g.currentScope.Resolve(methodName); ok {
 								entity = methodSym.IRValue
 								
-								// Determine if we need to pass address (for mutating/pointer receiver) or value
 								if fn, ok := entity.(*ir.Function); ok && len(fn.FuncType.ParamTypes) > 0 {
 									firstParam := fn.FuncType.ParamTypes[0]
-									
-									// If method expects a pointer to struct (*T)
 									if _, isPtrParam := firstParam.(*types.PointerType); isPtrParam {
-										// Check if we need to pass currPtr directly or load it
-										// currPtr is usually the address of the struct (*T) here after deref logic above.
-										// But if basePtr was originally a variable (**T) and we loaded it to *T...
-										
-										// If basePtr (variable) is **T. 
-										// Logic above: `currPtr = load(**T) -> *T`.
-										// We pass `*T`.
 										newArgs := []ir.Value{currPtr}
 										newArgs = append(newArgs, args...)
 										argsToPass = newArgs
 									} else {
-										// Method expects value (T). Pass *currPtr (load it).
 										selfVal := g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 										newArgs := []ir.Value{selfVal}
 										newArgs = append(newArgs, args...)
 										argsToPass = newArgs
 									}
 								}
-								
 								valid = true 
 								break
 							}
@@ -546,7 +524,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 				
 				if valid && entity == nil {
-					// It was a field access (entity not set by method logic)
 					ptrType := currPtr.Type().(*types.PointerType)
 					entity = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 				}
@@ -564,7 +541,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 
 		if isCall {
 			if fn, ok := entity.(*ir.Function); ok {
-				// Use argsToPass (which might include self)
 				if len(argsToPass) == len(fn.FuncType.ParamTypes) || (fn.FuncType.Variadic && len(argsToPass) >= len(fn.FuncType.ParamTypes)) {
 					for i, paramType := range fn.FuncType.ParamTypes {
 						if i < len(argsToPass) {
@@ -585,6 +561,10 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 }
 
 func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
+	if ctx.InitializerList() != nil {
+		return g.Visit(ctx.InitializerList())
+	}
+
 	txt := ctx.GetText()
 	if ctx.NULL() != nil { return g.ctx.Builder.ConstNull(types.NewPointer(types.Void)) }
 	
@@ -629,6 +609,33 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 		return g.ctx.Builder.CreateInBoundsGEP(arrType, global, []ir.Value{zero, zero}, "")
 	}
 	return g.getZeroValue(types.I64)
+}
+
+func (g *Generator) VisitInitializerList(ctx *parser.InitializerListContext) interface{} {
+	var elems []ir.Constant
+	var elemType types.Type
+
+	for _, expr := range ctx.AllExpression() {
+		val := g.Visit(expr)
+		if c, ok := val.(ir.Constant); ok {
+			elems = append(elems, c)
+			if elemType == nil {
+				elemType = c.Type()
+			}
+		} else {
+			// Fallback: This simplification only supports constant lists.
+			// Ideally, we'd allocate stack space and store items.
+			panic("Non-constant initializer list not supported in this simplified compiler")
+		}
+	}
+	
+	if elemType == nil { elemType = types.I64 }
+
+	arrType := types.NewArray(elemType, int64(len(elems)))
+	return &ir.ConstantArray{
+		BaseValue: ir.BaseValue{ValType: arrType},
+		Elements:  elems,
+	}
 }
 
 func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {

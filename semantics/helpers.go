@@ -61,17 +61,13 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 
 		// Handle Generics
 		if genericArgs != nil {
-			// array<T, N>
 			if name == "array" {
 				args := genericArgs.GenericArgList().AllGenericArg()
 				if len(args) == 2 {
-					// Arg 0: Type
 					var elemType types.Type
 					if tCtx := args[0].Type_(); tCtx != nil {
 						elemType = a.resolveType(tCtx)
 					}
-					
-					// Arg 1: Size (Expression)
 					var length int64
 					if exprCtx := args[1].Expression(); exprCtx != nil {
 						if lit := exprCtx.GetText(); lit != "" {
@@ -80,14 +76,11 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 							}
 						}
 					}
-					
 					if elemType != nil && length > 0 {
 						return types.NewArray(elemType, length)
 					}
 				}
 			}
-			
-			// Fallback for other generics
 			return types.NewPointer(types.I8) 
 		}
 
@@ -116,6 +109,14 @@ func areTypesCompatible(src, dest types.Type) bool {
 		if destPtr, dOk := dest.(*types.PointerType); dOk {
 			if srcPtr.ElementType == types.Void || destPtr.ElementType == types.Void {
 				return true
+			}
+		}
+	}
+	// Array compatibility (recursive)
+	if srcArr, sOk := src.(*types.ArrayType); sOk {
+		if destArr, dOk := dest.(*types.ArrayType); dOk {
+			if srcArr.Length == destArr.Length {
+				return areTypesCompatible(srcArr.ElementType, destArr.ElementType)
 			}
 		}
 	}
