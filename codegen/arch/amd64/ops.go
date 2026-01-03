@@ -290,9 +290,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	case ir.OpCall:
 		call := inst.(*ir.CallInst)
 		
-		// GPR registers: RDI, RSI, RDX, RCX, R8, R9
 		gprRegs := []Register{RDI, RSI, RDX, RCX, R8, R9}
-		// XMM registers: XMM0-XMM7 (using indices 0-7)
 		xmmRegs := []Register{0, 1, 2, 3, 4, 5, 6, 7}
 		
 		gprIdx := 0
@@ -302,14 +300,17 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			if arg == nil { continue }
 			if types.IsFloat(arg.Type()) {
 				if xmmIdx < len(xmmRegs) {
-					// Load float bits into RAX
 					c.load(RAX, arg)
-					// Move RAX to XMM[xmmIdx]
-					// If 64-bit float, use MOVQ. If 32-bit, MOVD.
 					if arg.Type().BitSize() == 64 {
 						c.asm.Movq(xmmRegs[xmmIdx], RAX)
 					} else {
+						// Promote f32 to f64 for variadic safety (standard C behavior)
+						// Though for strict typing we might not want this always, 
+						// printf expects double.
 						c.asm.Movd(xmmRegs[xmmIdx], RAX)
+						if arg.Type().BitSize() == 32 {
+							c.asm.Cvtss2sd(xmmRegs[xmmIdx], xmmRegs[xmmIdx])
+						}
 					}
 					xmmIdx++
 				}
@@ -321,7 +322,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			}
 		}
 		
-		// Set AL to number of XMM registers used (for varargs)
 		c.asm.Mov(RegOp(RAX), ImmOp(int64(xmmIdx)), 8)
 		
 		name := call.CalleeName

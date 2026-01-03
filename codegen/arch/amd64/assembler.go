@@ -602,3 +602,12 @@ func (a *Assembler) Movq(dst Register, src Register) {
 	a.emitByte(0x6E)
 	a.encodeModRM(dst, RegOp(src))
 }
+
+func (a *Assembler) Cvtss2sd(dst Register, src Register) {
+	// F3 0F 5A /r (CVTSS2SD xmm1, xmm2)
+	a.emitByte(0xF3)
+	a.encodeRex(false, dst, NoReg, src)
+	a.emitByte(0x0F)
+	a.emitByte(0x5A)
+	a.encodeModRM(dst, RegOp(src))
+}
