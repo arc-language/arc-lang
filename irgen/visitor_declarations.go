@@ -20,27 +20,14 @@ func (g *Generator) VisitCompilationUnit(ctx *parser.CompilationUnitContext) int
 }
 
 func (g *Generator) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface{} {
-	if ctx.FunctionDecl() != nil {
-		return g.Visit(ctx.FunctionDecl())
-	}
-	if ctx.VariableDecl() != nil {
-		return g.Visit(ctx.VariableDecl())
-	}
-	if ctx.ExternDecl() != nil {
-		return g.Visit(ctx.ExternDecl())
-	}
-	if ctx.StructDecl() != nil {
-		return g.Visit(ctx.StructDecl())
-	}
-	if ctx.ClassDecl() != nil {
-		return g.Visit(ctx.ClassDecl())
-	}
-	if ctx.EnumDecl() != nil {
-		return g.Visit(ctx.EnumDecl())
-	}
-	if ctx.ConstDecl() != nil {
-		return g.Visit(ctx.ConstDecl())
-	}
+	if ctx.FunctionDecl() != nil { return g.Visit(ctx.FunctionDecl()) }
+	if ctx.VariableDecl() != nil { return g.Visit(ctx.VariableDecl()) }
+	if ctx.ExternDecl() != nil { return g.Visit(ctx.ExternDecl()) }
+	if ctx.StructDecl() != nil { return g.Visit(ctx.StructDecl()) }
+	if ctx.ClassDecl() != nil { return g.Visit(ctx.ClassDecl()) }
+	if ctx.EnumDecl() != nil { return g.Visit(ctx.EnumDecl()) }
+	if ctx.ConstDecl() != nil { return g.Visit(ctx.ConstDecl()) }
+	if ctx.MutatingDecl() != nil { return g.Visit(ctx.MutatingDecl()) }
 	return nil
 }
 
@@ -116,9 +103,8 @@ func (g *Generator) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 	}
 
 	for _, member := range ctx.AllStructMember() {
-		if member.FunctionDecl() != nil {
-			g.Visit(member.FunctionDecl())
-		}
+		if member.FunctionDecl() != nil { g.Visit(member.FunctionDecl()) }
+		if member.MutatingDecl() != nil { g.Visit(member.MutatingDecl()) }
 	}
 	return nil
 }
@@ -132,9 +118,7 @@ func (g *Generator) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 	}
 
 	for _, member := range ctx.AllClassMember() {
-		if member.FunctionDecl() != nil {
-			g.Visit(member.FunctionDecl())
-		}
+		if member.FunctionDecl() != nil { g.Visit(member.FunctionDecl()) }
 	}
 	return nil
 }
@@ -163,10 +147,7 @@ func (g *Generator) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 }
 
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
-	if ctx.GenericParams() != nil {
-		// Generics not fully supported in IRGen yet
-		return nil
-	}
+	if ctx.GenericParams() != nil { return nil }
 
 	name := ctx.IDENTIFIER().GetText()
 	irName := name
@@ -215,7 +196,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	
 	// If 'self' exists, this is a method defined outside struct block.
 	// Semantic analyzer mangles this to "Struct_Method".
-	// We must look up that symbol.
 	lookupName := name
 	if selfType != nil {
 		// Extract struct name
@@ -283,6 +263,85 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
+	g.ctx.ExitFunction()
+	return nil
+}
+
+func (g *Generator) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface{} {
+	name := ctx.IDENTIFIER(0).GetText()
+	
+	// Try to find parent StructDecl to prepend name
+	var parentName string
+	if parent := ctx.GetParent(); parent != nil {
+		if _, ok := parent.(*parser.StructMemberContext); ok {
+			if sd, ok := parent.GetParent().(*parser.StructDeclContext); ok {
+				parentName = sd.IDENTIFIER().GetText()
+			}
+		}
+	}
+	
+	irName := name
+	if parentName != "" {
+		irName = parentName + "_" + name
+	}
+
+	// Resolve Parameters
+	var paramTypes []types.Type
+	var paramNames []string
+	
+	// Self param (explicit)
+	selfName := ctx.IDENTIFIER(1).GetText()
+	selfType := g.resolveType(ctx.Type_())
+	paramNames = append(paramNames, selfName)
+	paramTypes = append(paramTypes, selfType)
+	
+	// Other params
+	for _, param := range ctx.AllParameter() {
+		pName := param.IDENTIFIER().GetText()
+		pType := g.resolveType(param.Type_())
+		paramNames = append(paramNames, pName)
+		paramTypes = append(paramTypes, pType)
+	}
+	
+	// Return type
+	var retType types.Type = types.Void
+	if ctx.ReturnType() != nil && ctx.ReturnType().Type_() != nil {
+		retType = g.resolveType(ctx.ReturnType().Type_())
+	}
+
+	fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
+	
+	if sym, ok := g.currentScope.Resolve(irName); ok {
+		sym.IRValue = fn
+	}
+
+	g.ctx.EnterFunction(fn)
+	g.enterScope(ctx)
+	defer g.exitScope()
+
+	for i, arg := range fn.Arguments {
+		arg.SetName(paramNames[i])
+		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
+		g.ctx.Builder.CreateStore(arg, alloca)
+		if s, ok := g.currentScope.Resolve(paramNames[i]); ok {
+			s.IRValue = alloca
+		}
+	}
+
+	if ctx.Block() != nil {
+		g.deferStack = NewDeferStack()
+		g.Visit(ctx.Block())
+	}
+	
+	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
+		g.deferStack.Emit(g)
+		if retType == types.Void {
+			g.ctx.Builder.CreateRetVoid()
+		} else {
+			g.ctx.Builder.CreateRet(g.getZeroValue(retType))
+		}
+	}
+	
 	g.ctx.ExitFunction()
 	return nil
 }

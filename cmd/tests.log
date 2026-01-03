@@ -1949,9 +1949,8 @@ func main() int32 {
 }
 
 Run Output:
-Result: FAIL
-Error: runtime error (exit code -1)
-Output: 
+value=20
+Result: PASS
 
 --- Test: pointer_arithmetic_sub ---
 Source Code:
@@ -1982,9 +1981,8 @@ func main() int32 {
 }
 
 Run Output:
-Result: FAIL
-Error: runtime error (exit code -1)
-Output: 
+value=10
+Result: PASS
 
 --- Test: pointer_array_indexing ---
 Source Code:
@@ -2014,9 +2012,8 @@ func main() int32 {
 }
 
 Run Output:
-Result: FAIL
-Error: runtime error (exit code -1)
-Output: 
+arr[1]=200
+Result: PASS
 
 --- Test: pointer_basic_type ---
 Source Code:
@@ -2144,9 +2141,8 @@ func main() int32 {
 }
 
 Run Output:
-Result: FAIL
-Error: runtime error (exit code -1)
-Output: 
+value=77
+Result: PASS
 
 --- Test: pointer_non_null ---
 Source Code:
@@ -2269,9 +2265,8 @@ func main() int32 {
 }
 
 Run Output:
-Result: FAIL
-Error: runtime error (exit code -1)
-Output: 
+value=42
+Result: PASS
 
 --- Test: struct_definition ---
 Source Code:
@@ -3229,9 +3224,8 @@ func main() int32 {
 }
 
 Run Output:
-Result: FAIL
-Error: runtime error (exit code -1)
-Output: 
+value=42
+Result: PASS
 
 --- Test: cast_signed_to_unsigned ---
 Source Code:
@@ -4298,4 +4292,4 @@ zero_array_ok
 Result: PASS
 
 ============================================================
-Passed: 98 | Failed: 36 | Total Time: 10.06s
+Passed: 104 | Failed: 30 | Total Time: 9.23s

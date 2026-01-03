@@ -36,6 +36,7 @@ func (a *Analyzer) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface{
 	if ctx.ClassDecl() != nil { return a.Visit(ctx.ClassDecl()) }
 	if ctx.ExternDecl() != nil { return a.Visit(ctx.ExternDecl()) }
 	if ctx.ConstDecl() != nil { return a.Visit(ctx.ConstDecl()) }
+	if ctx.MutatingDecl() != nil { return a.Visit(ctx.MutatingDecl()) }
 	return nil
 }
 
@@ -143,6 +144,75 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 	return nil
 }
 
+func (a *Analyzer) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface{} {
+	// Syntax: mutating Name(self param: Type, p2: Type...) { ... }
+	name := ctx.IDENTIFIER(0).GetText()
+	
+	// Resolve Return Type
+	var retType types.Type = types.Void
+	if ctx.ReturnType() != nil {
+		if ctx.ReturnType().Type_() != nil {
+			retType = a.resolveType(ctx.ReturnType().Type_())
+		}
+	}
+
+	var paramTypes []types.Type
+	
+	// 1. Handle Self Param (Explicit in grammar)
+	// Rule structure: IDENTIFIER(0)=name, IDENTIFIER(1)=selfName, Type_()=selfType
+	selfParamName := ctx.IDENTIFIER(1).GetText()
+	selfType := a.resolveType(ctx.Type_()) // The first type listed is self's type
+	paramTypes = append(paramTypes, selfType)
+	
+	// 2. Handle Other Params
+	for _, param := range ctx.AllParameter() {
+		pType := a.resolveType(param.Type_())
+		paramTypes = append(paramTypes, pType)
+	}
+
+	// 3. Name Mangling (Struct_Method)
+	// Infer struct name from self type (expected to be *Struct)
+	var structName string
+	base := selfType
+	if ptr, ok := base.(*types.PointerType); ok {
+		base = ptr.ElementType
+	}
+	if st, ok := base.(*types.StructType); ok {
+		structName = st.Name
+	}
+	
+	fullName := name
+	if structName != "" {
+		fullName = structName + "_" + name
+	}
+
+	// 4. Define Function Symbol
+	fnType := types.NewFunction(retType, paramTypes, false)
+	a.currentScope.Define(fullName, symbol.SymFunc, fnType)
+
+	// 5. Scope & Body Analysis
+	a.currentFuncRetType = retType
+	a.pushScope(ctx)
+	defer func() { a.popScope(); a.currentFuncRetType = nil }()
+
+	// Define Self
+	a.currentScope.Define(selfParamName, symbol.SymVar, selfType)
+	
+	// Define Params
+	for _, param := range ctx.AllParameter() {
+		pName := param.IDENTIFIER().GetText()
+		pType := a.resolveType(param.Type_())
+		a.currentScope.Define(pName, symbol.SymVar, pType)
+	}
+
+	if ctx.Block() != nil {
+		a.scopes[ctx.Block()] = a.currentScope
+		for _, stmt := range ctx.Block().AllStatement() { a.Visit(stmt) }
+	}
+
+	return nil
+}
+
 func (a *Analyzer) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
 	// Handle Tuple Destructuring: let (a, b) = pair
 	if ctx.TuplePattern() != nil {
@@ -232,12 +302,8 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 	
 	// Pass 2: Analyze Methods
 	for _, member := range ctx.AllStructMember() {
-		if m := member.FunctionDecl(); m != nil { 
-			a.Visit(m) 
-		}
-		if m := member.MutatingDecl(); m != nil {
-			a.Visit(m)
-		}
+		if m := member.FunctionDecl(); m != nil { a.Visit(m) }
+		if m := member.MutatingDecl(); m != nil { a.Visit(m) }
 	}
 	return nil
 }
@@ -267,12 +333,8 @@ func (a *Analyzer) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 
 	// Pass 2: Analyze Methods
 	for _, member := range ctx.AllClassMember() {
-		if m := member.FunctionDecl(); m != nil { 
-			a.Visit(m) 
-		}
-		if d := member.DeinitDecl(); d != nil {
-			a.Visit(d)
-		}
+		if m := member.FunctionDecl(); m != nil { a.Visit(m) }
+		if d := member.DeinitDecl(); d != nil { a.Visit(d) }
 	}
 	return nil
 }
@@ -288,5 +350,4 @@ func (a *Analyzer) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 
 // Stubs
 func (a *Analyzer) VisitMethodDecl(ctx *parser.MethodDeclContext) interface{} { return nil }
-func (a *Analyzer) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface{} { return nil }
 func (a *Analyzer) VisitDeinitDecl(ctx *parser.DeinitDeclContext) interface{} { return nil }

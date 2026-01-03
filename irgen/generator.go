@@ -58,6 +58,7 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.CompilationUnitContext: return g.VisitCompilationUnit(ctx)
 	case *parser.TopLevelDeclContext: return g.VisitTopLevelDecl(ctx)
 	case *parser.FunctionDeclContext: return g.VisitFunctionDecl(ctx)
+	case *parser.MutatingDeclContext: return g.VisitMutatingDecl(ctx)
 	case *parser.VariableDeclContext: return g.VisitVariableDecl(ctx)
 	case *parser.ExternDeclContext: return g.VisitExternDecl(ctx)
 	case *parser.StructDeclContext: return g.VisitStructDecl(ctx)
