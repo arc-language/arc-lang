@@ -479,6 +479,7 @@ func (a *Assembler) Test(dst, src Register) {
 	a.encodeModRM(src, RegOp(dst))
 }
 
+// MovZX emits: MOVZX dst, src
 func (a *Assembler) MovZX(dst Register, src Operand, srcSize int) {
 	// 0F B6 /r (byte), 0F B7 /r (word)
 	if srcSize == 8 {
@@ -487,7 +488,6 @@ func (a *Assembler) MovZX(dst Register, src Operand, srcSize int) {
 			a.emitByte(0x0F); a.emitByte(0xB6)
 			a.encodeModRM(dst, src)
 		} else if s, ok := src.(RegOp); ok {
-			// MOVZX r64, r8
 			a.encodeRex(true, dst, NoReg, Register(s))
 			a.emitByte(0x0F); a.emitByte(0xB6)
 			a.encodeModRM(dst, src)
@@ -501,12 +501,19 @@ func (a *Assembler) Movsxd(dst, src Register) {
 	a.encodeModRM(dst, RegOp(src))
 }
 
-func (a *Assembler) Movsx(dst, src Register, srcSize int) {
+// Movsx emits: MOVSX dst, src
+func (a *Assembler) Movsx(dst Register, src Operand, srcSize int) {
 	// 0F BE /r (byte)
 	if srcSize == 8 {
-		a.encodeRex(true, dst, NoReg, src)
-		a.emitByte(0x0F); a.emitByte(0xBE)
-		a.encodeModRM(dst, RegOp(src))
+		if m, ok := src.(MemOp); ok {
+			a.encodeRex(true, dst, NoReg, m.Base)
+			a.emitByte(0x0F); a.emitByte(0xBE)
+			a.encodeModRM(dst, src)
+		} else if s, ok := src.(RegOp); ok {
+			a.encodeRex(true, dst, NoReg, Register(s))
+			a.emitByte(0x0F); a.emitByte(0xBE)
+			a.encodeModRM(dst, src)
+		}
 	}
 }
 
