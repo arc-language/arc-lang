@@ -1,0 +1,386 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Arc",
+	"scopeName": "source.arc",
+	"patterns": [
+		{ "include": "#comments" },
+		{ "include": "#strings" },
+		{ "include": "#chars" },
+		{ "include": "#extern-blocks" },
+		{ "include": "#definitions" },
+		{ "include": "#keywords" },
+		{ "include": "#types" },
+		{ "include": "#constants" },
+		{ "include": "#functions" },
+		{ "include": "#operators" }
+	],
+	"repository": {
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.block.arc",
+					"begin": "/\\*",
+					"end": "\\*/"
+				},
+				{
+					"name": "comment.line.double-slash.arc",
+					"begin": "//",
+					"end": "$"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.arc",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.arc",
+					"match": "\\\\([\"\\\\nrt0$]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})"
+				}
+			]
+		},
+		"chars": {
+			"name": "string.quoted.single.arc",
+			"begin": "'",
+			"end": "'",
+			"patterns": [
+				{
+					"name": "constant.character.escape.arc",
+					"match": "\\\\(['\\\\ nrt0]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})"
+				}
+			]
+		},
+		"extern-blocks": {
+			"patterns": [
+				{
+					"comment": "Extern C block",
+					"begin": "\\b(extern)\\s+(c)\\s*(\\{)",
+					"beginCaptures": {
+						"1": { "name": "keyword.other.extern.arc" },
+						"2": { "name": "storage.modifier.extern.c.arc" },
+						"3": { "name": "punctuation.section.block.begin.arc" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.section.block.end.arc" }
+					},
+					"patterns": [
+						{ "include": "#comments" },
+						{ "include": "#strings" },
+						{ "include": "#extern-keywords" },
+						{ "include": "#calling-conventions" },
+						{ "include": "#types" },
+						{ "include": "#constants" },
+						{ "include": "#operators" },
+						{ "include": "#extern-function-def" }
+					]
+				},
+				{
+					"comment": "Extern C++ block",
+					"begin": "\\b(extern)\\s+(cpp)\\s*(\\{)",
+					"beginCaptures": {
+						"1": { "name": "keyword.other.extern.arc" },
+						"2": { "name": "storage.modifier.extern.cpp.arc" },
+						"3": { "name": "punctuation.section.block.begin.arc" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.section.block.end.arc" }
+					},
+					"patterns": [
+						{ "include": "#comments" },
+						{ "include": "#strings" },
+						{ "include": "#extern-keywords" },
+						{ "include": "#calling-conventions" },
+						{ "include": "#types" },
+						{ "include": "#constants" },
+						{ "include": "#operators" },
+						{ "include": "#extern-function-def" },
+						{ "include": "#extern-cpp-class" }
+					]
+				}
+			]
+		},
+		"extern-keywords": {
+			"patterns": [
+				{
+					"name": "keyword.other.extern.arc",
+					"match": "\\b(opaque|virtual|static|abstract|new|delete|type|namespace|func|struct|class|const)\\b"
+				}
+			]
+		},
+		"extern-function-def": {
+			"match": "\\b(func)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+			"captures": {
+				"1": { "name": "keyword.declaration.arc" },
+				"2": { "name": "entity.name.function.arc" }
+			}
+		},
+		"extern-cpp-class": {
+			"begin": "\\b(abstract\\s+)?(class)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+			"beginCaptures": {
+				"1": { "name": "storage.modifier.arc" },
+				"2": { "name": "keyword.declaration.arc" },
+				"3": { "name": "entity.name.type.class.arc" }
+			},
+			"end": "(?<=\\})",
+			"patterns": [
+				{ "include": "#comments" },
+				{ "include": "#strings" },
+				{ "include": "#extern-keywords" },
+				{ "include": "#calling-conventions" },
+				{ "include": "#types" },
+				{ "include": "#constants" },
+				{ "include": "#operators" }
+			]
+		},
+		"calling-conventions": {
+			"name": "storage.modifier.calling-convention.arc",
+			"match": "\\b(stdcall|cdecl|fastcall|vectorcall|thiscall)\\b"
+		},
+		"definitions": {
+			"patterns": [
+				{
+					"comment": "Async function definition",
+					"match": "\\b(async)\\s+(func)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+					"captures": {
+						"1": { "name": "storage.modifier.async.arc" },
+						"2": { "name": "keyword.declaration.arc" },
+						"3": { "name": "entity.name.function.arc" }
+					}
+				},
+				{
+					"comment": "Function definition",
+					"match": "\\b(func)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+					"captures": {
+						"1": { "name": "keyword.declaration.arc" },
+						"2": { "name": "entity.name.function.arc" }
+					}
+				},
+				{
+					"comment": "Mutating method definition",
+					"match": "\\b(mutating)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+					"captures": {
+						"1": { "name": "keyword.declaration.arc" },
+						"2": { "name": "entity.name.function.arc" }
+					}
+				},
+				{
+					"comment": "Init definition",
+					"match": "\\b(init)\\s*(?=\\()",
+					"captures": {
+						"1": { "name": "keyword.declaration.arc" }
+					}
+				},
+				{
+					"comment": "Deinit definition",
+					"match": "\\b(deinit)\\s*(?=\\()",
+					"captures": {
+						"1": { "name": "keyword.declaration.arc" }
+					}
+				},
+				{
+					"comment": "Struct definition with optional compute marker",
+					"match": "\\b(struct)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(<compute>)?",
+					"captures": {
+						"1": { "name": "keyword.declaration.arc" },
+						"2": { "name": "entity.name.type.struct.arc" },
+						"3": { "name": "storage.modifier.compute.arc" }
+					}
+				},
+				{
+					"comment": "Class definition",
+					"match": "\\b(class)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+					"captures": {
+						"1": { "name": "keyword.declaration.arc" },
+						"2": { "name": "entity.name.type.class.arc" }
+					}
+				},
+				{
+					"comment": "Enum definition",
+					"match": "\\b(enum)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+					"captures": {
+						"1": { "name": "keyword.declaration.arc" },
+						"2": { "name": "entity.name.type.enum.arc" }
+					}
+				},
+				{
+					"comment": "Namespace definition",
+					"match": "\\b(namespace)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+					"captures": {
+						"1": { "name": "keyword.other.namespace.arc" },
+						"2": { "name": "entity.name.namespace.arc" }
+					}
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.flow.arc",
+					"match": "\\b(if|else|switch|case|default|for|in|break|continue|return)\\b"
+				},
+				{
+					"name": "keyword.control.exception.arc",
+					"match": "\\b(try|throw|except|finally)\\b"
+				},
+				{
+					"name": "keyword.control.async.arc",
+					"match": "\\b(async|await)\\b"
+				},
+				{
+					"name": "keyword.control.defer.arc",
+					"match": "\\b(defer)\\b"
+				},
+				{
+					"name": "keyword.other.import.arc",
+					"match": "\\b(import)\\b"
+				},
+				{
+					"name": "keyword.other.namespace.arc",
+					"match": "\\b(namespace)\\b"
+				},
+				{
+					"name": "keyword.other.extern.arc",
+					"match": "\\b(extern)\\b"
+				},
+				{
+					"name": "storage.modifier.arc",
+					"match": "\\b(let|const|static|mutating|compute)\\b"
+				},
+				{
+					"name": "keyword.declaration.arc",
+					"match": "\\b(func|struct|class|enum|init|deinit)\\b"
+				},
+				{
+					"name": "variable.language.self.arc",
+					"match": "\\b(self)\\b"
+				}
+			]
+		},
+		"types": {
+			"patterns": [
+				{
+					"name": "storage.type.primitive.arc",
+					"match": "\\b(int8|int16|int32|int64|uint8|uint16|uint32|uint64|usize|isize|float16|float32|float64|bfloat16|byte|bool|char|string|void)\\b"
+				},
+				{
+					"comment": "Type annotation after colon",
+					"match": "(:)\\s*([A-Z][a-zA-Z0-9_]*)",
+					"captures": {
+						"1": { "name": "punctuation.separator.type.arc" },
+						"2": { "name": "entity.name.type.arc" }
+					}
+				}
+			]
+		},
+		"constants": {
+			"patterns": [
+				{
+					"name": "constant.language.boolean.arc",
+					"match": "\\b(true|false)\\b"
+				},
+				{
+					"name": "constant.language.null.arc",
+					"match": "\\b(null)\\b"
+				},
+				{
+					"name": "constant.numeric.binary.arc",
+					"match": "\\b0[bB][01][01_]*\\b"
+				},
+				{
+					"name": "constant.numeric.hex.arc",
+					"match": "\\b0[xX][0-9a-fA-F][0-9a-fA-F_]*\\b"
+				},
+				{
+					"name": "constant.numeric.octal.arc",
+					"match": "\\b0[oO][0-7][0-7_]*\\b"
+				},
+				{
+					"name": "constant.numeric.float.arc",
+					"match": "(\\b[0-9][0-9_]*\\.[0-9][0-9_]*([eE][+-]?[0-9][0-9_]*)?\\b|\\b[0-9][0-9_]*[eE][+-]?[0-9][0-9_]*\\b|\\.[0-9][0-9_]*([eE][+-]?[0-9][0-9_]*)?\\b)"
+				},
+				{
+					"name": "constant.numeric.decimal.arc",
+					"match": "\\b[0-9][0-9_]*\\b"
+				}
+			]
+		},
+		"functions": {
+			"patterns": [
+				{
+					"comment": "Intrinsics and built-ins",
+					"name": "support.function.builtin.arc",
+					"match": "\\b(sizeof|alignof|alloca|cast|bit_cast|syscall|memset|memcpy|memmove|memcmp|memchr|strlen|va_start|va_arg|va_end|raise|slice)\\b"
+				},
+				{
+					"comment": "Method call on object",
+					"match": "(\\.)\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+					"captures": {
+						"1": { "name": "punctuation.accessor.arc" },
+						"2": { "name": "entity.name.function.member.arc" }
+					}
+				},
+				{
+					"comment": "Function calls",
+					"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+					"captures": {
+						"1": { "name": "entity.name.function.call.arc" }
+					}
+				},
+				{
+					"comment": "Generic function calls",
+					"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=<[^>]+>\\s*\\()",
+					"captures": {
+						"1": { "name": "entity.name.function.call.arc" }
+					}
+				}
+			]
+		},
+		"operators": {
+			"patterns": [
+				{
+					"name": "keyword.operator.arrow.arc",
+					"match": "(->|=>)"
+				},
+				{
+					"name": "keyword.operator.range.arc",
+					"match": "(\\.\\.\\.|\\.\\.\\.)"
+				},
+				{
+					"name": "keyword.operator.comparison.arc",
+					"match": "(==|!=|<=|>=|<|>)"
+				},
+				{
+					"name": "keyword.operator.logical.arc",
+					"match": "(&&|\\|\\||!)"
+				},
+				{
+					"name": "keyword.operator.assignment.compound.arc",
+					"match": "(\\+=|-=|\\*=|/=|%=|\\|=|&=|\\^=)"
+				},
+				{
+					"name": "keyword.operator.increment-decrement.arc",
+					"match": "(\\+\\+|--)"
+				},
+				{
+					"name": "keyword.operator.arithmetic.arc",
+					"match": "(\\+|-|\\*|/|%)"
+				},
+				{
+					"name": "keyword.operator.bitwise.arc",
+					"match": "(\\||&|\\^|~)"
+				},
+				{
+					"name": "keyword.operator.assignment.arc",
+					"match": "="
+				},
+				{
+					"name": "keyword.operator.address.arc",
+					"match": "@"
+				}
+			]
+		}
+	}
+}
