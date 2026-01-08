@@ -9,6 +9,7 @@ import (
 	"github.com/arc-language/arc-lang/codegen/cpu/amd64"
 	"github.com/arc-language/arc-lang/codegen/format/elf"
 	"github.com/arc-language/arc-lang/codegen/gpu/nvidia"
+	"github.com/arc-language/arc-lang/codegen/gpu/amd"
 	"github.com/arc-language/arc-lang/codegen/tpu" // New Import
 	"github.com/arc-language/arc-lang/context"
 )
