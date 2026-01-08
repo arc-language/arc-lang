@@ -178,7 +178,11 @@ externCppSelfParam
 // =============================================================================
 
 genericParams: LT genericParamList GT;
-genericParamList: IDENTIFIER (COMMA IDENTIFIER)*;
+
+// UPDATED: Allows simple identifiers "T" or qualified names "gpu.rocm"
+genericParamList: genericParam (COMMA genericParam)*;
+genericParam: IDENTIFIER (DOT IDENTIFIER)*;
+
 genericArgs: LT genericArgList GT;
 genericArgList: genericArg (COMMA genericArg)*;
 genericArg: type | expression;

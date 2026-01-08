@@ -148,6 +148,10 @@ func (v *BaseArcParserVisitor) VisitGenericParamList(ctx *GenericParamListContex
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseArcParserVisitor) VisitGenericParam(ctx *GenericParamContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseArcParserVisitor) VisitGenericArgs(ctx *GenericArgsContext) interface{} {
 	return v.VisitChildren(ctx)
 }

@@ -113,6 +113,9 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#genericParamList.
 	VisitGenericParamList(ctx *GenericParamListContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#genericParam.
+	VisitGenericParam(ctx *GenericParamContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#genericArgs.
 	VisitGenericArgs(ctx *GenericArgsContext) interface{}
 

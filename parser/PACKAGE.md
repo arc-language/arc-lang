@@ -291,90 +291,91 @@ const (
 	ArcParserRULE_externCppSelfParam       = 32
 	ArcParserRULE_genericParams            = 33
 	ArcParserRULE_genericParamList         = 34
-	ArcParserRULE_genericArgs              = 35
-	ArcParserRULE_genericArgList           = 36
-	ArcParserRULE_genericArg               = 37
-	ArcParserRULE_functionDecl             = 38
-	ArcParserRULE_returnType               = 39
-	ArcParserRULE_typeList                 = 40
-	ArcParserRULE_parameterList            = 41
-	ArcParserRULE_parameter                = 42
-	ArcParserRULE_structDecl               = 43
-	ArcParserRULE_computeMarker            = 44
-	ArcParserRULE_structMember             = 45
-	ArcParserRULE_structField              = 46
-	ArcParserRULE_initDecl                 = 47
-	ArcParserRULE_classDecl                = 48
-	ArcParserRULE_classMember              = 49
-	ArcParserRULE_classField               = 50
-	ArcParserRULE_enumDecl                 = 51
-	ArcParserRULE_enumMember               = 52
-	ArcParserRULE_methodDecl               = 53
-	ArcParserRULE_mutatingDecl             = 54
-	ArcParserRULE_deinitDecl               = 55
-	ArcParserRULE_variableDecl             = 56
-	ArcParserRULE_constDecl                = 57
-	ArcParserRULE_tuplePattern             = 58
-	ArcParserRULE_tupleType                = 59
-	ArcParserRULE_type                     = 60
-	ArcParserRULE_qualifiedType            = 61
-	ArcParserRULE_functionType             = 62
-	ArcParserRULE_arrayType                = 63
-	ArcParserRULE_qualifiedIdentifier      = 64
-	ArcParserRULE_primitiveType            = 65
-	ArcParserRULE_pointerType              = 66
-	ArcParserRULE_referenceType            = 67
-	ArcParserRULE_block                    = 68
-	ArcParserRULE_statement                = 69
-	ArcParserRULE_assignmentStmt           = 70
-	ArcParserRULE_assignmentOp             = 71
-	ArcParserRULE_leftHandSide             = 72
-	ArcParserRULE_expressionStmt           = 73
-	ArcParserRULE_returnStmt               = 74
-	ArcParserRULE_deferStmt                = 75
-	ArcParserRULE_breakStmt                = 76
-	ArcParserRULE_continueStmt             = 77
-	ArcParserRULE_throwStmt                = 78
-	ArcParserRULE_ifStmt                   = 79
-	ArcParserRULE_forStmt                  = 80
-	ArcParserRULE_switchStmt               = 81
-	ArcParserRULE_switchCase               = 82
-	ArcParserRULE_defaultCase              = 83
-	ArcParserRULE_tryStmt                  = 84
-	ArcParserRULE_exceptClause             = 85
-	ArcParserRULE_finallyClause            = 86
-	ArcParserRULE_expression               = 87
-	ArcParserRULE_logicalOrExpression      = 88
-	ArcParserRULE_logicalAndExpression     = 89
-	ArcParserRULE_bitOrExpression          = 90
-	ArcParserRULE_bitXorExpression         = 91
-	ArcParserRULE_bitAndExpression         = 92
-	ArcParserRULE_equalityExpression       = 93
-	ArcParserRULE_relationalExpression     = 94
-	ArcParserRULE_shiftExpression          = 95
-	ArcParserRULE_rangeExpression          = 96
-	ArcParserRULE_additiveExpression       = 97
-	ArcParserRULE_multiplicativeExpression = 98
-	ArcParserRULE_unaryExpression          = 99
-	ArcParserRULE_postfixExpression        = 100
-	ArcParserRULE_postfixOp                = 101
-	ArcParserRULE_primaryExpression        = 102
-	ArcParserRULE_computeExpression        = 103
-	ArcParserRULE_computeContext           = 104
-	ArcParserRULE_sizeofExpression         = 105
-	ArcParserRULE_alignofExpression        = 106
-	ArcParserRULE_literal                  = 107
-	ArcParserRULE_initializerList          = 108
-	ArcParserRULE_initializerEntry         = 109
-	ArcParserRULE_structLiteral            = 110
-	ArcParserRULE_fieldInit                = 111
-	ArcParserRULE_argumentList             = 112
-	ArcParserRULE_argument                 = 113
-	ArcParserRULE_lambdaExpression         = 114
-	ArcParserRULE_anonymousFuncExpression  = 115
-	ArcParserRULE_lambdaParamList          = 116
-	ArcParserRULE_lambdaParam              = 117
-	ArcParserRULE_tupleExpression          = 118
+	ArcParserRULE_genericParam             = 35
+	ArcParserRULE_genericArgs              = 36
+	ArcParserRULE_genericArgList           = 37
+	ArcParserRULE_genericArg               = 38
+	ArcParserRULE_functionDecl             = 39
+	ArcParserRULE_returnType               = 40
+	ArcParserRULE_typeList                 = 41
+	ArcParserRULE_parameterList            = 42
+	ArcParserRULE_parameter                = 43
+	ArcParserRULE_structDecl               = 44
+	ArcParserRULE_computeMarker            = 45
+	ArcParserRULE_structMember             = 46
+	ArcParserRULE_structField              = 47
+	ArcParserRULE_initDecl                 = 48
+	ArcParserRULE_classDecl                = 49
+	ArcParserRULE_classMember              = 50
+	ArcParserRULE_classField               = 51
+	ArcParserRULE_enumDecl                 = 52
+	ArcParserRULE_enumMember               = 53
+	ArcParserRULE_methodDecl               = 54
+	ArcParserRULE_mutatingDecl             = 55
+	ArcParserRULE_deinitDecl               = 56
+	ArcParserRULE_variableDecl             = 57
+	ArcParserRULE_constDecl                = 58
+	ArcParserRULE_tuplePattern             = 59
+	ArcParserRULE_tupleType                = 60
+	ArcParserRULE_type                     = 61
+	ArcParserRULE_qualifiedType            = 62
+	ArcParserRULE_functionType             = 63
+	ArcParserRULE_arrayType                = 64
+	ArcParserRULE_qualifiedIdentifier      = 65
+	ArcParserRULE_primitiveType            = 66
+	ArcParserRULE_pointerType              = 67
+	ArcParserRULE_referenceType            = 68
+	ArcParserRULE_block                    = 69
+	ArcParserRULE_statement                = 70
+	ArcParserRULE_assignmentStmt           = 71
+	ArcParserRULE_assignmentOp             = 72
+	ArcParserRULE_leftHandSide             = 73
+	ArcParserRULE_expressionStmt           = 74
+	ArcParserRULE_returnStmt               = 75
+	ArcParserRULE_deferStmt                = 76
+	ArcParserRULE_breakStmt                = 77
+	ArcParserRULE_continueStmt             = 78
+	ArcParserRULE_throwStmt                = 79
+	ArcParserRULE_ifStmt                   = 80
+	ArcParserRULE_forStmt                  = 81
+	ArcParserRULE_switchStmt               = 82
+	ArcParserRULE_switchCase               = 83
+	ArcParserRULE_defaultCase              = 84
+	ArcParserRULE_tryStmt                  = 85
+	ArcParserRULE_exceptClause             = 86
+	ArcParserRULE_finallyClause            = 87
+	ArcParserRULE_expression               = 88
+	ArcParserRULE_logicalOrExpression      = 89
+	ArcParserRULE_logicalAndExpression     = 90
+	ArcParserRULE_bitOrExpression          = 91
+	ArcParserRULE_bitXorExpression         = 92
+	ArcParserRULE_bitAndExpression         = 93
+	ArcParserRULE_equalityExpression       = 94
+	ArcParserRULE_relationalExpression     = 95
+	ArcParserRULE_shiftExpression          = 96
+	ArcParserRULE_rangeExpression          = 97
+	ArcParserRULE_additiveExpression       = 98
+	ArcParserRULE_multiplicativeExpression = 99
+	ArcParserRULE_unaryExpression          = 100
+	ArcParserRULE_postfixExpression        = 101
+	ArcParserRULE_postfixOp                = 102
+	ArcParserRULE_primaryExpression        = 103
+	ArcParserRULE_computeExpression        = 104
+	ArcParserRULE_computeContext           = 105
+	ArcParserRULE_sizeofExpression         = 106
+	ArcParserRULE_alignofExpression        = 107
+	ArcParserRULE_literal                  = 108
+	ArcParserRULE_initializerList          = 109
+	ArcParserRULE_initializerEntry         = 110
+	ArcParserRULE_structLiteral            = 111
+	ArcParserRULE_fieldInit                = 112
+	ArcParserRULE_argumentList             = 113
+	ArcParserRULE_argument                 = 114
+	ArcParserRULE_lambdaExpression         = 115
+	ArcParserRULE_anonymousFuncExpression  = 116
+	ArcParserRULE_lambdaParamList          = 117
+	ArcParserRULE_lambdaParam              = 118
+	ArcParserRULE_tupleExpression          = 119
 )
     ArcParser rules.
 
@@ -488,6 +489,7 @@ func InitEmptyFunctionTypeContext(p *FunctionTypeContext)
 func InitEmptyGenericArgContext(p *GenericArgContext)
 func InitEmptyGenericArgListContext(p *GenericArgListContext)
 func InitEmptyGenericArgsContext(p *GenericArgsContext)
+func InitEmptyGenericParamContext(p *GenericParamContext)
 func InitEmptyGenericParamListContext(p *GenericParamListContext)
 func InitEmptyGenericParamsContext(p *GenericParamsContext)
 func InitEmptyIfStmtContext(p *IfStmtContext)
@@ -787,6 +789,8 @@ func (p *ArcParser) GenericArg() (localctx IGenericArgContext)
 func (p *ArcParser) GenericArgList() (localctx IGenericArgListContext)
 
 func (p *ArcParser) GenericArgs() (localctx IGenericArgsContext)
+
+func (p *ArcParser) GenericParam() (localctx IGenericParamContext)
 
 func (p *ArcParser) GenericParamList() (localctx IGenericParamListContext)
 
@@ -1719,6 +1723,9 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#genericParamList.
 	VisitGenericParamList(ctx *GenericParamListContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#genericParam.
+	VisitGenericParam(ctx *GenericParamContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#genericArgs.
 	VisitGenericArgs(ctx *GenericArgsContext) interface{}
@@ -3052,6 +3059,8 @@ func (v *BaseArcParserVisitor) VisitGenericArg(ctx *GenericArgContext) interface
 func (v *BaseArcParserVisitor) VisitGenericArgList(ctx *GenericArgListContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitGenericArgs(ctx *GenericArgsContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitGenericParam(ctx *GenericParamContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitGenericParamList(ctx *GenericParamListContext) interface{}
 
@@ -4860,6 +4869,33 @@ func (s *GenericArgsContext) LT() antlr.TerminalNode
 
 func (s *GenericArgsContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
+type GenericParamContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyGenericParamContext() *GenericParamContext
+
+func NewGenericParamContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *GenericParamContext
+
+func (s *GenericParamContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *GenericParamContext) AllDOT() []antlr.TerminalNode
+
+func (s *GenericParamContext) AllIDENTIFIER() []antlr.TerminalNode
+
+func (s *GenericParamContext) DOT(i int) antlr.TerminalNode
+
+func (s *GenericParamContext) GetParser() antlr.Parser
+
+func (s *GenericParamContext) GetRuleContext() antlr.RuleContext
+
+func (s *GenericParamContext) IDENTIFIER(i int) antlr.TerminalNode
+
+func (*GenericParamContext) IsGenericParamContext()
+
+func (s *GenericParamContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
 type GenericParamListContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
@@ -4873,15 +4909,15 @@ func (s *GenericParamListContext) Accept(visitor antlr.ParseTreeVisitor) interfa
 
 func (s *GenericParamListContext) AllCOMMA() []antlr.TerminalNode
 
-func (s *GenericParamListContext) AllIDENTIFIER() []antlr.TerminalNode
+func (s *GenericParamListContext) AllGenericParam() []IGenericParamContext
 
 func (s *GenericParamListContext) COMMA(i int) antlr.TerminalNode
+
+func (s *GenericParamListContext) GenericParam(i int) IGenericParamContext
 
 func (s *GenericParamListContext) GetParser() antlr.Parser
 
 func (s *GenericParamListContext) GetRuleContext() antlr.RuleContext
-
-func (s *GenericParamListContext) IDENTIFIER(i int) antlr.TerminalNode
 
 func (*GenericParamListContext) IsGenericParamListContext()
 
@@ -6121,7 +6157,7 @@ type IGenericArgsContext interface {
 }
     IGenericArgsContext is an interface to support dynamic dispatch.
 
-type IGenericParamListContext interface {
+type IGenericParamContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -6130,6 +6166,23 @@ type IGenericParamListContext interface {
 	// Getter signatures
 	AllIDENTIFIER() []antlr.TerminalNode
 	IDENTIFIER(i int) antlr.TerminalNode
+	AllDOT() []antlr.TerminalNode
+	DOT(i int) antlr.TerminalNode
+
+	// IsGenericParamContext differentiates from other interfaces.
+	IsGenericParamContext()
+}
+    IGenericParamContext is an interface to support dynamic dispatch.
+
+type IGenericParamListContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllGenericParam() []IGenericParamContext
+	GenericParam(i int) IGenericParamContext
 	AllCOMMA() []antlr.TerminalNode
 	COMMA(i int) antlr.TerminalNode
 
