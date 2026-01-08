@@ -73,8 +73,6 @@ func (g *Generator) exitScope() {
 	}
 }
 
-// VisitFunctionDecl handles function declarations.
-// It detects hardware markers in generics (<gpu>, <tpu>, etc.) to set calling conventions.
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	// 1. Detect Hardware Markers in Generics
 	// We scan the generic parameter list for specific tags.
@@ -84,18 +82,23 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	isCUDA := false
 	isTPU := false
 
+	// Access generic parameters using the updated grammar structure
 	if gp := ctx.GenericParams(); gp != nil {
 		if gpl := gp.GenericParamList(); gpl != nil {
-			for _, id := range gpl.AllIDENTIFIER() {
-				tag := id.GetText()
-				if tag == "gpu" {
-					isGPU = true
-				} else if tag == "rocm" {
-					isROCm = true
-				} else if tag == "cuda" {
-					isCUDA = true
-				} else if tag == "tpu" {
-					isTPU = true
+			// Iterate over genericParam contexts (e.g. "gpu.rocm", "T")
+			for _, param := range gpl.AllGenericParam() {
+				// Iterate over identifiers within a param (e.g. "gpu" and "rocm")
+				for _, id := range param.AllIDENTIFIER() {
+					tag := id.GetText()
+					if tag == "gpu" {
+						isGPU = true
+					} else if tag == "rocm" {
+						isROCm = true
+					} else if tag == "cuda" {
+						isCUDA = true
+					} else if tag == "tpu" {
+						isTPU = true
+					}
 				}
 			}
 		}
@@ -166,7 +169,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			fn.CallConv = ir.CC_PTX
 		} else if isGPU {
 			// Default generic <gpu> to CUDA/PTX if not specified
-			// In a real implementation, this might default based on a compiler flag
 			fn.CallConv = ir.CC_PTX
 		}
 
