@@ -4,6 +4,7 @@
 
 ---
 
+
 ## Compiler Architecture: One Parser, Two Backends
 
 Arc uses a **Unified Frontend** with a **Split Backend**. The same parser handles both CPU and GPU code.
