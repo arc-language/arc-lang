@@ -3,7 +3,6 @@ package amd
 import (
 	"bytes"
 	"fmt"
-	"strings"
 
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
