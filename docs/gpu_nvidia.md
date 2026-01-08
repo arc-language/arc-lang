@@ -1,4 +1,4 @@
-# Arc NVIDIA GPU Execution Model
+# Arc NVIDIA GPU Model
 
 **Key Concept:** Functions marked `async func<gpu>` compile **entirely** to PTX (Parallel Thread Execution). Everything - control flow, loops, operations - becomes PTX instructions.
 
