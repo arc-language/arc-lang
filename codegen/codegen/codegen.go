@@ -20,11 +20,14 @@ func Generate(module *ir.Module) error {
 
 	// 1. Scan for Hardware Specific Functions
 	hasGPUFunctions := false
+	hasROCmFunctions := false
 	hasTPUFunctions := false
 
 	for _, fn := range module.Functions {
 		if fn.CallConv == ir.CC_PTX {
 			hasGPUFunctions = true
+		} else if fn.CallConv == ir.CC_ROCM {
+			hasROCmFunctions = true
 		} else if fn.CallConv == ir.CC_TPU {
 			hasTPUFunctions = true
 		}
@@ -32,21 +35,37 @@ func Generate(module *ir.Module) error {
 
 	// 2. Generate NVIDIA PTX if needed
 	if hasGPUFunctions {
-		logger.Info("GPU functions detected (CC_PTX). Generating NVIDIA PTX...")
+		logger.Info("NVIDIA GPU functions detected (CC_PTX). Generating PTX Assembly...")
 
 		ptxCode, err := nvidia.Generate(module)
 		if err != nil {
-			return fmt.Errorf("GPU codegen failed: %w", err)
+			return fmt.Errorf("NVIDIA codegen failed: %w", err)
 		}
 
 		fmt.Println("\n// ==========================================")
-		fmt.Println("// GENERATED PTX ASSEMBLY")
+		fmt.Println("// GENERATED NVIDIA PTX ASSEMBLY")
 		fmt.Println("// ==========================================")
 		fmt.Println(ptxCode)
 		fmt.Println("// ==========================================\n")
 	}
 
-	// 3. Generate Google TPU HLO if needed
+	// 3. Generate AMD ROCm (GCN) if needed
+	if hasROCmFunctions {
+		logger.Info("AMD GPU functions detected (CC_ROCM). Generating GCN Assembly...")
+
+		gcnCode, err := amd.Generate(module)
+		if err != nil {
+			return fmt.Errorf("AMD codegen failed: %w", err)
+		}
+
+		fmt.Println("\n// ==========================================")
+		fmt.Println("// GENERATED AMD GCN ASSEMBLY")
+		fmt.Println("// ==========================================")
+		fmt.Println(gcnCode)
+		fmt.Println("// ==========================================\n")
+	}
+
+	// 4. Generate Google TPU HLO if needed
 	if hasTPUFunctions {
 		logger.Info("TPU functions detected (CC_TPU). Generating Google HLO...")
 
@@ -62,9 +81,10 @@ func Generate(module *ir.Module) error {
 		fmt.Println("// ==========================================\n")
 	}
 
-	// 4. Always proceed with standard CPU Code Generation
+	// 5. Always proceed with standard CPU Code Generation
 	// The CPU backend (amd64) handles the host code.
-	// Hardware kernel functions (PTX/TPU) act as externs/stubs in the host ELF.
+	// Hardware kernel functions (PTX/ROCm/TPU) act as externs/stubs in the host ELF,
+	// typically managed via the runtime (not shown here) loading the generated assembly above.
 	logger.Info("Generating x86-64 CPU code...")
 
 	objBytes, err := GenerateObject(module)

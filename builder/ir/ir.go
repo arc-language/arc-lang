@@ -22,9 +22,12 @@ const (
 
 	// Add this for GPU functions
 	CC_PTX 	
+	
+	// AMD ROCm/HIP functions
+	CC_ROCM
 
 	// TPU functions
-	CC_TPU	
+	CC_TPU
 )
 
 func (cc CallingConvention) String() string {
@@ -44,6 +47,8 @@ func (cc CallingConvention) String() string {
 
 	case CC_PTX:
 		return "ptx_kernel"
+	case CC_ROCM:
+		return "amdgpu_kernel"
 	case CC_TPU:
 		return "tpu_kernel"
 	}

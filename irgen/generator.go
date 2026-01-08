@@ -74,11 +74,14 @@ func (g *Generator) exitScope() {
 }
 
 // VisitFunctionDecl handles function declarations.
-// It includes logic to detect the <gpu> and <tpu> generic tags to set specific calling conventions.
+// It detects hardware markers in generics (<gpu>, <tpu>, etc.) to set calling conventions.
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	// 1. Detect Hardware Markers in Generics
-	// We scan the generic parameter list for specific tags like "gpu" or "tpu".
+	// We scan the generic parameter list for specific tags.
+	// Supports: <gpu>, <gpu.cuda>, <gpu.rocm>, <tpu>
 	isGPU := false
+	isROCm := false
+	isCUDA := false
 	isTPU := false
 
 	if gp := ctx.GenericParams(); gp != nil {
@@ -87,6 +90,10 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 				tag := id.GetText()
 				if tag == "gpu" {
 					isGPU = true
+				} else if tag == "rocm" {
+					isROCm = true
+				} else if tag == "cuda" {
+					isCUDA = true
 				} else if tag == "tpu" {
 					isTPU = true
 				}
@@ -133,7 +140,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 
 	// --- Phase 1: Create Function Prototype ---
 	// In this phase, we define the function signature and add it to the module.
-	// We do not generate the body yet.
 	if g.Phase == 1 {
 		var retType types.Type = types.Void
 		if ctx.ReturnType() != nil {
@@ -152,10 +158,16 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
 
 		// Apply specific calling conventions based on tags found earlier
-		if isGPU {
-			fn.CallConv = ir.CC_PTX
-		} else if isTPU {
+		if isTPU {
 			fn.CallConv = ir.CC_TPU
+		} else if isROCm {
+			fn.CallConv = ir.CC_ROCM
+		} else if isCUDA {
+			fn.CallConv = ir.CC_PTX
+		} else if isGPU {
+			// Default generic <gpu> to CUDA/PTX if not specified
+			// In a real implementation, this might default based on a compiler flag
+			fn.CallConv = ir.CC_PTX
 		}
 
 		// Link the IR function to the semantic symbol
