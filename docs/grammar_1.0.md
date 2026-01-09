@@ -822,7 +822,7 @@ let result = add(5, 10)
 
 ## Extern, C interoperability
 ```arc
-extern libc {
+extern c {
     // Maps Arc 'printf' to C symbol 'printf'
     // Uses *byte (C-String) instead of high-level string
     func printf "printf" (*byte, ...) int32
@@ -834,7 +834,7 @@ extern libc {
     func usleep(int32) int32
 }
 
-libc.printf()
+printf()
 ```
 
 ## Enums
@@ -859,24 +859,6 @@ enum Color: uint8 {
     GREEN = 0x00FF00
     BLUE = 0x0000FF
 }
-```
-
-## String Interpolation
-```arc
-let name = "Alice"
-let age = 30
-
-// Basic variable interpolation
-let msg = "Hello ${name}"
-
-// Expression interpolation
-let info = "You are ${age} years old, born in ${2025 - age}"
-
-// Complex expressions
-let result = "Sum: ${a + b}, Product: ${a * b}"
-
-// Nested function calls
-let upper = "Name: ${name.to_upper()}"
 ```
 
 ## Generics, struct, monomorphizes
