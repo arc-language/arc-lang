@@ -243,10 +243,9 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 	var isQualified bool
 	var hasParens bool = (ctx.LPAREN() != nil)
 	isCall := hasParens && (ctx.IDENTIFIER() != nil || ctx.QualifiedIdentifier() != nil)
-	var qCtx *parser.QualifiedIdentifierContext
 
 	if ctx.QualifiedIdentifier() != nil {
-		qCtx = ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
+		qCtx := ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
 		for i, id := range qCtx.AllIDENTIFIER() {
 			if i > 0 { name += "." }
 			name += id.GetText()
@@ -300,7 +299,44 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 			}
 			return typ
 		} else if isQualified {
-			// (Member access logic omitted, assumed unchanged from previous steps)
+			// Handle qualified identifiers that resolve to member access (e.g., rect.width)
+			qCtx := ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
+			ids := qCtx.AllIDENTIFIER()
+			baseName := ids[0].GetText()
+
+			s, ok := a.currentScope.Resolve(baseName)
+			if !ok && a.currentNamespacePrefix != "" {
+				s, ok = a.currentScope.Resolve(a.currentNamespacePrefix + "." + baseName)
+			}
+
+			if ok {
+				curr := s.Type
+				valid := true
+				
+				for i := 1; i < len(ids); i++ {
+					fieldName := ids[i].GetText()
+					
+					// Dereference pointer if needed
+					if ptr, ok := curr.(*types.PointerType); ok {
+						curr = ptr.ElementType
+					}
+
+					if st, ok := curr.(*types.StructType); ok {
+						if indices, ok := a.structIndices[st.Name]; ok {
+							if idx, ok := indices[fieldName]; ok {
+								curr = st.Fields[idx]
+								continue
+							}
+						}
+					}
+					valid = false
+					break
+				}
+				
+				if valid {
+					return curr
+				}
+			}
 		}
 		
 		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Undefined identifier '%s'", name)
