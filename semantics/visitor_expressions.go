@@ -258,8 +258,22 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 
 	if name != "" {
 		if ctx.GenericArgs() != nil && !isQualified {
-			if name == "cast" || name == "bit_cast" { return types.I64 } // Simplification
-			if name == "alloca" { return types.NewPointer(types.I8) }
+			// Handle intrinsics with generic arguments
+			args := ctx.GenericArgs().GenericArgList().AllGenericArg()
+
+			if name == "cast" || name == "bit_cast" { 
+				if len(args) > 0 && args[0].Type_() != nil {
+					return a.resolveType(args[0].Type_())
+				}
+				return types.I64 
+			} 
+			if name == "alloca" { 
+				if len(args) > 0 && args[0].Type_() != nil {
+					elemType := a.resolveType(args[0].Type_())
+					return types.NewPointer(elemType)
+				}
+				return types.NewPointer(types.I8) 
+			}
 		}
 		
 		s, ok := a.currentScope.Resolve(name)
