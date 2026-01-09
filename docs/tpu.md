@@ -141,6 +141,31 @@ extern pjrt {
     
     func PJRT_Buffer_ToHostBuffer(buffer: *void, dst: *void, size: usize) int32
 }
+
+
+// Your StableHLO as a text string:
+let stablehlo_text = """
+module {
+  func.func @add(%arg0: tensor<f32>, %arg1: tensor<f32>) -> tensor<f32> {
+    %0 = stablehlo.add %arg0, %arg1 : tensor<f32>
+    return %0 : tensor<f32>
+  }
+}
+"""
+
+// Pass to PJRT:
+PJRT_Program program;
+program.code = stablehlo_text.ptr;     // ← Pointer to text string
+program.code_size = stablehlo_text.len; // ← Length of string  
+program.format = "mlir";                // ← Format identifier
+program.format_size = 4;                // ← Length of "mlir"
+
+PJRT_Client_Compile_Args compile_args;
+compile_args.program = &program;
+// ... set other args ...
+
+pjrt_api.PJRT_Client_Compile(&compile_args);
+
 ```
 
 **PJRT provides XLA compilation + runtime in a clean C API.**
