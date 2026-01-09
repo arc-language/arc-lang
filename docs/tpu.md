@@ -1,20 +1,20 @@
-# Arc Google TPU Execution Model
+# Arc Google TPU Model
 
-**Key Concept:** Functions marked `async func<tpu>` compile **entirely** to HLO (High-Level Operations). Everything - control flow, loops, operations - becomes HLO operations.
+**Key Concept:** Functions marked `async func<tpu>` compile **entirely** to StableHLO (Stable High-Level Operations). Everything - control flow, loops, operations - becomes StableHLO operations.
 
 ---
 
 ## How `<tpu>` Functions Work
 
-### The Entire Function Becomes HLO
+### The Entire Function Becomes StableHLO
 
 ```arc
 async func example<tpu>(data: *float32, n: usize) *float32 {
-    // EVERYTHING in here → HLO operations
+    // EVERYTHING in here → StableHLO operations
     let idx = tpu.replica_id()
     
-    if idx < n {  // ← HLO CONDITIONAL/SELECT
-        return data[idx] * 2.0  // ← HLO MULTIPLY
+    if idx < n {  // ← StableHLO CONDITIONAL/SELECT
+        return data[idx] * 2.0  // ← StableHLO MULTIPLY
     }
 }
 ```
@@ -23,26 +23,28 @@ async func example<tpu>(data: *float32, n: usize) *float32 {
 
 | Your Code | Compiles To |
 |-----------|-------------|
-| `if ... else` | HLO `CONDITIONAL` or `SELECT` |
-| `for` loop | HLO `WHILE` |
-| `while` loop | HLO `WHILE` |
-| Arithmetic | HLO `ADD`, `MULTIPLY`, etc. |
-| Array access | HLO `DYNAMIC-SLICE` |
+| `if ... else` | StableHLO `stablehlo.case` or `stablehlo.select` |
+| `for` loop | StableHLO `stablehlo.while` |
+| `while` loop | StableHLO `stablehlo.while` |
+| Arithmetic | StableHLO `stablehlo.add`, `stablehlo.multiply`, etc. |
+| Array access | StableHLO `stablehlo.dynamic_slice` |
 
 **Not Supported:**
 - System calls, recursive functions, runtime memory allocation
+
+**StableHLO Specification:** https://openxla.org/stablehlo/spec
 
 ---
 
 ## Memory Model: Buffer Inference
 
-**Critical:** HLO computations don't allocate memory. They describe operations on buffers.
+**Critical:** StableHLO computations don't allocate memory. They describe operations on buffers.
 
 ### What Really Happens
 
 ```arc
 async func add<tpu>(a: *float32, b: *float32, n: usize) *float32 {
-    // NO malloc in HLO! Just operations on inputs
+    // NO malloc in StableHLO! Just operations on inputs
     let idx = tpu.replica_id()
     if idx < n {
         return a[idx] + b[idx]  // Compiler infers output is float32[n]
@@ -52,11 +54,11 @@ async func add<tpu>(a: *float32, b: *float32, n: usize) *float32 {
 
 **Flow:**
 1. **Compile time:** Compiler analyzes function, infers output shape `float32[n]`
-2. **Compile time:** Generates HLO operating on pre-allocated buffers
+2. **Compile time:** Generates StableHLO operating on pre-allocated buffers
 3. **Runtime (await):** PJRT allocates input buffers on TPU HBM
 4. **Runtime:** PJRT copies `a` and `b` to TPU
 5. **Runtime:** PJRT allocates output buffer based on shape inference
-6. **Runtime:** HLO executes on pre-allocated buffers
+6. **Runtime:** StableHLO executes on pre-allocated buffers
 7. **Runtime:** PJRT copies result back to CPU
 
 ### Syntactic Sugar (if provided)
@@ -64,31 +66,31 @@ async func add<tpu>(a: *float32, b: *float32, n: usize) *float32 {
 ```arc
 async func example<tpu>(data: *float32, n: usize) *float32 {
     let result = tpu.malloc<float32>(n)  // ← Compiler magic
-    // Compiler converts this to shape annotations in HLO
+    // Compiler converts this to shape annotations in StableHLO
     // Actual allocation happens at runtime by PJRT
 }
 ```
 
 **Behind the scenes:**
 - Compiler infers buffer shapes at compile time
-- Encodes shape metadata in HLO
+- Encodes shape metadata in StableHLO
 - PJRT handles actual HBM allocation at runtime
-- **No malloc operations in the HLO itself**
+- **No malloc operations in the StableHLO itself**
 
 ---
 
 ## Arc's Native Linking
 
-Arc links directly to `libpjrt_c_api_tpu_plugin.so`:
+Arc links directly to `libtpu.so`:
 
 ```
 Arc Source (async func<tpu>)
     ↓
 Arc Parser → AST
     ↓
-HLO Backend → Binary Protocol Buffer (embedded in executable)
+StableHLO Backend → Binary MLIR (embedded in executable)
     ↓
-Arc Linker → Links to libpjrt_c_api_tpu_plugin.so
+Arc Linker → Links to libtpu.so
     ↓
 Runtime (PJRT C API) → XLA Compiler → TPU Execution
 ```
@@ -97,12 +99,12 @@ Runtime (PJRT C API) → XLA Compiler → TPU Execution
 
 ## Why PJRT?
 
-**XLA is a compiler (HLO → machine code). PJRT is the runtime (device management, execution, memory).**
+**XLA is a compiler (StableHLO → machine code). PJRT is the runtime (device management, execution, memory).**
 
 ```
-Arc generates HLO → PJRT Runtime → XLA Compiler → TPU
-                    ↓
-                    Handles all the complexity
+Arc generates StableHLO → PJRT Runtime → XLA Compiler → TPU
+                          ↓
+                          Handles all the complexity
 ```
 
 ### What PJRT Does For You
@@ -125,7 +127,7 @@ PJRT handles all of this through a stable C API.
 extern pjrt {
     func PJRT_Client_Compile(
         client: *void,
-        hlo_bytes: *byte,
+        stablehlo_bytes: *byte,
         size: usize,
         executable: **void
     ) int32
@@ -153,11 +155,11 @@ extern pjrt {
 arc build --target=tpu my_program.arc
 ```
 
-1. Compile `async func<tpu>` → HLO operations
-2. Perform shape inference on HLO
-3. Serialize HLO → binary protobuf
-4. Embed HLO bytes in executable
-5. Link to `libpjrt_c_api_tpu_plugin.so`
+1. Compile `async func<tpu>` → StableHLO operations
+2. Perform shape inference on StableHLO
+3. Serialize StableHLO → binary MLIR bytecode
+4. Embed StableHLO bytes in executable
+5. Link to `libtpu.so`
 
 ### Runtime Execution (JIT)
 
@@ -165,15 +167,15 @@ arc build --target=tpu my_program.arc
 let result = await matrix_multiply(A, B, N)  // First call
 ```
 
-1. Load embedded HLO bytes from executable
-2. `PJRT_Client_Compile(hlo_bytes)` → executable handle
-3. **XLA JIT compiles HLO → TPU machine code**
+1. Load embedded StableHLO bytes from executable
+2. `PJRT_Client_Compile(stablehlo_bytes)` → executable handle
+3. **XLA JIT compiles StableHLO → TPU machine code**
 4. PJRT caches compiled TPU code
 5. PJRT allocates input buffers on TPU HBM
 6. PJRT copies CPU data → TPU buffers
 7. `PJRT_Executable_Execute()`
 8. PJRT infers output shape, allocates output buffer
-9. HLO executes on TPU
+9. StableHLO executes on TPU
 10. `await` synchronizes on completion
 11. PJRT copies result TPU → CPU
 
@@ -194,7 +196,7 @@ async func matrix_multiply<tpu>(A: *float32, B: *float32, N: usize) *float32 {
         let col = idx % N
         let mut sum: float32 = 0.0
         
-        for k in 0..N {  // ← Becomes HLO WHILE or optimized to DOT
+        for k in 0..N {  // ← Becomes StableHLO while or optimized to dot
             sum += A[row * N + k] * B[k * N + col]
         }
         
@@ -225,7 +227,7 @@ func main() {
 
 ## Pattern Matching
 
-**Pattern matching can eliminate control flow and generate optimized HLO.**
+**Pattern matching can eliminate control flow and generate optimized StableHLO.**
 
 ### Best Case: Pure Array Operations
 
@@ -235,7 +237,7 @@ async func add<tpu>(a: [float32; N], b: [float32; N]) [float32; N] {
 }
 ```
 
-**Compiler generates:** `HLO: add(parameter(0), parameter(1))` - Single operation!
+**Compiler generates:** `stablehlo.add(parameter(0), parameter(1))` - Single operation!
 
 ### Manual Indexing
 
@@ -250,15 +252,15 @@ async func add_indexed<tpu>(a: *float32, b: *float32, n: usize) *float32 {
 
 **Compiler generates:**
 ```
-idx = replica_id()
-bound_check = compare(idx, n, LT)
-a_slice = dynamic-slice(a, idx)
-b_slice = dynamic-slice(b, idx)
-sum = add(a_slice, b_slice)
-result = select(bound_check, sum, zero)
+idx = stablehlo.replica_id()
+bound_check = stablehlo.compare(idx, n, LT)
+a_slice = stablehlo.dynamic_slice(a, idx)
+b_slice = stablehlo.dynamic_slice(b, idx)
+sum = stablehlo.add(a_slice, b_slice)
+result = stablehlo.select(bound_check, sum, zero)
 ```
 
-**Takeaway:** Write high-level array operations when possible. Manual indexing works but generates more HLO ops.
+**Takeaway:** Write high-level array operations when possible. Manual indexing works but generates more StableHLO ops.
 
 ---
 
@@ -267,12 +269,12 @@ result = select(bound_check, sum, zero)
 ```arc
 async func parallel_work<tpu>(data: *float32, n: usize) *float32 {
     let core_id = tpu.replica_id()  // Which TPU core am I?
-    // Each core runs same HLO but knows its index
+    // Each core runs same StableHLO but knows its index
     // Core 0 processes data[0], Core 1 processes data[1], etc.
 }
 ```
 
-**Maps to:** XLA's `ReplicaId()` operation
+**Maps to:** StableHLO's `stablehlo.replica_id()` operation
 
 **Characteristics:**
 - Coarse-grained: one index per TPU core
@@ -308,15 +310,14 @@ let initialized: bool = false
 func init() {
     if initialized { return }
     
-    let plugin: *void = null
-    pjrt.PJRT_Plugin_Initialize(&plugin, "tpu", "TFRT_TPU_RUNTIME")
-    pjrt.PJRT_Client_Create(plugin, &tpu_client)
+    let api = pjrt.GetPjrtApi()  // Load from libtpu.so
+    pjrt.PJRT_Client_Create(api, &tpu_client, "tpu")
     
     initialized = true
 }
 
 func replica_id() usize {
-    // Maps to HLO ReplicaId() operation
+    // Maps to StableHLO replica_id() operation
 }
 ```
 
@@ -326,10 +327,10 @@ func replica_id() usize {
 
 | Aspect | GPU/CUDA | TPU |
 |--------|----------|-----|
-| Backend Format | PTX (text assembly) | HLO (binary protobuf) |
+| Backend Format | PTX (text assembly) | **StableHLO (binary MLIR)** |
 | Abstraction | Low-level threads | High-level array ops |
-| Control Flow | PTX branches | HLO CONDITIONAL/SELECT/WHILE |
-| Compilation | AOT (Arc→PTX), JIT (PTX→SASS) | AOT (Arc→HLO), JIT (HLO→TPU code) |
+| Control Flow | PTX branches | StableHLO conditional/select/while |
+| Compilation | AOT (Arc→PTX), JIT (PTX→SASS) | AOT (Arc→StableHLO), JIT (StableHLO→TPU code) |
 | Runtime API | CUDA Driver API | **PJRT C API** |
 | Compiler | NVIDIA Driver JIT | **XLA (via PJRT)** |
 | Parallelism | `gpu.thread_id()` (fine-grained) | `tpu.replica_id()` (coarse SPMD) |
@@ -346,13 +347,13 @@ arc build --target=tpu my_program.arc
 
 # Run
 ./my_program
-# First call: PJRT JIT compiles HLO → TPU code
+# First call: PJRT JIT compiles StableHLO → TPU code
 # Subsequent calls: Reuse cached TPU executable
 ```
 
 **Requirements:**
 - TPU device (or Cloud TPU)
-- PJRT TPU plugin (`libpjrt_c_api_tpu_plugin.so`)
+- PJRT TPU plugin (`libtpu.so`)
 
 **NOT Required:**
 - C++ compiler
@@ -365,13 +366,13 @@ arc build --target=tpu my_program.arc
 
 ## Summary
 
-1. `async func<tpu>` compiles entirely to HLO
-2. Memory is pre-allocated - HLO operates on buffers
-3. Two-phase: Arc→HLO (AOT), HLO→TPU code (JIT on first call)
+1. `async func<tpu>` compiles entirely to **StableHLO** (see spec: https://openxla.org/stablehlo/spec)
+2. Memory is pre-allocated - StableHLO operates on buffers
+3. Two-phase: Arc→StableHLO (AOT), StableHLO→TPU code (JIT on first call)
 4. `await` triggers JIT compilation, execution, and synchronization
 5. Pattern matching optimizes to efficient array operations
 6. PJRT manages devices, execution, memory, buffer allocation
-7. XLA compiles HLO → TPU machine code
+7. XLA compiles StableHLO → TPU machine code
 8. `tpu.replica_id()` enables SPMD parallelism across TPU cores
 9. Shape inference determines buffer sizes at compile time
 
@@ -384,13 +385,13 @@ async func add<tpu>(a: *float32, b: *float32, n: usize) *float32 {
     }
 }
 
-// Compiler generates HLO (AOT):
-// - Shape inference: output is float32[n]
-// - Operations: replica_id, compare, dynamic-slice, add, select
+// Compiler generates StableHLO (AOT):
+// - Shape inference: output is tensor<?xf32> with dynamic dimension n
+// - Operations: replica_id, compare, dynamic_slice, add, select
 
-// First await: PJRT+XLA JIT compile HLO → TPU machine code
+// First await: PJRT+XLA JIT compile StableHLO → TPU machine code
 // PJRT allocates buffers, executes on TPU, returns result
 let result = await add(data_a, data_b, 1024)
 ```
 
-**PJRT provides the runtime. XLA provides the compiler. Together they give you TPU execution through a clean C API.** 🚀
+**PJRT provides the runtime. XLA provides the compiler. StableHLO provides the portable intermediate representation. Together they give you TPU execution through a clean C API.** 🚀
