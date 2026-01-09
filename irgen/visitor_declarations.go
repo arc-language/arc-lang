@@ -339,6 +339,17 @@ func (g *Generator) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface
 		}
 	}
 
+	// Fix: Handle Flat Mutating Methods (mutating func foo(self x: T))
+	if parentName == "" && ctx.Type_() != nil {
+		t := g.resolveType(ctx.Type_())
+		if ptr, ok := t.(*types.PointerType); ok {
+			t = ptr.ElementType
+		}
+		if st, ok := t.(*types.StructType); ok {
+			parentName = st.Name
+		}
+	}
+
 	irName := name
 	if parentName != "" {
 		irName = parentName + "_" + name

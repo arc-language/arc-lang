@@ -124,6 +124,26 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
+	// Fix: Handle Flat Methods (func foo(self x: T))
+	// If the function is not inside a struct block but has a 'self' parameter,
+	// it acts as a method and needs name mangling (Struct_Method).
+	if !isMethod && ctx.ParameterList() != nil {
+		for _, param := range ctx.ParameterList().AllParameter() {
+			if param.SELF() != nil {
+				// Resolve type to find the struct name
+				t := g.resolveType(param.Type_())
+				if ptr, ok := t.(*types.PointerType); ok {
+					t = ptr.ElementType
+				}
+				if st, ok := t.(*types.StructType); ok {
+					parentName = st.Name
+					isMethod = true
+				}
+				break
+			}
+		}
+	}
+
 	// Construct the actual IR name
 	if isMethod {
 		irName = parentName + "_" + name
