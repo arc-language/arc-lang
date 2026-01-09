@@ -364,6 +364,10 @@ arc build --target=tpu my_program.arc
 
 ---
 
+## StableHLO builder and codegen examples in golang 
+
+- https://github.com/gomlx/go-xla
+
 ## Summary
 
 1. `async func<tpu>` compiles entirely to **StableHLO** (see spec: https://openxla.org/stablehlo/spec)
