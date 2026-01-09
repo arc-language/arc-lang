@@ -152,11 +152,14 @@ FLOAT_LITERAL
 
 fragment EXPONENT: [eE] [+-]? DECIMAL_LITERAL;
 
+// V1 Decision: No string interpolation.
+// Matches "Hello World" or "Line\nBreak".
 STRING_LITERAL: '"' (~["\\\r\n] | ESCAPE_SEQUENCE)* '"';
+
 CHAR_LITERAL: '\'' (~['\\\r\n] | ESCAPE_SEQUENCE) '\'';
 
 fragment ESCAPE_SEQUENCE
-    : '\\' ['"\\nrt0$]
+    : '\\' ['"\\nrt0]  // Removed '$' as it's often used for interpolation, keeping it clean for v1
     | '\\' 'x' HEX_DIGIT HEX_DIGIT
     | '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     | '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
