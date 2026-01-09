@@ -148,6 +148,13 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		if ctx.ReturnType() != nil {
 			if ctx.ReturnType().Type_() != nil {
 				retType = g.resolveType(ctx.ReturnType().Type_())
+			} else if ctx.ReturnType().TypeList() != nil {
+				// Handle tuple return types: (T1, T2) -> struct { T1, T2 }
+				var tupleTypes []types.Type
+				for _, t := range ctx.ReturnType().TypeList().AllType_() {
+					tupleTypes = append(tupleTypes, g.resolveType(t))
+				}
+				retType = types.NewStruct("", tupleTypes, false)
 			}
 		}
 		var paramTypes []types.Type

@@ -348,8 +348,17 @@ func (g *Generator) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface
 
 	if g.Phase == 1 {
 		var retType types.Type = types.Void
-		if ctx.ReturnType() != nil && ctx.ReturnType().Type_() != nil {
-			retType = g.resolveType(ctx.ReturnType().Type_())
+		if ctx.ReturnType() != nil {
+			if ctx.ReturnType().Type_() != nil {
+				retType = g.resolveType(ctx.ReturnType().Type_())
+			} else if ctx.ReturnType().TypeList() != nil {
+				// Handle tuple return types
+				var tupleTypes []types.Type
+				for _, t := range ctx.ReturnType().TypeList().AllType_() {
+					tupleTypes = append(tupleTypes, g.resolveType(t))
+				}
+				retType = types.NewStruct("", tupleTypes, false)
+			}
 		}
 		var paramTypes []types.Type
 		if ctx.Type_() != nil {
