@@ -316,7 +316,6 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 				for i := 1; i < len(ids); i++ {
 					fieldName := ids[i].GetText()
 					
-					// Dereference pointer if needed
 					if ptr, ok := curr.(*types.PointerType); ok {
 						curr = ptr.ElementType
 					}
@@ -327,6 +326,13 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 								curr = st.Fields[idx]
 								continue
 							}
+						}
+						
+						// FIX: Method resolution for QualifiedIdentifier
+						methodName := st.Name + "_" + fieldName
+						if sym, ok := a.globalScope.Resolve(methodName); ok {
+							curr = sym.Type
+							continue
 						}
 					}
 					valid = false

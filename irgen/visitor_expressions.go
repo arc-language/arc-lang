@@ -391,6 +391,14 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	for _, op := range ctx.AllPostfixOp() {
 		if op.LPAREN() != nil {
 			var args []ir.Value
+			
+			// FIX: Handle BoundMethod
+			if bm, ok := curr.(*BoundMethod); ok {
+				curr = bm.Fn
+				pendingFnType = bm.Fn.FuncType
+				args = append(args, bm.This)
+			}
+			
 			var targetType *types.FunctionType = pendingFnType
 			if targetType == nil {
 				if fn, ok := curr.(*ir.Function); ok {
@@ -718,23 +726,28 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 						}
 						
 						// Try Method Resolution
-						if isCall && i == len(ids)-1 {
-							methodName := st.Name + "_" + fieldName
-							if methodSym, ok := g.currentScope.Resolve(methodName); ok {
-								if ft, ok := methodSym.Type.(*types.FunctionType); ok {
-									pendingFnType = ft
-									// Auto-load 'this' if needed
-									thisArg := currPtr
-									if len(ft.ParamTypes) > 0 && !ft.ParamTypes[0].Equal(thisArg.Type()) {
-										if pt, isPtr := thisArg.Type().(*types.PointerType); isPtr && pt.ElementType.Equal(ft.ParamTypes[0]) {
-											thisArg = g.ctx.Builder.CreateLoad(pt.ElementType, thisArg, "")
-										}
+						methodName := st.Name + "_" + fieldName
+						if methodSym, ok := g.currentScope.Resolve(methodName); ok {
+							if fn, ok := methodSym.IRValue.(*ir.Function); ok {
+								// Auto-load 'this' if needed
+								thisArg := currPtr
+								ft := fn.FuncType
+								if len(ft.ParamTypes) > 0 && !ft.ParamTypes[0].Equal(thisArg.Type()) {
+									if pt, isPtr := thisArg.Type().(*types.PointerType); isPtr && pt.ElementType.Equal(ft.ParamTypes[0]) {
+										thisArg = g.ctx.Builder.CreateLoad(pt.ElementType, thisArg, "")
 									}
-									argsToPass = append([]ir.Value{thisArg}, argsToPass...)
 								}
-								entity = methodSym.IRValue
-								valid = true
-								break
+
+								if isCall && i == len(ids)-1 {
+									pendingFnType = ft
+									argsToPass = append([]ir.Value{thisArg}, argsToPass...)
+									entity = methodSym.IRValue
+									valid = true
+									break
+								} else if i == len(ids)-1 {
+									// Return BoundMethod
+									return &BoundMethod{Fn: fn, This: thisArg}
+								}
 							}
 						}
 					}
@@ -914,3 +927,13 @@ func (g *Generator) checkTypeMatch(val ir.Value, expected types.Type) bool {
 	}
 	return false
 }
+
+type BoundMethod struct {
+	Fn   *ir.Function
+	This ir.Value
+}
+
+func (b *BoundMethod) Type() types.Type { return b.Fn.Type() }
+func (b *BoundMethod) Name() string     { return "bound_method" }
+func (b *BoundMethod) SetName(n string) {}
+func (b *BoundMethod) String() string   { return "bound_method" }
