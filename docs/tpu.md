@@ -367,7 +367,7 @@ arc build --target=tpu my_program.arc
 ## Summary
 
 1. `async func<tpu>` compiles entirely to **StableHLO** (see spec: https://openxla.org/stablehlo/spec)
-2. 
+2. builder api c++, https://openxla.org/stablehlo/generated/StablehloBuilder
 2. Memory is pre-allocated - StableHLO operates on buffers
 3. Two-phase: Arc→StableHLO (AOT), StableHLO→TPU code (JIT on first call)
 4. `await` triggers JIT compilation, execution, and synchronization
