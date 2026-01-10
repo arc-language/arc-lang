@@ -93,6 +93,7 @@ func (l *Linker) Link(outPath string) error {
 	if err := l.scanSymbols(); err != nil { return err }
 	l.layout()
 	if err := l.applyRelocations(); err != nil { return err }
+
 	return l.write(outPath)
 }
 
@@ -502,16 +503,17 @@ func (l *Linker) write(path string) error {
 	shStrOff := dataOff + dataSize
 	shTableOff := shStrOff + uint64(len(l.ShStrTab))
 
-	// Calculate section addresses and sizes
+	// Calculate actual content positions in TextSection
 	interpSize := uint64(len(l.InterpSect))
 	pltSize := uint64(len(l.GotEntries) * 16)
-	textActualAddr := l.TextAddr + interpSize + pltSize
-	textActualOff := textOff + interpSize + pltSize
-	textActualSize := textSize - interpSize - pltSize
+	
+	// TextSection = interp + PLT + objText
+	// So actual machine code starts after interp + PLT
+	codeStartInText := interpSize + pltSize
 
 	ehdr := Header{
 		Type: ET_EXEC, Machine: EM_X86_64, Version: EV_CURRENT, 
-		Entry: l.EntryAddr,  // USE THE ENTRY ADDRESS WE SET IN layout()
+		Entry: l.EntryAddr,
 		Phoff: 64, Ehsize: 64, Phentsize: 56, Phnum: 5, 
 		Shoff: shTableOff, Shentsize: 64, Shnum: 7, Shstrndx: 6,
 	}
@@ -526,17 +528,42 @@ func (l *Linker) write(path string) error {
 	binary.Write(f, Le, ProgHeader{Type: PT_LOAD, Flags: PF_R | PF_W, Off: dataOff, Vaddr: l.DataAddr, Paddr: l.DataAddr, Filesz: dataSize, Memsz: dataSize + l.BssSize, Align: 4096})
 	binary.Write(f, Le, ProgHeader{Type: PT_DYNAMIC, Flags: PF_R | PF_W, Off: dataOff, Vaddr: l.DataAddr, Paddr: l.DataAddr, Filesz: uint64(len(l.DynSect)), Memsz: uint64(len(l.DynSect)), Align: 8})
 
-	// Write content
-	if textOff > 64+56*5 { f.Write(make([]byte, textOff-(64+56*5))) }
+	// Write content - PAD to text offset
+	if textOff > 64+56*5 { 
+		f.Write(make([]byte, textOff-(64+56*5))) 
+	}
+	
+	// Write entire TextSection (interp + PLT + code) as one blob
 	f.Write(l.TextSection)
-	if dataOff > textOff+textSize { f.Write(make([]byte, dataOff-(textOff+textSize))) }
+	
+	// PAD to data offset
+	if dataOff > textOff+textSize { 
+		f.Write(make([]byte, dataOff-(textOff+textSize))) 
+	}
 	f.Write(l.DataSection)
 	f.Write(l.ShStrTab)
 
-	// Section Headers - with proper addresses
+	// Section Headers
 	binary.Write(f, Le, SectionHeader{}) // Null section
-	binary.Write(f, Le, SectionHeader{Name: idxInterp, Type: SHT_PROGBITS, Flags: SHF_ALLOC, Addr: l.TextAddr, Offset: textOff, Size: interpSize, Addralign: 1})
-	binary.Write(f, Le, SectionHeader{Name: idxText, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_EXECINSTR, Addr: textActualAddr, Offset: textActualOff, Size: textActualSize, Addralign: 16})
+	
+	// .interp section (first part of TextSection)
+	binary.Write(f, Le, SectionHeader{
+		Name: idxInterp, Type: SHT_PROGBITS, Flags: SHF_ALLOC, 
+		Addr: l.TextAddr, 
+		Offset: textOff, 
+		Size: interpSize, 
+		Addralign: 1,
+	})
+	
+	// .text section (code part of TextSection, AFTER interp + PLT)
+	binary.Write(f, Le, SectionHeader{
+		Name: idxText, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_EXECINSTR, 
+		Addr: l.TextAddr + codeStartInText, 
+		Offset: textOff + codeStartInText, 
+		Size: textSize - codeStartInText, 
+		Addralign: 16,
+	})
+	
 	binary.Write(f, Le, SectionHeader{Name: idxDyn, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: uint64(len(l.DynSect)), Link: 0, Addralign: 8})
 	binary.Write(f, Le, SectionHeader{Name: idxData, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: dataSize, Addralign: 4096})
 	binary.Write(f, Le, SectionHeader{Name: idxBss, Type: SHT_NOBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.BssAddr, Offset: dataOff + dataSize, Size: l.BssSize, Addralign: 8})
