@@ -65,15 +65,15 @@ const (
 	STT_FUNC   = 2
 
 	// Relocations (AMD64)
-	R_X86_64_NONE      = 0
-	R_X86_64_64        = 1
-	R_X86_64_PC32      = 2
-	R_X86_64_PLT32     = 4
-	R_X86_64_GLOB_DAT  = 6
-	R_X86_64_JMP_SLOT  = 7
-	R_X86_64_RELATIVE  = 8
-	R_X86_64_32        = 10
-	R_X86_64_32S       = 11
+	R_X86_64_NONE     = 0
+	R_X86_64_64       = 1
+	R_X86_64_PC32     = 2
+	R_X86_64_PLT32    = 4
+	R_X86_64_GLOB_DAT = 6
+	R_X86_64_JMP_SLOT = 7
+	R_X86_64_RELATIVE = 8
+	R_X86_64_32       = 10
+	R_X86_64_32S      = 11
 
 	// Dynamic Array Tags (d_tag)
 	DT_NULL     = 0
@@ -126,6 +126,20 @@ type ProgHeader struct {
 	Filesz uint64
 	Memsz  uint64
 	Align  uint64
+}
+
+// SectionHeader represents a Section Header (Elf64_Shdr)
+type SectionHeader struct {
+	Name      uint32
+	Type      uint32
+	Flags     uint64
+	Addr      uint64
+	Offset    uint64
+	Size      uint64
+	Link      uint32
+	Info      uint32
+	Addralign uint64
+	Entsize   uint64
 }
 
 // Elf64Sym represents the symbol structure in the binary (24 bytes)
