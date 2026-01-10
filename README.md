@@ -166,6 +166,8 @@ cd arc-lang/cmd
 Create `main.arc`:
 
 ```arc
+namespace main
+
 extern c {
   func printf(*byte, ...)
 }
