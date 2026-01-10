@@ -482,8 +482,6 @@ func (l *Linker) applyRelocations() error {
 	return nil
 }
 
-// In the write() function, update the section header writing:
-
 func (l *Linker) write(path string) error {
 	f, err := os.Create(path)
 	if err != nil { return err }
@@ -567,8 +565,36 @@ func (l *Linker) write(path string) error {
 		Addralign: 16,
 	})
 	
-	binary.Write(f, Le, SectionHeader{Name: idxDyn, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: uint64(len(l.DynSect)), Link: 0, Addralign: 8})
-	binary.Write(f, Le, SectionHeader{Name: idxData, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: dataSize, Addralign: 4096})
+	// Calculate where user data actually starts (after all dynamic structures)
+	dynStructsSize := uint64(len(l.DynSect))
+	dynStructsSize = align(dynStructsSize, 8)
+	dynStructsSize += uint64(len(l.DynSymSect))
+	dynStructsSize = align(dynStructsSize, 8)
+	dynStructsSize += uint64(len(l.DynStrTab))
+	dynStructsSize = align(dynStructsSize, 8)
+	dynStructsSize += uint64(len(l.RelaDynSect))
+	dynStructsSize = align(dynStructsSize, 8)
+	dynStructsSize += uint64(len(l.GotEntries) * 8)
+	dynStructsSize = align(dynStructsSize, 8)
+
+	binary.Write(f, Le, SectionHeader{Name: idxDyn, Type: SHT_DYNAMIC, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: uint64(len(l.DynSect)), Link: 0, Addralign: 8})
+	
+	// .data starts after dynamic structures
+	dataContentSize := dataSize
+	if dataSize > dynStructsSize {
+		dataContentSize = dataSize - dynStructsSize
+	} else {
+		dataContentSize = 0
+	}
+
+	binary.Write(f, Le, SectionHeader{
+		Name: idxData, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, 
+		Addr: l.DataAddr + dynStructsSize, 
+		Offset: dataOff + dynStructsSize, 
+		Size: dataContentSize, 
+		Addralign: 4096,
+	})
+
 	binary.Write(f, Le, SectionHeader{Name: idxBss, Type: SHT_NOBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.BssAddr, Offset: dataOff + dataSize, Size: l.BssSize, Addralign: 8})
 	binary.Write(f, Le, SectionHeader{Name: idxShstr, Type: SHT_STRTAB, Flags: 0, Addr: 0, Offset: shStrOff, Size: uint64(len(l.ShStrTab)), Addralign: 1})
 

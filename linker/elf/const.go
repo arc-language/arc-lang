@@ -35,6 +35,7 @@ const (
 	SHT_SYMTAB   = 2
 	SHT_STRTAB   = 3
 	SHT_RELA     = 4
+	SHT_DYNAMIC  = 6 // Added: Dynamic linking information
 	SHT_NOBITS   = 8
 
 	// Section Flags
