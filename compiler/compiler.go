@@ -41,6 +41,7 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	fileQueue := []string{absEntry}
 	processed := make(map[string]bool)
 	
+	// We collect source units to pass to IRGen
 	var units []*irgen.SourceUnit 
 
 	for i := 0; i < len(fileQueue); i++ {
@@ -52,7 +53,8 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 
 		c.logger.Debug("Parsing: %s", currentPath)
 		
-		// FIX: Call local Parse function (defined in parse.go)
+		// Call Parse from parser_helper.go
+		// Returns (parser.ICompilationUnitContext, *diagnostic.Bag)
 		tree, errs := Parse(currentPath) 
 		
 		if errs.HasErrors() {
