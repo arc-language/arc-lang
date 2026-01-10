@@ -170,17 +170,15 @@ func (l *Linker) layout() {
 	l.TextAddr = align(l.Config.BaseAddr+headerSize, 4096)
 
 	l.InterpSect = append([]byte(l.Config.Interpreter), 0)
-	pltOffset := uint64(len(l.InterpSect))
 
-	// Layout Text
+	// Calculate PLT Size FIRST
+	pltSize := uint64(len(l.GotEntries) * 16)
+
+	// Layout Text - but DON'T reserve stub yet
 	var objText []byte
 	
-	// Reserve Stub
-	if l.GlobalTable[l.Config.Entry].Section == "stub" {
-		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + pltOffset
-		objText = append(objText, make([]byte, 32)...)
-	}
-
+	needsStub := l.GlobalTable[l.Config.Entry].Section == "stub"
+	
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
 			if sec.Flags&SHF_EXECINSTR != 0 {
@@ -192,11 +190,21 @@ func (l *Linker) layout() {
 		}
 	}
 
-	// Calculate PLT Size
-	pltSize := uint64(len(l.GotEntries) * 16)
-	
-	// Now fix up offsets
+	// Now we know objText size, calculate final layout
 	baseTextOffset := uint64(len(l.InterpSect)) + pltSize
+	
+	// If we need a stub, it goes FIRST in objText (after interp + PLT)
+	stubSize := uint64(0)
+	if needsStub {
+		stubSize = 32
+		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + baseTextOffset
+		// Prepend stub space to objText
+		objText = append(make([]byte, stubSize), objText...)
+		// Adjust all section offsets to account for stub
+		for sec := range l.SectionOffsets {
+			l.SectionOffsets[sec] += stubSize
+		}
+	}
 	
 	// Update VirtualAddress for sections
 	for sec, relOff := range l.SectionOffsets {
@@ -204,11 +212,6 @@ func (l *Linker) layout() {
 		sec.OutputOffset = finalOffset
 		sec.VirtualAddress = l.TextAddr + finalOffset
 		l.SectionOffsets[sec] = finalOffset
-	}
-	
-	// Update Stub Address
-	if l.GlobalTable[l.Config.Entry].Section == "stub" {
-		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + baseTextOffset
 	}
 
 	// Data Segment Layout
@@ -218,26 +221,22 @@ func (l *Linker) layout() {
 	// Build Dyn Data - Add library names to DynStrTab
 	libNameOffsets := make(map[string]uint32)
 	for _, lib := range l.SharedLibs {
-		// Extract just the filename (SONAME) from the full path
 		libName := lib.Name
 		if idx := strings.LastIndex(libName, "/"); idx != -1 {
 			libName = libName[idx+1:]
 		}
 		
-		// Validate we have a non-empty library name
 		if libName == "" {
-			fmt.Printf("WARNING: Empty library name for path: %s\n", lib.Name)
 			continue
 		}
 		
-		// Add to string table
 		nameOffset := uint32(len(l.DynStrTab))
 		l.DynStrTab = append(l.DynStrTab, []byte(libName)...)
 		l.DynStrTab = append(l.DynStrTab, 0)
 		libNameOffsets[lib.Name] = nameOffset
 	}
 
-	// Now build symbol table
+	// Build symbol table
 	symBuf := new(bytes.Buffer)
 	for _, ds := range l.DynSyms {
 		binary.Write(symBuf, Le, ds.Name); symBuf.WriteByte(ds.Info); symBuf.WriteByte(ds.Other)
@@ -246,16 +245,14 @@ func (l *Linker) layout() {
 	l.DynSymSect = symBuf.Bytes()
 	relaSize := uint64(len(l.GotEntries) * 24)
 
-	// Write Dynamic Section entries FIRST to know its size
+	// Write Dynamic Section entries to get size
 	dynBuf := new(bytes.Buffer)
 	writeDyn := func(tag int64, val uint64) {
 		binary.Write(dynBuf, Le, tag); binary.Write(dynBuf, Le, val)
 	}
 	
-	// Placeholder - we'll fill in actual addresses after calculating offsets
-	// For now, just write to get the size
 	for range l.SharedLibs {
-		writeDyn(DT_NEEDED, 0)  // Placeholder
+		writeDyn(DT_NEEDED, 0)
 	}
 	writeDyn(DT_STRTAB, 0)
 	writeDyn(DT_SYMTAB, 0)
@@ -267,10 +264,9 @@ func (l *Linker) layout() {
 	writeDyn(DT_RELAENT, 24)
 	writeDyn(DT_NULL, 0)
 	
-	// Now we know DynSect size
 	dynSectSize := uint64(dynBuf.Len())
 
-	// Calculate Offsets - NOW accounting for DynSect at the start
+	// Calculate Offsets
 	offset := dynSectSize
 	offset = align(offset, 8); offsetSym := offset; offset += uint64(len(l.DynSymSect))
 	offset = align(offset, 8); offsetStr := offset; offset += uint64(len(l.DynStrTab))
@@ -283,21 +279,15 @@ func (l *Linker) layout() {
 	relaAddr := l.DataAddr + offsetRela
 	gotAddr := l.DataAddr + offsetGot
 
-	// NOW rebuild DynSect with correct addresses
+	// Rebuild DynSect with correct addresses
 	dynBuf.Reset()
-	
-	// Write DT_NEEDED entries with correct offsets
 	for _, lib := range l.SharedLibs {
 		offset, ok := libNameOffsets[lib.Name]
-		if !ok {
-			continue
-		}
-		if offset == 0 {
+		if !ok || offset == 0 {
 			continue
 		}
 		writeDyn(DT_NEEDED, uint64(offset))
 	}
-	
 	writeDyn(DT_STRTAB, strAddr)
 	writeDyn(DT_SYMTAB, symAddr)
 	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
@@ -318,7 +308,7 @@ func (l *Linker) layout() {
 	}
 	l.RelaDynSect = relaBuf.Bytes()
 
-	// Assemble Data Section with correct offsets
+	// Assemble Data Section
 	buf := new(bytes.Buffer)
 	buf.Write(l.DynSect)
 	for uint64(buf.Len()) < offsetSym { buf.WriteByte(0) }
