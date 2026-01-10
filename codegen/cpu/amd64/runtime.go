@@ -360,7 +360,7 @@ func (r *Runtime) EmitProcessCreate(fn *ir.Function, argCount int) {
 
 	// --- CHILD CODE ---
 	
-	// Restore args from preserved registers to ABI registers
+	// Restore args
 	abiRegs := []Register{RDI, RSI, RDX, RCX, R8}
 	preservedRegs := []Register{R12, R13, R14, R15, RBX}
 	
@@ -372,19 +372,16 @@ func (r *Runtime) EmitProcessCreate(fn *ir.Function, argCount int) {
 	r.asm.CallRelative(fn.Name())
 
 	// Exit Child CLEANLY (Flush Buffers)
-	// The return value of the user function is in RAX. Move to RDI for exit code.
+	// Move return value to RDI (Exit Code)
 	r.asm.Mov(RegOp(RDI), RegOp(RAX), 64) 
 	
-	// CRITICAL FIX: Call libc 'exit' instead of raw syscall.
-	// This ensures stdout/printf buffers are flushed to the terminal.
-	// (Requires linking with -lc, which you are already doing).
+	// FIX: Call libc 'exit' to flush printf buffers
 	r.asm.CallRelative("exit")
 	
-	// Fallback: If 'exit' somehow returns (impossible), use raw syscall to prevent crash
+	// Safety fallback
 	r.asm.Mov(RegOp(RAX), ImmOp(60), 64)
 	r.asm.Syscall()
 
 	// --- PARENT CODE ---
 	r.asm.PatchJump(parentLabel)
-	// Parent continues with RAX = PID
 }
