@@ -66,6 +66,10 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 	sectionsByIndex := make(map[int]*InputSection)
 
 	for i, sec := range f.Sections {
+		// Go's debug/elf Sections slice skips the NULL section [0].
+		// So f.Sections[i] corresponds to ELF Section Index i + 1.
+		elfIdx := i + 1
+
 		if sec.Type == stdelf.SHT_PROGBITS || sec.Type == stdelf.SHT_NOBITS {
 			data, _ := sec.Data()
 			isec := &InputSection{
@@ -75,7 +79,7 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 				Data:  data,
 			}
 			obj.Sections = append(obj.Sections, isec)
-			sectionsByIndex[i] = isec
+			sectionsByIndex[elfIdx] = isec
 		}
 	}
 
@@ -94,7 +98,7 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 			Size:  s.Size,
 		}
 
-		if s.Section >= 0 && int(s.Section) < len(f.Sections) {
+		if s.Section >= 0 {
 			if targetSec, ok := sectionsByIndex[int(s.Section)]; ok {
 				isym.Section = targetSec
 			}
@@ -105,6 +109,7 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 	// 3. Load Relocations
 	for _, sec := range f.Sections {
 		if sec.Type == stdelf.SHT_RELA {
+			// sec.Info holds the index of the section these relocations apply to
 			targetSec := sectionsByIndex[int(sec.Info)]
 			if targetSec == nil {
 				continue
@@ -212,14 +217,5 @@ func LoadSharedObject(name string, data []byte) (*SharedObject, error) {
 	}
 	
 	fmt.Printf("DEBUG: Loaded shared object '%s' with %d exported symbols\n", name, len(so.Symbols))
-	for i, sym := range so.Symbols {
-		if i < 10 { // Show first 10 symbols
-			fmt.Printf("  - %s\n", sym)
-		}
-	}
-	if len(so.Symbols) > 10 {
-		fmt.Printf("  ... and %d more\n", len(so.Symbols)-10)
-	}
-	
 	return so, nil
 }
