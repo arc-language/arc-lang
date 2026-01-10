@@ -97,17 +97,21 @@ func (l *Linker) Link(outPath string) error {
 }
 
 func (l *Linker) scanSymbols() error {
+	// Initialize entry point
 	l.GlobalTable[l.Config.Entry] = &ResolvedSymbol{Name: l.Config.Entry, Defined: false}
 
+	// 1. Scan defined symbols from objects
 	for _, obj := range l.Objects {
 		for _, sym := range obj.Symbols {
 			if sym.Bind == STB_GLOBAL {
 				if sym.Section != nil {
+					// Defined symbol
 					if existing, ok := l.GlobalTable[sym.Name]; ok && existing.Defined {
 						return fmt.Errorf("duplicate symbol: %s", sym.Name)
 					}
 					l.GlobalTable[sym.Name] = &ResolvedSymbol{Name: sym.Name, Defined: true, Section: "text"}
 				} else {
+					// Undefined symbol
 					if _, ok := l.GlobalTable[sym.Name]; !ok {
 						l.GlobalTable[sym.Name] = &ResolvedSymbol{Name: sym.Name, Defined: false}
 					}
@@ -116,16 +120,37 @@ func (l *Linker) scanSymbols() error {
 		}
 	}
 
+	// 2. Scan relocations to find undefined external symbols (THIS IS THE FIX!)
+	for _, obj := range l.Objects {
+		for _, sec := range obj.Sections {
+			for _, reloc := range sec.Relocs {
+				// If symbol is undefined (external), add to GlobalTable
+				if reloc.Sym.Section == nil && reloc.Sym.Bind == STB_GLOBAL {
+					if _, ok := l.GlobalTable[reloc.Sym.Name]; !ok {
+						l.GlobalTable[reloc.Sym.Name] = &ResolvedSymbol{
+							Name:    reloc.Sym.Name,
+							Defined: false,
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 3. Add __libc_start_main if we have main
 	if _, hasMain := l.GlobalTable["main"]; hasMain {
 		if _, ok := l.GlobalTable["__libc_start_main"]; !ok {
 			l.GlobalTable["__libc_start_main"] = &ResolvedSymbol{Name: "__libc_start_main", Defined: false}
 		}
 	}
 
+	// 4. Resolve undefined symbols from shared libraries
 	for _, so := range l.SharedLibs {
 		for _, symName := range so.Symbols {
 			cleanName := symName
-			if idx := strings.Index(cleanName, "@"); idx != -1 { cleanName = cleanName[:idx] }
+			if idx := strings.Index(cleanName, "@"); idx != -1 {
+				cleanName = cleanName[:idx]
+			}
 			if target, ok := l.GlobalTable[cleanName]; ok && !target.Defined {
 				target.Defined = true
 				target.Section = "dynamic"
@@ -135,6 +160,7 @@ func (l *Linker) scanSymbols() error {
 		}
 	}
 
+	// 5. Check entry point
 	if !l.GlobalTable[l.Config.Entry].Defined {
 		if l.GlobalTable["main"].Defined {
 			l.GlobalTable[l.Config.Entry].Defined = true
@@ -143,6 +169,7 @@ func (l *Linker) scanSymbols() error {
 			return fmt.Errorf("entry point %s not found", l.Config.Entry)
 		}
 	}
+	
 	return nil
 }
 
@@ -166,9 +193,9 @@ func align(val, align uint64) uint64 {
 }
 
 func (l *Linker) layout() {
+
 	headerSize := uint64(64 + 56*5)
 	l.TextAddr = align(l.Config.BaseAddr+headerSize, 4096)
-
 	l.InterpSect = append([]byte(l.Config.Interpreter), 0)
 
 	// Calculate PLT Size FIRST
