@@ -66,8 +66,7 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 	sectionsByIndex := make(map[int]*InputSection)
 
 	for i, sec := range f.Sections {
-		// Go's debug/elf Sections slice INCLUDES the NULL section at index 0.
-		// So i is the correct ELF Section Index.
+		// Use original indexing 'i' which matched the symbol table in your working build
 		if sec.Type == stdelf.SHT_PROGBITS || sec.Type == stdelf.SHT_NOBITS {
 			data, _ := sec.Data()
 			isec := &InputSection{
