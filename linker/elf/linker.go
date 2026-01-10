@@ -210,9 +210,24 @@ func (l *Linker) layout() {
 	
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
-			if sec.Flags&SHF_EXECINSTR != 0 {
-				pad := (16 - (len(objText) % 16)) % 16
-				for i := 0; i < int(pad); i++ { objText = append(objText, 0x90) }
+			// Include Executable (Code) OR Read-Only Data (Alloc + !Write + Progbits)
+			isCode := sec.Flags&SHF_EXECINSTR != 0
+			isRoData := (sec.Flags&SHF_ALLOC != 0) && (sec.Flags&SHF_WRITE == 0) && (sec.Type == SHT_PROGBITS)
+
+			if isCode || isRoData {
+				// Alignment: 16 for code, 4 for data
+				align := 16
+				if !isCode { align = 4 }
+				
+				pad := (align - (len(objText) % align)) % align
+				for i := 0; i < int(pad); i++ { 
+					if isCode {
+						objText = append(objText, 0x90) // NOP for code
+					} else {
+						objText = append(objText, 0)    // 0 for data
+					}
+				}
+				
 				l.SectionOffsets[sec] = uint64(len(objText))
 				objText = append(objText, sec.Data...)
 			}
@@ -461,7 +476,11 @@ func (l *Linker) applyRelocations() error {
 				var bufOff uint64
 				
 				if off, ok := l.SectionOffsets[sec]; ok {
-					if sec.Flags&SHF_EXECINSTR != 0 {
+					// Check if this section ended up in Text (Exec or ROData) or Data
+					isCode := sec.Flags&SHF_EXECINSTR != 0
+					isRoData := (sec.Flags&SHF_ALLOC != 0) && (sec.Flags&SHF_WRITE == 0) && (sec.Type == SHT_PROGBITS)
+
+					if isCode || isRoData {
 						buf = l.TextSection
 					} else {
 						buf = l.DataSection
@@ -472,6 +491,11 @@ func (l *Linker) applyRelocations() error {
 				}
 
 				if bufOff >= uint64(len(buf)) { panic("Buffer overflow in relocation") }
+				
+				if r.Sym.Name == "printf" {
+					fmt.Printf("DEBUG: Reloc printf: Type=%d Off=%x Addend=%d SymVal=%x P=%x Val=%d\n", 
+						r.Type, r.Offset, r.Addend, symVal, P, int32(int64(symVal)+r.Addend-int64(P)))
+				}
 
 				switch r.Type {
 				case R_X86_64_64:
