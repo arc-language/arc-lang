@@ -227,7 +227,7 @@ func (l *Linker) layout() {
 
 	// Offsets
 	offset := uint64(0)
-	offsetDyn := offset; offset += uint64((len(l.SharedLibs) + 9) * 16)
+	//offsetDyn := offset; offset += uint64((len(l.SharedLibs) + 9) * 16)
 	offset = align(offset, 8); offsetSym := offset; offset += uint64(len(l.DynSymSect))
 	offsetStr := offset; offset += uint64(len(l.DynStrTab))
 	for _, lib := range l.SharedLibs { offset += uint64(len(lib.Name) + 1) }
