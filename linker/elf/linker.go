@@ -215,7 +215,23 @@ func (l *Linker) layout() {
 	totalTextSize := baseTextOffset + uint64(len(objText))
 	l.DataAddr = align(l.TextAddr+totalTextSize, 4096)
 
-	// Build Dyn Data - Add library names to DynStrTab FIRST
+	// DEBUG: Show current state of DynStrTab BEFORE adding libraries
+	fmt.Printf("DEBUG: DynStrTab before adding libraries: len=%d\n", len(l.DynStrTab))
+	fmt.Printf("DEBUG: DynStrTab contents: %v\n", l.DynStrTab)
+	for i := 0; i < len(l.DynStrTab); i++ {
+		if l.DynStrTab[i] == 0 {
+			fmt.Printf("  [%d]: <null>\n", i)
+		} else if i == 0 || l.DynStrTab[i-1] == 0 {
+			// Start of a new string
+			end := i
+			for end < len(l.DynStrTab) && l.DynStrTab[end] != 0 {
+				end++
+			}
+			fmt.Printf("  [%d]: \"%s\"\n", i, string(l.DynStrTab[i:end]))
+		}
+	}
+
+	// Build Dyn Data - Add library names to DynStrTab
 	libNameOffsets := make(map[string]uint32)
 	for _, lib := range l.SharedLibs {
 		// Extract just the filename (SONAME) from the full path
@@ -232,11 +248,28 @@ func (l *Linker) layout() {
 		
 		// Add to string table (DynStrTab already starts with a 0 byte)
 		nameOffset := uint32(len(l.DynStrTab))
+		fmt.Printf("DEBUG: Before adding '%s': DynStrTab len=%d, offset will be=%d\n", libName, len(l.DynStrTab), nameOffset)
 		l.DynStrTab = append(l.DynStrTab, []byte(libName)...)
 		l.DynStrTab = append(l.DynStrTab, 0)
+		fmt.Printf("DEBUG: After adding '%s': DynStrTab len=%d\n", libName, len(l.DynStrTab))
 		libNameOffsets[lib.Name] = nameOffset
 		
-		fmt.Printf("DEBUG: Added library '%s' at DynStrTab offset %d\n", libName, nameOffset)
+		fmt.Printf("DEBUG: Added library '%s' at DynStrTab offset %d (full path key: '%s')\n", libName, nameOffset, lib.Name)
+	}
+
+	// DEBUG: Show final DynStrTab
+	fmt.Printf("DEBUG: Final DynStrTab: len=%d, contents:\n", len(l.DynStrTab))
+	for i := 0; i < len(l.DynStrTab); i++ {
+		if l.DynStrTab[i] == 0 {
+			fmt.Printf("  [%d]: <null>\n", i)
+		} else if i == 0 || l.DynStrTab[i-1] == 0 {
+			// Start of a new string
+			end := i
+			for end < len(l.DynStrTab) && l.DynStrTab[end] != 0 {
+				end++
+			}
+			fmt.Printf("  [%d]: \"%s\"\n", i, string(l.DynStrTab[i:end]))
+		}
 	}
 
 	// Now build symbol table
@@ -260,6 +293,13 @@ func (l *Linker) layout() {
 	strAddr := l.DataAddr + offsetStr
 	relaAddr := l.DataAddr + offsetRela
 	gotAddr := l.DataAddr + offsetGot
+
+	fmt.Printf("DEBUG: Data section layout:\n")
+	fmt.Printf("  DataAddr: 0x%x\n", l.DataAddr)
+	fmt.Printf("  DynSymSect at offset %d, addr 0x%x, size %d\n", offsetSym, symAddr, len(l.DynSymSect))
+	fmt.Printf("  DynStrTab at offset %d, addr 0x%x, size %d\n", offsetStr, strAddr, len(l.DynStrTab))
+	fmt.Printf("  RelaDyn at offset %d, addr 0x%x, size %d\n", offsetRela, relaAddr, relaSize)
+	fmt.Printf("  GOT at offset %d, addr 0x%x, size %d\n", offsetGot, gotAddr, sizeGot)
 
 	// Write Dynamic Section entries
 	dynBuf := new(bytes.Buffer)
@@ -316,6 +356,8 @@ func (l *Linker) layout() {
 	for uint64(buf.Len()) < offsetGot { buf.WriteByte(0) }
 	buf.Write(make([]byte, sizeGot))
 	l.DataSection = buf.Bytes()
+
+	fmt.Printf("DEBUG: Final DataSection size: %d bytes\n", len(l.DataSection))
 
 	// PLT Construction
 	pltBuf := new(bytes.Buffer)
