@@ -146,6 +146,13 @@ func (l *Linker) scanSymbols() error {
 		}
 	}
 
+	// FIX: Explicitly add __libc_start_main if main is present
+	if _, hasMain := l.GlobalTable["main"]; hasMain {
+		if _, ok := l.GlobalTable["__libc_start_main"]; !ok {
+			l.GlobalTable["__libc_start_main"] = &ResolvedSymbol{Name: "__libc_start_main", Defined: false}
+		}
+	}
+
 	// 2. Scan Shared Libs
 	for _, so := range l.SharedLibs {
 		for _, symName := range so.Symbols {
@@ -211,8 +218,8 @@ func (l *Linker) layout() {
 	// Stub Alignment
 	if l.GlobalTable[l.Config.Entry].Section == "stub" {
 		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + pltOffset
-		objText = append(objText, make([]byte, 29)...)
-		objText = append(objText, 0x90, 0x90, 0x90)
+		// FIX: Reserve 32 bytes for the __libc_start_main stub
+		objText = append(objText, make([]byte, 32)...)
 	}
 
 	for _, obj := range l.Objects {
@@ -239,8 +246,7 @@ func (l *Linker) layout() {
 		l.DataAddr += 4096 - (l.DataAddr % 4096)
 	}
 
-	// FIX: Exact size calculation for Dynamic Section
-	// Entries: DT_NEEDED(N) + STRTAB + SYMTAB + STRSZ + SYMENT + RELA + RELASZ + RELAENT + NULL
+	// Exact Dynamic Section Size
 	numDynEntries := len(l.SharedLibs) + 8
 	dynSize := numDynEntries * 16
 
@@ -273,8 +279,8 @@ func (l *Linker) layout() {
 	// Stub Re-Alignment
 	if l.GlobalTable[l.Config.Entry].Section == "stub" {
 		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + currentTextLen
-		objText = append(objText, make([]byte, 29)...)
-		objText = append(objText, 0x90, 0x90, 0x90)
+		// FIX: Reserve 32 bytes
+		objText = append(objText, make([]byte, 32)...)
 	}
 
 	for _, obj := range l.Objects {
@@ -284,8 +290,6 @@ func (l *Linker) layout() {
 				for i := 0; i < int(pad); i++ {
 					objText = append(objText, 0x90)
 				}
-				
-				// Critical: Recalculate offset relative to the new TextSection start
 				sec.OutputOffset = currentTextLen + uint64(len(objText))
 				sec.VirtualAddress = l.TextAddr + sec.OutputOffset
 				objText = append(objText, sec.Data...)
@@ -403,17 +407,47 @@ func (l *Linker) layout() {
 }
 
 func (l *Linker) applyRelocations() error {
+	// FIX: Use __libc_start_main to properly initialize glibc
 	if l.GlobalTable[l.Config.Entry].Section == "stub" {
+		// xor rbp, rbp; mov r9, rdx; pop rsi; mov rdx, rsp; and rsp, -16;
+		// lea rdi, [rip+main]; xor rcx, rcx; xor r8, r8; call __libc_start_main; hlt
 		stub := []byte{
-			0xE8, 0, 0, 0, 0, // call main
-			0x48, 0x31, 0xFF, // xor rdi, rdi
-			0x48, 0xC7, 0xC0, 0x3C, 0x00, 0x00, 0x00, // mov rax, 60
-			0x0F, 0x05, // syscall
+			0x31, 0xed,                   // xor rbp, rbp
+			0x49, 0x89, 0xd1,             // mov r9, rdx
+			0x5e,                         // pop rsi
+			0x48, 0x89, 0xe2,             // mov rdx, rsp
+			0x48, 0x83, 0xe4, 0xf0,       // and rsp, -16
+			0x48, 0x8d, 0x3d, 0, 0, 0, 0, // lea rdi, [rip + offset]
+			0x48, 0x31, 0xc9,             // xor rcx, rcx
+			0x45, 0x31, 0xc0,             // xor r8d, r8d
+			0xe8, 0, 0, 0, 0,             // call __libc_start_main
+			0xf4,                         // hlt
 		}
+
 		stubOffset := l.GlobalTable[l.Config.Entry].Value - l.TextAddr
-		pc := l.TextAddr + stubOffset + 5
-		target := l.GlobalTable["main"].Value
-		binary.LittleEndian.PutUint32(stub[1:], uint32(int32(target-pc)))
+		
+		// Patch main address (LEA RDI)
+		// Instruction is 7 bytes. Imm32 starts at index 15 within stub.
+		// PC after instruction = StubAddr + 13 + 7 = StubAddr + 20.
+		// LEA PC-Relative: Target = PC + Imm. Imm = Target - PC.
+		leaPC := l.GlobalTable[l.Config.Entry].Value + 20
+		mainAddr := l.GlobalTable["main"].Value
+		binary.LittleEndian.PutUint32(stub[16:], uint32(int32(mainAddr - leaPC)))
+
+		// Patch __libc_start_main call
+		// Instruction is 5 bytes. Imm32 starts at index 27.
+		// PC after instruction = StubAddr + 26 + 5 = StubAddr + 31.
+		callPC := l.GlobalTable[l.Config.Entry].Value + 31
+		
+		libcStartAddr := uint64(0)
+		if s, ok := l.GlobalTable["__libc_start_main"]; ok {
+			libcStartAddr = s.Value
+		} else {
+			return fmt.Errorf("libc not found (required for main)")
+		}
+		
+		binary.LittleEndian.PutUint32(stub[27:], uint32(int32(libcStartAddr - callPC)))
+
 		copy(l.TextSection[stubOffset:], stub)
 	}
 
@@ -513,16 +547,15 @@ func (l *Linker) write(path string) error {
 
 	binary.Write(f, Le, ehdr)
 
-	// FIX: Reorder Program Headers so PT_PHDR comes first!
-	// 0: PHDR
+	// PHDR
 	binary.Write(f, Le, ProgHeader{Type: PT_PHDR, Flags: PF_R, Off: 64, Vaddr: l.Config.BaseAddr + 64, Paddr: l.Config.BaseAddr + 64, Filesz: 56 * 5, Memsz: 56 * 5, Align: 8})
-	// 1: INTERP
+	// INTERP
 	binary.Write(f, Le, ProgHeader{Type: PT_INTERP, Flags: PF_R, Off: textOff, Vaddr: l.TextAddr, Paddr: l.TextAddr, Filesz: uint64(len(l.InterpSect)), Memsz: uint64(len(l.InterpSect)), Align: 1})
-	// 2: TEXT
+	// TEXT
 	binary.Write(f, Le, ProgHeader{Type: PT_LOAD, Flags: PF_R | PF_X, Off: 0, Vaddr: l.Config.BaseAddr, Paddr: l.Config.BaseAddr, Filesz: textOff + textSize, Memsz: textOff + textSize, Align: 4096})
-	// 3: DATA
+	// DATA
 	binary.Write(f, Le, ProgHeader{Type: PT_LOAD, Flags: PF_R | PF_W, Off: dataOff, Vaddr: l.DataAddr, Paddr: l.DataAddr, Filesz: dataSize, Memsz: dataSize + l.BssSize, Align: 4096})
-	// 4: DYNAMIC
+	// DYNAMIC
 	binary.Write(f, Le, ProgHeader{Type: PT_DYNAMIC, Flags: PF_R | PF_W, Off: dataOff, Vaddr: l.DataAddr, Paddr: l.DataAddr, Filesz: uint64(len(l.DynSect)), Memsz: uint64(len(l.DynSect)), Align: 8})
 
 	// Body
@@ -537,30 +570,15 @@ func (l *Linker) write(path string) error {
 		f.Write(make([]byte, dataOff-cur))
 	}
 	f.Write(l.DataSection)
-
-	// Write .shstrtab
 	f.Write(l.ShStrTab)
 
-	// Write Section Header Table
-	// 0: NULL
+	// Section Headers
 	binary.Write(f, Le, SectionHeader{})
-
-	// 1: .interp
 	binary.Write(f, Le, SectionHeader{Name: idxInterp, Type: SHT_PROGBITS, Flags: SHF_ALLOC, Addr: l.TextAddr, Offset: textOff, Size: uint64(len(l.InterpSect)), Addralign: 1})
-
-	// 2: .text
 	binary.Write(f, Le, SectionHeader{Name: idxText, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_EXECINSTR, Addr: l.TextAddr, Offset: textOff, Size: textSize, Addralign: 16})
-
-	// 3: .dynamic
 	binary.Write(f, Le, SectionHeader{Name: idxDyn, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: uint64(len(l.DynSect)), Link: 0, Addralign: 8})
-
-	// 4: .data
 	binary.Write(f, Le, SectionHeader{Name: idxData, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: dataSize, Addralign: 4096})
-
-	// 5: .bss
 	binary.Write(f, Le, SectionHeader{Name: idxBss, Type: SHT_NOBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.BssAddr, Offset: dataOff + dataSize, Size: l.BssSize, Addralign: 8})
-
-	// 6: .shstrtab
 	binary.Write(f, Le, SectionHeader{Name: idxShstr, Type: SHT_STRTAB, Flags: 0, Addr: 0, Offset: shStrOff, Size: uint64(len(l.ShStrTab)), Addralign: 1})
 
 	f.Chmod(0755)
