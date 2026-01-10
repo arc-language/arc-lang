@@ -194,43 +194,15 @@ func (l *Linker) layout() {
 	headerSize := uint64(64 + 56*5)
 
 	// --- Text Segment ---
-	l.TextAddr = align(l.Config.BaseAddr+headerSize, 16)
+	l.TextAddr = align(l.Config.BaseAddr+headerSize, 4096) // Align Text Segment to page
 
-	// .interp
 	l.InterpSect = append([]byte(l.Config.Interpreter), 0)
 
-	// PLT
-	pltOffset := uint64(len(l.InterpSect))
-
-	var objText []byte
-
-	// Stub
-	if l.GlobalTable[l.Config.Entry].Section == "stub" {
-		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + pltOffset
-		objText = append(objText, make([]byte, 32)...)
-	}
-
-	for _, obj := range l.Objects {
-		for _, sec := range obj.Sections {
-			if sec.Flags&SHF_EXECINSTR != 0 {
-				pad := (16 - (len(objText) % 16)) % 16
-				for i := 0; i < int(pad); i++ {
-					objText = append(objText, 0x90)
-				}
-				sec.OutputOffset = pltOffset + uint64(len(objText))
-				sec.VirtualAddress = l.TextAddr + sec.OutputOffset
-				objText = append(objText, sec.Data...)
-			}
-		}
-	}
-
-	// --- Data Segment ---
-	estPltSize := uint64(len(l.GotEntries) * 6)
-	totalTextSize := uint64(len(l.InterpSect)) + estPltSize + uint64(len(objText))
-
-	l.DataAddr = align(l.TextAddr+totalTextSize, 4096)
-
-	// Build Dynamic Data
+	// -- Data Layout (Dyn, GOT, etc) --
+	// Place Data immediately after estimated text size or separate page.
+	// For simplicity, we calculate offsets first then place.
+	
+	// Prepare Dynamic Data
 	dynBuf := new(bytes.Buffer)
 	symBuf := new(bytes.Buffer)
 	for _, ds := range l.DynSyms {
@@ -238,12 +210,12 @@ func (l *Linker) layout() {
 		binary.Write(symBuf, Le, ds.Shndx); binary.Write(symBuf, Le, ds.Value); binary.Write(symBuf, Le, ds.Size)
 	}
 	l.DynSymSect = symBuf.Bytes()
-
+	
 	relaSize := uint64(len(l.GotEntries) * 24)
 	
-	// Layout & Alignment Tracking
+	// Layout Data Section
 	offset := uint64(0)
-	offsetDyn := offset // Start of Dyn is 0 relative to DataAddr
+	offsetDyn := offset
 	numDynEntries := len(l.SharedLibs) + 9
 	sizeDyn := uint64(numDynEntries * 16)
 	offset += sizeDyn
@@ -267,14 +239,34 @@ func (l *Linker) layout() {
 	sizeGot := uint64(len(l.GotEntries) * 8)
 	offset += sizeGot
 
-	// Base Addresses
-	// dynAddr (unused local removed)
-	l.DynAddr = l.DataAddr + offsetDyn // Update struct field instead
+	// We can't finalize DataAddr yet because we don't know Text size exactly (PLT variable).
+	// But we need GOT address for PLT.
+	// Solution: Estimate PLT size.
+	pltSize := uint64(len(l.GotEntries) * 16) // 16 bytes per entry
+	// Stub size
+	stubSize := uint64(0)
+	if l.GlobalTable[l.Config.Entry].Section == "stub" { stubSize = 32 }
+	
+	// Calculate Object Text Size
+	objTextSize := uint64(0)
+	for _, obj := range l.Objects {
+		for _, sec := range obj.Sections {
+			if sec.Flags&SHF_EXECINSTR != 0 {
+				pad := (16 - (objTextSize % 16)) % 16
+				objTextSize += pad + uint64(len(sec.Data))
+			}
+		}
+	}
+
+	totalTextSize := uint64(len(l.InterpSect)) + pltSize + stubSize + objTextSize
+	l.DataAddr = align(l.TextAddr+totalTextSize, 4096)
+
 	symAddr := l.DataAddr + offsetSym
 	strAddr := l.DataAddr + offsetStr
 	relaAddr := l.DataAddr + offsetRela
 	gotAddr := l.DataAddr + offsetGot
 
+	// Fill Dynamic Section
 	writeDyn := func(tag int64, val uint64) {
 		binary.Write(dynBuf, Le, tag); binary.Write(dynBuf, Le, val)
 	}
@@ -283,10 +275,9 @@ func (l *Linker) layout() {
 		l.DynStrTab = append(l.DynStrTab, 0)
 		writeDyn(DT_NEEDED, uint64(len(l.DynStrTab)-len(lib.Name)-1))
 	}
-	
 	writeDyn(DT_STRTAB, strAddr)
 	writeDyn(DT_SYMTAB, symAddr)
-	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
+	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab))) // Update size
 	writeDyn(DT_SYMENT, 24)
 	writeDyn(DT_RELA, relaAddr)
 	writeDyn(DT_RELASZ, relaSize)
@@ -294,6 +285,7 @@ func (l *Linker) layout() {
 	writeDyn(DT_NULL, 0)
 	l.DynSect = dynBuf.Bytes()
 
+	// Fill Rela
 	relaBuf := new(bytes.Buffer)
 	for i := range l.GotEntries {
 		rOff := gotAddr + uint64(i*8)
@@ -304,7 +296,7 @@ func (l *Linker) layout() {
 	}
 	l.RelaDynSect = relaBuf.Bytes()
 
-	// Assemble Data Section with padding
+	// Assemble Data
 	buf := new(bytes.Buffer)
 	buf.Write(l.DynSect)
 	for uint64(buf.Len()) < offsetSym { buf.WriteByte(0) }
@@ -317,36 +309,52 @@ func (l *Linker) layout() {
 	buf.Write(make([]byte, sizeGot))
 	l.DataSection = buf.Bytes()
 
-	// Generate PLT
+	// -- Assemble Text --
+	// 1. Interp
+	// 2. PLT
+	// 3. Stub
+	// 4. Obj
+
+	// PLT
 	pltBuf := new(bytes.Buffer)
 	for i, symName := range l.GotEntries {
 		targetGot := gotAddr + uint64(i*8)
-		currentPC := l.TextAddr + pltOffset + uint64(pltBuf.Len())
-		rel := int32(targetGot - (currentPC + 6))
+		// JMP [RIP + offset]
+		// FF 25 00 00 00 00
 		pltBuf.WriteByte(0xFF); pltBuf.WriteByte(0x25)
+		
+		// PC is address of next instruction (start + 6)
+		currentPC := l.TextAddr + uint64(len(l.InterpSect)) + uint64(pltBuf.Len()) + 4
+		rel := int32(targetGot - currentPC)
 		binary.Write(pltBuf, Le, rel)
+		
+		// Pad to 16 bytes (standard PLT entry size)
+		// current size 6. Need 10 nops.
+		for k:=0; k<10; k++ { pltBuf.WriteByte(0x90) }
 
-		l.GlobalTable[symName].Value = currentPC
+		// Update symbol to point to start of this PLT entry
+		l.GlobalTable[symName].Value = l.TextAddr + uint64(len(l.InterpSect)) + uint64(i*16)
 		l.GlobalTable[symName].Section = "plt"
 	}
-	
 	actualPlt := pltBuf.Bytes()
+
 	fullText := append(l.InterpSect, actualPlt...)
-	
 	currentTextLen := uint64(len(fullText))
-	objText = nil
+
+	var objText []byte
+	// Stub
 	if l.GlobalTable[l.Config.Entry].Section == "stub" {
+		// FIX: Stub is placed AFTER PLT
 		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + currentTextLen
 		objText = append(objText, make([]byte, 32)...)
 	}
-	
+
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
 			if sec.Flags&SHF_EXECINSTR != 0 {
 				pad := (16 - ((currentTextLen + uint64(len(objText))) % 16)) % 16
-				for i := 0; i < int(pad); i++ {
-					objText = append(objText, 0x90)
-				}
+				for i := 0; i < int(pad); i++ { objText = append(objText, 0x90) }
+				
 				sec.OutputOffset = currentTextLen + uint64(len(objText))
 				sec.VirtualAddress = l.TextAddr + sec.OutputOffset
 				objText = append(objText, sec.Data...)
@@ -355,6 +363,7 @@ func (l *Linker) layout() {
 	}
 	l.TextSection = append(fullText, objText...)
 
+	// ... [Data Loop for Objects] ...
 	currentDataLen := uint64(len(l.DataSection))
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
@@ -375,9 +384,7 @@ func (l *Linker) layout() {
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
 			if sec.Flags&SHF_WRITE != 0 && sec.Type == SHT_NOBITS {
-				if currBss%8 != 0 {
-					currBss += 8 - (currBss % 8)
-				}
+				if currBss%8 != 0 { currBss += 8 - (currBss % 8) }
 				sec.OutputOffset = currBss
 				sec.VirtualAddress = l.BssAddr + currBss
 				currBss += uint64(len(sec.Data))
@@ -451,9 +458,7 @@ func (l *Linker) applyRelocations() error {
 				} else if sec.Flags&SHF_WRITE != 0 {
 					buf = l.DataSection
 					bufOff = sec.OutputOffset + r.Offset
-				} else {
-					continue
-				}
+				} else { continue }
 				if bufOff >= uint64(len(buf)) { continue }
 
 				switch r.Type {
@@ -477,7 +482,7 @@ func (l *Linker) write(path string) error {
 	defer f.Close()
 
 	hdrSize := uint64(64 + 56*5)
-	textOff := align(hdrSize, 16)
+	textOff := align(hdrSize, 4096) // Align File Offset too for cleanliness
 	textSize := uint64(len(l.TextSection))
 	dataOff := align(textOff+textSize, 4096)
 	dataSize := uint64(len(l.DataSection))
