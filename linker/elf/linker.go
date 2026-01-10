@@ -239,11 +239,11 @@ func (l *Linker) layout() {
 		l.DataAddr += 4096 - (l.DataAddr % 4096)
 	}
 
-	// --- FIX: Calculate Exact Dynamic Section Size ---
-	// Entries: DT_NEEDED(xN) + STRTAB + SYMTAB + STRSZ + SYMENT + RELA + RELASZ + RELAENT + NULL
+	// FIX: Exact size calculation for Dynamic Section
+	// Entries: DT_NEEDED(N) + STRTAB + SYMTAB + STRSZ + SYMENT + RELA + RELASZ + RELAENT + NULL
 	numDynEntries := len(l.SharedLibs) + 8
 	dynSize := numDynEntries * 16
-	
+
 	symSize := len(l.DynSyms) * 24
 	strSize := len(l.DynStrTab)
 	relaSize := len(l.GotEntries) * 24
@@ -328,7 +328,6 @@ func (l *Linker) layout() {
 
 	l.DynSect = dynBuf.Bytes()
 
-	// ... [Rest of layout() regarding symbols, rela, data alignment, bss remains valid] ...
 	symBuf := new(bytes.Buffer)
 	for _, ds := range l.DynSyms {
 		binary.Write(symBuf, Le, ds.Name)
@@ -484,8 +483,10 @@ func (l *Linker) write(path string) error {
 
 	dataSize := uint64(len(l.DataSection))
 
-	// ... [Section Headers setup remains unchanged] ...
-	l.addShStr("") 
+	// Define Sections for objdump
+	// 0: NULL, 1: .interp, 2: .text, 3: .dynamic, 4: .data, 5: .bss, 6: .shstrtab
+
+	l.addShStr("") // Add null string (index 0)
 	idxInterp := l.addShStr(".interp")
 	idxText := l.addShStr(".text")
 	idxDyn := l.addShStr(".dynamic")
@@ -493,7 +494,10 @@ func (l *Linker) write(path string) error {
 	idxBss := l.addShStr(".bss")
 	idxShstr := l.addShStr(".shstrtab")
 
+	// Append shstrtab to file content
 	shStrOff := dataOff + dataSize
+
+	// Calculate Table Offset
 	shTableOff := shStrOff + uint64(len(l.ShStrTab))
 	shNum := uint16(7)
 
@@ -502,19 +506,25 @@ func (l *Linker) write(path string) error {
 		Entry: l.EntryAddr, Phoff: 64, Ehsize: 64, Phentsize: 56, Phnum: 5,
 		Shoff: shTableOff, Shentsize: 64, Shnum: shNum, Shstrndx: 6,
 	}
-	ehdr.Ident[0] = 0x7F; ehdr.Ident[1] = 'E'; ehdr.Ident[2] = 'L'; ehdr.Ident[3] = 'F'
-	ehdr.Ident[4] = ELFCLASS64; ehdr.Ident[5] = ELFDATA2LSB; ehdr.Ident[6] = EV_CURRENT; ehdr.Ident[7] = 3
+	ehdr.Ident[0] = 0x7F
+	ehdr.Ident[1] = 'E'
+	ehdr.Ident[2] = 'L'
+	ehdr.Ident[3] = 'F'
+	ehdr.Ident[4] = ELFCLASS64
+	ehdr.Ident[5] = ELFDATA2LSB
+	ehdr.Ident[6] = EV_CURRENT
+	ehdr.Ident[7] = 3
 
 	binary.Write(f, Le, ehdr)
 
-	// --- FIX: Reorder Program Headers (PHDR first) ---
+	// FIX: Reorder Program Headers so PT_PHDR comes first!
 	// 0: PHDR
 	binary.Write(f, Le, ProgHeader{Type: PT_PHDR, Flags: PF_R, Off: 64, Vaddr: l.Config.BaseAddr + 64, Paddr: l.Config.BaseAddr + 64, Filesz: 56 * 5, Memsz: 56 * 5, Align: 8})
 	// 1: INTERP
 	binary.Write(f, Le, ProgHeader{Type: PT_INTERP, Flags: PF_R, Off: textOff, Vaddr: l.TextAddr, Paddr: l.TextAddr, Filesz: uint64(len(l.InterpSect)), Memsz: uint64(len(l.InterpSect)), Align: 1})
-	// 2: LOAD (Text)
+	// 2: TEXT
 	binary.Write(f, Le, ProgHeader{Type: PT_LOAD, Flags: PF_R | PF_X, Off: 0, Vaddr: l.Config.BaseAddr, Paddr: l.Config.BaseAddr, Filesz: textOff + textSize, Memsz: textOff + textSize, Align: 4096})
-	// 3: LOAD (Data)
+	// 3: DATA
 	binary.Write(f, Le, ProgHeader{Type: PT_LOAD, Flags: PF_R | PF_W, Off: dataOff, Vaddr: l.DataAddr, Paddr: l.DataAddr, Filesz: dataSize, Memsz: dataSize + l.BssSize, Align: 4096})
 	// 4: DYNAMIC
 	binary.Write(f, Le, ProgHeader{Type: PT_DYNAMIC, Flags: PF_R | PF_W, Off: dataOff, Vaddr: l.DataAddr, Paddr: l.DataAddr, Filesz: uint64(len(l.DynSect)), Memsz: uint64(len(l.DynSect)), Align: 8})
@@ -531,15 +541,30 @@ func (l *Linker) write(path string) error {
 		f.Write(make([]byte, dataOff-cur))
 	}
 	f.Write(l.DataSection)
+
+	// Write .shstrtab
 	f.Write(l.ShStrTab)
 
-	// Section Headers
+	// Write Section Header Table
+	// 0: NULL
 	binary.Write(f, Le, SectionHeader{})
+
+	// 1: .interp
 	binary.Write(f, Le, SectionHeader{Name: idxInterp, Type: SHT_PROGBITS, Flags: SHF_ALLOC, Addr: l.TextAddr, Offset: textOff, Size: uint64(len(l.InterpSect)), Addralign: 1})
+
+	// 2: .text
 	binary.Write(f, Le, SectionHeader{Name: idxText, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_EXECINSTR, Addr: l.TextAddr, Offset: textOff, Size: textSize, Addralign: 16})
+
+	// 3: .dynamic
 	binary.Write(f, Le, SectionHeader{Name: idxDyn, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: uint64(len(l.DynSect)), Link: 0, Addralign: 8})
+
+	// 4: .data
 	binary.Write(f, Le, SectionHeader{Name: idxData, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: dataSize, Addralign: 4096})
+
+	// 5: .bss
 	binary.Write(f, Le, SectionHeader{Name: idxBss, Type: SHT_NOBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.BssAddr, Offset: dataOff + dataSize, Size: l.BssSize, Addralign: 8})
+
+	// 6: .shstrtab
 	binary.Write(f, Le, SectionHeader{Name: idxShstr, Type: SHT_STRTAB, Flags: 0, Addr: 0, Offset: shStrOff, Size: uint64(len(l.ShStrTab)), Addralign: 1})
 
 	f.Chmod(0755)
