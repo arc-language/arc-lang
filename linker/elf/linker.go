@@ -284,6 +284,8 @@ func (l *Linker) layout() {
 				for i := 0; i < int(pad); i++ {
 					objText = append(objText, 0x90)
 				}
+				
+				// Critical: Recalculate offset relative to the new TextSection start
 				sec.OutputOffset = currentTextLen + uint64(len(objText))
 				sec.VirtualAddress = l.TextAddr + sec.OutputOffset
 				objText = append(objText, sec.Data...)
@@ -506,14 +508,8 @@ func (l *Linker) write(path string) error {
 		Entry: l.EntryAddr, Phoff: 64, Ehsize: 64, Phentsize: 56, Phnum: 5,
 		Shoff: shTableOff, Shentsize: 64, Shnum: shNum, Shstrndx: 6,
 	}
-	ehdr.Ident[0] = 0x7F
-	ehdr.Ident[1] = 'E'
-	ehdr.Ident[2] = 'L'
-	ehdr.Ident[3] = 'F'
-	ehdr.Ident[4] = ELFCLASS64
-	ehdr.Ident[5] = ELFDATA2LSB
-	ehdr.Ident[6] = EV_CURRENT
-	ehdr.Ident[7] = 3
+	ehdr.Ident[0] = 0x7F; ehdr.Ident[1] = 'E'; ehdr.Ident[2] = 'L'; ehdr.Ident[3] = 'F'
+	ehdr.Ident[4] = ELFCLASS64; ehdr.Ident[5] = ELFDATA2LSB; ehdr.Ident[6] = EV_CURRENT; ehdr.Ident[7] = 3
 
 	binary.Write(f, Le, ehdr)
 
