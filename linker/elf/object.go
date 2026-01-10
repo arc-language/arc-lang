@@ -2,7 +2,7 @@ package elf
 
 import (
 	"bytes"
-	stdelf "debug/elf" // Alias standard lib to avoid collision
+	stdelf "debug/elf" // Kept only for LoadSharedObject convenience
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -16,13 +16,12 @@ type InputObject struct {
 	Name     string
 	Sections []*InputSection
 	Symbols  []*InputSymbol
-	File     *stdelf.File
 }
 
 type InputSection struct {
 	Name   string
-	Type   stdelf.SectionType
-	Flags  stdelf.SectionFlag
+	Type   uint32
+	Flags  uint64
 	Data   []byte
 	Relocs []InputReloc
 
@@ -40,8 +39,8 @@ type InputReloc struct {
 
 type InputSymbol struct {
 	Name    string
-	Type    stdelf.SymType
-	Bind    stdelf.SymBind
+	Type    uint8
+	Bind    uint8
 	Section *InputSection // Nil if Undefined
 	Value   uint64
 	Size    uint64
@@ -50,30 +49,113 @@ type InputSymbol struct {
 // SharedObject represents a dynamic library (e.g., libc.so)
 type SharedObject struct {
 	Name    string
-	Symbols []string // Only the names of exported dynamic symbols
+	Symbols []string 
 }
 
-// LoadObject parses an ELF object from a byte slice
+// Internal ELF structures for manual parsing
+type elfHeader struct {
+	Ident     [16]byte
+	Type      uint16
+	Machine   uint16
+	Version   uint32
+	Entry     uint64
+	Phoff     uint64
+	Shoff     uint64
+	Flags     uint32
+	Ehsize    uint16
+	Phentsize uint16
+	Phnum     uint16
+	Shentsize uint16
+	Shnum     uint16
+	Shstrndx  uint16
+}
+
+type sectionHeader struct {
+	Name      uint32
+	Type      uint32
+	Flags     uint64
+	Addr      uint64
+	Offset    uint64
+	Size      uint64
+	Link      uint32
+	Info      uint32
+	Addralign uint64
+	Entsize   uint64
+}
+
+type elfSymbol struct {
+	Name  uint32
+	Info  uint8
+	Other uint8
+	Shndx uint16
+	Value uint64
+	Size  uint64
+}
+
+type elfRela struct {
+	Offset uint64
+	Info   uint64
+	Addend int64
+}
+
+// LoadObject parses an ELF object manually to ensure 1:1 index mapping
 func LoadObject(name string, data []byte) (*InputObject, error) {
-	f, err := stdelf.NewFile(bytes.NewReader(data))
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse elf %s: %w", name, err)
+	r := bytes.NewReader(data)
+	var hdr elfHeader
+	if err := binary.Read(r, Le, &hdr); err != nil {
+		return nil, fmt.Errorf("failed to read elf header: %w", err)
 	}
 
-	obj := &InputObject{Name: name, File: f}
+	if hdr.Ident[0] != 0x7f || hdr.Ident[1] != 'E' || hdr.Ident[2] != 'L' || hdr.Ident[3] != 'F' {
+		return nil, fmt.Errorf("not a valid ELF file")
+	}
 
-	// 1. Load Sections (Only PROGBITS and NOBITS)
+	// Read Section Headers
+	shdrs := make([]sectionHeader, hdr.Shnum)
+	if _, err := r.Seek(int64(hdr.Shoff), io.SeekStart); err != nil {
+		return nil, err
+	}
+	if err := binary.Read(r, Le, &shdrs); err != nil {
+		return nil, err
+	}
+
+	// Read ShStrTab
+	if hdr.Shstrndx >= hdr.Shnum {
+		return nil, fmt.Errorf("invalid shstrndx")
+	}
+	shstrSec := shdrs[hdr.Shstrndx]
+	shstrData := make([]byte, shstrSec.Size)
+	r.Seek(int64(shstrSec.Offset), io.SeekStart)
+	io.ReadFull(r, shstrData)
+
+	getName := func(idx uint32) string {
+		if idx >= uint32(len(shstrData)) { return "" }
+		end := idx
+		for end < uint32(len(shstrData)) && shstrData[end] != 0 {
+			end++
+		}
+		return string(shstrData[idx:end])
+	}
+
+	obj := &InputObject{Name: name}
 	sectionsByIndex := make(map[int]*InputSection)
 
-	for i, sec := range f.Sections {
-		// Use original indexing 'i' which matched the symbol table in your working build
-		if sec.Type == stdelf.SHT_PROGBITS || sec.Type == stdelf.SHT_NOBITS {
-			data, _ := sec.Data()
+	// 1. Load Sections
+	for i, sh := range shdrs {
+		if sh.Type == SHT_PROGBITS || sh.Type == SHT_NOBITS {
+			secName := getName(sh.Name)
+			var secData []byte
+			if sh.Type == SHT_PROGBITS {
+				secData = make([]byte, sh.Size)
+				r.Seek(int64(sh.Offset), io.SeekStart)
+				io.ReadFull(r, secData)
+			}
+
 			isec := &InputSection{
-				Name:  sec.Name,
-				Type:  sec.Type,
-				Flags: sec.Flags,
-				Data:  data,
+				Name:  secName,
+				Type:  sh.Type,
+				Flags: sh.Flags,
+				Data:  secData,
 			}
 			obj.Sections = append(obj.Sections, isec)
 			sectionsByIndex[i] = isec
@@ -81,55 +163,78 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 	}
 
 	// 2. Load Symbols
-	syms, err := f.Symbols()
-	if err != nil && err != stdelf.ErrNoSymbols {
-		return nil, err
+	var symTabHdr *sectionHeader
+	var strTabHdr *sectionHeader
+
+	for i := range shdrs {
+		if shdrs[i].Type == SHT_SYMTAB {
+			symTabHdr = &shdrs[i]
+			if shdrs[i].Link < uint32(len(shdrs)) {
+				strTabHdr = &shdrs[shdrs[i].Link]
+			}
+			break
+		}
 	}
 
-	for _, s := range syms {
-		isym := &InputSymbol{
-			Name:  s.Name,
-			Type:  stdelf.SymType(s.Info & 0xf),
-			Bind:  stdelf.SymBind(s.Info >> 4),
-			Value: s.Value,
-			Size:  s.Size,
+	if symTabHdr != nil && strTabHdr != nil {
+		strTabData := make([]byte, strTabHdr.Size)
+		r.Seek(int64(strTabHdr.Offset), io.SeekStart)
+		io.ReadFull(r, strTabData)
+
+		getSymName := func(idx uint32) string {
+			if idx >= uint32(len(strTabData)) { return "" }
+			end := idx
+			for end < uint32(len(strTabData)) && strTabData[end] != 0 {
+				end++
+			}
+			return string(strTabData[idx:end])
 		}
 
-		if s.Section >= 0 {
-			if targetSec, ok := sectionsByIndex[int(s.Section)]; ok {
-				isym.Section = targetSec
+		numSyms := symTabHdr.Size / symTabHdr.Entsize
+		r.Seek(int64(symTabHdr.Offset), io.SeekStart)
+
+		for k := uint64(0); k < numSyms; k++ {
+			var sym elfSymbol
+			binary.Read(r, Le, &sym)
+
+			isym := &InputSymbol{
+				Name:  getSymName(sym.Name),
+				Type:  sym.Info & 0xf,
+				Bind:  sym.Info >> 4,
+				Value: sym.Value,
+				Size:  sym.Size,
 			}
+
+			if sym.Shndx < 0xFF00 {
+				if sec, ok := sectionsByIndex[int(sym.Shndx)]; ok {
+					isym.Section = sec
+				}
+			}
+			obj.Symbols = append(obj.Symbols, isym)
 		}
-		obj.Symbols = append(obj.Symbols, isym)
 	}
 
 	// 3. Load Relocations
-	for _, sec := range f.Sections {
-		if sec.Type == stdelf.SHT_RELA {
-			targetSec := sectionsByIndex[int(sec.Info)]
-			if targetSec == nil {
-				continue
-			}
+	for _, sh := range shdrs {
+		if sh.Type == SHT_RELA {
+			targetSec := sectionsByIndex[int(sh.Info)]
+			if targetSec == nil { continue }
 
-			rdata, _ := sec.Data()
-			rreader := bytes.NewReader(rdata)
-			numRelocs := uint64(len(rdata)) / 24 // sizeof(Elf64_Rela)
+			numRelocs := sh.Size / sh.Entsize
+			r.Seek(int64(sh.Offset), io.SeekStart)
 
-			for i := uint64(0); i < numRelocs; i++ {
-				var rOff, rInfo uint64
-				var rAddend int64
-				binary.Read(rreader, Le, &rOff)
-				binary.Read(rreader, Le, &rInfo)
-				binary.Read(rreader, Le, &rAddend)
+			for k := uint64(0); k < numRelocs; k++ {
+				var rel elfRela
+				binary.Read(r, Le, &rel)
 
-				symIdx := int(rInfo >> 32)
-				rType := uint32(rInfo & 0xFFFFFFFF)
+				symIdx := int(rel.Info >> 32)
+				rType := uint32(rel.Info & 0xffffffff)
 
 				if symIdx < len(obj.Symbols) {
 					targetSec.Relocs = append(targetSec.Relocs, InputReloc{
-						Offset: rOff,
+						Offset: rel.Offset,
 						Type:   rType,
-						Addend: rAddend,
+						Addend: rel.Addend,
 						Sym:    obj.Symbols[symIdx],
 					})
 				}
