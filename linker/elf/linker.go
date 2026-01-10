@@ -121,7 +121,7 @@ func (l *Linker) scanSymbols() error {
 		}
 	}
 
-	// 2. Scan relocations to find undefined external symbols (THIS IS THE FIX!)
+	// 2. Scan relocations to find undefined external symbols
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
 			for _, reloc := range sec.Relocs {
@@ -215,8 +215,11 @@ func (l *Linker) layout() {
 			isRoData := (sec.Flags&SHF_ALLOC != 0) && (sec.Flags&SHF_WRITE == 0) && (sec.Type == SHT_PROGBITS)
 
 			if isCode || isRoData {
-				// Align to 16 bytes for code, 4 for rodata usually enough, but 16 safe
-				pad := (16 - (len(objText) % 16)) % 16
+				// Align to 16 bytes for code, 4 for data
+				alignVal := 16
+				if !isCode { alignVal = 4 }
+				
+				pad := (alignVal - (len(objText) % alignVal)) % alignVal
 				for i := 0; i < int(pad); i++ { 
 					if isCode {
 						objText = append(objText, 0x90) // NOP
@@ -483,10 +486,17 @@ func (l *Linker) applyRelocations() error {
 					}
 					bufOff = off + r.Offset
 				} else {
+					fmt.Printf("DEBUG: Skipping relocation in section '%s' (not mapped)\n", sec.Name)
 					continue
 				}
 
 				if bufOff >= uint64(len(buf)) { panic("Buffer overflow in relocation") }
+				
+				// Debug logging for specific symbols to trace issues
+				if r.Sym.Name == "printf" || strings.HasPrefix(r.Sym.Name, ".str") {
+					fmt.Printf("DEBUG: Reloc %s: Type=%d Off=%x Addend=%d SymVal=%x P=%x Val=%d BufOff=%d\n", 
+						r.Sym.Name, r.Type, r.Offset, r.Addend, symVal, P, int32(int64(symVal)+r.Addend-int64(P)), bufOff)
+				}
 
 				switch r.Type {
 				case R_X86_64_64:
