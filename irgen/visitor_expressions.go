@@ -607,7 +607,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 
 func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpressionContext) interface{} {
 	// 1. Generate a unique internal name
-	// e.g. "main_lambda_0"
 	name := fmt.Sprintf("lambda_%d", len(g.ctx.Module.Functions))
 	if g.ctx.CurrentFunction != nil {
 		name = fmt.Sprintf("%s_lambda_%d", g.ctx.CurrentFunction.Name(), len(g.ctx.Module.Functions))
@@ -635,14 +634,17 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 	// 4. Create the IR Function
 	fn := g.ctx.Builder.CreateFunction(name, retType, paramTypes, false)
 
-	// Flag the function based on keywords
+	// 5. Flag the function based on keywords (String Detection)
 	if ctx.ASYNC() != nil {
 		fn.FuncType.IsAsync = true
-	} else if ctx.PROCESS() != nil {
-		fn.FuncType.IsProcess = true
+	} else if ctx.IDENTIFIER() != nil {
+		// Check for specific concurrency keywords
+		if ctx.IDENTIFIER().GetText() == "process" {
+			fn.FuncType.IsProcess = true
+		}
 	}
 
-	// 5. Context Switch: Save current state
+	// 6. Context Switch: Save current state
 	prevFunc := g.ctx.CurrentFunction
 	prevBlock := g.ctx.Builder.GetInsertBlock()
 
@@ -650,11 +652,9 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 	g.ctx.EnterFunction(fn)
 
 	// Critical: Enter the Semantic Scope associated with this node.
-	// We do not create a new scope here manually; we rely on the one created
-	// during the Semantic Analysis phase so that the Block visitor finds the variables.
 	g.enterScope(ctx)
 
-	// 6. Setup Arguments (Allocas)
+	// 7. Setup Arguments (Allocas)
 	for i, arg := range fn.Arguments {
 		arg.SetName(paramNames[i])
 		
@@ -662,24 +662,23 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
 		g.ctx.Builder.CreateStore(arg, alloca)
 
-		// Register the IRValue in the current scope so the body can resolve it
+		// Register the IRValue in the current scope
 		if s, ok := g.currentScope.ResolveLocal(paramNames[i]); ok {
 			s.IRValue = alloca
 		} else {
-			// Fallback safety: ensure it exists in the scope
+			// Fallback safety
 			g.currentScope.Define(paramNames[i], symbol.SymVar, arg.Type()).IRValue = alloca
 		}
 	}
 
-	// 7. Generate Body
+	// 8. Generate Body
 	if ctx.Block() != nil {
-		// Use a fresh defer stack for the inner function to handle 'defer' statements correctly
 		outerDefer := g.deferStack
 		g.deferStack = NewDeferStack()
 
 		g.Visit(ctx.Block())
 
-		// Handle implicit return if the user didn't write one
+		// Handle implicit return
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			g.deferStack.Emit(g)
 			if retType == types.Void {
@@ -692,8 +691,8 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		g.deferStack = outerDefer
 	}
 
-	// 8. Restore Context
-	g.exitScope() // Exit the semantic scope
+	// 9. Restore Context
+	g.exitScope()
 	g.ctx.ExitFunction()
 
 	if prevFunc != nil {

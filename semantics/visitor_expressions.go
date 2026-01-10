@@ -449,61 +449,81 @@ func (a *Analyzer) VisitInitializerList(ctx *parser.InitializerListContext) inte
 }
 
 func (a *Analyzer) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpressionContext) interface{} {
-    // 1. Resolve Return Type
-    var retType types.Type = types.Void
-    if ctx.ReturnType() != nil {
-        if ctx.ReturnType().Type_() != nil {
-            retType = a.resolveType(ctx.ReturnType().Type_())
-        }
-    }
+	// 1. Resolve Return Type
+	var retType types.Type = types.Void
+	if ctx.ReturnType() != nil {
+		if ctx.ReturnType().Type_() != nil {
+			retType = a.resolveType(ctx.ReturnType().Type_())
+		}
+	}
 
-    // 2. Resolve Parameters
-    var paramTypes []types.Type
-    type paramInfo struct {
-        name string
-        typ  types.Type
-    }
-    var params []paramInfo
+	// 2. Resolve Parameters
+	// We capture name+type for scoping, and type-only for the function signature
+	var paramTypes []types.Type
+	type paramInfo struct {
+		name string
+		typ  types.Type
+	}
+	var params []paramInfo
 
-    if ctx.ParameterList() != nil {
-        for _, param := range ctx.ParameterList().AllParameter() {
-            pType := a.resolveType(param.Type_())
-            pName := param.IDENTIFIER().GetText()
-            paramTypes = append(paramTypes, pType)
-            params = append(params, paramInfo{name: pName, typ: pType})
-        }
-    }
+	if ctx.ParameterList() != nil {
+		for _, param := range ctx.ParameterList().AllParameter() {
+			pType := a.resolveType(param.Type_())
+			pName := param.IDENTIFIER().GetText()
 
-    // 3. Construct the Function Type
-    var fnType *types.FunctionType
-    if ctx.ASYNC() != nil {
-        fnType = types.NewAsyncFunction(retType, paramTypes, false)
-    } else if ctx.PROCESS() != nil {
-        // NEW: Handle Process
-        fnType = types.NewProcessFunction(retType, paramTypes, false)
-    } else {
-        fnType = types.NewFunction(retType, paramTypes, false)
-    }
+			paramTypes = append(paramTypes, pType)
+			params = append(params, paramInfo{name: pName, typ: pType})
+		}
+	}
 
-    // 4. Analyze the Body
-    prevRetType := a.currentFuncRetType
-    a.currentFuncRetType = retType
-    a.pushScope(ctx)
-    for _, p := range params {
-        a.currentScope.Define(p.name, symbol.SymVar, p.typ)
-    }
+	// 3. Detect Concurrency Model (Async vs Process)
+	isAsync := ctx.ASYNC() != nil
+	isProcess := false
 
-    if ctx.Block() != nil {
-        a.scopes[ctx.Block()] = a.currentScope
-        for _, stmt := range ctx.Block().AllStatement() {
-            a.Visit(stmt)
-        }
-    }
+	// Check if a generic identifier is present and matches specific keywords
+	if ctx.IDENTIFIER() != nil {
+		text := ctx.IDENTIFIER().GetText()
+		if text == "process" {
+			isProcess = true
+		}
+		// Future: Add "worker", "gpu", etc. here
+	}
 
-    a.popScope()
-    a.currentFuncRetType = prevRetType
+	// 4. Construct Function Type
+	var fnType *types.FunctionType
+	if isAsync {
+		fnType = types.NewAsyncFunction(retType, paramTypes, false)
+	} else if isProcess {
+		fnType = types.NewProcessFunction(retType, paramTypes, false)
+	} else {
+		fnType = types.NewFunction(retType, paramTypes, false)
+	}
 
-    return fnType
+	// 5. Analyze Body
+	// We must enter a new scope to validate the code inside the block
+	prevRetType := a.currentFuncRetType
+	a.currentFuncRetType = retType
+	
+	a.pushScope(ctx)
+
+	// Define parameters in the inner scope
+	for _, p := range params {
+		a.currentScope.Define(p.name, symbol.SymVar, p.typ)
+	}
+
+	if ctx.Block() != nil {
+		// Link block context to this scope for IRGen later
+		a.scopes[ctx.Block()] = a.currentScope
+		
+		for _, stmt := range ctx.Block().AllStatement() {
+			a.Visit(stmt)
+		}
+	}
+
+	a.popScope()
+	a.currentFuncRetType = prevRetType
+
+	return fnType
 }
 
 // --- Passthroughs for Precedence Rules ---

@@ -326,3 +326,41 @@ func NewProcessFunction(ret Type, params []Type, variadic bool) *FunctionType {
 		IsProcess:  true, // Tag it
 	}
 }
+
+func (t *FunctionType) Equal(other Type) bool {
+	o, ok := other.(*FunctionType)
+	if !ok {
+		return false
+	}
+
+	// 1. Check Concurrency Flags
+	if t.IsAsync != o.IsAsync {
+		return false
+	}
+	if t.IsProcess != o.IsProcess {
+		return false
+	}
+
+	// 2. Check Variadic Flag
+	if t.Variadic != o.Variadic {
+		return false
+	}
+
+	// 3. Check Return Type
+	if !t.ReturnType.Equal(o.ReturnType) {
+		return false
+	}
+
+	// 4. Check Parameters
+	if len(t.ParamTypes) != len(o.ParamTypes) {
+		return false
+	}
+
+	for i := range t.ParamTypes {
+		if !t.ParamTypes[i].Equal(o.ParamTypes[i]) {
+			return false
+		}
+	}
+
+	return true
+}
