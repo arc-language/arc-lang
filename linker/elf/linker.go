@@ -194,7 +194,7 @@ func (l *Linker) layout() {
 	headerSize := uint64(64 + 56*5)
 
 	// --- Text Segment ---
-	l.TextAddr = align(l.Config.BaseAddr+headerSize, 16)
+	l.TextAddr = align(l.Config.BaseAddr+headerSize, 4096)
 
 	// .interp
 	l.InterpSect = append([]byte(l.Config.Interpreter), 0)
@@ -241,6 +241,15 @@ func (l *Linker) layout() {
 
 	relaSize := uint64(len(l.GotEntries) * 24)
 	
+	// Pre-calculate String Table Size (FIX: Include libraries)
+	// We need to know the exact size of DynStrTab *before* calculating offsets for following sections.
+	// Current DynStrTab already has symbols. We append lib names now to a temporary buffer to measure size.
+	// Then we append them for real during writing.
+	tempStrTabLen := len(l.DynStrTab)
+	for _, lib := range l.SharedLibs {
+		tempStrTabLen += len(lib.Name) + 1
+	}
+
 	// Layout & Alignment Tracking
 	offset := uint64(0)
 	
@@ -258,7 +267,7 @@ func (l *Linker) layout() {
 
 	// Strings
 	offsetStr := offset
-	sizeStr := uint64(len(l.DynStrTab))
+	sizeStr := uint64(tempStrTabLen)
 	offset += sizeStr
 
 	// Relocations
@@ -282,10 +291,12 @@ func (l *Linker) layout() {
 	writeDyn := func(tag int64, val uint64) {
 		binary.Write(dynBuf, Le, tag); binary.Write(dynBuf, Le, val)
 	}
+	// Append Libs to StrTab and write DT_NEEDED
 	for _, lib := range l.SharedLibs {
+		idx := len(l.DynStrTab)
 		l.DynStrTab = append(l.DynStrTab, []byte(lib.Name)...)
 		l.DynStrTab = append(l.DynStrTab, 0)
-		writeDyn(DT_NEEDED, uint64(len(l.DynStrTab)-len(lib.Name)-1))
+		writeDyn(DT_NEEDED, uint64(idx))
 	}
 	
 	writeDyn(DT_STRTAB, strAddr)
@@ -301,7 +312,8 @@ func (l *Linker) layout() {
 	relaBuf := new(bytes.Buffer)
 	for i := range l.GotEntries {
 		rOff := gotAddr + uint64(i*8)
-		rInfo := uint64((i+1)<<32) | uint64(R_X86_64_JMP_SLOT)
+		// Use GLOB_DAT for simple GOT resolution (no lazy binding)
+		rInfo := uint64((i+1)<<32) | uint64(R_X86_64_GLOB_DAT)
 		binary.Write(relaBuf, Le, rOff)
 		binary.Write(relaBuf, Le, rInfo)
 		binary.Write(relaBuf, Le, int64(0))
