@@ -211,11 +211,11 @@ func (l *Linker) layout() {
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
 			// Include Executable (Code) OR Read-Only Data (Alloc + !Write + Progbits)
-			// This captures .text AND .rodata sections
 			isCode := sec.Flags&SHF_EXECINSTR != 0
 			isRoData := (sec.Flags&SHF_ALLOC != 0) && (sec.Flags&SHF_WRITE == 0) && (sec.Type == SHT_PROGBITS)
 
 			if isCode || isRoData {
+				// Align to 16 bytes for code, 4 for data
 				alignVal := 16
 				if !isCode { alignVal = 4 }
 				
@@ -492,10 +492,10 @@ func (l *Linker) applyRelocations() error {
 
 				if bufOff >= uint64(len(buf)) { panic("Buffer overflow in relocation") }
 				
-				// Debug logging
+				// Debug logging for tracing
 				if r.Sym.Name == "printf" || strings.HasPrefix(r.Sym.Name, ".str") {
-					fmt.Printf("DEBUG: Reloc %s: Type=%d Off=%x Addend=%d SymVal=%x P=%x Val=%d BufOff=%d\n", 
-						r.Sym.Name, r.Type, r.Offset, r.Addend, symVal, P, int32(int64(symVal)+r.Addend-int64(P)), bufOff)
+					fmt.Printf("DEBUG: Reloc %s: Type=%d Off=%x Addend=%d SymVal=%x P=%x Val=%d\n", 
+						r.Sym.Name, r.Type, r.Offset, r.Addend, symVal, P, int32(int64(symVal)+r.Addend-int64(P)))
 				}
 
 				switch r.Type {

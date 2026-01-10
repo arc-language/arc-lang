@@ -66,10 +66,8 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 	sectionsByIndex := make(map[int]*InputSection)
 
 	for i, sec := range f.Sections {
-		// Go's debug/elf Sections slice skips the NULL section [0].
-		// So f.Sections[i] corresponds to ELF Section Index i + 1.
-		elfIdx := i + 1
-
+		// Go's debug/elf Sections slice INCLUDES the NULL section at index 0.
+		// So i is the correct ELF Section Index.
 		if sec.Type == stdelf.SHT_PROGBITS || sec.Type == stdelf.SHT_NOBITS {
 			data, _ := sec.Data()
 			isec := &InputSection{
@@ -79,7 +77,7 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 				Data:  data,
 			}
 			obj.Sections = append(obj.Sections, isec)
-			sectionsByIndex[elfIdx] = isec
+			sectionsByIndex[i] = isec
 		}
 	}
 
@@ -109,7 +107,6 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 	// 3. Load Relocations
 	for _, sec := range f.Sections {
 		if sec.Type == stdelf.SHT_RELA {
-			// sec.Info holds the index of the section these relocations apply to
 			targetSec := sectionsByIndex[int(sec.Info)]
 			if targetSec == nil {
 				continue
