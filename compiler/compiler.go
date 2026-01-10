@@ -11,7 +11,6 @@ import (
 	"github.com/arc-language/arc-lang/context"
 	"github.com/arc-language/arc-lang/diagnostic"
 	"github.com/arc-language/arc-lang/irgen"
-	"github.com/arc-language/arc-lang/parser" // Assumed parser package
 	"github.com/arc-language/arc-lang/semantics"
 	"github.com/arc-language/arc-lang/symbol"
 )
@@ -30,10 +29,6 @@ func NewCompiler() *Compiler {
 }
 
 // CompileProject handles the frontend pipeline:
-// 1. Parsing & Discovery
-// 2. Semantic Analysis
-// 3. IR Generation
-// It returns a generic IR Module, which driver.go then compiles to machine code.
 func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	absEntry, err := filepath.Abs(entryFile)
 	if err != nil {
@@ -46,7 +41,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	fileQueue := []string{absEntry}
 	processed := make(map[string]bool)
 	
-	// Use irgen.SourceUnit to avoid circular dependency
 	var units []*irgen.SourceUnit 
 
 	for i := 0; i < len(fileQueue); i++ {
@@ -58,10 +52,8 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 
 		c.logger.Debug("Parsing: %s", currentPath)
 		
-		// Call your parser generation here (assuming Parse function exists in parser package or similar)
-		// Since I don't have the parser package code, I'm assuming a generic Parse function signature
-		// You might need to adjust this call to match your parser's API
-		tree, errs := parser.Parse(currentPath) 
+		// FIX: Call local Parse function (defined in parse.go)
+		tree, errs := Parse(currentPath) 
 		
 		if errs.HasErrors() {
 			c.printDiagnostics(errs)
@@ -128,7 +120,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	c.logger.Debug("Phase 3: IR Generation")
 	moduleName := filepath.Base(absEntry)
 	
-	// Generate IR Module using the collected source units
 	module := irgen.GenerateProject(units, moduleName, analysisRes)
 
 	return module, nil
