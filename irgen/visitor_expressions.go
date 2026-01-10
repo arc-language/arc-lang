@@ -582,12 +582,106 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	return curr
 }
 
+func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpressionContext) interface{} {
+	// 1. Generate a unique internal name
+	name := fmt.Sprintf("lambda_%d", len(g.ctx.Module.Functions))
+	if g.ctx.CurrentFunction != nil {
+		name = fmt.Sprintf("%s_lambda_%d", g.ctx.CurrentFunction.Name(), len(g.ctx.Module.Functions))
+	}
+
+	// 2. Resolve Return Type
+	var retType types.Type = types.Void
+	if ctx.ReturnType() != nil {
+		if ctx.ReturnType().Type_() != nil {
+			retType = g.resolveType(ctx.ReturnType().Type_())
+		}
+	}
+
+	// 3. Resolve Parameters
+	var paramTypes []types.Type
+	var paramNames []string
+
+	if ctx.ParameterList() != nil {
+		for _, param := range ctx.ParameterList().AllParameter() {
+			paramTypes = append(paramTypes, g.resolveType(param.Type_()))
+			paramNames = append(paramNames, param.IDENTIFIER().GetText())
+		}
+	}
+
+	// 4. Create the IR Function
+	fn := g.ctx.Builder.CreateFunction(name, retType, paramTypes, false)
+
+	// Mark as Async if keyword is present
+	if ctx.ASYNC() != nil {
+		fn.FuncType.IsAsync = true
+	}
+
+	// 5. Context Switch: Save current state
+	prevFunc := g.ctx.CurrentFunction
+	prevBlock := g.ctx.Builder.GetInsertBlock()
+
+	// Enter the new function context
+	g.ctx.EnterFunction(fn)
+	
+	// Create a temporary scope for parameters (manual scope creation to ensure isolation)
+	// We handle this manually here because semantic analysis might handle anonymous scopes differently
+	parentScope := g.currentScope
+	g.currentScope = symbol.NewScope(parentScope)
+	defer func() { g.currentScope = parentScope }()
+
+	// 6. Setup Arguments (Allocas)
+	for i, arg := range fn.Arguments {
+		arg.SetName(paramNames[i])
+		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
+		g.ctx.Builder.CreateStore(arg, alloca)
+		
+		// Register in local scope
+		g.currentScope.Define(paramNames[i], symbol.SymVar, arg.Type()).IRValue = alloca
+	}
+
+	// 7. Generate Body
+	if ctx.Block() != nil {
+		// Use a fresh defer stack for the inner function
+		outerDefer := g.deferStack
+		g.deferStack = NewDeferStack()
+
+		g.Visit(ctx.Block())
+
+		// Handle implicit return
+		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
+			g.deferStack.Emit(g)
+			if retType == types.Void {
+				g.ctx.Builder.CreateRetVoid()
+			} else {
+				g.ctx.Builder.CreateRet(g.getZeroValue(retType))
+			}
+		}
+		
+		g.deferStack = outerDefer
+	}
+
+	// 8. Restore Context
+	g.ctx.ExitFunction()
+	if prevFunc != nil {
+		g.ctx.CurrentFunction = prevFunc
+		g.ctx.SetInsertBlock(prevBlock)
+	}
+
+	return fn
+}
+
 // --- Primary Expressions ---
 
 func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
 	if ctx.StructLiteral() != nil {
 		return g.Visit(ctx.StructLiteral())
 	}
+	
+	// --- ADD THIS BLOCK ---
+	if ctx.AnonymousFuncExpression() != nil {
+		return g.Visit(ctx.AnonymousFuncExpression())
+	}
+
 	if ctx.Literal() != nil {
 		return g.Visit(ctx.Literal())
 	}
