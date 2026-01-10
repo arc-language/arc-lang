@@ -298,14 +298,17 @@ func (a *Analyzer) visitExternCppMethod(ctx *parser.ExternCppMethodDeclContext, 
 // --- Standard Declarations ---
 
 func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
-	name := ctx.IDENTIFIER().GetText()
-	
+	// 1. Get Function Name
+	// Due to grammar change (prefix?), the name is always the LAST identifier token.
+	ids := ctx.AllIDENTIFIER()
+	nameToken := ids[len(ids)-1]
+	name := nameToken.GetText()
+
 	if a.currentNamespacePrefix != "" && name != "main" {
 		name = a.currentNamespacePrefix + "." + name
 	}
 
-	// --- Fix: Ensure method name mangling happens in all phases ---
-	// This ensures Phase 2 resolves "Counter_get" instead of "get".
+	// 2. Handle Method Mangling
 	var selfType types.Type
 	if ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
@@ -315,51 +318,68 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 			}
 		}
 	}
-	
+
 	if selfType != nil {
 		base := selfType
-		if ptr, ok := base.(*types.PointerType); ok { base = ptr.ElementType }
+		if ptr, ok := base.(*types.PointerType); ok {
+			base = ptr.ElementType
+		}
 		if st, ok := base.(*types.StructType); ok {
-			name = st.Name + "_" + ctx.IDENTIFIER().GetText()
+			// Re-use the raw name token to avoid double-prefixing issues
+			name = st.Name + "_" + nameToken.GetText()
 		}
 	}
-	// -------------------------------------------------------------
-	
+
+	// 3. Phase 1: Register Declarations
 	if a.Phase == 1 || a.Phase == 0 {
 		var retType types.Type = types.Void
-		if ctx.ReturnType() != nil && ctx.ReturnType().Type_() != nil {
-			retType = a.resolveType(ctx.ReturnType().Type_())
-		} else if ctx.ReturnType() != nil && ctx.ReturnType().TypeList() != nil {
-			var tupleTypes []types.Type
-			for _, t := range ctx.ReturnType().TypeList().AllType_() {
-				tupleTypes = append(tupleTypes, a.resolveType(t))
+		if ctx.ReturnType() != nil {
+			if ctx.ReturnType().Type_() != nil {
+				retType = a.resolveType(ctx.ReturnType().Type_())
+			} else if ctx.ReturnType().TypeList() != nil {
+				var tupleTypes []types.Type
+				for _, t := range ctx.ReturnType().TypeList().AllType_() {
+					tupleTypes = append(tupleTypes, a.resolveType(t))
+				}
+				retType = types.NewStruct("", tupleTypes, false)
 			}
-			retType = types.NewStruct("", tupleTypes, false)
 		}
 
 		var paramTypes []types.Type
-		
 		if ctx.ParameterList() != nil {
 			for _, param := range ctx.ParameterList().AllParameter() {
-				pType := a.resolveType(param.Type_())
 				// selfType logic moved up, but we still need the types for the signature
-				paramTypes = append(paramTypes, pType)
+				paramTypes = append(paramTypes, a.resolveType(param.Type_()))
 			}
 		}
-		
-		// Check for async keyword
+
+		// --- DETECT CONCURRENCY MODEL ---
 		var fnType *types.FunctionType
-		if ctx.ASYNC() != nil {
+		isAsync := ctx.ASYNC() != nil
+		isProcess := false
+
+		// If there is more than 1 identifier, the first one is the prefix (e.g. "process")
+		if len(ids) > 1 {
+			if ids[0].GetText() == "process" {
+				isProcess = true
+			}
+		}
+
+		if isAsync {
 			fnType = types.NewAsyncFunction(retType, paramTypes, false)
+		} else if isProcess {
+			fnType = types.NewProcessFunction(retType, paramTypes, false)
 		} else {
 			fnType = types.NewFunction(retType, paramTypes, false)
 		}
+		// --------------------------------
 
 		if _, ok := a.currentScope.ResolveLocal(name); !ok {
 			a.currentScope.Define(name, symbol.SymFunc, fnType)
 		}
 	}
-	
+
+	// 4. Phase 2: Analyze Body
 	if a.Phase == 2 || a.Phase == 0 {
 		sym, ok := a.currentScope.Resolve(name)
 		var retType types.Type = types.Void
@@ -382,7 +402,9 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		}
 		if ctx.Block() != nil {
 			a.scopes[ctx.Block()] = a.currentScope
-			for _, stmt := range ctx.Block().AllStatement() { a.Visit(stmt) }
+			for _, stmt := range ctx.Block().AllStatement() {
+				a.Visit(stmt)
+			}
 		}
 	}
 	return nil

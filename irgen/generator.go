@@ -74,40 +74,34 @@ func (g *Generator) exitScope() {
 }
 
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
-	// 1. Detect Hardware Markers in Generics
-	// We scan the generic parameter list for specific tags.
-	// Supports: <gpu>, <gpu.cuda>, <gpu.rocm>, <tpu>
+	// 1. Hardware Markers (Generics)
 	isGPU := false
 	isROCm := false
 	isCUDA := false
 	isTPU := false
 
-	// Access generic parameters using the updated grammar structure
 	if gp := ctx.GenericParams(); gp != nil {
 		if gpl := gp.GenericParamList(); gpl != nil {
-			// Iterate over genericParam contexts (e.g. "gpu.rocm", "T")
 			for _, param := range gpl.AllGenericParam() {
-				// Iterate over identifiers within a param (e.g. "gpu" and "rocm")
 				for _, id := range param.AllIDENTIFIER() {
 					tag := id.GetText()
-					if tag == "gpu" {
-						isGPU = true
-					} else if tag == "rocm" {
-						isROCm = true
-					} else if tag == "cuda" {
-						isCUDA = true
-					} else if tag == "tpu" {
-						isTPU = true
-					}
+					if tag == "gpu" { isGPU = true } 
+					else if tag == "rocm" { isROCm = true } 
+					else if tag == "cuda" { isCUDA = true } 
+					else if tag == "tpu" { isTPU = true }
 				}
 			}
 		}
 	}
 
-	name := ctx.IDENTIFIER().GetText()
+	// 2. Resolve Name
+	// Get all identifiers. The function name is the LAST one.
+	ids := ctx.AllIDENTIFIER()
+	nameToken := ids[len(ids)-1]
+	name := nameToken.GetText()
+	
 	irName := name
 
-	// 2. Handle Name Mangling (Methods / Namespaces)
 	var parentName string
 	isMethod := false
 	if parent := ctx.GetParent(); parent != nil {
@@ -124,13 +118,10 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
-	// Fix: Handle Flat Methods (func foo(self x: T))
-	// If the function is not inside a struct block but has a 'self' parameter,
-	// it acts as a method and needs name mangling (Struct_Method).
+	// Handle Flat Methods (func foo(self x: T))
 	if !isMethod && ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
 			if param.SELF() != nil {
-				// Resolve type to find the struct name
 				t := g.resolveType(param.Type_())
 				if ptr, ok := t.(*types.PointerType); ok {
 					t = ptr.ElementType
@@ -144,14 +135,12 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
-	// Construct the actual IR name
 	if isMethod {
 		irName = parentName + "_" + name
 	} else if g.currentNamespace != "" && name != "main" {
 		irName = g.currentNamespace + "_" + name
 	}
 
-	// Construct the lookup name for the symbol table
 	lookupName := name
 	if isMethod {
 		lookupName = parentName + "_" + name
@@ -161,15 +150,13 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 
 	sym, _ := g.currentScope.Resolve(lookupName)
 
-	// --- Phase 1: Create Function Prototype ---
-	// In this phase, we define the function signature and add it to the module.
+	// --- Phase 1: Prototype ---
 	if g.Phase == 1 {
 		var retType types.Type = types.Void
 		if ctx.ReturnType() != nil {
 			if ctx.ReturnType().Type_() != nil {
 				retType = g.resolveType(ctx.ReturnType().Type_())
 			} else if ctx.ReturnType().TypeList() != nil {
-				// Handle tuple return types: (T1, T2) -> struct { T1, T2 }
 				var tupleTypes []types.Type
 				for _, t := range ctx.ReturnType().TypeList().AllType_() {
 					tupleTypes = append(tupleTypes, g.resolveType(t))
@@ -184,10 +171,9 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			}
 		}
 
-		// Create the function in the IR module
 		fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
 
-		// Apply specific calling conventions based on tags found earlier
+		// Set Hardware CallConvs
 		if isTPU {
 			fn.CallConv = ir.CC_TPU
 		} else if isROCm {
@@ -195,19 +181,23 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		} else if isCUDA {
 			fn.CallConv = ir.CC_PTX
 		} else if isGPU {
-			// Default generic <gpu> to CUDA/PTX if not specified
 			fn.CallConv = ir.CC_PTX
 		}
 
-		// Link the IR function to the semantic symbol
+		// Set Concurrency Flags (String Detection)
+		if ctx.ASYNC() != nil {
+			fn.FuncType.IsAsync = true
+		} else if len(ids) > 1 && ids[0].GetText() == "process" {
+			fn.FuncType.IsProcess = true
+		}
+
 		if sym != nil {
 			sym.IRValue = fn
 		}
 		return nil
 	}
 
-	// --- Phase 2: Generate Body ---
-	// In this phase, we generate the instructions inside the function.
+	// --- Phase 2: Body ---
 	if g.Phase == 2 {
 		if sym == nil || sym.IRValue == nil {
 			return nil
@@ -218,8 +208,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		g.enterScope(ctx)
 		defer g.exitScope()
 
-		// 3. Setup Arguments
-		// We create stack allocations (alloca) for parameters so they are mutable l-values.
 		var paramNames []string
 		if ctx.ParameterList() != nil {
 			for _, param := range ctx.ParameterList().AllParameter() {
@@ -230,37 +218,24 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		for i, arg := range fn.Arguments {
 			if i < len(paramNames) {
 				arg.SetName(paramNames[i])
-				
-				// Create a stack slot for the argument
 				alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
-				
-				// Store the incoming argument value into the stack slot
 				g.ctx.Builder.CreateStore(arg, alloca)
-				
-				// Update the symbol table so variable lookups find the alloca (l-value)
 				if s, ok := g.currentScope.Resolve(paramNames[i]); ok {
 					s.IRValue = alloca
 				}
 			}
 		}
 
-		// 4. Generate Block Instructions
 		if ctx.Block() != nil {
-			// Reset defer stack for the new function scope
 			g.deferStack = NewDeferStack()
 			g.Visit(ctx.Block())
 		}
 
-		// 5. Implicit Return
-		// If the last block doesn't have a terminator (ret, br), insert a return.
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
-			// Run any deferred statements before the implicit return
 			g.deferStack.Emit(g)
-			
 			if fn.FuncType.ReturnType == types.Void {
 				g.ctx.Builder.CreateRetVoid()
 			} else {
-				// Safety: return a zero value for non-void functions missing a return
 				g.ctx.Builder.CreateRet(g.getZeroValue(fn.FuncType.ReturnType))
 			}
 		}
