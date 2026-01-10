@@ -8,14 +8,12 @@ import (
 	"strings"
 )
 
-// Config allows customizing the target
 type Config struct {
 	Entry       string
 	BaseAddr    uint64
 	Interpreter string
 }
 
-// Linker holds the state of the linking process
 type Linker struct {
 	Config      Config
 	Objects     []*InputObject
@@ -41,8 +39,11 @@ type Linker struct {
 	DataAddr  uint64
 	BssAddr   uint64
 	EntryAddr uint64
-	DynAddr   uint64
 	BssSize   uint64
+	
+	// Map input section to its offset in the output buffer
+	// Key: *InputSection, Value: Offset in TextSection or DataSection
+	SectionOffsets map[*InputSection]uint64
 }
 
 type ResolvedSymbol struct {
@@ -53,60 +54,45 @@ type ResolvedSymbol struct {
 }
 
 func NewLinker(cfg Config) *Linker {
-	if cfg.Entry == "" {
-		cfg.Entry = "_start"
-	}
-	if cfg.BaseAddr == 0 {
-		cfg.BaseAddr = 0x400000
-	}
-	if cfg.Interpreter == "" {
-		cfg.Interpreter = "/lib64/ld-linux-x86-64.so.2"
-	}
+	if cfg.Entry == "" { cfg.Entry = "_start" }
+	if cfg.BaseAddr == 0 { cfg.BaseAddr = 0x400000 }
+	if cfg.Interpreter == "" { cfg.Interpreter = "/lib64/ld-linux-x86-64.so.2" }
 
 	return &Linker{
-		Config:      cfg,
-		GlobalTable: make(map[string]*ResolvedSymbol),
-		DynSyms:     []Elf64Sym{{}}, // Null Symbol
-		DynStrTab:   []byte{0},
-		ShStrTab:    []byte{0},
+		Config:         cfg,
+		GlobalTable:    make(map[string]*ResolvedSymbol),
+		DynSyms:        []Elf64Sym{{}},
+		DynStrTab:      []byte{0},
+		ShStrTab:       []byte{0},
+		SectionOffsets: make(map[*InputSection]uint64),
 	}
 }
 
 func (l *Linker) AddObject(name string, data []byte) error {
 	obj, err := LoadObject(name, data)
-	if err != nil {
-		return err
-	}
+	if err != nil { return err }
 	l.Objects = append(l.Objects, obj)
 	return nil
 }
 
 func (l *Linker) AddArchive(path string) error {
 	objs, err := LoadArchive(path)
-	if err != nil {
-		return err
-	}
+	if err != nil { return err }
 	l.Objects = append(l.Objects, objs...)
 	return nil
 }
 
 func (l *Linker) AddSharedLib(path string, data []byte) error {
 	so, err := LoadSharedObject(path, data)
-	if err != nil {
-		return err
-	}
+	if err != nil { return err }
 	l.SharedLibs = append(l.SharedLibs, so)
 	return nil
 }
 
 func (l *Linker) Link(outPath string) error {
-	if err := l.scanSymbols(); err != nil {
-		return err
-	}
+	if err := l.scanSymbols(); err != nil { return err }
 	l.layout()
-	if err := l.applyRelocations(); err != nil {
-		return err
-	}
+	if err := l.applyRelocations(); err != nil { return err }
 	return l.write(outPath)
 }
 
@@ -118,11 +104,9 @@ func (l *Linker) scanSymbols() error {
 			if sym.Bind == STB_GLOBAL {
 				if sym.Section != nil {
 					if existing, ok := l.GlobalTable[sym.Name]; ok && existing.Defined {
-						return fmt.Errorf("duplicate symbol: %s in %s", sym.Name, obj.Name)
+						return fmt.Errorf("duplicate symbol: %s", sym.Name)
 					}
-					l.GlobalTable[sym.Name] = &ResolvedSymbol{
-						Name: sym.Name, Defined: true, Section: "text",
-					}
+					l.GlobalTable[sym.Name] = &ResolvedSymbol{Name: sym.Name, Defined: true, Section: "text"}
 				} else {
 					if _, ok := l.GlobalTable[sym.Name]; !ok {
 						l.GlobalTable[sym.Name] = &ResolvedSymbol{Name: sym.Name, Defined: false}
@@ -141,10 +125,7 @@ func (l *Linker) scanSymbols() error {
 	for _, so := range l.SharedLibs {
 		for _, symName := range so.Symbols {
 			cleanName := symName
-			if idx := strings.Index(cleanName, "@"); idx != -1 {
-				cleanName = cleanName[:idx]
-			}
-
+			if idx := strings.Index(cleanName, "@"); idx != -1 { cleanName = cleanName[:idx] }
 			if target, ok := l.GlobalTable[cleanName]; ok && !target.Defined {
 				target.Defined = true
 				target.Section = "dynamic"
@@ -154,13 +135,12 @@ func (l *Linker) scanSymbols() error {
 		}
 	}
 
-	entry := l.GlobalTable[l.Config.Entry]
-	if !entry.Defined {
-		if mainSym, ok := l.GlobalTable["main"]; ok && mainSym.Defined {
-			entry.Defined = true
-			entry.Section = "stub"
+	if !l.GlobalTable[l.Config.Entry].Defined {
+		if l.GlobalTable["main"].Defined {
+			l.GlobalTable[l.Config.Entry].Defined = true
+			l.GlobalTable[l.Config.Entry].Section = "stub"
 		} else {
-			return fmt.Errorf("undefined entry point: %s", l.Config.Entry)
+			return fmt.Errorf("entry point %s not found", l.Config.Entry)
 		}
 	}
 	return nil
@@ -170,10 +150,7 @@ func (l *Linker) addDynamicSymbol(name string) {
 	nameIdx := uint32(len(l.DynStrTab))
 	l.DynStrTab = append(l.DynStrTab, []byte(name)...)
 	l.DynStrTab = append(l.DynStrTab, 0)
-
-	l.DynSyms = append(l.DynSyms, Elf64Sym{
-		Name: nameIdx, Info: 0x12, Shndx: 0, Value: 0, Size: 0,
-	})
+	l.DynSyms = append(l.DynSyms, Elf64Sym{Name: nameIdx, Info: 0x12, Shndx: 0, Value: 0, Size: 0})
 }
 
 func (l *Linker) addShStr(s string) uint32 {
@@ -184,27 +161,21 @@ func (l *Linker) addShStr(s string) uint32 {
 }
 
 func align(val, align uint64) uint64 {
-	if val%align != 0 {
-		return val + (align - (val % align))
-	}
+	if val%align != 0 { return val + (align - (val % align)) }
 	return val
 }
 
 func (l *Linker) layout() {
 	headerSize := uint64(64 + 56*5)
-
-	// --- Text Segment ---
 	l.TextAddr = align(l.Config.BaseAddr+headerSize, 4096)
 
-	// .interp
 	l.InterpSect = append([]byte(l.Config.Interpreter), 0)
-
-	// PLT Offset (relative to TextAddr)
 	pltOffset := uint64(len(l.InterpSect))
 
+	// Layout Text
 	var objText []byte
-
-	// Stub
+	
+	// Reserve Stub
 	if l.GlobalTable[l.Config.Entry].Section == "stub" {
 		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + pltOffset
 		objText = append(objText, make([]byte, 32)...)
@@ -214,23 +185,37 @@ func (l *Linker) layout() {
 		for _, sec := range obj.Sections {
 			if sec.Flags&SHF_EXECINSTR != 0 {
 				pad := (16 - (len(objText) % 16)) % 16
-				for i := 0; i < int(pad); i++ {
-					objText = append(objText, 0x90)
-				}
-				sec.OutputOffset = pltOffset + uint64(len(objText))
-				sec.VirtualAddress = l.TextAddr + sec.OutputOffset
+				for i := 0; i < int(pad); i++ { objText = append(objText, 0x90) }
+				l.SectionOffsets[sec] = uint64(len(objText)) // Store relative to objText start for now
 				objText = append(objText, sec.Data...)
 			}
 		}
 	}
 
-	// --- Data Segment ---
-	estPltSize := uint64(len(l.GotEntries) * 6)
-	totalTextSize := uint64(len(l.InterpSect)) + estPltSize + uint64(len(objText))
+	// Calculate PLT Size
+	pltSize := uint64(len(l.GotEntries) * 16)
+	
+	// Now fix up offsets
+	baseTextOffset := uint64(len(l.InterpSect)) + pltSize
+	
+	// Update VirtualAddress for sections
+	for sec, relOff := range l.SectionOffsets {
+		finalOffset := baseTextOffset + relOff
+		sec.OutputOffset = finalOffset
+		sec.VirtualAddress = l.TextAddr + finalOffset
+		l.SectionOffsets[sec] = finalOffset // Update map to absolute offset in TextSection
+	}
+	
+	// Update Stub Address
+	if l.GlobalTable[l.Config.Entry].Section == "stub" {
+		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + baseTextOffset
+	}
 
+	// Data Segment Layout
+	totalTextSize := baseTextOffset + uint64(len(objText))
 	l.DataAddr = align(l.TextAddr+totalTextSize, 4096)
 
-	// Build Dynamic Data
+	// Build Dyn Data
 	dynBuf := new(bytes.Buffer)
 	symBuf := new(bytes.Buffer)
 	for _, ds := range l.DynSyms {
@@ -238,51 +223,19 @@ func (l *Linker) layout() {
 		binary.Write(symBuf, Le, ds.Shndx); binary.Write(symBuf, Le, ds.Value); binary.Write(symBuf, Le, ds.Size)
 	}
 	l.DynSymSect = symBuf.Bytes()
-
 	relaSize := uint64(len(l.GotEntries) * 24)
-	
-	// Pre-calculate String Table Size (FIX: Include libraries)
-	// We need to know the exact size of DynStrTab *before* calculating offsets for following sections.
-	// Current DynStrTab already has symbols. We append lib names now to a temporary buffer to measure size.
-	// Then we append them for real during writing.
-	tempStrTabLen := len(l.DynStrTab)
-	for _, lib := range l.SharedLibs {
-		tempStrTabLen += len(lib.Name) + 1
-	}
 
-	// Layout & Alignment Tracking
+	// Offsets
 	offset := uint64(0)
+	offsetDyn := offset; offset += uint64((len(l.SharedLibs) + 9) * 16)
+	offset = align(offset, 8); offsetSym := offset; offset += uint64(len(l.DynSymSect))
+	offsetStr := offset; offset += uint64(len(l.DynStrTab))
+	for _, lib := range l.SharedLibs { offset += uint64(len(lib.Name) + 1) }
 	
-	// Dynamic Section
-	offsetDyn := offset 
-	numDynEntries := len(l.SharedLibs) + 9
-	sizeDyn := uint64(numDynEntries * 16)
-	offset += sizeDyn
+	offset = align(offset, 8); offsetRela := offset; offset += relaSize
+	offset = align(offset, 8); offsetGot := offset; sizeGot := uint64(len(l.GotEntries) * 8); offset += sizeGot
 
-	// Symbols
-	offset = align(offset, 8)
-	offsetSym := offset
-	sizeSym := uint64(len(l.DynSymSect))
-	offset += sizeSym
-
-	// Strings
-	offsetStr := offset
-	sizeStr := uint64(tempStrTabLen)
-	offset += sizeStr
-
-	// Relocations
-	offset = align(offset, 8)
-	offsetRela := offset
-	offset += relaSize
-
-	// GOT
-	offset = align(offset, 8)
-	offsetGot := offset
-	sizeGot := uint64(len(l.GotEntries) * 8)
-	offset += sizeGot
-
-	// Assign Base Addresses
-	l.DynAddr = l.DataAddr + offsetDyn
+	// Base Addrs
 	symAddr := l.DataAddr + offsetSym
 	strAddr := l.DataAddr + offsetStr
 	relaAddr := l.DataAddr + offsetRela
@@ -291,14 +244,11 @@ func (l *Linker) layout() {
 	writeDyn := func(tag int64, val uint64) {
 		binary.Write(dynBuf, Le, tag); binary.Write(dynBuf, Le, val)
 	}
-	// Append Libs to StrTab and write DT_NEEDED
 	for _, lib := range l.SharedLibs {
-		idx := len(l.DynStrTab)
 		l.DynStrTab = append(l.DynStrTab, []byte(lib.Name)...)
 		l.DynStrTab = append(l.DynStrTab, 0)
-		writeDyn(DT_NEEDED, uint64(idx))
+		writeDyn(DT_NEEDED, uint64(len(l.DynStrTab)-len(lib.Name)-1))
 	}
-	
 	writeDyn(DT_STRTAB, strAddr)
 	writeDyn(DT_SYMTAB, symAddr)
 	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
@@ -312,15 +262,11 @@ func (l *Linker) layout() {
 	relaBuf := new(bytes.Buffer)
 	for i := range l.GotEntries {
 		rOff := gotAddr + uint64(i*8)
-		// Use GLOB_DAT for simple GOT resolution (no lazy binding)
-		rInfo := uint64((i+1)<<32) | uint64(R_X86_64_GLOB_DAT)
-		binary.Write(relaBuf, Le, rOff)
-		binary.Write(relaBuf, Le, rInfo)
-		binary.Write(relaBuf, Le, int64(0))
+		rInfo := uint64((i+1)<<32) | uint64(R_X86_64_JMP_SLOT)
+		binary.Write(relaBuf, Le, rOff); binary.Write(relaBuf, Le, rInfo); binary.Write(relaBuf, Le, int64(0))
 	}
 	l.RelaDynSect = relaBuf.Bytes()
 
-	// Assemble Data Section with padding
 	buf := new(bytes.Buffer)
 	buf.Write(l.DynSect)
 	for uint64(buf.Len()) < offsetSym { buf.WriteByte(0) }
@@ -333,50 +279,24 @@ func (l *Linker) layout() {
 	buf.Write(make([]byte, sizeGot))
 	l.DataSection = buf.Bytes()
 
-	// Generate PLT
+	// PLT Construction
 	pltBuf := new(bytes.Buffer)
 	for i, symName := range l.GotEntries {
 		targetGot := gotAddr + uint64(i*8)
-		// JMP [RIP + offset]
 		pltBuf.WriteByte(0xFF); pltBuf.WriteByte(0x25)
-		
-		// PC is address of next instruction (start + 6)
 		currentPC := l.TextAddr + uint64(len(l.InterpSect)) + uint64(pltBuf.Len()) + 4
 		rel := int32(targetGot - currentPC)
 		binary.Write(pltBuf, Le, rel)
-		
-		// Pad to 16 bytes
 		for k:=0; k<10; k++ { pltBuf.WriteByte(0x90) }
-
+		
 		l.GlobalTable[symName].Value = l.TextAddr + uint64(len(l.InterpSect)) + uint64(i*16)
 		l.GlobalTable[symName].Section = "plt"
 	}
-	
-	actualPlt := pltBuf.Bytes()
-	fullText := append(l.InterpSect, actualPlt...)
-	
-	currentTextLen := uint64(len(fullText))
-	objText = nil
-	if l.GlobalTable[l.Config.Entry].Section == "stub" {
-		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + currentTextLen
-		objText = append(objText, make([]byte, 32)...)
-	}
-	
-	for _, obj := range l.Objects {
-		for _, sec := range obj.Sections {
-			if sec.Flags&SHF_EXECINSTR != 0 {
-				pad := (16 - ((currentTextLen + uint64(len(objText))) % 16)) % 16
-				for i := 0; i < int(pad); i++ {
-					objText = append(objText, 0x90)
-				}
-				sec.OutputOffset = currentTextLen + uint64(len(objText))
-				sec.VirtualAddress = l.TextAddr + sec.OutputOffset
-				objText = append(objText, sec.Data...)
-			}
-		}
-	}
-	l.TextSection = append(fullText, objText...)
 
+	l.TextSection = append(l.InterpSect, pltBuf.Bytes()...)
+	l.TextSection = append(l.TextSection, objText...)
+
+	// ... [BSS and Data layout for objects - standard] ...
 	currentDataLen := uint64(len(l.DataSection))
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
@@ -384,6 +304,7 @@ func (l *Linker) layout() {
 				pad := (8 - ((currentDataLen) % 8)) % 8
 				l.DataSection = append(l.DataSection, make([]byte, int(pad))...)
 				currentDataLen += uint64(pad)
+				l.SectionOffsets[sec] = currentDataLen // Map data offset too
 				sec.OutputOffset = currentDataLen
 				sec.VirtualAddress = l.DataAddr + sec.OutputOffset
 				l.DataSection = append(l.DataSection, sec.Data...)
@@ -391,24 +312,10 @@ func (l *Linker) layout() {
 			}
 		}
 	}
-	
 	l.BssAddr = l.DataAddr + currentDataLen
-	currBss := uint64(0)
-	for _, obj := range l.Objects {
-		for _, sec := range obj.Sections {
-			if sec.Flags&SHF_WRITE != 0 && sec.Type == SHT_NOBITS {
-				if currBss%8 != 0 {
-					currBss += 8 - (currBss % 8)
-				}
-				sec.OutputOffset = currBss
-				sec.VirtualAddress = l.BssAddr + currBss
-				currBss += uint64(len(sec.Data))
-			}
-		}
-	}
-	l.BssSize = currBss
-	l.EntryAddr = l.GlobalTable[l.Config.Entry].Value
+	l.BssSize = 0 
 	
+	// Finalize Globals
 	for _, obj := range l.Objects {
 		for _, sym := range obj.Symbols {
 			if sym.Section != nil {
@@ -421,32 +328,21 @@ func (l *Linker) layout() {
 }
 
 func (l *Linker) applyRelocations() error {
+	// Apply Stub
 	if l.GlobalTable[l.Config.Entry].Section == "stub" {
 		stub := []byte{
-			0x31, 0xed,                   // xor rbp, rbp
-			0x49, 0x89, 0xd1,             // mov r9, rdx
-			0x5e,                         // pop rsi
-			0x48, 0x89, 0xe2,             // mov rdx, rsp
-			0x48, 0x83, 0xe4, 0xf0,       // and rsp, -16
-			0x48, 0x8d, 0x3d, 0, 0, 0, 0, // lea rdi, [rip + offset]
-			0x48, 0x31, 0xc9,             // xor rcx, rcx
-			0x45, 0x31, 0xc0,             // xor r8d, r8d
-			0xe8, 0, 0, 0, 0,             // call __libc_start_main
-			0xf4,                         // hlt
+			0x31, 0xed, 0x49, 0x89, 0xd1, 0x5e, 0x48, 0x89, 0xe2, 0x48, 0x83, 0xe4, 0xf0, 
+			0x48, 0x8d, 0x3d, 0, 0, 0, 0, // 13: lea rdi
+			0x48, 0x31, 0xc9, 0x45, 0x31, 0xc0, 
+			0xe8, 0, 0, 0, 0, // 26: call
+			0xf4,
 		}
-
 		stubOffset := l.GlobalTable[l.Config.Entry].Value - l.TextAddr
 		leaPC := l.GlobalTable[l.Config.Entry].Value + 20
 		mainAddr := l.GlobalTable["main"].Value
 		binary.LittleEndian.PutUint32(stub[16:], uint32(int32(mainAddr - leaPC)))
-
 		callPC := l.GlobalTable[l.Config.Entry].Value + 31
-		libcStartAddr := uint64(0)
-		if s, ok := l.GlobalTable["__libc_start_main"]; ok {
-			libcStartAddr = s.Value
-		} else {
-			return fmt.Errorf("libc not found")
-		}
+		libcStartAddr := l.GlobalTable["__libc_start_main"].Value
 		binary.LittleEndian.PutUint32(stub[27:], uint32(int32(libcStartAddr - callPC)))
 		copy(l.TextSection[stubOffset:], stub)
 	}
@@ -459,24 +355,28 @@ func (l *Linker) applyRelocations() error {
 					symVal = r.Sym.Section.VirtualAddress + r.Sym.Value
 				} else {
 					global, ok := l.GlobalTable[r.Sym.Name]
-					if !ok || !global.Defined {
-						return fmt.Errorf("undefined symbol: %s", r.Sym.Name)
-					}
+					if !ok || !global.Defined { return fmt.Errorf("undefined symbol: %s", r.Sym.Name) }
 					symVal = global.Value
 				}
+				
 				P := sec.VirtualAddress + r.Offset
+				
+				// Use the Map to find buffer
 				var buf []byte
 				var bufOff uint64
-				if sec.Flags&SHF_EXECINSTR != 0 {
-					buf = l.TextSection
-					bufOff = sec.OutputOffset + r.Offset
-				} else if sec.Flags&SHF_WRITE != 0 {
-					buf = l.DataSection
-					bufOff = sec.OutputOffset + r.Offset
+				
+				if off, ok := l.SectionOffsets[sec]; ok {
+					if sec.Flags&SHF_EXECINSTR != 0 {
+						buf = l.TextSection
+					} else {
+						buf = l.DataSection
+					}
+					bufOff = off + r.Offset
 				} else {
-					continue
+					continue // Should not happen for mapped sections
 				}
-				if bufOff >= uint64(len(buf)) { continue }
+
+				if bufOff >= uint64(len(buf)) { panic("Buffer overflow in relocation") }
 
 				switch r.Type {
 				case R_X86_64_64:
@@ -499,31 +399,18 @@ func (l *Linker) write(path string) error {
 	defer f.Close()
 
 	hdrSize := uint64(64 + 56*5)
-	textOff := align(hdrSize, 16)
+	textOff := align(hdrSize, 4096)
 	textSize := uint64(len(l.TextSection))
 	dataOff := align(textOff+textSize, 4096)
 	dataSize := uint64(len(l.DataSection))
 
-	l.addShStr("")
-	idxInterp := l.addShStr(".interp")
-	idxText := l.addShStr(".text")
-	idxDyn := l.addShStr(".dynamic")
-	idxData := l.addShStr(".data")
-	idxBss := l.addShStr(".bss")
-	idxShstr := l.addShStr(".shstrtab")
-
+	l.addShStr(""); idxInterp := l.addShStr(".interp"); idxText := l.addShStr(".text")
+	idxDyn := l.addShStr(".dynamic"); idxData := l.addShStr(".data"); idxBss := l.addShStr(".bss"); idxShstr := l.addShStr(".shstrtab")
 	shStrOff := dataOff + dataSize
 	shTableOff := shStrOff + uint64(len(l.ShStrTab))
-	shNum := uint16(7)
 
-	ehdr := Header{
-		Type: ET_EXEC, Machine: EM_X86_64, Version: EV_CURRENT,
-		Entry: l.EntryAddr, Phoff: 64, Ehsize: 64, Phentsize: 56, Phnum: 5,
-		Shoff: shTableOff, Shentsize: 64, Shnum: shNum, Shstrndx: 6,
-	}
-	ehdr.Ident[0] = 0x7F; ehdr.Ident[1] = 'E'; ehdr.Ident[2] = 'L'; ehdr.Ident[3] = 'F'
-	ehdr.Ident[4] = ELFCLASS64; ehdr.Ident[5] = ELFDATA2LSB; ehdr.Ident[6] = EV_CURRENT; ehdr.Ident[7] = 3
-
+	ehdr := Header{Type: ET_EXEC, Machine: EM_X86_64, Version: EV_CURRENT, Entry: l.EntryAddr, Phoff: 64, Ehsize: 64, Phentsize: 56, Phnum: 5, Shoff: shTableOff, Shentsize: 64, Shnum: 7, Shstrndx: 6}
+	ehdr.Ident[0]=0x7F; ehdr.Ident[1]='E'; ehdr.Ident[2]='L'; ehdr.Ident[3]='F'; ehdr.Ident[4]=ELFCLASS64; ehdr.Ident[5]=ELFDATA2LSB; ehdr.Ident[6]=EV_CURRENT; ehdr.Ident[7]=3
 	binary.Write(f, Le, ehdr)
 
 	binary.Write(f, Le, ProgHeader{Type: PT_PHDR, Flags: PF_R, Off: 64, Vaddr: l.Config.BaseAddr + 64, Paddr: l.Config.BaseAddr + 64, Filesz: 56 * 5, Memsz: 56 * 5, Align: 8})
@@ -532,12 +419,9 @@ func (l *Linker) write(path string) error {
 	binary.Write(f, Le, ProgHeader{Type: PT_LOAD, Flags: PF_R | PF_W, Off: dataOff, Vaddr: l.DataAddr, Paddr: l.DataAddr, Filesz: dataSize, Memsz: dataSize + l.BssSize, Align: 4096})
 	binary.Write(f, Le, ProgHeader{Type: PT_DYNAMIC, Flags: PF_R | PF_W, Off: dataOff, Vaddr: l.DataAddr, Paddr: l.DataAddr, Filesz: uint64(len(l.DynSect)), Memsz: uint64(len(l.DynSect)), Align: 8})
 
-	cur := uint64(64 + 56*5)
-	if textOff > cur { f.Write(make([]byte, textOff-cur)) }
+	if textOff > 64+56*5 { f.Write(make([]byte, textOff-(64+56*5))) }
 	f.Write(l.TextSection)
-
-	cur = textOff + textSize
-	if dataOff > cur { f.Write(make([]byte, dataOff-cur)) }
+	if dataOff > textOff+textSize { f.Write(make([]byte, dataOff-(textOff+textSize))) }
 	f.Write(l.DataSection)
 	f.Write(l.ShStrTab)
 
