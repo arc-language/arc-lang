@@ -68,7 +68,6 @@ func (c *Compiler) emitExecutable(m *ir.Module, cfg Config) error {
 	}
 
 	// Step 3: Resolve External Libraries
-	// Standard search paths including typical distros
 	searchPaths := append(cfg.LibraryPaths,
 		"/usr/lib/x86_64-linux-gnu",
 		"/lib/x86_64-linux-gnu",
@@ -78,8 +77,6 @@ func (c *Compiler) emitExecutable(m *ir.Module, cfg Config) error {
 		"/lib",
 	)
 
-	// Regex to find library path inside GNU ld script
-	// Matches: GROUP ( /path/to/lib ... )
 	ldScriptRegex := regexp.MustCompile(`(?:GROUP|INPUT)\s*\(\s*([^\s)]+)`)
 
 	for _, lib := range cfg.Libraries {
@@ -88,40 +85,48 @@ func (c *Compiler) emitExecutable(m *ir.Module, cfg Config) error {
 		for _, dir := range searchPaths {
 			// Priority 1: Shared Library (.so)
 			soPath := filepath.Join(dir, "lib"+lib+".so")
-			if data, err := os.ReadFile(soPath); err == nil {
-				c.logger.Debug("Found candidate library: %s", soPath)
+			data, err := os.ReadFile(soPath)
+			if err != nil {
+				continue // Try next path
+			}
+			
+			c.logger.Debug("Found candidate library: %s", soPath)
 
-				// CHECK: Is this a GNU Linker Script? (e.g. libc.so text file)
-				// Magic: "/* GNU ld script"
-				if len(data) > 8 && string(data[:8]) == "/* GNU l" {
-					c.logger.Debug("Parsing linker script: %s", soPath)
-					content := string(data)
-					match := ldScriptRegex.FindStringSubmatch(content)
-					if len(match) > 1 {
-						realPath := match[1]
-						// If path is relative, join with current dir, otherwise uses absolute
-						if !filepath.IsAbs(realPath) {
-							realPath = filepath.Join(dir, realPath)
-						}
+			// CHECK: Is this a GNU Linker Script?
+			if len(data) > 8 && string(data[:8]) == "/* GNU l" {
+				c.logger.Debug("Parsing linker script: %s", soPath)
+				content := string(data)
+				match := ldScriptRegex.FindStringSubmatch(content)
+				if len(match) > 1 {
+					realPath := match[1]
+					if !filepath.IsAbs(realPath) {
+						realPath = filepath.Join(dir, realPath)
+					}
 
-						// Load the REAL library (e.g. libc.so.6)
-						if realData, err := os.ReadFile(realPath); err == nil {
-							c.logger.Debug("Linking resolved library: %s", realPath)
-							if err := linker.AddSharedLib(realPath, realData); err != nil {
-								return fmt.Errorf("failed to link resolved lib %s: %w", realPath, err)
-							}
-							found = true
-							break
+					// Load the REAL library
+					if realData, err := os.ReadFile(realPath); err == nil {
+						c.logger.Debug("Linking resolved library: %s", realPath)
+						if err := linker.AddSharedLib(realPath, realData); err != nil {
+							c.logger.Debug("Failed to link resolved lib %s: %v", realPath, err)
+							continue
 						}
+						found = true
+						break
+					} else {
+						c.logger.Debug("Failed to read real library %s: %v", realPath, err)
 					}
 				}
+				// Linker script parsing failed or couldn't find real lib, try next search path
+				continue
+			}
 
-				// Standard Binary ELF Load
-				if err := linker.AddSharedLib(soPath, data); err == nil {
-					c.logger.Debug("Linking shared library: %s", soPath)
-					found = true
-					break
-				}
+			// Standard Binary ELF Load
+			if err := linker.AddSharedLib(soPath, data); err == nil {
+				c.logger.Debug("Linking shared library: %s", soPath)
+				found = true
+				break
+			} else {
+				c.logger.Debug("Failed to load %s as ELF: %v", soPath, err)
 			}
 
 			// Priority 2: Static Library (.a)
@@ -129,7 +134,8 @@ func (c *Compiler) emitExecutable(m *ir.Module, cfg Config) error {
 			if _, err := os.Stat(aPath); err == nil {
 				c.logger.Debug("Linking static library: %s", aPath)
 				if err := linker.AddArchive(aPath); err != nil {
-					return fmt.Errorf("failed to link archive %s: %w", aPath, err)
+					c.logger.Debug("Failed to link archive %s: %v", aPath, err)
+					continue
 				}
 				found = true
 				break

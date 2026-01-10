@@ -186,7 +186,7 @@ func (l *Linker) layout() {
 			if sec.Flags&SHF_EXECINSTR != 0 {
 				pad := (16 - (len(objText) % 16)) % 16
 				for i := 0; i < int(pad); i++ { objText = append(objText, 0x90) }
-				l.SectionOffsets[sec] = uint64(len(objText)) // Store relative to objText start for now
+				l.SectionOffsets[sec] = uint64(len(objText))
 				objText = append(objText, sec.Data...)
 			}
 		}
@@ -203,7 +203,7 @@ func (l *Linker) layout() {
 		finalOffset := baseTextOffset + relOff
 		sec.OutputOffset = finalOffset
 		sec.VirtualAddress = l.TextAddr + finalOffset
-		l.SectionOffsets[sec] = finalOffset // Update map to absolute offset in TextSection
+		l.SectionOffsets[sec] = finalOffset
 	}
 	
 	// Update Stub Address
@@ -215,8 +215,7 @@ func (l *Linker) layout() {
 	totalTextSize := baseTextOffset + uint64(len(objText))
 	l.DataAddr = align(l.TextAddr+totalTextSize, 4096)
 
-	// Build Dyn Data
-	// IMPORTANT: Add library names to DynStrTab FIRST, before calculating offsets
+	// Build Dyn Data - Add library names to DynStrTab FIRST
 	libNameOffsets := make(map[string]uint32)
 	for _, lib := range l.SharedLibs {
 		// Extract just the filename (SONAME) from the full path
@@ -225,11 +224,19 @@ func (l *Linker) layout() {
 			libName = libName[idx+1:]
 		}
 		
-		// Add to string table
+		// Validate we have a non-empty library name
+		if libName == "" {
+			fmt.Printf("WARNING: Empty library name for path: %s\n", lib.Name)
+			continue
+		}
+		
+		// Add to string table (DynStrTab already starts with a 0 byte)
 		nameOffset := uint32(len(l.DynStrTab))
 		l.DynStrTab = append(l.DynStrTab, []byte(libName)...)
 		l.DynStrTab = append(l.DynStrTab, 0)
 		libNameOffsets[lib.Name] = nameOffset
+		
+		fmt.Printf("DEBUG: Added library '%s' at DynStrTab offset %d\n", libName, nameOffset)
 	}
 
 	// Now build symbol table
@@ -260,11 +267,19 @@ func (l *Linker) layout() {
 		binary.Write(dynBuf, Le, tag); binary.Write(dynBuf, Le, val)
 	}
 	
-	// Write DT_NEEDED entries FIRST (using the offsets we stored)
+	// Write DT_NEEDED entries FIRST
 	for _, lib := range l.SharedLibs {
-		if offset, ok := libNameOffsets[lib.Name]; ok {
-			writeDyn(DT_NEEDED, uint64(offset))
+		offset, ok := libNameOffsets[lib.Name]
+		if !ok {
+			fmt.Printf("WARNING: Library %s not found in offset map, skipping\n", lib.Name)
+			continue
 		}
+		if offset == 0 {
+			fmt.Printf("WARNING: Library %s has invalid offset 0, skipping\n", lib.Name)
+			continue
+		}
+		fmt.Printf("DEBUG: Writing DT_NEEDED for '%s' with offset %d\n", lib.Name, offset)
+		writeDyn(DT_NEEDED, uint64(offset))
 	}
 	
 	writeDyn(DT_STRTAB, strAddr)
@@ -272,11 +287,10 @@ func (l *Linker) layout() {
 	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
 	writeDyn(DT_SYMENT, 24)
 	
-	// PLT/GOT relocations use DT_JMPREL, not DT_RELA
-	writeDyn(DT_PLTREL, 7)  // 7 = DT_RELA (indicates we're using RELA-style relocations)
-	writeDyn(DT_JMPREL, relaAddr)  // Address of PLT relocations
-	writeDyn(DT_PLTRELSZ, relaSize)  // Size of PLT relocations
-	writeDyn(DT_RELAENT, 24)  // Size of one relocation entry
+	writeDyn(DT_PLTREL, 7)
+	writeDyn(DT_JMPREL, relaAddr)
+	writeDyn(DT_PLTRELSZ, relaSize)
+	writeDyn(DT_RELAENT, 24)
 	
 	writeDyn(DT_NULL, 0)
 	l.DynSect = dynBuf.Bytes()
@@ -328,7 +342,7 @@ func (l *Linker) layout() {
 				pad := (8 - ((currentDataLen) % 8)) % 8
 				l.DataSection = append(l.DataSection, make([]byte, int(pad))...)
 				currentDataLen += uint64(pad)
-				l.SectionOffsets[sec] = currentDataLen // Map data offset too
+				l.SectionOffsets[sec] = currentDataLen
 				sec.OutputOffset = currentDataLen
 				sec.VirtualAddress = l.DataAddr + sec.OutputOffset
 				l.DataSection = append(l.DataSection, sec.Data...)
@@ -350,7 +364,6 @@ func (l *Linker) layout() {
 		}
 	}
 	
-	// SET ENTRY POINT - THIS IS CRITICAL!
 	l.EntryAddr = l.GlobalTable[l.Config.Entry].Value
 }
 

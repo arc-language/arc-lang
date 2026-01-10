@@ -191,7 +191,6 @@ func LoadArchive(path string) ([]*InputObject, error) {
 	return objects, nil
 }
 
-// LoadSharedObject parses a .so file to find exported symbols
 func LoadSharedObject(name string, data []byte) (*SharedObject, error) {
 	f, err := stdelf.NewFile(bytes.NewReader(data))
 	if err != nil {
@@ -200,22 +199,27 @@ func LoadSharedObject(name string, data []byte) (*SharedObject, error) {
 
 	so := &SharedObject{Name: name}
 
-	// We look at SHT_DYNSYM (Dynamic Symbols)
 	syms, err := f.DynamicSymbols()
 	if err != nil {
-		// Some libs might strip dynsyms or handle them differently,
-		// but standard .so files have them.
-		// If fails, we return empty symbols, not error, to be safe.
+		fmt.Printf("WARNING: No dynamic symbols in %s: %v\n", name, err)
 		return so, nil
 	}
 
 	for _, s := range syms {
-		// We only care about Defined Global Functions or Objects
-		// SHN_UNDEF (0) means undefined import
 		if s.Section != stdelf.SHN_UNDEF && (stdelf.ST_BIND(s.Info) == stdelf.STB_GLOBAL || stdelf.ST_BIND(s.Info) == stdelf.STB_WEAK) {
 			so.Symbols = append(so.Symbols, s.Name)
 		}
 	}
-
+	
+	fmt.Printf("DEBUG: Loaded shared object '%s' with %d exported symbols\n", name, len(so.Symbols))
+	for i, sym := range so.Symbols {
+		if i < 10 { // Show first 10 symbols
+			fmt.Printf("  - %s\n", sym)
+		}
+	}
+	if len(so.Symbols) > 10 {
+		fmt.Printf("  ... and %d more\n", len(so.Symbols)-10)
+	}
+	
 	return so, nil
 }
