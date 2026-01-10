@@ -243,7 +243,7 @@ func (l *Linker) layout() {
 	
 	// Layout & Alignment Tracking
 	offset := uint64(0)
-	offsetDyn := offset
+	offsetDyn := offset // Start of Dyn is 0 relative to DataAddr
 	numDynEntries := len(l.SharedLibs) + 9
 	sizeDyn := uint64(numDynEntries * 16)
 	offset += sizeDyn
@@ -267,7 +267,9 @@ func (l *Linker) layout() {
 	sizeGot := uint64(len(l.GotEntries) * 8)
 	offset += sizeGot
 
-	dynAddr := l.DataAddr + offsetDyn
+	// Base Addresses
+	// dynAddr (unused local removed)
+	l.DynAddr = l.DataAddr + offsetDyn // Update struct field instead
 	symAddr := l.DataAddr + offsetSym
 	strAddr := l.DataAddr + offsetStr
 	relaAddr := l.DataAddr + offsetRela
@@ -284,7 +286,7 @@ func (l *Linker) layout() {
 	
 	writeDyn(DT_STRTAB, strAddr)
 	writeDyn(DT_SYMTAB, symAddr)
-	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab))) // Re-calculate approximate size (safe to overshoot slightly if needed, but here we appended)
+	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
 	writeDyn(DT_SYMENT, 24)
 	writeDyn(DT_RELA, relaAddr)
 	writeDyn(DT_RELASZ, relaSize)
