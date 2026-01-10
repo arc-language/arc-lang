@@ -299,9 +299,13 @@ func (a *Analyzer) visitExternCppMethod(ctx *parser.ExternCppMethodDeclContext, 
 
 func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	// 1. Get Function Name
-	// Due to grammar change (prefix?), the name is always the LAST identifier token.
+	// With the grammar change, we might have [name] OR [prefix, name]
 	ids := ctx.AllIDENTIFIER()
-	nameToken := ids[len(ids)-1]
+	if len(ids) == 0 {
+		return nil // Should be caught by parser error listener
+	}
+	
+	nameToken := ids[len(ids)-1] // The name is always the last identifier
 	name := nameToken.GetText()
 
 	if a.currentNamespacePrefix != "" && name != "main" {
@@ -325,7 +329,7 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 			base = ptr.ElementType
 		}
 		if st, ok := base.(*types.StructType); ok {
-			// Re-use the raw name token to avoid double-prefixing issues
+			// Re-use the raw name token text to avoid double-prefixing issues
 			name = st.Name + "_" + nameToken.GetText()
 		}
 	}
@@ -348,7 +352,6 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		var paramTypes []types.Type
 		if ctx.ParameterList() != nil {
 			for _, param := range ctx.ParameterList().AllParameter() {
-				// selfType logic moved up, but we still need the types for the signature
 				paramTypes = append(paramTypes, a.resolveType(param.Type_()))
 			}
 		}
@@ -358,7 +361,8 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		isAsync := ctx.ASYNC() != nil
 		isProcess := false
 
-		// If there is more than 1 identifier, the first one is the prefix (e.g. "process")
+		// Check for identifier-based keywords (like "process")
+		// If len(ids) > 1, the first identifier is the prefix.
 		if len(ids) > 1 {
 			if ids[0].GetText() == "process" {
 				isProcess = true

@@ -85,24 +85,20 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			for _, param := range gpl.AllGenericParam() {
 				for _, id := range param.AllIDENTIFIER() {
 					tag := id.GetText()
-					if tag == "gpu" { 
-						isGPU = true 
-					} else if tag == "rocm" { 
-						isROCm = true 
-					} else if tag == "cuda" { 
-						isCUDA = true 
-					} else if tag == "tpu" { 
-						isTPU = true 
-					}
+					if tag == "gpu" { isGPU = true } 
+					else if tag == "rocm" { isROCm = true } 
+					else if tag == "cuda" { isCUDA = true } 
+					else if tag == "tpu" { isTPU = true }
 				}
 			}
 		}
 	}
 
 	// 2. Resolve Name
-	// Get all identifiers. The function name is the LAST one.
 	ids := ctx.AllIDENTIFIER()
-	nameToken := ids[len(ids)-1]
+	if len(ids) == 0 { return nil }
+	
+	nameToken := ids[len(ids)-1] // Last identifier is the name
 	name := nameToken.GetText()
 	
 	irName := name
