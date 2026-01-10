@@ -23,6 +23,8 @@ Write your model once. Deploy everywhere. With full systems control when you nee
 ## Write Once. Run Anywhere.
 
 ```arc
+namespace main
+
 import "ai"
 
 // Train on NVIDIA GPUs
