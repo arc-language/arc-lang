@@ -85,10 +85,15 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			for _, param := range gpl.AllGenericParam() {
 				for _, id := range param.AllIDENTIFIER() {
 					tag := id.GetText()
-					if tag == "gpu" { isGPU = true } 
-					else if tag == "rocm" { isROCm = true } 
-					else if tag == "cuda" { isCUDA = true } 
-					else if tag == "tpu" { isTPU = true }
+					if tag == "gpu" { 
+						isGPU = true 
+					} else if tag == "rocm" { 
+						isROCm = true 
+					} else if tag == "cuda" { 
+						isCUDA = true 
+					} else if tag == "tpu" { 
+						isTPU = true 
+					}
 				}
 			}
 		}
