@@ -214,22 +214,42 @@ func (t *FunctionType) String() string {
 // BitSize returns 64 because function values are essentially pointers in the IR
 func (t *FunctionType) BitSize() int { return 64 }
 
-func (t *FunctionType) Equal(o Type) bool {
-	if ot, ok := o.(*FunctionType); ok {
-		if !t.ReturnType.Equal(ot.ReturnType) || t.Variadic != ot.Variadic || t.IsAsync != ot.IsAsync {
-			return false
-		}
-		if len(t.ParamTypes) != len(ot.ParamTypes) {
-			return false
-		}
-		for i := range t.ParamTypes {
-			if !t.ParamTypes[i].Equal(ot.ParamTypes[i]) {
-				return false
-			}
-		}
-		return true
+func (t *FunctionType) Equal(other Type) bool {
+	o, ok := other.(*FunctionType)
+	if !ok {
+		return false
 	}
-	return false
+
+	// 1. Check Concurrency Flags
+	if t.IsAsync != o.IsAsync {
+		return false
+	}
+	if t.IsProcess != o.IsProcess {
+		return false
+	}
+
+	// 2. Check Variadic Flag
+	if t.Variadic != o.Variadic {
+		return false
+	}
+
+	// 3. Check Return Type
+	if !t.ReturnType.Equal(o.ReturnType) {
+		return false
+	}
+
+	// 4. Check Parameters
+	if len(t.ParamTypes) != len(o.ParamTypes) {
+		return false
+	}
+
+	for i := range t.ParamTypes {
+		if !t.ParamTypes[i].Equal(o.ParamTypes[i]) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // LabelType represents a basic block label
@@ -325,42 +345,4 @@ func NewProcessFunction(ret Type, params []Type, variadic bool) *FunctionType {
 		Variadic:   variadic,
 		IsProcess:  true, // Tag it
 	}
-}
-
-func (t *FunctionType) Equal(other Type) bool {
-	o, ok := other.(*FunctionType)
-	if !ok {
-		return false
-	}
-
-	// 1. Check Concurrency Flags
-	if t.IsAsync != o.IsAsync {
-		return false
-	}
-	if t.IsProcess != o.IsProcess {
-		return false
-	}
-
-	// 2. Check Variadic Flag
-	if t.Variadic != o.Variadic {
-		return false
-	}
-
-	// 3. Check Return Type
-	if !t.ReturnType.Equal(o.ReturnType) {
-		return false
-	}
-
-	// 4. Check Parameters
-	if len(t.ParamTypes) != len(o.ParamTypes) {
-		return false
-	}
-
-	for i := range t.ParamTypes {
-		if !t.ParamTypes[i].Equal(o.ParamTypes[i]) {
-			return false
-		}
-	}
-
-	return true
 }
