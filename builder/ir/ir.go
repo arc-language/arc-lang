@@ -164,6 +164,8 @@ const (
 	// Replaces previous Coroutine intrinsics
 	OpAsyncTaskCreate
 	OpAsyncTaskAwait
+
+   OpProcessCreate // New
 )
 
 var opcodeNames = map[Opcode]string{
@@ -228,6 +230,8 @@ var opcodeNames = map[Opcode]string{
 	OpRaise:           "raise",
 	OpAsyncTaskCreate: "async_task_create",
 	OpAsyncTaskAwait:  "async_task_await",
+
+    OpProcessCreate: "process_create",
 }
 
 func (op Opcode) String() string {
