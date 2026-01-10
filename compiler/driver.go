@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/arc-language/arc-lang/builder/ir"
-	"github.com/arc-language/arc-lang/codegen"
+	"github.com/arc-language/arc-lang/codegen/codegen"
 	"github.com/arc-language/arc-lang/linker/elf" // Our native linker
 )
 
