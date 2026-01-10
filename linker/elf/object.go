@@ -16,16 +16,16 @@ type InputObject struct {
 	Name     string
 	Sections []*InputSection
 	Symbols  []*InputSymbol
-	File     *stdelf.File 
+	File     *stdelf.File
 }
 
 type InputSection struct {
-	Name    string
-	Type    stdelf.SectionType
-	Flags   stdelf.SectionFlag
-	Data    []byte
-	Relocs  []InputReloc
-	
+	Name   string
+	Type   stdelf.SectionType
+	Flags  stdelf.SectionFlag
+	Data   []byte
+	Relocs []InputReloc
+
 	// Output mapping
 	VirtualAddress uint64
 	OutputOffset   uint64
@@ -35,7 +35,7 @@ type InputReloc struct {
 	Offset uint64
 	Type   uint32
 	Addend int64
-	Sym    *InputSymbol 
+	Sym    *InputSymbol
 }
 
 type InputSymbol struct {
@@ -43,8 +43,14 @@ type InputSymbol struct {
 	Type    stdelf.SymType
 	Bind    stdelf.SymBind
 	Section *InputSection // Nil if Undefined
-	Value   uint64        
+	Value   uint64
 	Size    uint64
+}
+
+// SharedObject represents a dynamic library (e.g., libc.so)
+type SharedObject struct {
+	Name    string
+	Symbols []string // Only the names of exported dynamic symbols
 }
 
 // LoadObject parses an ELF object from a byte slice
@@ -55,10 +61,10 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 	}
 
 	obj := &InputObject{Name: name, File: f}
-	
+
 	// 1. Load Sections (Only PROGBITS and NOBITS)
 	sectionsByIndex := make(map[int]*InputSection)
-	
+
 	for i, sec := range f.Sections {
 		if sec.Type == stdelf.SHT_PROGBITS || sec.Type == stdelf.SHT_NOBITS {
 			data, _ := sec.Data()
@@ -100,7 +106,9 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 	for _, sec := range f.Sections {
 		if sec.Type == stdelf.SHT_RELA {
 			targetSec := sectionsByIndex[int(sec.Info)]
-			if targetSec == nil { continue }
+			if targetSec == nil {
+				continue
+			}
 
 			rdata, _ := sec.Data()
 			rreader := bytes.NewReader(rdata)
@@ -112,7 +120,7 @@ func LoadObject(name string, data []byte) (*InputObject, error) {
 				binary.Read(rreader, Le, &rOff)
 				binary.Read(rreader, Le, &rInfo)
 				binary.Read(rreader, Le, &rAddend)
-				
+
 				symIdx := int(rInfo >> 32)
 				rType := uint32(rInfo & 0xFFFFFFFF)
 
@@ -149,7 +157,9 @@ func LoadArchive(path string) ([]*InputObject, error) {
 	for {
 		header := make([]byte, 60)
 		if _, err := io.ReadFull(f, header); err != nil {
-			if err == io.EOF { break }
+			if err == io.EOF {
+				break
+			}
 			return nil, err
 		}
 
@@ -162,9 +172,13 @@ func LoadArchive(path string) ([]*InputObject, error) {
 			return nil, err
 		}
 
-		if size%2 != 0 { f.Seek(1, io.SeekCurrent) }
+		if size%2 != 0 {
+			f.Seek(1, io.SeekCurrent)
+		}
 
-		if name == "/" || name == "//" || name == "/SYM64/" { continue }
+		if name == "/" || name == "//" || name == "/SYM64/" {
+			continue
+		}
 
 		// Heuristic: Check for ELF magic inside archive member
 		if len(content) > 4 && string(content[1:4]) == "ELF" {
@@ -186,16 +200,18 @@ func LoadSharedObject(name string, data []byte) (*SharedObject, error) {
 
 	so := &SharedObject{Name: name}
 
-	// We look at SHT_DYNSYM (Dynamic Symbols) not SHT_SYMTAB
+	// We look at SHT_DYNSYM (Dynamic Symbols)
 	syms, err := f.DynamicSymbols()
 	if err != nil {
-		// Some libs might strip dynsyms or handle them differently, 
+		// Some libs might strip dynsyms or handle them differently,
 		// but standard .so files have them.
-		return nil, fmt.Errorf("no dynamic symbols in %s", name)
+		// If fails, we return empty symbols, not error, to be safe.
+		return so, nil
 	}
 
 	for _, s := range syms {
 		// We only care about Defined Global Functions or Objects
+		// SHN_UNDEF (0) means undefined import
 		if s.Section != stdelf.SHN_UNDEF && (stdelf.ST_BIND(s.Info) == stdelf.STB_GLOBAL || stdelf.ST_BIND(s.Info) == stdelf.STB_WEAK) {
 			so.Symbols = append(so.Symbols, s.Name)
 		}
