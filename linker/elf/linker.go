@@ -186,7 +186,7 @@ func (l *Linker) layout() {
 			if sec.Flags&SHF_EXECINSTR != 0 {
 				pad := (16 - (len(objText) % 16)) % 16
 				for i := 0; i < int(pad); i++ { objText = append(objText, 0x90) }
-				l.SectionOffsets[sec] = uint64(len(objText)) // Store relative to objText start for now
+				l.SectionOffsets[sec] = uint64(len(objText))
 				objText = append(objText, sec.Data...)
 			}
 		}
@@ -203,7 +203,7 @@ func (l *Linker) layout() {
 		finalOffset := baseTextOffset + relOff
 		sec.OutputOffset = finalOffset
 		sec.VirtualAddress = l.TextAddr + finalOffset
-		l.SectionOffsets[sec] = finalOffset // Update map to absolute offset in TextSection
+		l.SectionOffsets[sec] = finalOffset
 	}
 	
 	// Update Stub Address
@@ -227,7 +227,6 @@ func (l *Linker) layout() {
 
 	// Offsets
 	offset := uint64(0)
-	//offsetDyn := offset; offset += uint64((len(l.SharedLibs) + 9) * 16)
 	offset = align(offset, 8); offsetSym := offset; offset += uint64(len(l.DynSymSect))
 	offsetStr := offset; offset += uint64(len(l.DynStrTab))
 	for _, lib := range l.SharedLibs { offset += uint64(len(lib.Name) + 1) }
@@ -296,7 +295,7 @@ func (l *Linker) layout() {
 	l.TextSection = append(l.InterpSect, pltBuf.Bytes()...)
 	l.TextSection = append(l.TextSection, objText...)
 
-	// ... [BSS and Data layout for objects - standard] ...
+	// Data layout for objects
 	currentDataLen := uint64(len(l.DataSection))
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
@@ -304,7 +303,7 @@ func (l *Linker) layout() {
 				pad := (8 - ((currentDataLen) % 8)) % 8
 				l.DataSection = append(l.DataSection, make([]byte, int(pad))...)
 				currentDataLen += uint64(pad)
-				l.SectionOffsets[sec] = currentDataLen // Map data offset too
+				l.SectionOffsets[sec] = currentDataLen
 				sec.OutputOffset = currentDataLen
 				sec.VirtualAddress = l.DataAddr + sec.OutputOffset
 				l.DataSection = append(l.DataSection, sec.Data...)
@@ -325,6 +324,9 @@ func (l *Linker) layout() {
 			}
 		}
 	}
+	
+	// SET ENTRY POINT - THIS IS CRITICAL!
+	l.EntryAddr = l.GlobalTable[l.Config.Entry].Value
 }
 
 func (l *Linker) applyRelocations() error {
@@ -406,7 +408,7 @@ func (l *Linker) write(path string) error {
 	dataOff := align(textOff+textSize, 4096)
 	dataSize := uint64(len(l.DataSection))
 
-	l.addShStr(""); 
+	l.addShStr("")
 	idxInterp := l.addShStr(".interp")
 	idxText := l.addShStr(".text")
 	idxDyn := l.addShStr(".dynamic")
@@ -417,31 +419,41 @@ func (l *Linker) write(path string) error {
 	shStrOff := dataOff + dataSize
 	shTableOff := shStrOff + uint64(len(l.ShStrTab))
 
-	// Calculate actual addresses for interp and text
-	interpAddr := l.TextAddr
+	// Calculate section addresses and sizes
 	interpSize := uint64(len(l.InterpSect))
-	textActualAddr := l.TextAddr + uint64(len(l.InterpSect)) + uint64(len(l.GotEntries)*16) // After interp + PLT
-	textActualSize := textSize - interpSize - uint64(len(l.GotEntries)*16) // Remaining size
+	pltSize := uint64(len(l.GotEntries) * 16)
+	textActualAddr := l.TextAddr + interpSize + pltSize
+	textActualOff := textOff + interpSize + pltSize
+	textActualSize := textSize - interpSize - pltSize
 
-	ehdr := Header{Type: ET_EXEC, Machine: EM_X86_64, Version: EV_CURRENT, Entry: l.GlobalTable[l.Config.Entry].Value, Phoff: 64, Ehsize: 64, Phentsize: 56, Phnum: 5, Shoff: shTableOff, Shentsize: 64, Shnum: 7, Shstrndx: 6}
-	ehdr.Ident[0]=0x7F; ehdr.Ident[1]='E'; ehdr.Ident[2]='L'; ehdr.Ident[3]='F'; ehdr.Ident[4]=ELFCLASS64; ehdr.Ident[5]=ELFDATA2LSB; ehdr.Ident[6]=EV_CURRENT; ehdr.Ident[7]=3
+	ehdr := Header{
+		Type: ET_EXEC, Machine: EM_X86_64, Version: EV_CURRENT, 
+		Entry: l.EntryAddr,  // USE THE ENTRY ADDRESS WE SET IN layout()
+		Phoff: 64, Ehsize: 64, Phentsize: 56, Phnum: 5, 
+		Shoff: shTableOff, Shentsize: 64, Shnum: 7, Shstrndx: 6,
+	}
+	ehdr.Ident[0]=0x7F; ehdr.Ident[1]='E'; ehdr.Ident[2]='L'; ehdr.Ident[3]='F'
+	ehdr.Ident[4]=ELFCLASS64; ehdr.Ident[5]=ELFDATA2LSB; ehdr.Ident[6]=EV_CURRENT; ehdr.Ident[7]=3
 	binary.Write(f, Le, ehdr)
 
+	// Program Headers
 	binary.Write(f, Le, ProgHeader{Type: PT_PHDR, Flags: PF_R, Off: 64, Vaddr: l.Config.BaseAddr + 64, Paddr: l.Config.BaseAddr + 64, Filesz: 56 * 5, Memsz: 56 * 5, Align: 8})
-	binary.Write(f, Le, ProgHeader{Type: PT_INTERP, Flags: PF_R, Off: textOff, Vaddr: l.TextAddr, Paddr: l.TextAddr, Filesz: uint64(len(l.InterpSect)), Memsz: uint64(len(l.InterpSect)), Align: 1})
+	binary.Write(f, Le, ProgHeader{Type: PT_INTERP, Flags: PF_R, Off: textOff, Vaddr: l.TextAddr, Paddr: l.TextAddr, Filesz: interpSize, Memsz: interpSize, Align: 1})
 	binary.Write(f, Le, ProgHeader{Type: PT_LOAD, Flags: PF_R | PF_X, Off: 0, Vaddr: l.Config.BaseAddr, Paddr: l.Config.BaseAddr, Filesz: textOff + textSize, Memsz: textOff + textSize, Align: 4096})
 	binary.Write(f, Le, ProgHeader{Type: PT_LOAD, Flags: PF_R | PF_W, Off: dataOff, Vaddr: l.DataAddr, Paddr: l.DataAddr, Filesz: dataSize, Memsz: dataSize + l.BssSize, Align: 4096})
 	binary.Write(f, Le, ProgHeader{Type: PT_DYNAMIC, Flags: PF_R | PF_W, Off: dataOff, Vaddr: l.DataAddr, Paddr: l.DataAddr, Filesz: uint64(len(l.DynSect)), Memsz: uint64(len(l.DynSect)), Align: 8})
 
+	// Write content
 	if textOff > 64+56*5 { f.Write(make([]byte, textOff-(64+56*5))) }
 	f.Write(l.TextSection)
 	if dataOff > textOff+textSize { f.Write(make([]byte, dataOff-(textOff+textSize))) }
 	f.Write(l.DataSection)
 	f.Write(l.ShStrTab)
 
-	binary.Write(f, Le, SectionHeader{})
-	binary.Write(f, Le, SectionHeader{Name: idxInterp, Type: SHT_PROGBITS, Flags: SHF_ALLOC, Addr: interpAddr, Offset: textOff, Size: interpSize, Addralign: 1})
-	binary.Write(f, Le, SectionHeader{Name: idxText, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_EXECINSTR, Addr: textActualAddr, Offset: textOff + interpSize + uint64(len(l.GotEntries)*16), Size: textActualSize, Addralign: 16})
+	// Section Headers - with proper addresses
+	binary.Write(f, Le, SectionHeader{}) // Null section
+	binary.Write(f, Le, SectionHeader{Name: idxInterp, Type: SHT_PROGBITS, Flags: SHF_ALLOC, Addr: l.TextAddr, Offset: textOff, Size: interpSize, Addralign: 1})
+	binary.Write(f, Le, SectionHeader{Name: idxText, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_EXECINSTR, Addr: textActualAddr, Offset: textActualOff, Size: textActualSize, Addralign: 16})
 	binary.Write(f, Le, SectionHeader{Name: idxDyn, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: uint64(len(l.DynSect)), Link: 0, Addralign: 8})
 	binary.Write(f, Le, SectionHeader{Name: idxData, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: dataSize, Addralign: 4096})
 	binary.Write(f, Le, SectionHeader{Name: idxBss, Type: SHT_NOBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.BssAddr, Offset: dataOff + dataSize, Size: l.BssSize, Addralign: 8})
