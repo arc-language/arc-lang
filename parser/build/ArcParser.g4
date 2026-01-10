@@ -189,8 +189,8 @@ genericArg: type | expression;
 // Functions
 // =============================================================================
 
-// MODIFIED: Accepts ASYNC or IDENTIFIER (for 'process' etc)
-functionDecl: (ASYNC | IDENTIFIER)? FUNC IDENTIFIER genericParams? LPAREN parameterList? RPAREN returnType? block;
+// Hardcoded keywords for concurrency models
+functionDecl: (ASYNC | PROCESS | CONTAINER)? FUNC IDENTIFIER genericParams? LPAREN parameterList? RPAREN returnType? block;
 
 returnType: type | LPAREN typeList RPAREN;
 typeList: type (COMMA type)*;
@@ -436,13 +436,13 @@ argumentList: argument (COMMA argument)*;
 argument: expression | lambdaExpression | anonymousFuncExpression;
 
 lambdaExpression
-    : (ASYNC | IDENTIFIER)? LPAREN lambdaParamList? RPAREN FAT_ARROW block
-    | (ASYNC | IDENTIFIER)? LPAREN lambdaParamList? RPAREN FAT_ARROW expression
+    : (ASYNC | PROCESS | CONTAINER)? LPAREN lambdaParamList? RPAREN FAT_ARROW block
+    | (ASYNC | PROCESS | CONTAINER)? LPAREN lambdaParamList? RPAREN FAT_ARROW expression
     ;
 
-// MODIFIED: Accepts ASYNC or IDENTIFIER (for 'process' etc)
+// Hardcoded keywords here too
 anonymousFuncExpression
-    : (ASYNC | IDENTIFIER)? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
+    : (ASYNC | PROCESS | CONTAINER)? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
     ;
 
 lambdaParamList: lambdaParam (COMMA lambdaParam)*;
