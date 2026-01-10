@@ -316,6 +316,7 @@ func (l *Linker) layout() {
 		}
 		writeDyn(DT_NEEDED, uint64(offset))
 	}
+	writeDyn(DT_PLTGOT, gotAddr)     // ← ADD THIS LINE!
 	writeDyn(DT_STRTAB, strAddr)
 	writeDyn(DT_SYMTAB, symAddr)
 	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
@@ -325,7 +326,9 @@ func (l *Linker) layout() {
 	writeDyn(DT_PLTRELSZ, relaSize)
 	writeDyn(DT_RELAENT, 24)
 	writeDyn(DT_NULL, 0)
+
 	l.DynSect = dynBuf.Bytes()
+
 
 	// Build Relocation section
 	relaBuf := new(bytes.Buffer)

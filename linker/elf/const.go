@@ -98,6 +98,7 @@ const (
 	DT_PLTRELSZ = 2
 	DT_PLTREL   = 20
 
+	DT_PLTGOT   = 3
 )
 
 // Internal ELF Headers used for writing
