@@ -32,7 +32,6 @@ func Parse(filepath string) (parser.ICompilationUnitContext, *diagnostic.Bag) {
 	// Setup Lexer
 	lexer := parser.NewArcLexer(input)
 	lexer.RemoveErrorListeners() // Remove console printer
-	// Note: You can add a lexical error listener here too if needed
 
 	// Setup Token Stream
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
@@ -49,6 +48,7 @@ func Parse(filepath string) (parser.ICompilationUnitContext, *diagnostic.Bag) {
 	p.AddErrorListener(listener)
 
 	// Parse
+	// Note: This assumes your grammar's entry point is named 'compilationUnit'
 	tree := p.CompilationUnit()
 	
 	return tree, bag
