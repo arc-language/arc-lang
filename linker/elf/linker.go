@@ -215,22 +215,6 @@ func (l *Linker) layout() {
 	totalTextSize := baseTextOffset + uint64(len(objText))
 	l.DataAddr = align(l.TextAddr+totalTextSize, 4096)
 
-	// DEBUG: Show current state of DynStrTab BEFORE adding libraries
-	fmt.Printf("DEBUG: DynStrTab before adding libraries: len=%d\n", len(l.DynStrTab))
-	fmt.Printf("DEBUG: DynStrTab contents: %v\n", l.DynStrTab)
-	for i := 0; i < len(l.DynStrTab); i++ {
-		if l.DynStrTab[i] == 0 {
-			fmt.Printf("  [%d]: <null>\n", i)
-		} else if i == 0 || l.DynStrTab[i-1] == 0 {
-			// Start of a new string
-			end := i
-			for end < len(l.DynStrTab) && l.DynStrTab[end] != 0 {
-				end++
-			}
-			fmt.Printf("  [%d]: \"%s\"\n", i, string(l.DynStrTab[i:end]))
-		}
-	}
-
 	// Build Dyn Data - Add library names to DynStrTab
 	libNameOffsets := make(map[string]uint32)
 	for _, lib := range l.SharedLibs {
@@ -246,30 +230,11 @@ func (l *Linker) layout() {
 			continue
 		}
 		
-		// Add to string table (DynStrTab already starts with a 0 byte)
+		// Add to string table
 		nameOffset := uint32(len(l.DynStrTab))
-		fmt.Printf("DEBUG: Before adding '%s': DynStrTab len=%d, offset will be=%d\n", libName, len(l.DynStrTab), nameOffset)
 		l.DynStrTab = append(l.DynStrTab, []byte(libName)...)
 		l.DynStrTab = append(l.DynStrTab, 0)
-		fmt.Printf("DEBUG: After adding '%s': DynStrTab len=%d\n", libName, len(l.DynStrTab))
 		libNameOffsets[lib.Name] = nameOffset
-		
-		fmt.Printf("DEBUG: Added library '%s' at DynStrTab offset %d (full path key: '%s')\n", libName, nameOffset, lib.Name)
-	}
-
-	// DEBUG: Show final DynStrTab
-	fmt.Printf("DEBUG: Final DynStrTab: len=%d, contents:\n", len(l.DynStrTab))
-	for i := 0; i < len(l.DynStrTab); i++ {
-		if l.DynStrTab[i] == 0 {
-			fmt.Printf("  [%d]: <null>\n", i)
-		} else if i == 0 || l.DynStrTab[i-1] == 0 {
-			// Start of a new string
-			end := i
-			for end < len(l.DynStrTab) && l.DynStrTab[end] != 0 {
-				end++
-			}
-			fmt.Printf("  [%d]: \"%s\"\n", i, string(l.DynStrTab[i:end]))
-		}
 	}
 
 	// Now build symbol table
@@ -281,8 +246,32 @@ func (l *Linker) layout() {
 	l.DynSymSect = symBuf.Bytes()
 	relaSize := uint64(len(l.GotEntries) * 24)
 
-	// Calculate Offsets (DynStrTab now has the correct size)
-	offset := uint64(0)
+	// Write Dynamic Section entries FIRST to know its size
+	dynBuf := new(bytes.Buffer)
+	writeDyn := func(tag int64, val uint64) {
+		binary.Write(dynBuf, Le, tag); binary.Write(dynBuf, Le, val)
+	}
+	
+	// Placeholder - we'll fill in actual addresses after calculating offsets
+	// For now, just write to get the size
+	for range l.SharedLibs {
+		writeDyn(DT_NEEDED, 0)  // Placeholder
+	}
+	writeDyn(DT_STRTAB, 0)
+	writeDyn(DT_SYMTAB, 0)
+	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
+	writeDyn(DT_SYMENT, 24)
+	writeDyn(DT_PLTREL, 7)
+	writeDyn(DT_JMPREL, 0)
+	writeDyn(DT_PLTRELSZ, relaSize)
+	writeDyn(DT_RELAENT, 24)
+	writeDyn(DT_NULL, 0)
+	
+	// Now we know DynSect size
+	dynSectSize := uint64(dynBuf.Len())
+
+	// Calculate Offsets - NOW accounting for DynSect at the start
+	offset := dynSectSize
 	offset = align(offset, 8); offsetSym := offset; offset += uint64(len(l.DynSymSect))
 	offset = align(offset, 8); offsetStr := offset; offset += uint64(len(l.DynStrTab))
 	offset = align(offset, 8); offsetRela := offset; offset += relaSize
@@ -294,31 +283,18 @@ func (l *Linker) layout() {
 	relaAddr := l.DataAddr + offsetRela
 	gotAddr := l.DataAddr + offsetGot
 
-	fmt.Printf("DEBUG: Data section layout:\n")
-	fmt.Printf("  DataAddr: 0x%x\n", l.DataAddr)
-	fmt.Printf("  DynSymSect at offset %d, addr 0x%x, size %d\n", offsetSym, symAddr, len(l.DynSymSect))
-	fmt.Printf("  DynStrTab at offset %d, addr 0x%x, size %d\n", offsetStr, strAddr, len(l.DynStrTab))
-	fmt.Printf("  RelaDyn at offset %d, addr 0x%x, size %d\n", offsetRela, relaAddr, relaSize)
-	fmt.Printf("  GOT at offset %d, addr 0x%x, size %d\n", offsetGot, gotAddr, sizeGot)
-
-	// Write Dynamic Section entries
-	dynBuf := new(bytes.Buffer)
-	writeDyn := func(tag int64, val uint64) {
-		binary.Write(dynBuf, Le, tag); binary.Write(dynBuf, Le, val)
-	}
+	// NOW rebuild DynSect with correct addresses
+	dynBuf.Reset()
 	
-	// Write DT_NEEDED entries FIRST
+	// Write DT_NEEDED entries with correct offsets
 	for _, lib := range l.SharedLibs {
 		offset, ok := libNameOffsets[lib.Name]
 		if !ok {
-			fmt.Printf("WARNING: Library %s not found in offset map, skipping\n", lib.Name)
 			continue
 		}
 		if offset == 0 {
-			fmt.Printf("WARNING: Library %s has invalid offset 0, skipping\n", lib.Name)
 			continue
 		}
-		fmt.Printf("DEBUG: Writing DT_NEEDED for '%s' with offset %d\n", lib.Name, offset)
 		writeDyn(DT_NEEDED, uint64(offset))
 	}
 	
@@ -326,12 +302,10 @@ func (l *Linker) layout() {
 	writeDyn(DT_SYMTAB, symAddr)
 	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
 	writeDyn(DT_SYMENT, 24)
-	
 	writeDyn(DT_PLTREL, 7)
 	writeDyn(DT_JMPREL, relaAddr)
 	writeDyn(DT_PLTRELSZ, relaSize)
 	writeDyn(DT_RELAENT, 24)
-	
 	writeDyn(DT_NULL, 0)
 	l.DynSect = dynBuf.Bytes()
 
@@ -344,7 +318,7 @@ func (l *Linker) layout() {
 	}
 	l.RelaDynSect = relaBuf.Bytes()
 
-	// Assemble Data Section
+	// Assemble Data Section with correct offsets
 	buf := new(bytes.Buffer)
 	buf.Write(l.DynSect)
 	for uint64(buf.Len()) < offsetSym { buf.WriteByte(0) }
@@ -356,8 +330,6 @@ func (l *Linker) layout() {
 	for uint64(buf.Len()) < offsetGot { buf.WriteByte(0) }
 	buf.Write(make([]byte, sizeGot))
 	l.DataSection = buf.Bytes()
-
-	fmt.Printf("DEBUG: Final DataSection size: %d bytes\n", len(l.DataSection))
 
 	// PLT Construction
 	pltBuf := new(bytes.Buffer)
