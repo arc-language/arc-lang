@@ -284,6 +284,7 @@ func (l *Linker) layout() {
 	for range l.SharedLibs {
 		writeDyn(DT_NEEDED, 0)
 	}
+	writeDyn(DT_PLTGOT, 0) // Added this to match rebuild loop size
 	writeDyn(DT_STRTAB, 0)
 	writeDyn(DT_SYMTAB, 0)
 	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
@@ -319,7 +320,7 @@ func (l *Linker) layout() {
 		fmt.Printf("DEBUG: Writing DT_NEEDED for '%s' = %d\n", lib.Name, offset)
 		writeDyn(DT_NEEDED, uint64(offset))
 	}
-	writeDyn(DT_PLTGOT, gotAddr)     // ← ADD THIS LINE!
+	writeDyn(DT_PLTGOT, gotAddr)
 	writeDyn(DT_STRTAB, strAddr)
 	writeDyn(DT_SYMTAB, symAddr)
 	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
