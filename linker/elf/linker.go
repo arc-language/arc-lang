@@ -376,6 +376,19 @@ func (l *Linker) layout() {
 	}
 	l.BssSize = currBss
 	l.EntryAddr = l.GlobalTable[l.Config.Entry].Value
+
+	// --- FIX: Update Global Symbols with Final Addresses ---
+	for _, obj := range l.Objects {
+		for _, sym := range obj.Symbols {
+			if sym.Section != nil {
+				// We only care about global symbols here that need to be visible to relocations
+				if gSym, ok := l.GlobalTable[sym.Name]; ok {
+					// Add the Section Base Address to the Symbol Offset
+					gSym.Value = sym.Section.VirtualAddress + sym.Value
+				}
+			}
+		}
+	}
 }
 
 func (l *Linker) applyRelocations() error {
