@@ -207,16 +207,25 @@ func (l *Linker) layout() {
 
 	// 3. Object Text
 	var objText []byte
+
+	// FIX: Align Stub to avoid '00' padding injection later
 	if l.GlobalTable[l.Config.Entry].Section == "stub" {
-		objText = append(objText, make([]byte, 29)...)
 		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + pltOffset
+		// Reserve 29 bytes for stub
+		objText = append(objText, make([]byte, 29)...)
+		// Add 3 NOPs to align to 32 bytes (16-byte boundary)
+		objText = append(objText, 0x90, 0x90, 0x90)
 	}
 
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
 			if sec.Flags&SHF_EXECINSTR != 0 {
 				pad := (16 - (len(objText) % 16)) % 16
-				objText = append(objText, make([]byte, pad)...)
+				// Pad with NOPs (0x90) instead of Zeros for safety
+				for i := 0; i < pad; i++ {
+					objText = append(objText, 0x90)
+				}
+
 				sec.OutputOffset = pltOffset + uint64(len(objText))
 				sec.VirtualAddress = l.TextAddr + sec.OutputOffset
 				objText = append(objText, sec.Data...)
@@ -247,9 +256,7 @@ func (l *Linker) layout() {
 		targetGot := gotAddr + uint64(i*8)
 		currentPC := l.TextAddr + pltOffset + uint64(pltBuf.Len())
 		rel := int32(targetGot - (currentPC + 6))
-
-		pltBuf.WriteByte(0xFF)
-		pltBuf.WriteByte(0x25)
+		pltBuf.WriteByte(0xFF); pltBuf.WriteByte(0x25)
 		binary.Write(pltBuf, Le, rel)
 
 		l.GlobalTable[symName].Value = currentPC
@@ -262,22 +269,27 @@ func (l *Linker) layout() {
 	currentTextLen := uint64(len(fullText))
 	objText = nil
 
+	// REPEAT FIX: Align Stub
 	if l.GlobalTable[l.Config.Entry].Section == "stub" {
 		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + currentTextLen
 		objText = append(objText, make([]byte, 29)...)
+		objText = append(objText, 0x90, 0x90, 0x90)
 	}
 
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
 			if sec.Flags&SHF_EXECINSTR != 0 {
 				pad := (16 - ((currentTextLen + uint64(len(objText))) % 16)) % 16
-				objText = append(objText, make([]byte, pad)...)
+				for i := 0; i < pad; i++ {
+					objText = append(objText, 0x90)
+				}
 				sec.OutputOffset = currentTextLen + uint64(len(objText))
 				sec.VirtualAddress = l.TextAddr + sec.OutputOffset
 				objText = append(objText, sec.Data...)
 			}
 		}
 	}
+
 	l.TextSection = append(fullText, objText...)
 
 	// Re-align Data Addr
@@ -287,11 +299,9 @@ func (l *Linker) layout() {
 	}
 	gotAddr = l.DataAddr + gotOffset
 
-	// Generate Dynamic Data
 	dynBuf := new(bytes.Buffer)
 	writeDyn := func(tag int64, val uint64) {
-		binary.Write(dynBuf, Le, tag)
-		binary.Write(dynBuf, Le, val)
+		binary.Write(dynBuf, Le, tag); binary.Write(dynBuf, Le, val)
 	}
 
 	baseData := l.DataAddr
@@ -320,8 +330,7 @@ func (l *Linker) layout() {
 	symBuf := new(bytes.Buffer)
 	for _, ds := range l.DynSyms {
 		binary.Write(symBuf, Le, ds.Name)
-		symBuf.WriteByte(ds.Info)
-		symBuf.WriteByte(ds.Other)
+		symBuf.WriteByte(ds.Info); symBuf.WriteByte(ds.Other)
 		binary.Write(symBuf, Le, ds.Shndx)
 		binary.Write(symBuf, Le, ds.Value)
 		binary.Write(symBuf, Le, ds.Size)
@@ -377,13 +386,11 @@ func (l *Linker) layout() {
 	l.BssSize = currBss
 	l.EntryAddr = l.GlobalTable[l.Config.Entry].Value
 
-	// --- FIX: Update Global Symbols with Final Addresses ---
+	// FIX: Update Global Symbols with Final Addresses
 	for _, obj := range l.Objects {
 		for _, sym := range obj.Symbols {
 			if sym.Section != nil {
-				// We only care about global symbols here that need to be visible to relocations
 				if gSym, ok := l.GlobalTable[sym.Name]; ok {
-					// Add the Section Base Address to the Symbol Offset
 					gSym.Value = sym.Section.VirtualAddress + sym.Value
 				}
 			}
