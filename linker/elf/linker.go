@@ -464,7 +464,7 @@ func (l *Linker) write(path string) error {
 	// Define Sections for objdump
 	// 0: NULL, 1: .interp, 2: .text, 3: .dynamic, 4: .data, 5: .bss, 6: .shstrtab
 
-	idxNull := l.addShStr("")
+	l.addShStr("") // Add null string (index 0)
 	idxInterp := l.addShStr(".interp")
 	idxText := l.addShStr(".text")
 	idxDyn := l.addShStr(".dynamic")
@@ -474,7 +474,7 @@ func (l *Linker) write(path string) error {
 
 	// Append shstrtab to file content
 	shStrOff := dataOff + dataSize
-	
+
 	// Calculate Table Offset
 	shTableOff := shStrOff + uint64(len(l.ShStrTab))
 	shNum := uint16(7)
