@@ -393,6 +393,8 @@ func (l *Linker) applyRelocations() error {
 	return nil
 }
 
+// In the write() function, update the section header writing:
+
 func (l *Linker) write(path string) error {
 	f, err := os.Create(path)
 	if err != nil { return err }
@@ -404,12 +406,24 @@ func (l *Linker) write(path string) error {
 	dataOff := align(textOff+textSize, 4096)
 	dataSize := uint64(len(l.DataSection))
 
-	l.addShStr(""); idxInterp := l.addShStr(".interp"); idxText := l.addShStr(".text")
-	idxDyn := l.addShStr(".dynamic"); idxData := l.addShStr(".data"); idxBss := l.addShStr(".bss"); idxShstr := l.addShStr(".shstrtab")
+	l.addShStr(""); 
+	idxInterp := l.addShStr(".interp")
+	idxText := l.addShStr(".text")
+	idxDyn := l.addShStr(".dynamic")
+	idxData := l.addShStr(".data")
+	idxBss := l.addShStr(".bss")
+	idxShstr := l.addShStr(".shstrtab")
+	
 	shStrOff := dataOff + dataSize
 	shTableOff := shStrOff + uint64(len(l.ShStrTab))
 
-	ehdr := Header{Type: ET_EXEC, Machine: EM_X86_64, Version: EV_CURRENT, Entry: l.EntryAddr, Phoff: 64, Ehsize: 64, Phentsize: 56, Phnum: 5, Shoff: shTableOff, Shentsize: 64, Shnum: 7, Shstrndx: 6}
+	// Calculate actual addresses for interp and text
+	interpAddr := l.TextAddr
+	interpSize := uint64(len(l.InterpSect))
+	textActualAddr := l.TextAddr + uint64(len(l.InterpSect)) + uint64(len(l.GotEntries)*16) // After interp + PLT
+	textActualSize := textSize - interpSize - uint64(len(l.GotEntries)*16) // Remaining size
+
+	ehdr := Header{Type: ET_EXEC, Machine: EM_X86_64, Version: EV_CURRENT, Entry: l.GlobalTable[l.Config.Entry].Value, Phoff: 64, Ehsize: 64, Phentsize: 56, Phnum: 5, Shoff: shTableOff, Shentsize: 64, Shnum: 7, Shstrndx: 6}
 	ehdr.Ident[0]=0x7F; ehdr.Ident[1]='E'; ehdr.Ident[2]='L'; ehdr.Ident[3]='F'; ehdr.Ident[4]=ELFCLASS64; ehdr.Ident[5]=ELFDATA2LSB; ehdr.Ident[6]=EV_CURRENT; ehdr.Ident[7]=3
 	binary.Write(f, Le, ehdr)
 
@@ -426,8 +440,8 @@ func (l *Linker) write(path string) error {
 	f.Write(l.ShStrTab)
 
 	binary.Write(f, Le, SectionHeader{})
-	binary.Write(f, Le, SectionHeader{Name: idxInterp, Type: SHT_PROGBITS, Flags: SHF_ALLOC, Addr: l.TextAddr, Offset: textOff, Size: uint64(len(l.InterpSect)), Addralign: 1})
-	binary.Write(f, Le, SectionHeader{Name: idxText, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_EXECINSTR, Addr: l.TextAddr, Offset: textOff, Size: textSize, Addralign: 16})
+	binary.Write(f, Le, SectionHeader{Name: idxInterp, Type: SHT_PROGBITS, Flags: SHF_ALLOC, Addr: interpAddr, Offset: textOff, Size: interpSize, Addralign: 1})
+	binary.Write(f, Le, SectionHeader{Name: idxText, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_EXECINSTR, Addr: textActualAddr, Offset: textOff + interpSize + uint64(len(l.GotEntries)*16), Size: textActualSize, Addralign: 16})
 	binary.Write(f, Le, SectionHeader{Name: idxDyn, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: uint64(len(l.DynSect)), Link: 0, Addralign: 8})
 	binary.Write(f, Le, SectionHeader{Name: idxData, Type: SHT_PROGBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.DataAddr, Offset: dataOff, Size: dataSize, Addralign: 4096})
 	binary.Write(f, Le, SectionHeader{Name: idxBss, Type: SHT_NOBITS, Flags: SHF_ALLOC | SHF_WRITE, Addr: l.BssAddr, Offset: dataOff + dataSize, Size: l.BssSize, Addralign: 8})
