@@ -74,7 +74,7 @@ func (g *Generator) exitScope() {
 }
 
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
-	// 1. Hardware Markers (Generics)
+	// 1. Hardware Markers
 	isGPU := false
 	isROCm := false
 	isCUDA := false
@@ -85,27 +85,17 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			for _, param := range gpl.AllGenericParam() {
 				for _, id := range param.AllIDENTIFIER() {
 					tag := id.GetText()
-					if tag == "gpu" { 
-						isGPU = true 
-					} else if tag == "rocm" { 
-						isROCm = true 
-					} else if tag == "cuda" { 
-						isCUDA = true 
-					} else if tag == "tpu" { 
-						isTPU = true 
-					}
+					if tag == "gpu" { isGPU = true } 
+					else if tag == "rocm" { isROCm = true } 
+					else if tag == "cuda" { isCUDA = true } 
+					else if tag == "tpu" { isTPU = true }
 				}
 			}
 		}
 	}
 
-	// 2. Resolve Name
-	ids := ctx.AllIDENTIFIER()
-	if len(ids) == 0 { return nil }
-	
-	nameToken := ids[len(ids)-1] // Last identifier is the name
-	name := nameToken.GetText()
-	
+	// 2. Resolve Name (Clean Identifier)
+	name := ctx.IDENTIFIER().GetText()
 	irName := name
 
 	var parentName string
@@ -124,7 +114,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
-	// Handle Flat Methods (func foo(self x: T))
+	// Flat Methods
 	if !isMethod && ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
 			if param.SELF() != nil {
@@ -179,21 +169,15 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 
 		fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
 
-		// Set Hardware CallConvs
-		if isTPU {
-			fn.CallConv = ir.CC_TPU
-		} else if isROCm {
-			fn.CallConv = ir.CC_ROCM
-		} else if isCUDA {
-			fn.CallConv = ir.CC_PTX
-		} else if isGPU {
-			fn.CallConv = ir.CC_PTX
-		}
+		if isTPU { fn.CallConv = ir.CC_TPU } 
+		else if isROCm { fn.CallConv = ir.CC_ROCM } 
+		else if isCUDA { fn.CallConv = ir.CC_PTX } 
+		else if isGPU { fn.CallConv = ir.CC_PTX }
 
-		// Set Concurrency Flags (String Detection)
+		// Set Flags (Clean Token Check)
 		if ctx.ASYNC() != nil {
 			fn.FuncType.IsAsync = true
-		} else if len(ids) > 1 && ids[0].GetText() == "process" {
+		} else if ctx.PROCESS() != nil {
 			fn.FuncType.IsProcess = true
 		}
 

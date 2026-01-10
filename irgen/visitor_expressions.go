@@ -606,13 +606,11 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 }
 
 func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpressionContext) interface{} {
-	// 1. Generate Name
 	name := fmt.Sprintf("lambda_%d", len(g.ctx.Module.Functions))
 	if g.ctx.CurrentFunction != nil {
 		name = fmt.Sprintf("%s_lambda_%d", g.ctx.CurrentFunction.Name(), len(g.ctx.Module.Functions))
 	}
 
-	// 2. Return Type
 	var retType types.Type = types.Void
 	if ctx.ReturnType() != nil {
 		if ctx.ReturnType().Type_() != nil {
@@ -620,7 +618,6 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		}
 	}
 
-	// 3. Parameters
 	var paramTypes []types.Type
 	var paramNames []string
 	if ctx.ParameterList() != nil {
@@ -630,27 +627,20 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		}
 	}
 
-	// 4. Create IR Function
 	fn := g.ctx.Builder.CreateFunction(name, retType, paramTypes, false)
 
-	// 5. Detect Flags (Process / Async)
+	// Clean Token Checks
 	if ctx.ASYNC() != nil {
 		fn.FuncType.IsAsync = true
-	} else if ctx.IDENTIFIER() != nil {
-		// Detect "process" keyword via generic identifier
-		fmt.Println(ctx.IDENTIFIER().GetText())
-		if ctx.IDENTIFIER().GetText() == "process" {
-			fn.FuncType.IsProcess = true
-		}
+	} else if ctx.PROCESS() != nil {
+		fn.FuncType.IsProcess = true
 	}
 
-	// 6. Context Switch
 	prevFunc := g.ctx.CurrentFunction
 	prevBlock := g.ctx.Builder.GetInsertBlock()
 	g.ctx.EnterFunction(fn)
 	g.enterScope(ctx)
 
-	// 7. Arguments Setup
 	for i, arg := range fn.Arguments {
 		arg.SetName(paramNames[i])
 		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
@@ -663,7 +653,6 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		}
 	}
 
-	// 8. Body
 	if ctx.Block() != nil {
 		outerDefer := g.deferStack
 		g.deferStack = NewDeferStack()

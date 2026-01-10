@@ -299,14 +299,9 @@ func (a *Analyzer) visitExternCppMethod(ctx *parser.ExternCppMethodDeclContext, 
 
 func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	// 1. Get Function Name
-	// With the grammar change, we might have [name] OR [prefix, name]
-	ids := ctx.AllIDENTIFIER()
-	if len(ids) == 0 {
-		return nil // Should be caught by parser error listener
-	}
-	
-	nameToken := ids[len(ids)-1] // The name is always the last identifier
-	name := nameToken.GetText()
+	// Since grammar is now `(ASYNC | PROCESS)? FUNC IDENTIFIER ...`
+	// IDENTIFIER is a single token, not a list.
+	name := ctx.IDENTIFIER().GetText()
 
 	if a.currentNamespacePrefix != "" && name != "main" {
 		name = a.currentNamespacePrefix + "." + name
@@ -329,8 +324,7 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 			base = ptr.ElementType
 		}
 		if st, ok := base.(*types.StructType); ok {
-			// Re-use the raw name token text to avoid double-prefixing issues
-			name = st.Name + "_" + nameToken.GetText()
+			name = st.Name + "_" + name
 		}
 	}
 
@@ -356,27 +350,17 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 			}
 		}
 
-		// --- DETECT CONCURRENCY MODEL ---
+		// --- CONCURRENCY MODEL ---
 		var fnType *types.FunctionType
-		isAsync := ctx.ASYNC() != nil
-		isProcess := false
-
-		// Check for identifier-based keywords (like "process")
-		// If len(ids) > 1, the first identifier is the prefix.
-		if len(ids) > 1 {
-			if ids[0].GetText() == "process" {
-				isProcess = true
-			}
-		}
-
-		if isAsync {
+		
+		if ctx.ASYNC() != nil {
 			fnType = types.NewAsyncFunction(retType, paramTypes, false)
-		} else if isProcess {
+		} else if ctx.PROCESS() != nil {
 			fnType = types.NewProcessFunction(retType, paramTypes, false)
 		} else {
 			fnType = types.NewFunction(retType, paramTypes, false)
 		}
-		// --------------------------------
+		// -------------------------
 
 		if _, ok := a.currentScope.ResolveLocal(name); !ok {
 			a.currentScope.Define(name, symbol.SymFunc, fnType)
