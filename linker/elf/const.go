@@ -94,6 +94,10 @@ const (
 	DT_TEXTREL  = 22
 	DT_JMPREL   = 23
 	DT_BIND_NOW = 24
+
+	DT_PLTRELSZ = 2
+	DT_PLTREL   = 20
+
 )
 
 // Internal ELF Headers used for writing

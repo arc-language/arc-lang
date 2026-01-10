@@ -271,9 +271,13 @@ func (l *Linker) layout() {
 	writeDyn(DT_SYMTAB, symAddr)
 	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
 	writeDyn(DT_SYMENT, 24)
-	writeDyn(DT_RELA, relaAddr)
-	writeDyn(DT_RELASZ, relaSize)
-	writeDyn(DT_RELAENT, 24)
+	
+	// PLT/GOT relocations use DT_JMPREL, not DT_RELA
+	writeDyn(DT_PLTREL, 7)  // 7 = DT_RELA (indicates we're using RELA-style relocations)
+	writeDyn(DT_JMPREL, relaAddr)  // Address of PLT relocations
+	writeDyn(DT_PLTRELSZ, relaSize)  // Size of PLT relocations
+	writeDyn(DT_RELAENT, 24)  // Size of one relocation entry
+	
 	writeDyn(DT_NULL, 0)
 	l.DynSect = dynBuf.Bytes()
 
