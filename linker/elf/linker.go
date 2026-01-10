@@ -393,10 +393,24 @@ func (l *Linker) applyRelocations() error {
 		}
 		stubOffset := l.GlobalTable[l.Config.Entry].Value - l.TextAddr
 		leaPC := l.GlobalTable[l.Config.Entry].Value + 20
-		mainAddr := l.GlobalTable["main"].Value
+		
+		// Get the ACTUAL main address from the global table
+		mainSym, ok := l.GlobalTable["main"]
+		if !ok || !mainSym.Defined {
+			return fmt.Errorf("main symbol not found or undefined")
+		}
+		mainAddr := mainSym.Value
+		
+		fmt.Printf("DEBUG: Stub at 0x%x, main at 0x%x, lea PC at 0x%x\n", 
+			l.GlobalTable[l.Config.Entry].Value, mainAddr, leaPC)
+		
 		binary.LittleEndian.PutUint32(stub[16:], uint32(int32(mainAddr - leaPC)))
 		callPC := l.GlobalTable[l.Config.Entry].Value + 31
 		libcStartAddr := l.GlobalTable["__libc_start_main"].Value
+		
+		fmt.Printf("DEBUG: call PC at 0x%x, __libc_start_main at 0x%x\n", 
+			callPC, libcStartAddr)
+		
 		binary.LittleEndian.PutUint32(stub[27:], uint32(int32(libcStartAddr - callPC)))
 		copy(l.TextSection[stubOffset:], stub)
 	}
@@ -427,7 +441,7 @@ func (l *Linker) applyRelocations() error {
 					}
 					bufOff = off + r.Offset
 				} else {
-					continue // Should not happen for mapped sections
+					continue
 				}
 
 				if bufOff >= uint64(len(buf)) { panic("Buffer overflow in relocation") }
