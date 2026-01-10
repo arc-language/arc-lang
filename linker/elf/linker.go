@@ -186,7 +186,7 @@ func (l *Linker) layout() {
 			if sec.Flags&SHF_EXECINSTR != 0 {
 				pad := (16 - (len(objText) % 16)) % 16
 				for i := 0; i < int(pad); i++ { objText = append(objText, 0x90) }
-				l.SectionOffsets[sec] = uint64(len(objText))
+				l.SectionOffsets[sec] = uint64(len(objText)) // Store relative to objText start for now
 				objText = append(objText, sec.Data...)
 			}
 		}
@@ -203,7 +203,7 @@ func (l *Linker) layout() {
 		finalOffset := baseTextOffset + relOff
 		sec.OutputOffset = finalOffset
 		sec.VirtualAddress = l.TextAddr + finalOffset
-		l.SectionOffsets[sec] = finalOffset
+		l.SectionOffsets[sec] = finalOffset // Update map to absolute offset in TextSection
 	}
 	
 	// Update Stub Address
@@ -216,7 +216,23 @@ func (l *Linker) layout() {
 	l.DataAddr = align(l.TextAddr+totalTextSize, 4096)
 
 	// Build Dyn Data
-	dynBuf := new(bytes.Buffer)
+	// IMPORTANT: Add library names to DynStrTab FIRST, before calculating offsets
+	libNameOffsets := make(map[string]uint32)
+	for _, lib := range l.SharedLibs {
+		// Extract just the filename (SONAME) from the full path
+		libName := lib.Name
+		if idx := strings.LastIndex(libName, "/"); idx != -1 {
+			libName = libName[idx+1:]
+		}
+		
+		// Add to string table
+		nameOffset := uint32(len(l.DynStrTab))
+		l.DynStrTab = append(l.DynStrTab, []byte(libName)...)
+		l.DynStrTab = append(l.DynStrTab, 0)
+		libNameOffsets[lib.Name] = nameOffset
+	}
+
+	// Now build symbol table
 	symBuf := new(bytes.Buffer)
 	for _, ds := range l.DynSyms {
 		binary.Write(symBuf, Le, ds.Name); symBuf.WriteByte(ds.Info); symBuf.WriteByte(ds.Other)
@@ -225,12 +241,10 @@ func (l *Linker) layout() {
 	l.DynSymSect = symBuf.Bytes()
 	relaSize := uint64(len(l.GotEntries) * 24)
 
-	// Offsets
+	// Calculate Offsets (DynStrTab now has the correct size)
 	offset := uint64(0)
 	offset = align(offset, 8); offsetSym := offset; offset += uint64(len(l.DynSymSect))
-	offsetStr := offset; offset += uint64(len(l.DynStrTab))
-	for _, lib := range l.SharedLibs { offset += uint64(len(lib.Name) + 1) }
-	
+	offset = align(offset, 8); offsetStr := offset; offset += uint64(len(l.DynStrTab))
 	offset = align(offset, 8); offsetRela := offset; offset += relaSize
 	offset = align(offset, 8); offsetGot := offset; sizeGot := uint64(len(l.GotEntries) * 8); offset += sizeGot
 
@@ -240,14 +254,19 @@ func (l *Linker) layout() {
 	relaAddr := l.DataAddr + offsetRela
 	gotAddr := l.DataAddr + offsetGot
 
+	// Write Dynamic Section entries
+	dynBuf := new(bytes.Buffer)
 	writeDyn := func(tag int64, val uint64) {
 		binary.Write(dynBuf, Le, tag); binary.Write(dynBuf, Le, val)
 	}
+	
+	// Write DT_NEEDED entries FIRST (using the offsets we stored)
 	for _, lib := range l.SharedLibs {
-		l.DynStrTab = append(l.DynStrTab, []byte(lib.Name)...)
-		l.DynStrTab = append(l.DynStrTab, 0)
-		writeDyn(DT_NEEDED, uint64(len(l.DynStrTab)-len(lib.Name)-1))
+		if offset, ok := libNameOffsets[lib.Name]; ok {
+			writeDyn(DT_NEEDED, uint64(offset))
+		}
 	}
+	
 	writeDyn(DT_STRTAB, strAddr)
 	writeDyn(DT_SYMTAB, symAddr)
 	writeDyn(DT_STRSZ, uint64(len(l.DynStrTab)))
@@ -258,6 +277,7 @@ func (l *Linker) layout() {
 	writeDyn(DT_NULL, 0)
 	l.DynSect = dynBuf.Bytes()
 
+	// Build Relocation section
 	relaBuf := new(bytes.Buffer)
 	for i := range l.GotEntries {
 		rOff := gotAddr + uint64(i*8)
@@ -266,6 +286,7 @@ func (l *Linker) layout() {
 	}
 	l.RelaDynSect = relaBuf.Bytes()
 
+	// Assemble Data Section
 	buf := new(bytes.Buffer)
 	buf.Write(l.DynSect)
 	for uint64(buf.Len()) < offsetSym { buf.WriteByte(0) }
@@ -303,7 +324,7 @@ func (l *Linker) layout() {
 				pad := (8 - ((currentDataLen) % 8)) % 8
 				l.DataSection = append(l.DataSection, make([]byte, int(pad))...)
 				currentDataLen += uint64(pad)
-				l.SectionOffsets[sec] = currentDataLen
+				l.SectionOffsets[sec] = currentDataLen // Map data offset too
 				sec.OutputOffset = currentDataLen
 				sec.VirtualAddress = l.DataAddr + sec.OutputOffset
 				l.DataSection = append(l.DataSection, sec.Data...)
