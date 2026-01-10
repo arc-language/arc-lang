@@ -626,6 +626,8 @@ func (s *AnonymousFuncExpressionContext) GetParser() antlr.Parser
 
 func (s *AnonymousFuncExpressionContext) GetRuleContext() antlr.RuleContext
 
+func (s *AnonymousFuncExpressionContext) IDENTIFIER() antlr.TerminalNode
+
 func (*AnonymousFuncExpressionContext) IsAnonymousFuncExpressionContext()
 
 func (s *AnonymousFuncExpressionContext) LPAREN() antlr.TerminalNode
@@ -4737,6 +4739,8 @@ func (s *FunctionDeclContext) ASYNC() antlr.TerminalNode
 
 func (s *FunctionDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
+func (s *FunctionDeclContext) AllIDENTIFIER() []antlr.TerminalNode
+
 func (s *FunctionDeclContext) Block() IBlockContext
 
 func (s *FunctionDeclContext) FUNC() antlr.TerminalNode
@@ -4747,7 +4751,7 @@ func (s *FunctionDeclContext) GetParser() antlr.Parser
 
 func (s *FunctionDeclContext) GetRuleContext() antlr.RuleContext
 
-func (s *FunctionDeclContext) IDENTIFIER() antlr.TerminalNode
+func (s *FunctionDeclContext) IDENTIFIER(i int) antlr.TerminalNode
 
 func (*FunctionDeclContext) IsFunctionDeclContext()
 
@@ -4995,10 +4999,11 @@ type IAnonymousFuncExpressionContext interface {
 	LPAREN() antlr.TerminalNode
 	RPAREN() antlr.TerminalNode
 	Block() IBlockContext
-	ASYNC() antlr.TerminalNode
 	GenericParams() IGenericParamsContext
 	ParameterList() IParameterListContext
 	ReturnType() IReturnTypeContext
+	ASYNC() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
 
 	// IsAnonymousFuncExpressionContext differentiates from other interfaces.
 	IsAnonymousFuncExpressionContext()
@@ -6075,14 +6080,15 @@ type IFunctionDeclContext interface {
 
 	// Getter signatures
 	FUNC() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
+	AllIDENTIFIER() []antlr.TerminalNode
+	IDENTIFIER(i int) antlr.TerminalNode
 	LPAREN() antlr.TerminalNode
 	RPAREN() antlr.TerminalNode
 	Block() IBlockContext
-	ASYNC() antlr.TerminalNode
 	GenericParams() IGenericParamsContext
 	ParameterList() IParameterListContext
 	ReturnType() IReturnTypeContext
+	ASYNC() antlr.TerminalNode
 
 	// IsFunctionDeclContext differentiates from other interfaces.
 	IsFunctionDeclContext()
@@ -6335,8 +6341,9 @@ type ILambdaExpressionContext interface {
 	RPAREN() antlr.TerminalNode
 	FAT_ARROW() antlr.TerminalNode
 	Block() IBlockContext
-	ASYNC() antlr.TerminalNode
 	LambdaParamList() ILambdaParamListContext
+	ASYNC() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
 	Expression() IExpressionContext
 
 	// IsLambdaExpressionContext differentiates from other interfaces.
@@ -7408,6 +7415,8 @@ func (s *LambdaExpressionContext) FAT_ARROW() antlr.TerminalNode
 func (s *LambdaExpressionContext) GetParser() antlr.Parser
 
 func (s *LambdaExpressionContext) GetRuleContext() antlr.RuleContext
+
+func (s *LambdaExpressionContext) IDENTIFIER() antlr.TerminalNode
 
 func (*LambdaExpressionContext) IsLambdaExpressionContext()
 

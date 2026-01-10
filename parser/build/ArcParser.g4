@@ -189,7 +189,9 @@ genericArg: type | expression;
 // Functions
 // =============================================================================
 
-functionDecl: ASYNC? FUNC IDENTIFIER genericParams? LPAREN parameterList? RPAREN returnType? block;
+// MODIFIED: Accepts ASYNC or IDENTIFIER (for 'process' etc)
+functionDecl: (ASYNC | IDENTIFIER)? FUNC IDENTIFIER genericParams? LPAREN parameterList? RPAREN returnType? block;
+
 returnType: type | LPAREN typeList RPAREN;
 typeList: type (COMMA type)*;
 parameterList: parameter (COMMA parameter)* (COMMA ELLIPSIS)? | ELLIPSIS;
@@ -434,12 +436,13 @@ argumentList: argument (COMMA argument)*;
 argument: expression | lambdaExpression | anonymousFuncExpression;
 
 lambdaExpression
-    : ASYNC? LPAREN lambdaParamList? RPAREN FAT_ARROW block
-    | ASYNC? LPAREN lambdaParamList? RPAREN FAT_ARROW expression
+    : (ASYNC | IDENTIFIER)? LPAREN lambdaParamList? RPAREN FAT_ARROW block
+    | (ASYNC | IDENTIFIER)? LPAREN lambdaParamList? RPAREN FAT_ARROW expression
     ;
 
+// MODIFIED: Accepts ASYNC or IDENTIFIER (for 'process' etc)
 anonymousFuncExpression
-    : ASYNC? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
+    : (ASYNC | IDENTIFIER)? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
     ;
 
 lambdaParamList: lambdaParam (COMMA lambdaParam)*;

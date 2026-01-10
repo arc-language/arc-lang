@@ -192,6 +192,7 @@ type FunctionType struct {
 	ParamTypes []Type
 	Variadic   bool
 	IsAsync    bool // True if declared with 'async' modifier
+	IsProcess  bool
 }
 
 func (t *FunctionType) Kind() TypeKind { return FunctionKind }
@@ -314,4 +315,14 @@ func IsPointer(t Type) bool { return t.Kind() == PointerKind }
 // IsAggregate returns true if the type is an aggregate (struct or array)
 func IsAggregate(t Type) bool {
 	return t.Kind() == StructKind || t.Kind() == ArrayKind
+}
+
+// Add this constructor
+func NewProcessFunction(ret Type, params []Type, variadic bool) *FunctionType {
+	return &FunctionType{
+		ReturnType: ret,
+		ParamTypes: params,
+		Variadic:   variadic,
+		IsProcess:  true, // Tag it
+	}
 }
