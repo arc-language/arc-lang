@@ -624,11 +624,9 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 	// Enter the new function context
 	g.ctx.EnterFunction(fn)
 	
-	// Create a temporary scope for parameters (manual scope creation to ensure isolation)
-	// We handle this manually here because semantic analysis might handle anonymous scopes differently
-	parentScope := g.currentScope
-	g.currentScope = symbol.NewScope(parentScope)
-	defer func() { g.currentScope = parentScope }()
+	// FIX: Enter the Semantic Scope instead of creating a manual one.
+	// This ensures the IRValues we set for params are visible to the block body.
+	g.enterScope(ctx)
 
 	// 6. Setup Arguments (Allocas)
 	for i, arg := range fn.Arguments {
@@ -636,8 +634,13 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
 		g.ctx.Builder.CreateStore(arg, alloca)
 		
-		// Register in local scope
-		g.currentScope.Define(paramNames[i], symbol.SymVar, arg.Type()).IRValue = alloca
+		// Register IRValue in the current (semantic) scope
+		if s, ok := g.currentScope.ResolveLocal(paramNames[i]); ok {
+			s.IRValue = alloca
+		} else {
+			// Fallback: If semantics missed it (shouldn't happen), define it now to prevent crash
+			g.currentScope.Define(paramNames[i], symbol.SymVar, arg.Type()).IRValue = alloca
+		}
 	}
 
 	// 7. Generate Body
@@ -662,7 +665,9 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 	}
 
 	// 8. Restore Context
+	g.exitScope() // Exit the semantic scope
 	g.ctx.ExitFunction()
+	
 	if prevFunc != nil {
 		g.ctx.CurrentFunction = prevFunc
 		g.ctx.SetInsertBlock(prevBlock)
