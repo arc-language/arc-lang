@@ -349,26 +349,18 @@ func (r *Runtime) EmitAsyncTaskAwait(handle Register) {
 // Expects arguments to be pre-loaded into R12, R13, R14, R15, RBX by the compiler.
 func (r *Runtime) EmitProcessCreate(fn *ir.Function, argCount int) {
 	// 1. Syscall Clone (Fork)
-	// RAX = 56 (sys_clone)
-	// RDI = 17 (SIGCHLD)
-	// RSI = 0  (0 means copy current stack pointer)
 	r.asm.Mov(RegOp(RAX), ImmOp(56), 64)
-	r.asm.Mov(RegOp(RDI), ImmOp(17), 64)
+	r.asm.Mov(RegOp(RDI), ImmOp(17), 64) // SIGCHLD
 	r.asm.Mov(RegOp(RSI), ImmOp(0), 64)
 	r.asm.Syscall()
 
 	// 2. Check Result (RAX)
-	// RAX == 0: We are Child
-	// RAX > 0:  We are Parent (PID)
 	r.asm.Test(RAX, RAX)
 	parentLabel := r.asm.JccRel(CondNe, 0) // Jump if PID != 0 (Parent)
 
 	// --- CHILD CODE ---
 	
-	// Restore args from preserved registers into Standard ABI registers (RDI, RSI...)
-	// Preserved: R12, R13, R14, R15, RBX
-	// ABI:       RDI, RSI, RDX, RCX, R8
-	
+	// Restore args from preserved registers to ABI registers
 	abiRegs := []Register{RDI, RSI, RDX, RCX, R8}
 	preservedRegs := []Register{R12, R13, R14, R15, RBX}
 	
@@ -379,10 +371,17 @@ func (r *Runtime) EmitProcessCreate(fn *ir.Function, argCount int) {
 	// Call User Function
 	r.asm.CallRelative(fn.Name())
 
-	// Exit Child
-	// Exit Code = Return value of function (RAX)
+	// Exit Child CLEANLY (Flush Buffers)
+	// The return value of the user function is in RAX. Move to RDI for exit code.
 	r.asm.Mov(RegOp(RDI), RegOp(RAX), 64) 
-	r.asm.Mov(RegOp(RAX), ImmOp(60), 64)  // sys_exit
+	
+	// CRITICAL FIX: Call libc 'exit' instead of raw syscall.
+	// This ensures stdout/printf buffers are flushed to the terminal.
+	// (Requires linking with -lc, which you are already doing).
+	r.asm.CallRelative("exit")
+	
+	// Fallback: If 'exit' somehow returns (impossible), use raw syscall to prevent crash
+	r.asm.Mov(RegOp(RAX), ImmOp(60), 64)
 	r.asm.Syscall()
 
 	// --- PARENT CODE ---
