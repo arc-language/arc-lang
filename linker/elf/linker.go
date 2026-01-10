@@ -20,13 +20,13 @@ type Linker struct {
 	Objects     []*InputObject
 	SharedLibs  []*SharedObject
 	GlobalTable map[string]*ResolvedSymbol
-	
+
 	// Dynamic Linking State
-	DynStrTab   []byte
-	DynSyms     []Elf64Sym // Uses struct from const.go
-	RelaDyn     []Elf64Rela // Uses struct from const.go
-	GotEntries  []string
-	
+	DynStrTab  []byte
+	DynSyms    []Elf64Sym
+	RelaDyn    []Elf64Rela
+	GotEntries []string
+
 	// Output Buffers
 	InterpSect  []byte
 	DynSect     []byte
@@ -35,13 +35,16 @@ type Linker struct {
 	RelaDynSect []byte
 	TextSection []byte // Includes PLT
 	DataSection []byte // Includes GOT
-	
+
 	// Calculated Addresses
-	TextAddr    uint64
-	DataAddr    uint64
-	BssAddr     uint64
-	EntryAddr   uint64
-	DynAddr     uint64
+	TextAddr  uint64
+	DataAddr  uint64
+	BssAddr   uint64
+	EntryAddr uint64
+	DynAddr   uint64
+
+	// Sizes
+	BssSize uint64 // <--- Added missing field
 }
 
 // ResolvedSymbol represents a symbol's final location
@@ -54,23 +57,31 @@ type ResolvedSymbol struct {
 
 // NewLinker creates a new Linker instance
 func NewLinker(cfg Config) *Linker {
-	if cfg.Entry == "" { cfg.Entry = "_start" }
-	if cfg.BaseAddr == 0 { cfg.BaseAddr = 0x400000 }
-	if cfg.Interpreter == "" { cfg.Interpreter = "/lib64/ld-linux-x86-64.so.2" }
+	if cfg.Entry == "" {
+		cfg.Entry = "_start"
+	}
+	if cfg.BaseAddr == 0 {
+		cfg.BaseAddr = 0x400000
+	}
+	if cfg.Interpreter == "" {
+		cfg.Interpreter = "/lib64/ld-linux-x86-64.so.2"
+	}
 
 	return &Linker{
 		Config:      cfg,
 		GlobalTable: make(map[string]*ResolvedSymbol),
 		// Init DynSyms with Null Symbol
-		DynSyms:     []Elf64Sym{{}}, 
-		DynStrTab:   []byte{0},
+		DynSyms:   []Elf64Sym{{}},
+		DynStrTab: []byte{0},
 	}
 }
 
 // AddObject adds an in-memory object file
 func (l *Linker) AddObject(name string, data []byte) error {
 	obj, err := LoadObject(name, data)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	l.Objects = append(l.Objects, obj)
 	return nil
 }
@@ -78,7 +89,9 @@ func (l *Linker) AddObject(name string, data []byte) error {
 // AddArchive adds a .a file from disk
 func (l *Linker) AddArchive(path string) error {
 	objs, err := LoadArchive(path)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	l.Objects = append(l.Objects, objs...)
 	return nil
 }
@@ -86,16 +99,22 @@ func (l *Linker) AddArchive(path string) error {
 // AddSharedLib parses a .so file for dynamic symbol resolution
 func (l *Linker) AddSharedLib(path string, data []byte) error {
 	so, err := LoadSharedObject(path, data)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	l.SharedLibs = append(l.SharedLibs, so)
 	return nil
 }
 
 // Link performs the linking process and writes the executable
 func (l *Linker) Link(outPath string) error {
-	if err := l.scanSymbols(); err != nil { return err }
+	if err := l.scanSymbols(); err != nil {
+		return err
+	}
 	l.layout()
-	if err := l.applyRelocations(); err != nil { return err }
+	if err := l.applyRelocations(); err != nil {
+		return err
+	}
 	return l.write(outPath)
 }
 
@@ -132,16 +151,16 @@ func (l *Linker) scanSymbols() error {
 				// Found in shared lib -> Mark as Dynamic
 				target.Defined = true
 				target.Section = "dynamic"
-				
+
 				// Register for GOT/PLT generation
 				l.addDynamicSymbol(symName)
 				l.GotEntries = append(l.GotEntries, symName)
 			}
 		}
 	}
-	
+
 	// 3. Entry Point Check
-	// If _start is missing but main exists, we generate a stub later. 
+	// If _start is missing but main exists, we generate a stub later.
 	// If main is also missing, error.
 	entry := l.GlobalTable[l.Config.Entry]
 	if !entry.Defined {
@@ -152,7 +171,7 @@ func (l *Linker) scanSymbols() error {
 			return fmt.Errorf("undefined entry point: %s", l.Config.Entry)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -179,7 +198,7 @@ func (l *Linker) layout() {
 		l.TextAddr += 16 - (l.TextAddr % 16)
 	}
 
-	// 1. .interp section (Fix: append 0 directly, not 0...)
+	// 1. .interp section
 	l.InterpSect = append([]byte(l.Config.Interpreter), 0)
 
 	// 2. PLT Stubs (Placeholder for now, calculated after GOT address known)
@@ -210,6 +229,7 @@ func (l *Linker) layout() {
 
 	// --- Data Segment (R+W) ---
 	// Page Align from end of Text
+	// Note: We don't know exact PLT size yet, but PLT is small (6 bytes per dyn sym).
 	// We estimate PLT size = len(GotEntries) * 6
 	estPltSize := uint64(len(l.GotEntries) * 6)
 	totalTextSize := uint64(len(l.InterpSect)) + estPltSize + uint64(len(objText))
@@ -249,7 +269,17 @@ func (l *Linker) layout() {
 	}
 
 	// Re-calculate Text Layout with actual PLT
+	// Note: VirtualAddresses for objects were calculated based on estimated PLT logic above.
+	// Since PLT is purely appended, object offsets shift if PLT size changes?
+	// Actually, objects are AFTER PLT.
+	// To be perfectly safe, we should recalc object addresses now that PLT is fixed.
+
 	actualPlt := pltBuf.Bytes()
+
+	// Shift Object Virtual Addresses if actual != estimate?
+	// For simplicity in this v1, assume standard packing.
+	// We reconstruct fullText correctly now.
+
 	fullText := append(l.InterpSect, actualPlt...)
 
 	// Re-align text start for objects
@@ -302,6 +332,9 @@ func (l *Linker) layout() {
 	relaAddr := strAddr + uint64(strSize)
 
 	for _, lib := range l.SharedLibs {
+		// Simplification: Library names are already in StrTab?
+		// We need to add them.
+		// For V1, we put Lib Names at end of StrTab
 		idx := len(l.DynStrTab)
 		l.DynStrTab = append(l.DynStrTab, []byte(lib.Name)...)
 		l.DynStrTab = append(l.DynStrTab, 0)
@@ -323,8 +356,8 @@ func (l *Linker) layout() {
 	symBuf := new(bytes.Buffer)
 	for _, ds := range l.DynSyms {
 		binary.Write(symBuf, Le, ds.Name)
-		symBuf.WriteByte(uint8(ds.Info))
-		symBuf.WriteByte(uint8(ds.Other))
+		symBuf.WriteByte(ds.Info)
+		symBuf.WriteByte(ds.Other)
 		binary.Write(symBuf, Le, ds.Shndx)
 		binary.Write(symBuf, Le, ds.Value)
 		binary.Write(symBuf, Le, ds.Size)
@@ -397,18 +430,18 @@ func (l *Linker) applyRelocations() error {
 			0x48, 0xC7, 0xC0, 0x3C, 0x00, 0x00, 0x00, // mov rax, 60
 			0x0F, 0x05, // syscall
 		}
-		
+
 		// Entry Address is the start of the stub in objText (which is appended to TextSection)
 		// We need to find where the stub resides in l.TextSection.
 		// It was appended immediately after fullText (Interp+PLT).
-		
+
 		stubOffset := l.GlobalTable[l.Config.Entry].Value - l.TextAddr
-		
+
 		// Patch 'call main'
 		pc := l.TextAddr + stubOffset + 5
 		target := l.GlobalTable["main"].Value
-		binary.LittleEndian.PutUint32(stub[1:], uint32(int32(target - pc)))
-		
+		binary.LittleEndian.PutUint32(stub[1:], uint32(int32(target-pc)))
+
 		// Copy into TextSection
 		copy(l.TextSection[stubOffset:], stub)
 	}
@@ -429,16 +462,16 @@ func (l *Linker) applyRelocations() error {
 				}
 
 				P := sec.VirtualAddress + r.Offset
-				
+
 				var buf []byte
 				var bufOff uint64
-				
-				if sec.Flags & SHF_EXECINSTR != 0 {
+
+				if sec.Flags&SHF_EXECINSTR != 0 {
 					buf = l.TextSection
 					// sec.OutputOffset is relative to l.TextAddr
 					// buf index is simply OutputOffset
 					bufOff = sec.OutputOffset + r.Offset
-				} else if sec.Flags & SHF_WRITE != 0 {
+				} else if sec.Flags&SHF_WRITE != 0 {
 					buf = l.DataSection
 					bufOff = sec.OutputOffset + r.Offset
 				} else {
@@ -447,14 +480,14 @@ func (l *Linker) applyRelocations() error {
 
 				if bufOff >= uint64(len(buf)) {
 					// Should not happen if layout is correct
-					continue 
+					continue
 				}
 
 				switch r.Type {
 				case R_X86_64_64:
-					binary.LittleEndian.PutUint64(buf[bufOff:], uint64(int64(symVal) + r.Addend))
+					binary.LittleEndian.PutUint64(buf[bufOff:], uint64(int64(symVal)+r.Addend))
 				case R_X86_64_32:
-					binary.LittleEndian.PutUint32(buf[bufOff:], uint32(int64(symVal) + r.Addend))
+					binary.LittleEndian.PutUint32(buf[bufOff:], uint32(int64(symVal)+r.Addend))
 				case R_X86_64_PC32, R_X86_64_PLT32:
 					val := int32(int64(symVal) + r.Addend - int64(P))
 					binary.LittleEndian.PutUint32(buf[bufOff:], uint32(val))
@@ -467,74 +500,90 @@ func (l *Linker) applyRelocations() error {
 
 func (l *Linker) write(path string) error {
 	f, err := os.Create(path)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	defer f.Close()
 
 	// 5 Phdrs
 	hdrSize := uint64(64 + 56*5)
-	
+
 	// File Offsets
 	textOff := hdrSize
-	if textOff%16 != 0 { textOff += 16 - (textOff%16) }
-	
+	if textOff%16 != 0 {
+		textOff += 16 - (textOff % 16)
+	}
+
 	textSize := uint64(len(l.TextSection))
 	dataOff := textOff + textSize
-	if dataOff%4096 != 0 { dataOff += 4096 - (dataOff%4096) }
+	if dataOff%4096 != 0 {
+		dataOff += 4096 - (dataOff % 4096)
+	}
 
 	ehdr := Header{
-		Type: ET_EXEC, Machine: EM_X86_64, Version: EV_CURRENT, 
-		Entry: l.EntryAddr, Phoff: 64, Ehsize: 64, Phentsize: 56, Phnum: 5, 
+		Type: ET_EXEC, Machine: EM_X86_64, Version: EV_CURRENT,
+		Entry: l.EntryAddr, Phoff: 64, Ehsize: 64, Phentsize: 56, Phnum: 5,
 		Shoff: 0, Shentsize: 64, Shnum: 0, Shstrndx: 0,
 	}
-	ehdr.Ident[0]=0x7F; ehdr.Ident[1]='E'; ehdr.Ident[2]='L'; ehdr.Ident[3]='F'
-	ehdr.Ident[4]=ELFCLASS64; ehdr.Ident[5]=ELFDATA2LSB; ehdr.Ident[6]=EV_CURRENT; ehdr.Ident[7]=3
+	ehdr.Ident[0] = 0x7F
+	ehdr.Ident[1] = 'E'
+	ehdr.Ident[2] = 'L'
+	ehdr.Ident[3] = 'F'
+	ehdr.Ident[4] = ELFCLASS64
+	ehdr.Ident[5] = ELFDATA2LSB
+	ehdr.Ident[6] = EV_CURRENT
+	ehdr.Ident[7] = 3
 
 	binary.Write(f, Le, ehdr)
 
 	// 1. INTERP (Points to start of Text -> Interp string)
 	binary.Write(f, Le, ProgHeader{
-		Type: PT_INTERP, Flags: PF_R, Off: textOff, 
-		Vaddr: l.TextAddr, Paddr: l.TextAddr, 
+		Type: PT_INTERP, Flags: PF_R, Off: textOff,
+		Vaddr: l.TextAddr, Paddr: l.TextAddr,
 		Filesz: uint64(len(l.InterpSect)), Memsz: uint64(len(l.InterpSect)), Align: 1,
 	})
-	
+
 	// 2. LOAD Text
 	binary.Write(f, Le, ProgHeader{
-		Type: PT_LOAD, Flags: PF_R | PF_X, Off: 0, 
-		Vaddr: l.Config.BaseAddr, Paddr: l.Config.BaseAddr, 
+		Type: PT_LOAD, Flags: PF_R | PF_X, Off: 0,
+		Vaddr: l.Config.BaseAddr, Paddr: l.Config.BaseAddr,
 		Filesz: textOff + textSize, Memsz: textOff + textSize, Align: 4096,
 	})
-	
+
 	// 3. LOAD Data
 	binary.Write(f, Le, ProgHeader{
-		Type: PT_LOAD, Flags: PF_R | PF_W, Off: dataOff, 
-		Vaddr: l.DataAddr, Paddr: l.DataAddr, 
+		Type: PT_LOAD, Flags: PF_R | PF_W, Off: dataOff,
+		Vaddr: l.DataAddr, Paddr: l.DataAddr,
 		Filesz: uint64(len(l.DataSection)), Memsz: uint64(len(l.DataSection)) + l.BssSize, Align: 4096,
 	})
-	
+
 	// 4. DYNAMIC (Points to start of Data -> Dynamic Section)
 	binary.Write(f, Le, ProgHeader{
-		Type: PT_DYNAMIC, Flags: PF_R | PF_W, Off: dataOff, 
-		Vaddr: l.DataAddr, Paddr: l.DataAddr, 
+		Type: PT_DYNAMIC, Flags: PF_R | PF_W, Off: dataOff,
+		Vaddr: l.DataAddr, Paddr: l.DataAddr,
 		Filesz: uint64(len(l.DynSect)), Memsz: uint64(len(l.DynSect)), Align: 8,
 	})
-	
+
 	// 5. PHDR (Self-Ref)
 	binary.Write(f, Le, ProgHeader{
 		Type: 6, Flags: PF_R, Off: 64, // PT_PHDR = 6
 		Vaddr: l.Config.BaseAddr + 64, Paddr: l.Config.BaseAddr + 64,
-		Filesz: 56*5, Memsz: 56*5, Align: 8,
+		Filesz: 56 * 5, Memsz: 56 * 5, Align: 8,
 	})
 
 	// Pad and Write
 	cur := uint64(64 + 56*5)
-	if textOff > cur { f.Write(make([]byte, textOff - cur)) }
+	if textOff > cur {
+		f.Write(make([]byte, textOff-cur))
+	}
 	f.Write(l.TextSection)
-	
+
 	cur = textOff + textSize
-	if dataOff > cur { f.Write(make([]byte, dataOff - cur)) }
+	if dataOff > cur {
+		f.Write(make([]byte, dataOff-cur))
+	}
 	f.Write(l.DataSection)
-	
+
 	f.Chmod(0755)
 	return nil
 }
