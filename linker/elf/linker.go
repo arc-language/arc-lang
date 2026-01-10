@@ -208,12 +208,10 @@ func (l *Linker) layout() {
 	// 3. Object Text
 	var objText []byte
 
-	// FIX: Align Stub to avoid '00' padding injection later
+	// Stub Alignment
 	if l.GlobalTable[l.Config.Entry].Section == "stub" {
 		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + pltOffset
-		// Reserve 29 bytes for stub
 		objText = append(objText, make([]byte, 29)...)
-		// Add 3 NOPs to align to 32 bytes (16-byte boundary)
 		objText = append(objText, 0x90, 0x90, 0x90)
 	}
 
@@ -221,7 +219,6 @@ func (l *Linker) layout() {
 		for _, sec := range obj.Sections {
 			if sec.Flags&SHF_EXECINSTR != 0 {
 				pad := (16 - (len(objText) % 16)) % 16
-				// Pad with NOPs (0x90) instead of Zeros for safety
 				for i := 0; i < pad; i++ {
 					objText = append(objText, 0x90)
 				}
@@ -269,7 +266,7 @@ func (l *Linker) layout() {
 	currentTextLen := uint64(len(fullText))
 	objText = nil
 
-	// REPEAT FIX: Align Stub
+	// Stub Re-Alignment
 	if l.GlobalTable[l.Config.Entry].Section == "stub" {
 		l.GlobalTable[l.Config.Entry].Value = l.TextAddr + currentTextLen
 		objText = append(objText, make([]byte, 29)...)
@@ -279,8 +276,10 @@ func (l *Linker) layout() {
 	for _, obj := range l.Objects {
 		for _, sec := range obj.Sections {
 			if sec.Flags&SHF_EXECINSTR != 0 {
+				// pad calculation involves uint64, so result is uint64
 				pad := (16 - ((currentTextLen + uint64(len(objText))) % 16)) % 16
-				for i := 0; i < pad; i++ {
+				// FIX: cast pad to int for loop comparison
+				for i := 0; i < int(pad); i++ {
 					objText = append(objText, 0x90)
 				}
 				sec.OutputOffset = currentTextLen + uint64(len(objText))
@@ -359,8 +358,10 @@ func (l *Linker) layout() {
 		for _, sec := range obj.Sections {
 			if sec.Flags&SHF_WRITE != 0 && sec.Type == SHT_PROGBITS {
 				pad := (8 - ((currentDataLen) % 8)) % 8
-				l.DataSection = append(l.DataSection, make([]byte, pad)...)
+				// FIX: cast pad to int for make()
+				l.DataSection = append(l.DataSection, make([]byte, int(pad))...)
 				currentDataLen += uint64(pad)
+				
 				sec.OutputOffset = currentDataLen
 				sec.VirtualAddress = l.DataAddr + sec.OutputOffset
 				l.DataSection = append(l.DataSection, sec.Data...)
@@ -386,7 +387,7 @@ func (l *Linker) layout() {
 	l.BssSize = currBss
 	l.EntryAddr = l.GlobalTable[l.Config.Entry].Value
 
-	// FIX: Update Global Symbols with Final Addresses
+	// Finalize Global Symbol Addresses
 	for _, obj := range l.Objects {
 		for _, sym := range obj.Symbols {
 			if sym.Section != nil {
