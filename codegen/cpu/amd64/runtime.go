@@ -343,3 +343,49 @@ func (r *Runtime) EmitAsyncTaskAwait(handle Register) {
 	r.asm.PatchJump(done)
 	r.asm.Mov(RegOp(RAX), NewMem(handle, 8), 64)
 }
+
+
+// EmitProcessCreate forks the process. 
+// Expects arguments to be pre-loaded into R12, R13, R14, R15, RBX by the compiler.
+func (r *Runtime) EmitProcessCreate(fn *ir.Function, argCount int) {
+	// 1. Syscall Clone (Fork)
+	// RAX = 56 (sys_clone)
+	// RDI = 17 (SIGCHLD)
+	// RSI = 0  (0 means copy current stack pointer)
+	r.asm.Mov(RegOp(RAX), ImmOp(56), 64)
+	r.asm.Mov(RegOp(RDI), ImmOp(17), 64)
+	r.asm.Mov(RegOp(RSI), ImmOp(0), 64)
+	r.asm.Syscall()
+
+	// 2. Check Result (RAX)
+	// RAX == 0: We are Child
+	// RAX > 0:  We are Parent (PID)
+	r.asm.Test(RAX, RAX)
+	parentLabel := r.asm.JccRel(CondNe, 0) // Jump if PID != 0 (Parent)
+
+	// --- CHILD CODE ---
+	
+	// Restore args from preserved registers into Standard ABI registers (RDI, RSI...)
+	// Preserved: R12, R13, R14, R15, RBX
+	// ABI:       RDI, RSI, RDX, RCX, R8
+	
+	abiRegs := []Register{RDI, RSI, RDX, RCX, R8}
+	preservedRegs := []Register{R12, R13, R14, R15, RBX}
+	
+	for i := 0; i < argCount; i++ {
+		r.asm.Mov(RegOp(abiRegs[i]), RegOp(preservedRegs[i]), 64)
+	}
+
+	// Call User Function
+	r.asm.CallRelative(fn.Name())
+
+	// Exit Child
+	// Exit Code = Return value of function (RAX)
+	r.asm.Mov(RegOp(RDI), RegOp(RAX), 64) 
+	r.asm.Mov(RegOp(RAX), ImmOp(60), 64)  // sys_exit
+	r.asm.Syscall()
+
+	// --- PARENT CODE ---
+	r.asm.PatchJump(parentLabel)
+	// Parent continues with RAX = PID
+}

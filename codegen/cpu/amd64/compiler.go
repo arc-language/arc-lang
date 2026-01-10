@@ -252,6 +252,11 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	if inst.Opcode() == ir.OpAsyncTaskAwait {
 		return c.compileAsyncTaskAwait(inst.(*ir.AsyncTaskAwaitInst))
 	}
+	
+	// NEW: Process check
+	if inst.Opcode() == ir.OpProcessCreate {
+		return c.compileProcessCreate(inst.(*ir.ProcessCreateInst))
+	}
 
 	switch inst.Opcode() {
 	case ir.OpAdd:
@@ -970,5 +975,28 @@ func (c *compiler) emitConstant(k ir.Constant) error {
 	default:
 		return fmt.Errorf("unsupported constant type: %T", k)
 	}
+	return nil
+}
+
+func (c *compiler) compileProcessCreate(inst *ir.ProcessCreateInst) error {
+	// 1. Use preserved registers (R12-R15, RBX) to hold arguments across the fork.
+	// We map the first 5 args to R12, R13, R14, R15, RBX.
+	preservedRegs := []Register{R12, R13, R14, R15, RBX}
+	
+	// Only support 5 args for V1 process creation
+	if len(inst.Operands()) > len(preservedRegs) {
+		return fmt.Errorf("process_create currently supports max 5 arguments")
+	}
+
+	// Load args into preserved registers
+	for i, arg := range inst.Operands() {
+		c.load(preservedRegs[i], arg)
+	}
+
+	// 2. Emit the Fork/Clone logic
+	c.runtime.EmitProcessCreate(inst.Callee, len(inst.Operands()))
+
+	// 3. Store result (PID) to destination
+	c.store(RAX, inst)
 	return nil
 }

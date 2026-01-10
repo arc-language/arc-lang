@@ -1052,3 +1052,24 @@ func (b *Builder) CreateAwaitTask(handle ir.Value, resultType types.Type, name s
 	b.insert(inst)
 	return inst
 }
+
+// builder/builder.go
+
+func (b *Builder) CreateProcess(fn *ir.Function, args []ir.Value, name string) *ir.ProcessCreateInst {
+	if name == "" {
+		name = b.generateName()
+	}
+	inst := &ir.ProcessCreateInst{
+		Callee: fn,
+	}
+	inst.Op = ir.OpProcessCreate
+	inst.SetName(name)
+	// Process returns an int32 PID
+	inst.SetType(types.I32)
+
+	for i, arg := range args {
+		inst.SetOperand(i, arg)
+	}
+	b.insert(inst)
+	return inst
+}

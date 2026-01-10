@@ -459,8 +459,6 @@ func (a *Analyzer) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpress
 
     // 2. Resolve Parameters
     var paramTypes []types.Type
-    
-    // We store parameter info to define them in the scope below
     type paramInfo struct {
         name string
         typ  types.Type
@@ -471,7 +469,6 @@ func (a *Analyzer) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpress
         for _, param := range ctx.ParameterList().AllParameter() {
             pType := a.resolveType(param.Type_())
             pName := param.IDENTIFIER().GetText()
-            
             paramTypes = append(paramTypes, pType)
             params = append(params, paramInfo{name: pName, typ: pType})
         }
@@ -481,42 +478,31 @@ func (a *Analyzer) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpress
     var fnType *types.FunctionType
     if ctx.ASYNC() != nil {
         fnType = types.NewAsyncFunction(retType, paramTypes, false)
+    } else if ctx.PROCESS() != nil {
+        // NEW: Handle Process
+        fnType = types.NewProcessFunction(retType, paramTypes, false)
     } else {
         fnType = types.NewFunction(retType, paramTypes, false)
     }
 
     // 4. Analyze the Body
-    // We must enter a new scope and visit the block to ensure the code inside is valid.
-    
-    // Save previous return type context (to check returns inside the block)
     prevRetType := a.currentFuncRetType
     a.currentFuncRetType = retType
-    
-    // Create and enter new scope
     a.pushScope(ctx)
-    
-    // Define parameters in the inner scope so they can be used
     for _, p := range params {
         a.currentScope.Define(p.name, symbol.SymVar, p.typ)
     }
 
-    // Visit the block statements
     if ctx.Block() != nil {
-        // Link the block context to this scope
         a.scopes[ctx.Block()] = a.currentScope
-        
         for _, stmt := range ctx.Block().AllStatement() {
             a.Visit(stmt)
         }
     }
 
-    // Restore state
     a.popScope()
     a.currentFuncRetType = prevRetType
 
-    // Return the FunctionType. 
-    // The PostfixExpression visitor will see this is an Async function 
-    // and correctly handle the return type of the *call* (which is a Handle).
     return fnType
 }
 

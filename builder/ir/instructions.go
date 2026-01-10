@@ -427,3 +427,20 @@ func (i *VaEndInst) String() string {
 	vaList := i.Ops[0]
 	return fmt.Sprintf("va_end %s %s", vaList.Type(), formatOp(vaList))
 }
+
+// ProcessCreateInst represents forking a new process
+// %pid = process_create @function(args...)
+type ProcessCreateInst struct {
+	BaseInstruction
+	Callee *Function
+}
+
+func (i *ProcessCreateInst) String() string {
+	target := "@" + i.Callee.Name()
+	var args []string
+	for _, op := range i.Ops {
+		args = append(args, fmt.Sprintf("%s %s", op.Type(), formatOp(op)))
+	}
+	return fmt.Sprintf("%%%s = process_create %s(%s)", 
+		i.ValName, target, strings.Join(args, ", "))
+}

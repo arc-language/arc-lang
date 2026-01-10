@@ -390,16 +390,17 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	var pendingFnType *types.FunctionType
 
 	for _, op := range ctx.AllPostfixOp() {
+		// --- Function Call ---
 		if op.LPAREN() != nil {
 			var args []ir.Value
-			
-			// FIX: Handle BoundMethod
+
+			// Handle BoundMethod (object.method)
 			if bm, ok := curr.(*BoundMethod); ok {
 				curr = bm.Fn
 				pendingFnType = bm.Fn.FuncType
 				args = append(args, bm.This)
 			}
-			
+
 			var targetType *types.FunctionType = pendingFnType
 			if targetType == nil {
 				if fn, ok := curr.(*ir.Function); ok {
@@ -413,11 +414,11 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				}
 			}
 
+			// Handle implicit 'this' pointer load if needed
 			if currPtr != nil && targetType != nil && len(targetType.ParamTypes) > 0 {
 				if g.checkTypeMatch(currPtr, targetType.ParamTypes[0]) {
 					args = append(args, currPtr)
 				} else {
-					// Auto-load 'this' if method expects value but we have pointer
 					if pt, ok := currPtr.Type().(*types.PointerType); ok && pt.ElementType.Equal(targetType.ParamTypes[0]) {
 						loaded := g.ctx.Builder.CreateLoad(pt.ElementType, currPtr, "")
 						args = append(args, loaded)
@@ -425,6 +426,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				}
 			}
 
+			// Process Arguments
 			if op.ArgumentList() != nil {
 				for _, arg := range op.ArgumentList().AllArgument() {
 					if v := g.Visit(arg.Expression()); v != nil {
@@ -448,15 +450,30 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			}
 
 			if curr != nil {
-				if targetType != nil && targetType.IsAsync {
+				// --- UPDATED LOGIC START ---
+				isAsync := targetType != nil && targetType.IsAsync
+				isProcess := targetType != nil && targetType.IsProcess
+
+				if isAsync {
+					// 1. ASYNC THREAD
 					if fn, ok := curr.(*ir.Function); ok {
 						curr = g.ctx.Builder.CreateAsyncTask(fn, args, "")
 					} else {
+						// Indirect async fallback
 						call := g.ctx.Builder.CreateIndirectCall(curr, args, "")
 						call.SetType(targetType.ReturnType)
 						curr = call
 					}
+				} else if isProcess {
+					// 2. PROCESS FORK
+					if fn, ok := curr.(*ir.Function); ok {
+						curr = g.ctx.Builder.CreateProcess(fn, args, "")
+					} else {
+						// Indirect process calls not supported yet
+						fmt.Println("[IRGen] Error: Indirect calls to 'process' functions are not supported yet.")
+					}
 				} else {
+					// 3. STANDARD CALL
 					if fn, ok := curr.(*ir.Function); ok {
 						curr = g.ctx.Builder.CreateCall(fn, args, "")
 					} else {
@@ -467,12 +484,15 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 						curr = call
 					}
 				}
+				// --- UPDATED LOGIC END ---
+
 				currPtr = nil
 				pendingFnType = nil
 			}
 			continue
 		}
 
+		// --- Member Access ---
 		if op.DOT() != nil {
 			pendingFnType = nil
 			fieldName := op.IDENTIFIER().GetText()
@@ -512,9 +532,10 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			continue
 		}
 
+		// --- Indexing ---
 		if op.LBRACKET() != nil {
 			idx := g.Visit(op.Expression()).(ir.Value)
-			
+
 			var basePtr ir.Value
 			if currPtr != nil {
 				if pt, ok := currPtr.Type().(*types.PointerType); ok {
@@ -545,6 +566,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			continue
 		}
 
+		// --- Increment/Decrement ---
 		if op.INCREMENT() != nil || op.DECREMENT() != nil {
 			if currPtr == nil {
 				continue
@@ -585,6 +607,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 
 func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpressionContext) interface{} {
 	// 1. Generate a unique internal name
+	// e.g. "main_lambda_0"
 	name := fmt.Sprintf("lambda_%d", len(g.ctx.Module.Functions))
 	if g.ctx.CurrentFunction != nil {
 		name = fmt.Sprintf("%s_lambda_%d", g.ctx.CurrentFunction.Name(), len(g.ctx.Module.Functions))
@@ -612,9 +635,11 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 	// 4. Create the IR Function
 	fn := g.ctx.Builder.CreateFunction(name, retType, paramTypes, false)
 
-	// Mark as Async if keyword is present
+	// Flag the function based on keywords
 	if ctx.ASYNC() != nil {
 		fn.FuncType.IsAsync = true
+	} else if ctx.PROCESS() != nil {
+		fn.FuncType.IsProcess = true
 	}
 
 	// 5. Context Switch: Save current state
@@ -623,35 +648,38 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 
 	// Enter the new function context
 	g.ctx.EnterFunction(fn)
-	
-	// FIX: Enter the Semantic Scope instead of creating a manual one.
-	// This ensures the IRValues we set for params are visible to the block body.
+
+	// Critical: Enter the Semantic Scope associated with this node.
+	// We do not create a new scope here manually; we rely on the one created
+	// during the Semantic Analysis phase so that the Block visitor finds the variables.
 	g.enterScope(ctx)
 
 	// 6. Setup Arguments (Allocas)
 	for i, arg := range fn.Arguments {
 		arg.SetName(paramNames[i])
+		
+		// Create stack slot for the argument
 		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
 		g.ctx.Builder.CreateStore(arg, alloca)
-		
-		// Register IRValue in the current (semantic) scope
+
+		// Register the IRValue in the current scope so the body can resolve it
 		if s, ok := g.currentScope.ResolveLocal(paramNames[i]); ok {
 			s.IRValue = alloca
 		} else {
-			// Fallback: If semantics missed it (shouldn't happen), define it now to prevent crash
+			// Fallback safety: ensure it exists in the scope
 			g.currentScope.Define(paramNames[i], symbol.SymVar, arg.Type()).IRValue = alloca
 		}
 	}
 
 	// 7. Generate Body
 	if ctx.Block() != nil {
-		// Use a fresh defer stack for the inner function
+		// Use a fresh defer stack for the inner function to handle 'defer' statements correctly
 		outerDefer := g.deferStack
 		g.deferStack = NewDeferStack()
 
 		g.Visit(ctx.Block())
 
-		// Handle implicit return
+		// Handle implicit return if the user didn't write one
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			g.deferStack.Emit(g)
 			if retType == types.Void {
@@ -660,14 +688,14 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 				g.ctx.Builder.CreateRet(g.getZeroValue(retType))
 			}
 		}
-		
+
 		g.deferStack = outerDefer
 	}
 
 	// 8. Restore Context
 	g.exitScope() // Exit the semantic scope
 	g.ctx.ExitFunction()
-	
+
 	if prevFunc != nil {
 		g.ctx.CurrentFunction = prevFunc
 		g.ctx.SetInsertBlock(prevBlock)
