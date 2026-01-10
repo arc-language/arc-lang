@@ -346,7 +346,7 @@ func (r *Runtime) EmitAsyncTaskAwait(handle Register) {
 
 
 // EmitProcessCreate forks the process. 
-// Expects arguments to be pre-loaded into R12, R13, R14, R15, RBX by the compiler.
+/// EmitProcessCreate forks the process. 
 func (r *Runtime) EmitProcessCreate(fn *ir.Function, argCount int) {
 	// 1. Syscall Clone (Fork)
 	r.asm.Mov(RegOp(RAX), ImmOp(56), 64)
@@ -378,7 +378,7 @@ func (r *Runtime) EmitProcessCreate(fn *ir.Function, argCount int) {
 	// FIX: Call libc 'exit' to flush printf buffers
 	r.asm.CallRelative("exit")
 	
-	// Safety fallback
+	// Safety fallback (should never be reached)
 	r.asm.Mov(RegOp(RAX), ImmOp(60), 64)
 	r.asm.Syscall()
 
