@@ -176,6 +176,7 @@ func (l *Linker) scanSymbols() error {
 
 func (l *Linker) addDynamicSymbol(name string) {
 	nameIdx := uint32(len(l.DynStrTab))
+	fmt.Printf("DEBUG: addDynamicSymbol: '%s' at offset %d\n", name, nameIdx)
 	l.DynStrTab = append(l.DynStrTab, []byte(name)...)
 	l.DynStrTab = append(l.DynStrTab, 0)
 	l.DynSyms = append(l.DynSyms, Elf64Sym{Name: nameIdx, Info: 0x12, Shndx: 0, Value: 0, Size: 0})
@@ -259,6 +260,7 @@ func (l *Linker) layout() {
 		}
 		
 		nameOffset := uint32(len(l.DynStrTab))
+		fmt.Printf("DEBUG: addLibName: '%s' at offset %d\n", libName, nameOffset)
 		l.DynStrTab = append(l.DynStrTab, []byte(libName)...)
 		l.DynStrTab = append(l.DynStrTab, 0)
 		libNameOffsets[lib.Name] = nameOffset
@@ -314,6 +316,7 @@ func (l *Linker) layout() {
 		if !ok || offset == 0 {
 			continue
 		}
+		fmt.Printf("DEBUG: Writing DT_NEEDED for '%s' = %d\n", lib.Name, offset)
 		writeDyn(DT_NEEDED, uint64(offset))
 	}
 	writeDyn(DT_PLTGOT, gotAddr)     // ← ADD THIS LINE!
