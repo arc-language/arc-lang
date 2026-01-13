@@ -27,6 +27,17 @@ namespace main
 
 import "ai"
 
+model NeuralNet {
+
+    async func train_model<gpu.cuda>(self model: *NeuralNet, data: Tensor) string {
+        for epoch in 0..100 {
+            let loss = model.forward(data)
+            model.backward(loss)
+            model.step()
+        }
+    }
+}
+
 // Train on NVIDIA GPUs
 async func train_model<gpu.cuda>(model: NeuralNet, data: Tensor) {
     for epoch in 0..100 {
@@ -151,7 +162,7 @@ async func distributed_train<cloud>(model: NeuralNet) {
 ## Getting Started
 
 ### Compile and Run (BETA)
-It's in beta so you can only run the test_runner and some .arc files.
+It's in beta so you can only run the test_runner and some .ax files.
 
 ```bash
 git clone https://github.com/arc-language/arc-lang
@@ -159,13 +170,13 @@ cd arc-lang/cmd
 ./build build
 ./test_runner
 
-./arc build main.arc -o main
+./arc build main.ax -o main
 ./main
 ```
 
 ### Write Your Program
 
-Create `main.arc`:
+Create `main.ax`:
 
 ```arc
 namespace main
