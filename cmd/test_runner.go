@@ -24,7 +24,12 @@ type TestCase struct {
 var AllTests []TestCase
 
 // Test execution timeout (per test)
-const TEST_TIMEOUT = 5 * time.Second
+const TEST_TIMEOUT = 10 * time.Second
+
+// LibPath defines where libc is located.
+// Your provided path: /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/
+// resolves to: /usr/lib/x86_64-linux-gnu/
+const LIB_PATH = "/usr/lib/x86_64-linux-gnu"
 
 func main() {
 	// 1. Setup Logging
@@ -119,6 +124,7 @@ extern c {
     func memcpy(*void, *void, usize) *void
     func memset(*void, int32, usize) *void
     func strlen(*byte) usize
+    func sleep(int32) int32
 }
 
 // --- Test Globals ---
@@ -132,7 +138,6 @@ func main() int32 {
 `, tc.Globals, tc.Body)
 
 	srcPath := filepath.Join(tempDir, "test.arc")
-	objPath := filepath.Join(tempDir, "test.o")
 	exePath := filepath.Join(tempDir, "test_exe")
 
 	// 2. Write Source File
@@ -141,41 +146,31 @@ func main() int32 {
 	}
 	writeLog(log, "Source Code:\n"+fullSource+"\n")
 
-	// 3. Compile (Arc -> Object) with timeout
+	// 3. Build (Compile + Link) using Arc
 	ctx, cancel := context.WithTimeout(context.Background(), TEST_TIMEOUT)
 	defer cancel()
 
-	cmdCompile := exec.CommandContext(ctx, arcBinary, "build", srcPath, "-o", objPath)
-	outCompile, err := cmdCompile.CombinedOutput()
+	// Command: ./arc build test.arc -o test_exe -L /usr/lib/... -l c
+	cmdBuild := exec.CommandContext(ctx, arcBinary, 
+		"build", srcPath, 
+		"-o", exePath, 
+		"-L", LIB_PATH, 
+		"-l", "c",
+	)
+	
+	outBuild, err := cmdBuild.CombinedOutput()
 	
 	if ctx.Err() == context.DeadlineExceeded {
-		writeLog(log, "Compile Output: TIMEOUT\n")
-		return "", fmt.Errorf("compile timeout (exceeded %v)", TEST_TIMEOUT)
+		writeLog(log, "Build Output: TIMEOUT\n")
+		return "", fmt.Errorf("build timeout (exceeded %v)", TEST_TIMEOUT)
 	}
 	
 	if err != nil {
-		writeLog(log, "Compile Output:\n"+string(outCompile))
-		return "", fmt.Errorf("compile failed: %s", strings.TrimSpace(string(outCompile)))
+		writeLog(log, "Build Output:\n"+string(outBuild))
+		return "", fmt.Errorf("build failed: %s", strings.TrimSpace(string(outBuild)))
 	}
 
-	// 4. Link (Object -> Executable using GCC) with timeout
-	ctx, cancel = context.WithTimeout(context.Background(), TEST_TIMEOUT)
-	defer cancel()
-
-	cmdLink := exec.CommandContext(ctx, "gcc", objPath, "-o", exePath, "-no-pie")
-	outLink, err := cmdLink.CombinedOutput()
-	
-	if ctx.Err() == context.DeadlineExceeded {
-		writeLog(log, "Link Output: TIMEOUT\n")
-		return "", fmt.Errorf("link timeout (exceeded %v)", TEST_TIMEOUT)
-	}
-	
-	if err != nil {
-		writeLog(log, "Link Output:\n"+string(outLink))
-		return "", fmt.Errorf("link failed: %s", strings.TrimSpace(string(outLink)))
-	}
-
-	// 5. Run Executable with timeout
+	// 4. Run Executable with timeout
 	ctx, cancel = context.WithTimeout(context.Background(), TEST_TIMEOUT)
 	defer cancel()
 
@@ -200,7 +195,7 @@ func main() int32 {
 		return output, fmt.Errorf("runtime error: %v\nOutput: %s", err, output)
 	}
 
-	// 6. Assert Expectations
+	// 5. Assert Expectations
 	if !strings.Contains(output, tc.Expected) {
 		return output, fmt.Errorf("assertion failed.\nExpected substring: %q\nGot output: %q", tc.Expected, output)
 	}
