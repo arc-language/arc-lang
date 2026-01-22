@@ -9,7 +9,6 @@ import (
 
 func (a *Analyzer) VisitCompilationUnit(ctx *parser.CompilationUnitContext) interface{} {
 	// Fix: Determine namespace prefix BEFORE registering types
-	// This ensures types are registered as "namespace.Type" instead of just "Type"
 	savedPrefix := a.currentNamespacePrefix
 	for _, ns := range ctx.AllNamespaceDecl() {
 		if ns.IDENTIFIER() != nil {
@@ -38,7 +37,11 @@ func (a *Analyzer) VisitCompilationUnit(ctx *parser.CompilationUnitContext) inte
 			if a.currentNamespacePrefix != "" {
 				name = a.currentNamespacePrefix + "." + name
 			}
-			st := types.NewStruct(name, nil, false)
+			
+			// --- CRITICAL FIX HERE ---
+			// Must use NewClass so IsClass=true
+			st := types.NewClass(name, nil, false)
+			
 			if _, ok := a.currentScope.ResolveLocal(name); !ok {
 				a.currentScope.Define(name, symbol.SymType, st)
 			}
@@ -58,7 +61,7 @@ func (a *Analyzer) VisitCompilationUnit(ctx *parser.CompilationUnitContext) inte
 		a.Visit(decl)
 	}
 	
-	// Restore prefix (good practice if analyzer is reused)
+	// Restore prefix
 	a.currentNamespacePrefix = savedPrefix
 	return nil
 }
@@ -87,7 +90,7 @@ func (a *Analyzer) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface{
 		if ctx.ConstDecl() != nil { return a.Visit(ctx.ConstDecl()) }
 	}
 	
-	// FIX: In Phase 2, we must visit structs/classes to process their method bodies
+	// In Phase 2, we visit structs/classes to process methods
 	if a.Phase == 2 {
 		if ctx.StructDecl() != nil { return a.Visit(ctx.StructDecl()) }
 		if ctx.ClassDecl() != nil { return a.Visit(ctx.ClassDecl()) }
@@ -305,7 +308,7 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 	var parentName string
 	isMethod := false
 
-	// Check if this function is inside a Class or Struct
+	// Check parent context
 	if parent := ctx.GetParent(); parent != nil {
 		if _, ok := parent.(*parser.ClassMemberContext); ok {
 			if cd, ok := parent.GetParent().(*parser.ClassDeclContext); ok {
@@ -321,8 +324,7 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 	}
 
 	if isMethod {
-		// Format: Namespace.StructName_MethodName
-		// Example: main.log_printf
+		// main.log_printf
 		if a.currentNamespacePrefix != "" {
 			fullName = a.currentNamespacePrefix + "." + parentName + "_" + rawName
 		} else {
@@ -355,9 +357,7 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		var paramTypes []types.Type
 		if ctx.ParameterList() != nil {
 			for _, param := range ctx.ParameterList().AllParameter() {
-				// Handle SELF type resolution for methods
 				if param.SELF() != nil {
-					// "self c: *log" -> resolve *log
 					paramTypes = append(paramTypes, a.resolveType(param.Type_()))
 				} else {
 					paramTypes = append(paramTypes, a.resolveType(param.Type_()))
@@ -365,7 +365,6 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 			}
 		}
 
-		// Create function type (standard, async, or process)
 		var fnType *types.FunctionType
 		if ctx.ASYNC() != nil {
 			fnType = types.NewAsyncFunction(retType, paramTypes, false)
@@ -615,16 +614,6 @@ func (a *Analyzer) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 		name = a.currentNamespacePrefix + "." + name
 	}
 
-	// Phase 1: Register the Type
-	if a.Phase == 1 || a.Phase == 0 {
-		if _, ok := a.currentScope.ResolveLocal(name); !ok {
-			// NewClass sets IsClass=true
-			st := types.NewClass(name, nil, false)
-			a.currentScope.Define(name, symbol.SymType, st)
-		}
-	}
-
-	// Phase 2: Resolve Fields
 	if a.Phase == 1 || a.Phase == 0 {
 		sym, _ := a.currentScope.Resolve(name)
 		if sym != nil {
