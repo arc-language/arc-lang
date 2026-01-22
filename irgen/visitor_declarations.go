@@ -478,7 +478,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 	// --- Phase 2: Local Variables ---
 	if g.ctx.CurrentFunction != nil && g.Phase == 2 {
 		
-		// 1. Tuple Destructuring (Simplified)
+		// 1. Tuple Destructuring
 		if ctx.TuplePattern() != nil {
 			if ctx.Expression() == nil { return nil }
 			val := g.Visit(ctx.Expression()).(ir.Value)
@@ -505,7 +505,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		if ctx.Expression() != nil {
 			initVal = g.Visit(ctx.Expression()).(ir.Value)
 			
-			// Type Inference
+			// Type Inference: Sync IR type with Expression type
 			if ctx.Type_() == nil && initVal != nil {
 				sym.Type = initVal.Type()
 			}
@@ -520,17 +520,22 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		isClass := false
 		var structType *types.StructType
 
+		// DEBUG: Print detection info
+		// fmt.Printf("[IRGen] Var '%s' Type: %s Kind: %d\n", name, sym.Type.String(), sym.Type.Kind())
+
 		// Check A: Type is directly a Class Struct
 		if st, ok := sym.Type.(*types.StructType); ok && st.IsClass {
+			// fmt.Printf("[IRGen] '%s' detected as Direct Class\n", name)
 			isClass = true
 			structType = st
 			storageType = types.NewPointer(sym.Type)
 		} else if ptr, ok := sym.Type.(*types.PointerType); ok {
-			// Check B: Type is a Pointer to a Class (Result of 'new' or 'malloc')
+			// Check B: Type is a Pointer to a Class
 			if st, ok := ptr.ElementType.(*types.StructType); ok && st.IsClass {
+				// fmt.Printf("[IRGen] '%s' detected as Pointer to Class\n", name)
 				isClass = true
 				structType = st
-				storageType = sym.Type // Already a pointer
+				storageType = sym.Type 
 			}
 		}
 
@@ -551,6 +556,8 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 
 		// 6. ARC Injection (Cleanup)
 		if isClass {
+			// fmt.Printf("[IRGen] Injecting ARC Defer for '%s'\n", name)
+			
 			g.deferStack.Add(func(gen *Generator) {
 				// A. Load pointer
 				objPtr := gen.ctx.Builder.CreateLoad(storageType, alloca, name+".arc_load")
@@ -577,9 +584,14 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 				// --- FREE BLOCK ---
 				gen.ctx.Builder.SetInsertPoint(freeBlock)
 
-				// 1. Call Deinit
+				// 1. Call Deinit (main.log_deinit)
+				// Note: Use string concatenation to ensure namespace matching
 				deinitName := structType.Name + "_deinit"
-				if deinitSym, ok := gen.currentScope.Resolve(deinitName); ok {
+				
+				// Try full lookup first
+				deinitSym, ok := gen.currentScope.Resolve(deinitName)
+				
+				if ok && deinitSym.IRValue != nil {
 					if fn, ok := deinitSym.IRValue.(*ir.Function); ok {
 						gen.ctx.Builder.CreateCall(fn, []ir.Value{objPtr}, "")
 					}

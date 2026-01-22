@@ -31,14 +31,12 @@ func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
 }
 
 func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
-	// 1. Emit Deferred Actions (ARC Cleanup)
+	// Emit Deferred Actions BEFORE return
 	if g.deferStack != nil {
 		g.deferStack.Emit(g)
 	}
 
 	var val ir.Value
-	
-	// 2. Handle Expressions
 	if ctx.Expression() != nil {
 		val = g.Visit(ctx.Expression()).(ir.Value)
 	} 
@@ -66,7 +64,6 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 		}
 	}
 
-	// 3. Generate Return
 	if val != nil {
 		if g.ctx.CurrentFunction != nil && ctx.TupleExpression() == nil {
 			targetType := g.ctx.CurrentFunction.FuncType.ReturnType
