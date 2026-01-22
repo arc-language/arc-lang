@@ -15,7 +15,7 @@
     "languages": [{
       "id": "arc",
       "aliases": ["Arc", "arc"],
-      "extensions": [".arc"],
+      "extensions": [".ax"],
       "configuration": "./language-configuration.json"
     }],
     "grammars": [{
