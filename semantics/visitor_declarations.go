@@ -298,61 +298,70 @@ func (a *Analyzer) visitExternCppMethod(ctx *parser.ExternCppMethodDeclContext, 
 // --- Standard Declarations ---
 
 func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
-	// 1. Get Function Name
-	// Since grammar is now `(ASYNC | PROCESS)? FUNC IDENTIFIER ...`
-	// IDENTIFIER is a single token, not a list.
-	name := ctx.IDENTIFIER().GetText()
+	rawName := ctx.IDENTIFIER().GetText()
+	
+	// 1. Determine Full Name (Mangling for Methods)
+	var fullName string
+	var parentName string
+	isMethod := false
 
-	if a.currentNamespacePrefix != "" && name != "main" {
-		name = a.currentNamespacePrefix + "." + name
-	}
-
-	// 2. Handle Method Mangling
-	var selfType types.Type
-	if ctx.ParameterList() != nil {
-		for _, param := range ctx.ParameterList().AllParameter() {
-			if param.SELF() != nil {
-				selfType = a.resolveType(param.Type_())
-				break
+	// Check if this function is inside a Class or Struct
+	if parent := ctx.GetParent(); parent != nil {
+		if _, ok := parent.(*parser.ClassMemberContext); ok {
+			if cd, ok := parent.GetParent().(*parser.ClassDeclContext); ok {
+				parentName = cd.IDENTIFIER().GetText()
+				isMethod = true
+			}
+		} else if _, ok := parent.(*parser.StructMemberContext); ok {
+			if sd, ok := parent.GetParent().(*parser.StructDeclContext); ok {
+				parentName = sd.IDENTIFIER().GetText()
+				isMethod = true
 			}
 		}
 	}
 
-	if selfType != nil {
-		base := selfType
-		if ptr, ok := base.(*types.PointerType); ok {
-			base = ptr.ElementType
+	if isMethod {
+		// Format: Namespace.StructName_MethodName
+		// Example: main.log_printf
+		if a.currentNamespacePrefix != "" {
+			fullName = a.currentNamespacePrefix + "." + parentName + "_" + rawName
+		} else {
+			fullName = parentName + "_" + rawName
 		}
-		if st, ok := base.(*types.StructType); ok {
-			name = st.Name + "_" + name
+	} else {
+		// Standard Function
+		if a.currentNamespacePrefix != "" && rawName != "main" {
+			fullName = a.currentNamespacePrefix + "." + rawName
+		} else {
+			fullName = rawName
 		}
 	}
 
-	// 3. Phase 1: Register Declarations
+	// 2. Phase 1: Register Declaration
 	if a.Phase == 1 || a.Phase == 0 {
 		var retType types.Type = types.Void
 		if ctx.ReturnType() != nil {
 			if ctx.ReturnType().Type_() != nil {
 				retType = a.resolveType(ctx.ReturnType().Type_())
-			} else if ctx.ReturnType().TypeList() != nil {
-				var tupleTypes []types.Type
-				for _, t := range ctx.ReturnType().TypeList().AllType_() {
-					tupleTypes = append(tupleTypes, a.resolveType(t))
-				}
-				retType = types.NewStruct("", tupleTypes, false)
 			}
+			// Handle tuple return types if needed...
 		}
 
 		var paramTypes []types.Type
 		if ctx.ParameterList() != nil {
 			for _, param := range ctx.ParameterList().AllParameter() {
-				paramTypes = append(paramTypes, a.resolveType(param.Type_()))
+				// Handle SELF type resolution for methods
+				if param.SELF() != nil {
+					// "self c: *log" -> resolve *log
+					paramTypes = append(paramTypes, a.resolveType(param.Type_()))
+				} else {
+					paramTypes = append(paramTypes, a.resolveType(param.Type_()))
+				}
 			}
 		}
 
-		// --- CONCURRENCY MODEL ---
+		// Create function type (standard, async, or process)
 		var fnType *types.FunctionType
-		
 		if ctx.ASYNC() != nil {
 			fnType = types.NewAsyncFunction(retType, paramTypes, false)
 		} else if ctx.PROCESS() != nil {
@@ -360,16 +369,15 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		} else {
 			fnType = types.NewFunction(retType, paramTypes, false)
 		}
-		// -------------------------
 
-		if _, ok := a.currentScope.ResolveLocal(name); !ok {
-			a.currentScope.Define(name, symbol.SymFunc, fnType)
+		if _, ok := a.currentScope.ResolveLocal(fullName); !ok {
+			a.currentScope.Define(fullName, symbol.SymFunc, fnType)
 		}
 	}
 
-	// 4. Phase 2: Analyze Body
+	// 3. Phase 2: Analyze Body
 	if a.Phase == 2 || a.Phase == 0 {
-		sym, ok := a.currentScope.Resolve(name)
+		sym, ok := a.currentScope.Resolve(fullName)
 		var retType types.Type = types.Void
 		if ok {
 			if fn, ok := sym.Type.(*types.FunctionType); ok {
@@ -388,6 +396,7 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 				a.currentScope.Define(pName, symbol.SymVar, pType)
 			}
 		}
+		
 		if ctx.Block() != nil {
 			a.scopes[ctx.Block()] = a.currentScope
 			for _, stmt := range ctx.Block().AllStatement() {

@@ -365,32 +365,45 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 // --- Literals & Structures ---
 
 func (a *Analyzer) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {
+	// 1. Determine the Type Name
 	name := ctx.IDENTIFIER().GetText()
-    
-    // Support Qualified Names in Struct Literal (e.g. Math.Vector3)
-    if ctx.QualifiedIdentifier() != nil {
-        qCtx := ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
-        name = ""
-        for i, id := range qCtx.AllIDENTIFIER() {
-            if i > 0 { name += "." }
-            name += id.GetText()
-        }
-    }
+	if ctx.QualifiedIdentifier() != nil {
+		qCtx := ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
+		name = ""
+		for i, id := range qCtx.AllIDENTIFIER() {
+			if i > 0 { name += "." }
+			name += id.GetText()
+		}
+	}
 
+	// 2. Resolve Symbol (with Namespace Fallback)
 	sym, ok := a.currentScope.Resolve(name)
+	
+	// Fallback: Try identifying with current namespace (e.g. "log" -> "main.log")
+	if !ok && a.currentNamespacePrefix != "" && ctx.QualifiedIdentifier() == nil {
+		sym, ok = a.currentScope.Resolve(a.currentNamespacePrefix + "." + name)
+	}
+
 	if !ok || sym.Kind != symbol.SymType {
-		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Unknown struct type '%s'", name)
+		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Unknown struct or class type '%s'", name)
 		return types.Void
 	}
 
+	// 3. Verify it is a Struct/Class
 	st, ok := sym.Type.(*types.StructType)
 	if !ok {
-		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "'%s' is not a struct", name)
+		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "'%s' is not a struct/class", name)
 		return types.Void
 	}
 
-	indices, hasIndices := a.structIndices[name]
-	if !hasIndices {
+	// 4. Validate Fields
+	// Note: Classes use the same indices map as structs for logical fields
+	indices, hasIndices := a.structIndices[st.Name]
+	
+	// If it's a class with no user fields defined yet, indices might be empty/nil, which is fine
+	if !hasIndices && len(ctx.AllFieldInit()) > 0 {
+		// Only report error if we try to init fields that don't exist
+		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Type '%s' has no fields to initialize", name)
 		return sym.Type
 	}
 
@@ -399,7 +412,7 @@ func (a *Analyzer) VisitStructLiteral(ctx *parser.StructLiteralContext) interfac
 		idx, exists := indices[fName]
 		if !exists {
 			a.bag.Report(a.file, field.GetStart().GetLine(), 0, 
-				"Struct '%s' has no field '%s'", name, fName)
+				"Type '%s' has no field '%s'", name, fName)
 			continue
 		}
 
