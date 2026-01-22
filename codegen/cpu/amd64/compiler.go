@@ -362,17 +362,27 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.store(RAX, inst)
 
 	case ir.OpTrunc:
+		if len(inst.Operands()) == 0 { return fmt.Errorf("OpTrunc missing operand: %s", inst.String()) }
 		c.load(RAX, inst.Operands()[0])
 		c.store(RAX, inst)
 
 	case ir.OpBitcast:
+		// DEBUG FIX: Panic protection for Bitcast
+		if len(inst.Operands()) == 0 {
+			return fmt.Errorf("OpBitcast missing operand! Inst: %s", inst.String())
+		}
 		c.moveValue(RBP, c.stackMap[inst], inst.Operands()[0])
 
 	case ir.OpZExt:
+		// DEBUG FIX: Panic protection for ZExt
+		if len(inst.Operands()) == 0 {
+			return fmt.Errorf("OpZExt missing operand! Inst: %s", inst.String())
+		}
 		c.load(RAX, inst.Operands()[0])
 		c.store(RAX, inst)
 
 	case ir.OpSExt:
+		if len(inst.Operands()) == 0 { return fmt.Errorf("OpSExt missing operand") }
 		src := inst.Operands()[0]
 		srcSize := SizeOf(src.Type())
 		c.load(RAX, src)
@@ -620,6 +630,9 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 
 	case ir.OpCondBr:
 		cbr := inst.(*ir.CondBrInst)
+		if cbr.Condition == nil {
+			return fmt.Errorf("CondBr missing condition")
+		}
 		c.load(RAX, cbr.Condition)
 		c.asm.Test(RAX, RAX)
 		offFalse := c.asm.JccRel(CondEq, 0)
