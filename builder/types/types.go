@@ -11,14 +11,14 @@ import (
 type TypeKind int
 
 const (
-    VoidKind TypeKind = iota
-    IntegerKind
-    FloatKind
-    PointerKind
-    ArrayKind
-    StructKind
-    FunctionKind
-    LabelKind
+	VoidKind TypeKind = iota
+	IntegerKind
+	FloatKind
+	PointerKind
+	ArrayKind
+	StructKind
+	FunctionKind
+	LabelKind
 )
 
 // Type is the interface all types implement
@@ -33,9 +33,9 @@ type Type interface {
 // VoidType represents the absence of a value
 type VoidType struct{}
 
-func (t *VoidType) Kind() TypeKind   { return VoidKind }
-func (t *VoidType) String() string   { return "void" }
-func (t *VoidType) BitSize() int     { return 0 }
+func (t *VoidType) Kind() TypeKind    { return VoidKind }
+func (t *VoidType) String() string    { return "void" }
+func (t *VoidType) BitSize() int      { return 0 }
 func (t *VoidType) Equal(o Type) bool { return o.Kind() == VoidKind }
 
 // IntType represents integers of arbitrary bit width
@@ -90,7 +90,7 @@ func (t *FloatType) Equal(o Type) bool {
 
 // PointerType represents a pointer to another type
 type PointerType struct {
-	ElementType Type
+	ElementType  Type
 	AddressSpace int // 0 = default, others for special memory regions
 }
 
@@ -129,36 +129,41 @@ func (t *ArrayType) Equal(o Type) bool {
 	return false
 }
 
-// StructType represents a composite type
+// StructType represents a composite type.
+// It serves as the definition for both 'struct' (value type) and 'class' (reference type).
 type StructType struct {
-	Name     string
-	Fields   []Type
-	Packed   bool // If true, no padding between fields
-
-	// IsClass changes the storage behavior:
-	// false = Value Type (Stack, direct fields)
-	// true  = Reference Type (Heap, RefCount Header + fields)
+	Name    string
+	Fields  []Type
+	Packed  bool
+	
+	// IsClass determines the storage strategy.
+	// false = Value Type: Allocated on stack, fields are accessed directly at index i.
+	// true  = Reference Type: Allocated on heap, implicit RefCount at index 0, fields at index i+1.
 	IsClass bool
 }
 
 func (t *StructType) Kind() TypeKind { return StructKind }
 
 func (t *StructType) String() string {
-	// If the struct is named, return the name reference
 	if t.Name != "" {
 		return fmt.Sprintf("%%%s", t.Name)
 	}
 	return t.DefString()
 }
 
-// DefString returns the structural definition (body) of the struct
 func (t *StructType) DefString() string {
 	fields := make([]string, len(t.Fields))
 	for i, f := range t.Fields {
 		fields[i] = f.String()
 	}
+	
+	// If it is a class, implicitly visualize the header for debugging
 	prefix := "{ "
 	suffix := " }"
+	if t.IsClass {
+		fields = append([]string{"i64 (ref)"}, fields...)
+	}
+
 	if t.Packed {
 		prefix = "<{ "
 		suffix = " }>"
@@ -168,11 +173,15 @@ func (t *StructType) DefString() string {
 
 func (t *StructType) BitSize() int {
 	total := 0
+	if t.IsClass {
+		total += 64 // Implicit RefCount header
+	}
 	for _, f := range t.Fields {
 		total += f.BitSize()
 	}
 	return total
 }
+
 func (t *StructType) Equal(o Type) bool {
 	if ot, ok := o.(*StructType); ok {
 		if t.Name != "" && ot.Name != "" {
@@ -186,7 +195,7 @@ func (t *StructType) Equal(o Type) bool {
 				return false
 			}
 		}
-		return t.Packed == ot.Packed
+		return t.Packed == ot.Packed && t.IsClass == ot.IsClass
 	}
 	return false
 }
@@ -197,7 +206,7 @@ type FunctionType struct {
 	ParamTypes []Type
 	Variadic   bool
 	IsAsync    bool // True if declared with 'async' modifier
-	IsProcess  bool
+	IsProcess  bool // True if declared with 'process' modifier
 }
 
 func (t *FunctionType) Kind() TypeKind { return FunctionKind }
@@ -212,6 +221,9 @@ func (t *FunctionType) String() string {
 	prefix := "fn"
 	if t.IsAsync {
 		prefix = "async fn"
+	}
+	if t.IsProcess {
+		prefix = "process fn"
 	}
 	return fmt.Sprintf("%s(%s) -> %s", prefix, strings.Join(params, ", "), t.ReturnType)
 }
@@ -260,28 +272,28 @@ func (t *FunctionType) Equal(other Type) bool {
 // LabelType represents a basic block label
 type LabelType struct{}
 
-func (t *LabelType) Kind() TypeKind   { return LabelKind }
-func (t *LabelType) String() string   { return "label" }
-func (t *LabelType) BitSize() int     { return 0 }
+func (t *LabelType) Kind() TypeKind    { return LabelKind }
+func (t *LabelType) String() string    { return "label" }
+func (t *LabelType) BitSize() int      { return 0 }
 func (t *LabelType) Equal(o Type) bool { return o.Kind() == LabelKind }
 
 // Common type constructors
 var (
 	Void  = &VoidType{}
 	Label = &LabelType{}
-	
+
 	I1   = &IntType{BitWidth: 1, Signed: true}
 	I8   = &IntType{BitWidth: 8, Signed: true}
 	I16  = &IntType{BitWidth: 16, Signed: true}
 	I32  = &IntType{BitWidth: 32, Signed: true}
 	I64  = &IntType{BitWidth: 64, Signed: true}
 	I128 = &IntType{BitWidth: 128, Signed: true}
-	
-	U8   = &IntType{BitWidth: 8, Signed: false}
-	U16  = &IntType{BitWidth: 16, Signed: false}
-	U32  = &IntType{BitWidth: 32, Signed: false}
-	U64  = &IntType{BitWidth: 64, Signed: false}
-	
+
+	U8  = &IntType{BitWidth: 8, Signed: false}
+	U16 = &IntType{BitWidth: 16, Signed: false}
+	U32 = &IntType{BitWidth: 32, Signed: false}
+	U64 = &IntType{BitWidth: 64, Signed: false}
+
 	F16  = &FloatType{BitWidth: 16}
 	F32  = &FloatType{BitWidth: 32}
 	F64  = &FloatType{BitWidth: 64}
@@ -313,13 +325,14 @@ func NewArray(elem Type, length int64) *ArrayType {
 	return &ArrayType{ElementType: elem, Length: length}
 }
 
-func NewClass(name string, fields []Type, packed bool) *StructType {
-	return &StructType{Name: name, Fields: fields, Packed: packed, IsClass: true}
+// NewStruct creates a struct type (Value Type)
+func NewStruct(name string, fields []Type, packed bool) *StructType {
+	return &StructType{Name: name, Fields: fields, Packed: packed, IsClass: false}
 }
 
-// NewStruct creates a struct type
-func NewStruct(name string, fields []Type, packed bool) *StructType {
-	return &StructType{Name: name, Fields: fields, Packed: packed}
+// NewClass creates a class type (Reference Type)
+func NewClass(name string, fields []Type, packed bool) *StructType {
+	return &StructType{Name: name, Fields: fields, Packed: packed, IsClass: true}
 }
 
 // NewFunction creates a function type
@@ -330,6 +343,16 @@ func NewFunction(ret Type, params []Type, variadic bool) *FunctionType {
 // NewAsyncFunction creates an async function type
 func NewAsyncFunction(ret Type, params []Type, variadic bool) *FunctionType {
 	return &FunctionType{ReturnType: ret, ParamTypes: params, Variadic: variadic, IsAsync: true}
+}
+
+// NewProcessFunction creates a process function type
+func NewProcessFunction(ret Type, params []Type, variadic bool) *FunctionType {
+	return &FunctionType{
+		ReturnType: ret,
+		ParamTypes: params,
+		Variadic:   variadic,
+		IsProcess:  true,
+	}
 }
 
 // IsInteger returns true if the type is an integer
@@ -344,14 +367,4 @@ func IsPointer(t Type) bool { return t.Kind() == PointerKind }
 // IsAggregate returns true if the type is an aggregate (struct or array)
 func IsAggregate(t Type) bool {
 	return t.Kind() == StructKind || t.Kind() == ArrayKind
-}
-
-// Add this constructor
-func NewProcessFunction(ret Type, params []Type, variadic bool) *FunctionType {
-	return &FunctionType{
-		ReturnType: ret,
-		ParamTypes: params,
-		Variadic:   variadic,
-		IsProcess:  true, // Tag it
-	}
 }
