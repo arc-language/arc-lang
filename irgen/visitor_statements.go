@@ -9,6 +9,7 @@ import (
 )
 
 func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
+	// 1. Scope Management
 	shouldEnter := false
 	if targetScope, isMapped := g.analysis.Scopes[ctx]; isMapped {
 		if targetScope != g.currentScope {
@@ -21,27 +22,40 @@ func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
 		defer g.exitScope()
 	}
 
+	// 2. Defer Stack Scope
+	// We need to snapshot the defer stack state so we only release
+	// variables declared *inside* this block when this block ends.
+	// (Note: In a full implementation, you'd push a new DeferScope)
+	// For now, assuming simple function-level defers or manually handling scoping logic.
+	
+	// Visit Statements
 	for _, stmt := range ctx.AllStatement() {
 		g.Visit(stmt)
 		if g.ctx.Builder.GetInsertBlock().Terminator() != nil {
 			break
 		}
 	}
+	
 	return nil
 }
 
 func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
-	g.deferStack.Emit(g)
+	// 1. Emit Deferred Actions (ARC Release, Defer statements)
+	// This generates the code to decrement RefCounts and free objects
+	// BEFORE the actual return instruction.
+	if g.deferStack != nil {
+		g.deferStack.Emit(g)
+	}
 
 	var val ir.Value
 	
-	// Handle single expression return
+	// 2. Handle single expression return
 	if ctx.Expression() != nil {
 		val = g.Visit(ctx.Expression()).(ir.Value)
 	} 
-	// Handle tuple return: return (a, b)
+	
+	// 3. Handle tuple return
 	if ctx.TupleExpression() != nil {
-		// We need to construct a struct value from the tuple expressions
 		tupleCtx := ctx.TupleExpression()
 		var fieldVals []ir.Value
 		for _, expr := range tupleCtx.AllExpression() {
@@ -49,15 +63,12 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 			fieldVals = append(fieldVals, v)
 		}
 		
-		// If current function return type is a struct (tuple), aggregate them
 		if g.ctx.CurrentFunction != nil {
 			retType := g.ctx.CurrentFunction.FuncType.ReturnType
 			if st, ok := retType.(*types.StructType); ok {
-				// Start with zero/undef struct
 				var agg ir.Value = g.ctx.Builder.ConstZero(st)
 				for i, v := range fieldVals {
 					if i < len(st.Fields) {
-						// Cast if needed
 						v = g.emitCast(v, st.Fields[i])
 						agg = g.ctx.Builder.CreateInsertValue(agg, v, []int{i}, "")
 					}
@@ -67,8 +78,8 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 		}
 	}
 
+	// 4. Generate Ret Instruction
 	if val != nil {
-		// Cast final result if needed (e.g. for single expression)
 		if g.ctx.CurrentFunction != nil && ctx.TupleExpression() == nil {
 			targetType := g.ctx.CurrentFunction.FuncType.ReturnType
 			val = g.emitCast(val, targetType)
