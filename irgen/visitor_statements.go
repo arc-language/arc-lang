@@ -22,13 +22,10 @@ func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
 		defer g.exitScope()
 	}
 
-	// 2. Defer Stack Scope
-	// We need to snapshot the defer stack state so we only release
-	// variables declared *inside* this block when this block ends.
-	// (Note: In a full implementation, you'd push a new DeferScope)
-	// For now, assuming simple function-level defers or manually handling scoping logic.
-	
-	// Visit Statements
+	// 2. Visit Statements
+	// Note: For block-level scopes (like inside 'if' or 'for'), 
+	// you would ideally handle block-local defers here. 
+	// For now, we rely on the function-level defer stack.
 	for _, stmt := range ctx.AllStatement() {
 		g.Visit(stmt)
 		if g.ctx.Builder.GetInsertBlock().Terminator() != nil {
@@ -41,8 +38,8 @@ func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
 
 func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 	// 1. Emit Deferred Actions (ARC Release, Defer statements)
-	// This generates the code to decrement RefCounts and free objects
-	// BEFORE the actual return instruction.
+	// IMPORTANT: This injects the cleanup code (dec ref, free) 
+	// immediately before the function returns.
 	if g.deferStack != nil {
 		g.deferStack.Emit(g)
 	}
