@@ -368,56 +368,45 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 }
 
 func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) interface{} {
-	// 1. Try to get the address (L-Value) of the base
 	var currPtr ir.Value = g.getLValue(ctx.PrimaryExpression())
 	var curr ir.Value
 
-	// 2. Resolve R-Value if needed
 	if currPtr != nil {
-		// If the L-Value is actually a function (e.g. global func), use it as the value
 		if _, isFn := currPtr.(*ir.Function); isFn {
 			curr = currPtr
 			currPtr = nil
 		} else if ptrType, ok := currPtr.Type().(*types.PointerType); ok {
-			// Otherwise load the value from the pointer
 			curr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 		} else {
 			curr = currPtr
 		}
 	} else {
-		// If no L-Value, evaluate as R-Value directly
 		res := g.Visit(ctx.PrimaryExpression())
 		if res != nil {
 			curr = res.(ir.Value)
 		}
 	}
 
-	// Track function type for indirect/method calls to know signatures
 	var pendingFnType *types.FunctionType
 
 	for _, op := range ctx.AllPostfixOp() {
 		
-		// ---------------------------------------------------------------------
-		// Case A: Function Call "()"
-		// ---------------------------------------------------------------------
+		// --- Function Call ---
 		if op.LPAREN() != nil {
 			var args []ir.Value
 
-			// 1. Handle BoundMethod (Result of "object.method")
-			// We extract the function and inject the 'this' pointer
+			// Handle BoundMethod
 			if bm, ok := curr.(*BoundMethod); ok {
 				curr = bm.Fn
 				pendingFnType = bm.Fn.FuncType
 				args = append(args, bm.This)
 			}
 
-			// 2. Determine Function Type
 			var targetType *types.FunctionType = pendingFnType
 			if targetType == nil {
 				if fn, ok := curr.(*ir.Function); ok {
 					targetType = fn.FuncType
 				} else if curr != nil {
-					// Indirect call via function pointer
 					if ptr, ok := curr.Type().(*types.PointerType); ok {
 						if ft, ok := ptr.ElementType.(*types.FunctionType); ok {
 							targetType = ft
@@ -426,15 +415,11 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				}
 			}
 
-			// 3. Implicit 'this' injection (Fallback for pointer calls)
-			// If we have a base pointer, and the function expects a pointer as arg 0,
-			// and we haven't already injected 'this' via BoundMethod.
+			// Implicit 'this'
 			if currPtr != nil && targetType != nil && len(targetType.ParamTypes) > 0 {
-				// Check if arg 0 matches base pointer type
 				if g.checkTypeMatch(currPtr, targetType.ParamTypes[0]) {
 					args = append(args, currPtr)
 				} else {
-					// Handle ptr** vs ptr* mismatch
 					if pt, ok := currPtr.Type().(*types.PointerType); ok && pt.ElementType.Equal(targetType.ParamTypes[0]) {
 						loaded := g.ctx.Builder.CreateLoad(pt.ElementType, currPtr, "")
 						args = append(args, loaded)
@@ -442,24 +427,14 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				}
 			}
 
-			// 4. Process Arguments
+			// Arguments
 			if op.ArgumentList() != nil {
 				for _, arg := range op.ArgumentList().AllArgument() {
 					if v := g.Visit(arg.Expression()); v != nil {
 						val := v.(ir.Value)
-						
-						// Cast arguments if signature is known
 						if targetType != nil {
-							targetIdx := len(args) // Account for 'this' if injected
-							
-							if targetType.Variadic && targetIdx >= len(targetType.ParamTypes) {
-								// Variadic promotions
-								if types.IsInteger(val.Type()) && val.Type().BitSize() < 64 {
-									val = g.emitCast(val, types.I64)
-								} else if types.IsFloat(val.Type()) && val.Type().BitSize() < 64 {
-									val = g.emitCast(val, types.F64)
-								}
-							} else if targetIdx < len(targetType.ParamTypes) {
+							targetIdx := len(args)
+							if targetIdx < len(targetType.ParamTypes) {
 								expected := targetType.ParamTypes[targetIdx]
 								val = g.emitCast(val, expected)
 							}
@@ -469,29 +444,23 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				}
 			}
 
-			// 5. Generate Call Instruction
 			if curr != nil {
 				if targetType != nil && targetType.IsAsync {
-					// --- ASYNC CALL ---
 					if fn, ok := curr.(*ir.Function); ok {
 						curr = g.ctx.Builder.CreateAsyncTask(fn, args, "")
 					} else {
-						// Indirect async call
 						call := g.ctx.Builder.CreateIndirectCall(curr, args, "")
 						call.SetType(targetType.ReturnType)
 						curr = call
 					}
 				} else if targetType != nil && targetType.IsProcess {
-					// --- PROCESS FORK ---
 					if fn, ok := curr.(*ir.Function); ok {
 						curr = g.ctx.Builder.CreateProcess(fn, args, "")
 					}
 				} else {
-					// --- STANDARD CALL ---
 					if fn, ok := curr.(*ir.Function); ok {
 						curr = g.ctx.Builder.CreateCall(fn, args, "")
 					} else {
-						// Indirect pointer call
 						call := g.ctx.Builder.CreateIndirectCall(curr, args, "")
 						if targetType != nil {
 							call.SetType(targetType.ReturnType)
@@ -499,29 +468,23 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 						curr = call
 					}
 				}
-				
-				// Reset context for next op
 				currPtr = nil
 				pendingFnType = nil
 			}
 			continue
 		}
 
-		// ---------------------------------------------------------------------
-		// Case B: Member Access ".identifier"
-		// ---------------------------------------------------------------------
+		// --- Member Access ---
 		if op.DOT() != nil {
 			pendingFnType = nil
 			fieldName := op.IDENTIFIER().GetText()
 
-			// Ensure we have a base pointer
 			var basePtr ir.Value = currPtr
 			if basePtr == nil && curr != nil && types.IsPointer(curr.Type()) {
 				basePtr = curr
 			}
 
 			if basePtr != nil {
-				// Dereference double pointers (common in variable access)
 				ptrType := basePtr.Type().(*types.PointerType)
 				if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 					basePtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, basePtr, "")
@@ -529,36 +492,27 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				ptrType = basePtr.Type().(*types.PointerType)
 
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
-					// 1. Try Field Access
+					// 1. Field Access
 					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-						// Calculate Physical Index
-						// Classes have a hidden RefCount at index 0, so user fields start at 1
 						physicalIndex := idx
 						if st.IsClass {
 							physicalIndex = idx + 1
 						}
-						
-						// GEP + Load
 						currPtr = g.ctx.Builder.CreateStructGEP(st, basePtr, physicalIndex, "")
 						curr = g.ctx.Builder.CreateLoad(st.Fields[idx], currPtr, "")
 						continue
 					}
 
-					// 2. Try Method Access
-					// st.Name is fully qualified (e.g. "main.log")
-					// Method name becomes "main.log_printf"
+					// 2. Method Access
 					methodName := st.Name + "_" + fieldName
-					
 					if methodSym, ok := g.currentScope.Resolve(methodName); ok {
 						if ft, ok := methodSym.Type.(*types.FunctionType); ok {
 							pendingFnType = ft
 						}
 						if methodSym.IRValue != nil {
-							// Return a BoundMethod
-							// This defers the actual call generation to the next LPAREN
 							curr = &BoundMethod{
 								Fn:   methodSym.IRValue.(*ir.Function),
-								This: basePtr, // Pass the object pointer as 'this'
+								This: basePtr,
 							}
 							currPtr = basePtr
 							continue
@@ -569,15 +523,10 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			continue
 		}
 
-		// ---------------------------------------------------------------------
-		// Case C: Indexing "[expr]"
-		// ---------------------------------------------------------------------
+		// --- Indexing ---
 		if op.LBRACKET() != nil {
 			idx := g.Visit(op.Expression()).(ir.Value)
-
 			var basePtr ir.Value
-			
-			// Handle array decays or raw pointers
 			if currPtr != nil {
 				if pt, ok := currPtr.Type().(*types.PointerType); ok {
 					if _, isArray := pt.ElementType.(*types.ArrayType); isArray {
@@ -588,69 +537,21 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			if basePtr == nil && curr != nil && types.IsPointer(curr.Type()) {
 				basePtr = curr
 			}
-			if basePtr == nil {
-				basePtr = currPtr
-			}
+			if basePtr == nil { basePtr = currPtr }
 
 			if basePtr != nil {
 				ptrType := basePtr.Type().(*types.PointerType)
 				var elemPtr ir.Value
-				
 				if _, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
-					// Array: GEP(ptr, 0, idx)
 					zero := g.ctx.Builder.ConstInt(types.I32, 0)
 					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{zero, idx}, "")
 				} else {
-					// Pointer: GEP(ptr, idx)
 					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{idx}, "")
 				}
-				
 				currPtr = elemPtr
 				curr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 			}
 			continue
-		}
-
-		// ---------------------------------------------------------------------
-		// Case D: Increment/Decrement "++" / "--"
-		// ---------------------------------------------------------------------
-		if op.INCREMENT() != nil || op.DECREMENT() != nil {
-			if currPtr == nil {
-				// Can't increment r-value
-				continue
-			}
-			
-			ptrType := currPtr.Type().(*types.PointerType)
-			val := g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
-
-			// Determine '1' constant based on type
-			var one ir.Value
-			if types.IsFloat(ptrType.ElementType) {
-				one = g.ctx.Builder.ConstFloat(ptrType.ElementType.(*types.FloatType), 1.0)
-			} else if intTy, ok := ptrType.ElementType.(*types.IntType); ok {
-				one = g.ctx.Builder.ConstInt(intTy, 1)
-			} else {
-				one = g.ctx.Builder.ConstInt(types.I64, 1)
-			}
-
-			var next ir.Value
-			if op.INCREMENT() != nil {
-				if types.IsFloat(ptrType.ElementType) {
-					next = g.ctx.Builder.CreateFAdd(val, one, "")
-				} else {
-					next = g.ctx.Builder.CreateAdd(val, one, "")
-				}
-			} else {
-				if types.IsFloat(ptrType.ElementType) {
-					next = g.ctx.Builder.CreateFSub(val, one, "")
-				} else {
-					next = g.ctx.Builder.CreateSub(val, one, "")
-				}
-			}
-
-			g.ctx.Builder.CreateStore(next, currPtr)
-			curr = val // Postfix returns original value, but for simplicity here returns loaded val. 
-			           // To match C exactly, 'curr' should be 'val' (old value), but side effect happens.
 		}
 	}
 	return curr
@@ -1063,13 +964,16 @@ func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
     }
     
 	sym, ok := g.currentScope.Resolve(name)
-	if !ok {
-		return g.getZeroValue(types.I64)
+	if !ok && g.currentNamespace != "" && ctx.QualifiedIdentifier() == nil {
+		sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + name)
 	}
+
+	if !ok { return g.getZeroValue(types.I64) }
+
 	structType := sym.Type.(*types.StructType)
 	indices := g.analysis.StructIndices[structType.Name]
 
-	// --- PATH 1: Standard Struct (Value Type) ---
+	// --- PATH 1: Struct ---
 	if !structType.IsClass {
 		var agg ir.Value = g.ctx.Builder.ConstZero(structType)
 		for _, field := range ctx.AllFieldInit() {
@@ -1083,42 +987,25 @@ func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 		return agg
 	}
 
-	// --- PATH 2: Class (Reference Type) ---
-	
-	// 1. Calculate Size of the underlying IR struct
-	// This includes the implicit i64 header because structType.Fields 
-	// (conceptually) are mapped to IR fields 1..N
+	// --- PATH 2: Class ---
 	size := g.ctx.Builder.CreateSizeOf(structType, "class_size")
-
-	// 2. Malloc
 	mallocFunc := g.getOrCreateMalloc()
 	rawPtr := g.ctx.Builder.CreateCall(mallocFunc, []ir.Value{size}, "raw_ptr")
-
-	// 3. Cast i8* to %MyClass*
 	classPtr := g.ctx.Builder.CreateBitCast(rawPtr, types.NewPointer(structType), "obj_ptr")
 
-	// 4. Initialize Ref Count (Index 0) to 1
 	rcPtr := g.ctx.Builder.CreateStructGEP(structType, classPtr, 0, "rc_ptr")
 	g.ctx.Builder.CreateStore(g.ctx.Builder.ConstInt(types.I64, 1), rcPtr)
 
-	// 5. Initialize User Fields (Index 1..N)
-	// We verify fields against the user-visible indices, but write to (index + 1)
 	for _, field := range ctx.AllFieldInit() {
 		fName := field.IDENTIFIER().GetText()
 		fVal := g.Visit(field.Expression()).(ir.Value)
-		
 		if idx, ok := indices[fName]; ok {
 			fVal = g.emitCast(fVal, structType.Fields[idx])
-			
-			// Offset by 1 for the header
 			physicalIndex := idx + 1
-			
 			fieldPtr := g.ctx.Builder.CreateStructGEP(structType, classPtr, physicalIndex, fName)
 			g.ctx.Builder.CreateStore(fVal, fieldPtr)
 		}
 	}
-
-	// Return the pointer to the heap object
 	return classPtr
 }
 
@@ -1146,7 +1033,6 @@ type BoundMethod struct {
 	Fn   *ir.Function
 	This ir.Value
 }
-
 func (b *BoundMethod) Type() types.Type { return b.Fn.Type() }
 func (b *BoundMethod) Name() string     { return "bound_method" }
 func (b *BoundMethod) SetName(n string) {}

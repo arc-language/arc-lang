@@ -289,18 +289,21 @@ func (g *Generator) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 func (g *Generator) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 	if g.Phase == 1 {
 		name := ctx.IDENTIFIER().GetText()
-		if sym, ok := g.currentScope.Resolve(name); ok {
+		lookupName := name
+		if g.currentNamespace != "" {
+			lookupName = g.currentNamespace + "." + name
+		}
+
+		if sym, ok := g.currentScope.Resolve(lookupName); ok {
 			if st, ok := sym.Type.(*types.StructType); ok {
-				// If it is a class, we do NOT use st.Fields directly for the IR definition.
-				// We must prepend the Reference Count header (i64).
 				if st.IsClass {
-					// 1. Create a new slice for IR definition: [RefCount, ...Fields]
+					// Define LLVM struct with implicit Header
+					// [0] RefCount (i64)
+					// [1..N] User Fields
 					irFields := make([]types.Type, len(st.Fields)+1)
-					irFields[0] = types.I64 // Header
+					irFields[0] = types.I64 
 					copy(irFields[1:], st.Fields)
 					
-					// 2. Create a temporary type description for the backend definition
-					// We keep the name so it registers as %ClassName
 					defSt := types.NewStruct(st.Name, irFields, st.Packed)
 					g.ctx.Builder.DefineStruct(defSt)
 				} else {

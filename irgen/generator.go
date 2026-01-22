@@ -74,8 +74,8 @@ func (g *Generator) exitScope() {
 }
 
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
-	// 1. Hardware Markers (Standard logic)
-	// Check generic parameters for hardware tags like <gpu>, <cuda>, etc.
+	// 1. Hardware Markers
+	// We scan generic parameters for tags like <gpu>, <cuda>, etc.
 	isGPU := false
 	isROCm := false
 	isCUDA := false
@@ -84,7 +84,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	if gp := ctx.GenericParams(); gp != nil {
 		if gpl := gp.GenericParamList(); gpl != nil {
 			for _, param := range gpl.AllGenericParam() {
-				// Each param might be dotted, but usually tags are single identifiers
 				for _, id := range param.AllIDENTIFIER() {
 					tag := id.GetText()
 					if tag == "gpu" { 
@@ -101,10 +100,8 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
-	// 2. Resolve Name
+	// 2. Resolve Name & Parent
 	name := ctx.IDENTIFIER().GetText()
-	
-	// Determine Parent Context (Struct/Class)
 	var parentName string
 	isMethod := false
 	
@@ -128,11 +125,11 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		for _, param := range ctx.ParameterList().AllParameter() {
 			if param.SELF() != nil {
 				t := g.resolveType(param.Type_())
+				// Unwrap pointer for class types
 				if ptr, ok := t.(*types.PointerType); ok {
 					t = ptr.ElementType
 				}
 				if st, ok := t.(*types.StructType); ok {
-					// st.Name might be fully qualified (e.g. "main.log")
 					parentName = st.Name 
 					isMethod = true
 				}
@@ -146,9 +143,8 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	var irName string
 
 	if isMethod {
-		// Clean parent name if it already has the namespace prefix
-		// This handles cases where 'parentName' came from resolveType (which returns qualified names)
-		// vs 'parentName' coming from AST (which is raw)
+		// Clean parent name if it already has the namespace prefix.
+		// st.Name from resolveType is fully qualified (e.g. "main.log").
 		shortParent := parentName
 		if g.currentNamespace != "" {
 			prefix := g.currentNamespace + "."
@@ -183,7 +179,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	// 4. Resolve Symbol
 	sym, ok := g.currentScope.Resolve(lookupName)
 	if !ok {
-		// Fallback: Try without namespace (global scope legacy)
+		// Fallback: Try raw name
 		sym, ok = g.currentScope.Resolve(name)
 	}
 
@@ -210,16 +206,11 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 
 		fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
 		
-		// Apply Hardware Markers to Calling Convention
-		if isTPU { 
-			fn.CallConv = ir.CC_TPU 
-		} else if isROCm { 
-			fn.CallConv = ir.CC_ROCM 
-		} else if isCUDA { 
-			fn.CallConv = ir.CC_PTX 
-		} else if isGPU { 
-			fn.CallConv = ir.CC_PTX 
-		}
+		// Apply Hardware Markers
+		if isTPU { fn.CallConv = ir.CC_TPU } 
+		else if isROCm { fn.CallConv = ir.CC_ROCM } 
+		else if isCUDA { fn.CallConv = ir.CC_PTX } 
+		else if isGPU { fn.CallConv = ir.CC_PTX }
 
 		// Apply Concurrency Flags
 		if ctx.ASYNC() != nil {
@@ -236,9 +227,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 
 	// --- Phase 2: Body ---
 	if g.Phase == 2 {
-		if sym == nil || sym.IRValue == nil {
-			return nil
-		}
+		if sym == nil || sym.IRValue == nil { return nil }
 
 		fn := sym.IRValue.(*ir.Function)
 		g.ctx.EnterFunction(fn)
@@ -252,7 +241,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			}
 		}
 
-		// Create Allocas for arguments
+		// Create Argument Allocas
 		for i, arg := range fn.Arguments {
 			if i < len(paramNames) {
 				arg.SetName(paramNames[i])
@@ -269,7 +258,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			g.Visit(ctx.Block())
 		}
 
-		// Implicit Return
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			g.deferStack.Emit(g)
 			if fn.FuncType.ReturnType == types.Void {
@@ -278,7 +266,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 				g.ctx.Builder.CreateRet(g.getZeroValue(fn.FuncType.ReturnType))
 			}
 		}
-		
 		g.ctx.ExitFunction()
 	}
 	return nil
