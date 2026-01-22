@@ -207,10 +207,15 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
 		
 		// Apply Hardware Markers
-		if isTPU { fn.CallConv = ir.CC_TPU } 
-		else if isROCm { fn.CallConv = ir.CC_ROCM } 
-		else if isCUDA { fn.CallConv = ir.CC_PTX } 
-		else if isGPU { fn.CallConv = ir.CC_PTX }
+		if isTPU { 
+			fn.CallConv = ir.CC_TPU 
+		} else if isROCm { 
+			fn.CallConv = ir.CC_ROCM 
+		} else if isCUDA { 
+			fn.CallConv = ir.CC_PTX 
+		} else if isGPU { 
+			fn.CallConv = ir.CC_PTX 
+		}
 
 		// Apply Concurrency Flags
 		if ctx.ASYNC() != nil {
