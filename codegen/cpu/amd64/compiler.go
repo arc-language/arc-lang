@@ -403,6 +403,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			return nil
 		}
 
+		// Handle First Index (Array/Pointer arithmetic)
 		firstIdx := indices[0]
 		baseType := gep.SourceElementType
 		baseSize := SizeOf(baseType)
@@ -417,15 +418,44 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			c.asm.Add(RegOp(RAX), RegOp(RCX))
 		}
 
+		// Handle Subsequent Indices (Struct/Array drilling)
 		currentType := baseType
 		for _, idxVal := range indices[1:] {
 			if st, ok := currentType.(*types.StructType); ok {
 				if cIdx, ok := idxVal.(*ir.ConstantInt); ok {
-					offset := GetStructFieldOffset(st, int(cIdx.Value))
+					idx := int(cIdx.Value)
+					offset := GetStructFieldOffset(st, idx)
 					if offset != 0 {
 						c.asm.Add(RegOp(RAX), ImmOp(int64(offset)))
 					}
-					currentType = st.Fields[cIdx.Value]
+					
+					// --- FIX: Handle Class Header Type Resolution ---
+					if st.IsClass {
+						if idx == 0 {
+							// Index 0 is the hidden RefCount header (i64)
+							currentType = types.I64
+						} else {
+							// Index N corresponds to User Field N-1
+							// We must check bounds safely
+							fieldIdx := idx - 1
+							if fieldIdx >= 0 && fieldIdx < len(st.Fields) {
+								currentType = st.Fields[fieldIdx]
+							} else {
+								// Fallback/Safety: Treat as i8 (should not happen in valid IR)
+								currentType = types.I8
+							}
+						}
+					} else {
+						// Standard Struct
+						if idx >= 0 && idx < len(st.Fields) {
+							currentType = st.Fields[idx]
+						} else {
+							return fmt.Errorf("field index %d out of bounds for struct %s", idx, st.Name)
+						}
+					}
+				} else {
+					// Dynamic struct indexing is not supported by standard GEP, usually requires Constants
+					return fmt.Errorf("non-constant struct index in GEP")
 				}
 			} else if at, ok := currentType.(*types.ArrayType); ok {
 				elemSize := SizeOf(at.ElementType)
