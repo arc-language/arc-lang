@@ -9,7 +9,6 @@ import (
 )
 
 func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
-	// 1. Scope Management
 	shouldEnter := false
 	if targetScope, isMapped := g.analysis.Scopes[ctx]; isMapped {
 		if targetScope != g.currentScope {
@@ -22,39 +21,28 @@ func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
 		defer g.exitScope()
 	}
 
-	// 2. Defer Stack Scope
-	// We need to snapshot the defer stack state so we only release
-	// variables declared *inside* this block when this block ends.
-	// (Note: In a full implementation, you'd push a new DeferScope)
-	// For now, assuming simple function-level defers or manually handling scoping logic.
-	
-	// Visit Statements
 	for _, stmt := range ctx.AllStatement() {
 		g.Visit(stmt)
 		if g.ctx.Builder.GetInsertBlock().Terminator() != nil {
 			break
 		}
 	}
-	
 	return nil
 }
 
 func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
-	// 1. Emit Deferred Actions (ARC Release, Defer statements)
-	// IMPORTANT: This injects the cleanup code (dec ref, free) 
-	// immediately before the function returns.
+	// 1. Emit Deferred Actions (ARC Cleanup)
 	if g.deferStack != nil {
 		g.deferStack.Emit(g)
 	}
 
 	var val ir.Value
 	
-	// 2. Handle single expression return
+	// 2. Handle Expressions
 	if ctx.Expression() != nil {
 		val = g.Visit(ctx.Expression()).(ir.Value)
 	} 
 	
-	// 3. Handle tuple return
 	if ctx.TupleExpression() != nil {
 		tupleCtx := ctx.TupleExpression()
 		var fieldVals []ir.Value
@@ -78,7 +66,7 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 		}
 	}
 
-	// 4. Generate Ret Instruction
+	// 3. Generate Return
 	if val != nil {
 		if g.ctx.CurrentFunction != nil && ctx.TupleExpression() == nil {
 			targetType := g.ctx.CurrentFunction.FuncType.ReturnType
@@ -90,6 +78,7 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 	}
 	return nil
 }
+
 
 func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) interface{} {
 	lhsCtx := ctx.LeftHandSide()

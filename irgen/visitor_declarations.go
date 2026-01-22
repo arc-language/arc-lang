@@ -458,7 +458,7 @@ func (g *Generator) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface
 }
 
 func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
-	// --- Phase 1: Global Variable Declarations ---
+	// --- Phase 1: Global Variables ---
 	if g.ctx.CurrentFunction == nil && g.Phase == 1 {
 		name := ctx.IDENTIFIER().GetText()
 		lookupName := name
@@ -467,9 +467,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		}
 
 		sym, ok := g.currentScope.Resolve(lookupName)
-		if !ok {
-			return nil
-		}
+		if !ok { return nil }
 		
 		var init ir.Constant = g.ctx.Builder.ConstZero(sym.Type)
 		glob := g.ctx.Builder.CreateGlobalVariable(name, sym.Type, init)
@@ -477,10 +475,10 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		return nil
 	}
 
-	// --- Phase 2: Local Variable Declarations ---
+	// --- Phase 2: Local Variables ---
 	if g.ctx.CurrentFunction != nil && g.Phase == 2 {
 		
-		// 1. Handle Tuple Destructuring
+		// 1. Tuple Destructuring (Simplified)
 		if ctx.TuplePattern() != nil {
 			if ctx.Expression() == nil { return nil }
 			val := g.Visit(ctx.Expression()).(ir.Value)
@@ -498,7 +496,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 			return nil
 		}
 
-		// 2. Handle Standard Declaration
+		// 2. Standard Declaration
 		name := ctx.IDENTIFIER().GetText()
 		sym, ok := g.currentScope.Resolve(name)
 		if !ok { return nil }
@@ -517,7 +515,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 			sym.Type = types.I64
 		}
 
-		// 3. Determine Storage Strategy & Detect Classes
+		// 3. Determine Storage & Class Status
 		var storageType types.Type = sym.Type
 		isClass := false
 		var structType *types.StructType
@@ -526,14 +524,13 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		if st, ok := sym.Type.(*types.StructType); ok && st.IsClass {
 			isClass = true
 			structType = st
-			storageType = types.NewPointer(sym.Type) // Variable holds pointer
+			storageType = types.NewPointer(sym.Type)
 		} else if ptr, ok := sym.Type.(*types.PointerType); ok {
-			// Check B: Type is a Pointer to a Class Struct (Result of new log{})
-			// This is the critical fix for your memory leak.
+			// Check B: Type is a Pointer to a Class (Result of 'new' or 'malloc')
 			if st, ok := ptr.ElementType.(*types.StructType); ok && st.IsClass {
 				isClass = true
 				structType = st
-				storageType = sym.Type // It is already a pointer
+				storageType = sym.Type // Already a pointer
 			}
 		}
 
@@ -541,7 +538,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		alloca := g.ctx.Builder.CreateAlloca(storageType, name+".addr")
 		sym.IRValue = alloca
 
-		// 5. Initialize Value
+		// 5. Store Initial Value
 		if initVal != nil {
 			if initVal.Type() == types.Void {
 				initVal = g.getZeroValue(storageType)
@@ -552,40 +549,35 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 			g.ctx.Builder.CreateStore(g.getZeroValue(storageType), alloca)
 		}
 
-		// 6. ARC Injection (Only for Classes)
+		// 6. ARC Injection (Cleanup)
 		if isClass {
 			g.deferStack.Add(func(gen *Generator) {
-				// A. Load Object Pointer
-				objPtr := gen.ctx.Builder.CreateLoad(storageType, alloca, name+".release_load")
+				// A. Load pointer
+				objPtr := gen.ctx.Builder.CreateLoad(storageType, alloca, name+".arc_load")
 
-				// Optional: Null check (objPtr != null)
-				// isNull := gen.ctx.Builder.CreateICmpEQ(objPtr, gen.ctx.Builder.ConstNull(storageType.(*types.PointerType)), "")
-				// ... branch ...
-
-				// B. Get RefCount Pointer (Header at Index 0)
+				// B. Get RefCount (Index 0)
 				rcPtr := gen.ctx.Builder.CreateStructGEP(structType, objPtr, 0, "rc_ptr")
 
-				// C. Decrement RefCount
+				// C. Decrement
 				rc := gen.ctx.Builder.CreateLoad(types.I64, rcPtr, "rc_val")
 				one := gen.ctx.Builder.ConstInt(types.I64, 1)
 				newRc := gen.ctx.Builder.CreateSub(rc, one, "rc_dec")
 				gen.ctx.Builder.CreateStore(newRc, rcPtr)
 
-				// D. Check if Zero
+				// D. Branch on Zero
 				zero := gen.ctx.Builder.ConstInt(types.I64, 0)
 				isZero := gen.ctx.Builder.CreateICmpEQ(newRc, zero, "is_zero")
 
-				// E. Conditional Free
-				currentFunc := gen.ctx.CurrentFunction
-				freeBlock := gen.ctx.Builder.CreateBlockInFunction("arc_free", currentFunc)
-				contBlock := gen.ctx.Builder.CreateBlockInFunction("arc_cont", currentFunc)
+				funcObj := gen.ctx.CurrentFunction
+				freeBlock := gen.ctx.Builder.CreateBlockInFunction("arc_free", funcObj)
+				contBlock := gen.ctx.Builder.CreateBlockInFunction("arc_cont", funcObj)
 
 				gen.ctx.Builder.CreateCondBr(isZero, freeBlock, contBlock)
 
 				// --- FREE BLOCK ---
 				gen.ctx.Builder.SetInsertPoint(freeBlock)
 
-				// 1. Call User Deinit (if exists)
+				// 1. Call Deinit
 				deinitName := structType.Name + "_deinit"
 				if deinitSym, ok := gen.currentScope.Resolve(deinitName); ok {
 					if fn, ok := deinitSym.IRValue.(*ir.Function); ok {
@@ -595,7 +587,6 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 
 				// 2. Call Free
 				voidPtr := gen.ctx.Builder.CreateBitCast(objPtr, types.NewPointer(types.I8), "")
-				
 				freeFn := gen.ctx.Module.GetFunction("free")
 				if freeFn == nil {
 					freeFn = gen.ctx.Builder.DeclareFunction("free", types.Void, []types.Type{types.NewPointer(types.I8)}, false)
