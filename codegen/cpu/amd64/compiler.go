@@ -106,16 +106,13 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
         c.runtime.EmitInitialization()
     }
 
-	// 1. Stack Allocation
 	offset := 0
 
 	// Arguments
 	for _, arg := range fn.Arguments {
 		size := SizeOf(arg.Type())
 		offset += size
-		if offset%8 != 0 {
-			offset += 8 - (offset % 8)
-		}
+		if offset%8 != 0 { offset += 8 - (offset % 8) }
 		c.stackMap[arg] = -offset
 	}
 
@@ -127,9 +124,7 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 				if count, ok := alloca.NumElements.(*ir.ConstantInt); ok {
 					allocSize *= int(count.Value)
 				}
-				if offset%16 != 0 {
-					offset += 16 - (offset % 16)
-				}
+				if offset%16 != 0 { offset += 16 - (offset % 16) }
 				offset += allocSize
 				c.stackMap[ir.Value(alloca)] = -offset
 				continue
@@ -139,30 +134,25 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 				size := SizeOf(inst.Type())
 				if size == 0 { size = 1 }
 				offset += size
-				if offset%8 != 0 {
-					offset += 8 - (offset % 8)
-				}
+				if offset%8 != 0 { offset += 8 - (offset % 8) }
 				c.stackMap[inst] = -offset
 			}
 		}
 	}
 
-	if offset%16 != 0 {
-		offset += 16 - (offset % 16)
-	}
+	if offset%16 != 0 { offset += 16 - (offset % 16) }
 	c.frameSize = offset
 
-	// 2. Prologue
+	// Prologue
 	c.asm.Push(RBP)
 	c.asm.Mov(RegOp(RBP), RegOp(RSP), 64)
 	if c.frameSize > 0 {
 		c.asm.Sub(RegOp(RSP), ImmOp(c.frameSize))
 	}
 
-	// 3. Save Register Arguments
+	// Save Register Arguments
 	regs := []Register{RDI, RSI, RDX, RCX, R8, R9}
 	xmmRegs := []Register{0, 1, 2, 3, 4, 5, 6, 7}
-
 	gprIdx := 0
 	xmmIdx := 0
 
@@ -186,7 +176,7 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 		}
 	}
 
-	// 4. Compile Body
+	// Compile Body
 	for _, block := range fn.Blocks {
 		c.blockOffsets[block] = c.asm.Len()
 		for _, inst := range block.Instructions {
@@ -196,7 +186,7 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 		}
 	}
 
-	// 5. Fixup Jumps
+	// Fixup Jumps
 	for _, fix := range c.jumpsToFix {
 		targetOff, ok := c.blockOffsets[fix.target]
 		if !ok {
@@ -210,10 +200,10 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 }
 
 func (c *compiler) compileInst(inst ir.Instruction) error {
-	// Guard against panics
-	if inst == nil {
-		return fmt.Errorf("nil instruction encountered")
-	}
+	if inst == nil { return fmt.Errorf("nil instruction encountered") }
+
+	// DEBUG LOGGING: Identify the crashing instruction
+	fmt.Printf("[CodeGen] Compiling Op %d: %s\n", inst.Opcode(), inst.String())
 
 	if inst.Opcode() == ir.OpAsyncTaskCreate {
 		return c.compileAsyncTaskCreate(inst.(*ir.AsyncTaskCreateInst))
@@ -225,7 +215,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		return c.compileProcessCreate(inst.(*ir.ProcessCreateInst))
 	}
 
-	// Helper to check operands
+	// Safety helper
 	requireOps := func(n int) error {
 		if len(inst.Operands()) < n {
 			return fmt.Errorf("instruction %s (Op %d) requires %d operands, got %d", 
@@ -386,7 +376,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.asm.Movss(destSlot, RAX)
 
 	case ir.OpAlloca:
-		// No-op
 		return nil
 
 	case ir.OpLoad:
@@ -404,7 +393,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 
 	case ir.OpGetElementPtr:
 		gep := inst.(*ir.GetElementPtrInst)
-		if err := requireOps(1); err != nil { return err } // At least base ptr
+		if err := requireOps(1); err != nil { return err }
 		base := gep.Operands()[0]
 		c.load(RAX, base)
 
@@ -609,9 +598,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 
 	case ir.OpCondBr:
 		cbr := inst.(*ir.CondBrInst)
-		if cbr.Condition == nil {
-			return fmt.Errorf("CondBr missing condition")
-		}
+		if cbr.Condition == nil { return fmt.Errorf("CondBr missing condition") }
 		c.load(RAX, cbr.Condition)
 		c.asm.Test(RAX, RAX)
 		offFalse := c.asm.JccRel(CondEq, 0)
@@ -669,6 +656,41 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 
 	case ir.OpPhi:
 		return nil
+
+	// NEW: OpSelect support
+	case ir.OpSelect:
+		if err := requireOps(3); err != nil { return err }
+		// Op0: Cond, Op1: TrueVal, Op2: FalseVal
+		// CMOV is tricky because it requires same register size and specific conditions.
+		// Simplified fallback: Branching implementation.
+		
+		cond := inst.Operands()[0]
+		trueVal := inst.Operands()[1]
+		falseVal := inst.Operands()[2]
+
+		c.load(RAX, cond)
+		c.asm.Test(RAX, RAX)
+		
+		// If 0, jump to false case
+		offFalse := c.asm.JccRel(CondEq, 0)
+		
+		// True Case
+		c.load(RAX, trueVal)
+		offDone := c.asm.JmpRel(0)
+		
+		// False Case
+		c.asm.PatchInt32(offFalse, int32(c.asm.Len() - (offFalse + 4)))
+		c.load(RAX, falseVal)
+		
+		// Merge
+		c.asm.PatchInt32(offDone, int32(c.asm.Len() - (offDone + 4)))
+		c.store(RAX, inst)
+
+	// NEW: OpUnreachable support
+	case ir.OpUnreachable:
+		// UD2 instruction (Undefined Operation) raises SIGILL
+		c.asm.emitByte(0x0F)
+		c.asm.emitByte(0x0B)
 
 	default:
 		return fmt.Errorf("unknown opcode: %s", inst.Opcode())
