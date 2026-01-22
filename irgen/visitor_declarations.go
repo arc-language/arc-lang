@@ -470,7 +470,11 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		if !ok {
 			return nil
 		}
+		
+		// Globals need a constant initializer
 		var init ir.Constant = g.ctx.Builder.ConstZero(sym.Type)
+		// (Optional: You could visit ctx.Expression() here if it's a constant expr)
+		
 		glob := g.ctx.Builder.CreateGlobalVariable(name, sym.Type, init)
 		sym.IRValue = glob
 		return nil
@@ -478,20 +482,22 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 
 	// --- Phase 2: Local Variable Declarations ---
 	if g.ctx.CurrentFunction != nil && g.Phase == 2 {
-		// 1. Handle Tuple Destructuring
+		
+		// 1. Handle Tuple Destructuring: let (a, b) = func()
 		if ctx.TuplePattern() != nil {
-			if ctx.Expression() == nil {
-				return nil
-			}
+			if ctx.Expression() == nil { return nil }
 			val := g.Visit(ctx.Expression()).(ir.Value)
 			names := ctx.TuplePattern().AllIDENTIFIER()
 			for i, idNode := range names {
 				name := idNode.GetText()
 				sym, ok := g.currentScope.Resolve(name)
-				if !ok {
-					continue
-				}
+				if !ok { continue }
+				
+				// Extract field
 				fieldVal := g.ctx.Builder.CreateExtractValue(val, []int{i}, "")
+				
+				// Determine storage (Struct vs Class) logic could apply here too, 
+				// but assuming simple types for tuples for now.
 				alloca := g.ctx.Builder.CreateAlloca(sym.Type, name+".addr")
 				g.ctx.Builder.CreateStore(fieldVal, alloca)
 				sym.IRValue = alloca
@@ -502,50 +508,118 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		// 2. Handle Standard Declaration: let x = val
 		name := ctx.IDENTIFIER().GetText()
 		sym, ok := g.currentScope.Resolve(name)
-		if !ok {
-			return nil
-		}
+		if !ok { return nil }
 
 		var initVal ir.Value
 		if ctx.Expression() != nil {
 			initVal = g.Visit(ctx.Expression()).(ir.Value)
 			
-			// Type Inference
+			// Type Inference: If source didn't specify type, use expression type
 			if ctx.Type_() == nil && initVal != nil {
 				sym.Type = initVal.Type()
 			}
 		}
 
+		// Fallback type
 		if sym.Type == nil || sym.Type == types.Void {
 			sym.Type = types.I64
 		}
 
-		// Determine Storage Type
-		// Struct: %MyStruct
-		// Class:  %MyClass* (Pointer to heap object)
+		// 3. Determine Storage Strategy
+		// Struct: Value Type -> Variable holds the data (%MyStruct)
+		// Class:  Reference Type -> Variable holds a pointer (%MyClass*)
 		var storageType types.Type = sym.Type
+		isClass := false
+		var structType *types.StructType
+
 		if st, ok := sym.Type.(*types.StructType); ok && st.IsClass {
-			// Variable holds a pointer to the object
+			isClass = true
+			structType = st
 			storageType = types.NewPointer(sym.Type)
 		}
 
-		// Create stack allocation
+		// 4. Allocate Stack Slot
 		alloca := g.ctx.Builder.CreateAlloca(storageType, name+".addr")
 		sym.IRValue = alloca
 
-		// Initialize value
+		// 5. Initialize Value
 		if initVal != nil {
+			// Edge case: void expression
 			if initVal.Type() == types.Void {
-				initVal = g.getZeroValue(sym.Type)
+				initVal = g.getZeroValue(storageType)
 			}
 			
-			// If it's a class, initVal comes from VisitStructLiteral which returns %MyClass*.
-			// storageType is %MyClass*. This matches.
+			// Cast and Store
+			// Note: If Class, initVal is %MyClass* (from VisitStructLiteral), storageType is %MyClass*. Matches.
 			initVal = g.emitCast(initVal, storageType)
 			g.ctx.Builder.CreateStore(initVal, alloca)
 		} else {
-			// Default zero initialization (Null for classes)
+			// Zero initialization (Null for classes)
 			g.ctx.Builder.CreateStore(g.getZeroValue(storageType), alloca)
+		}
+
+		// 6. Automatic Reference Counting (ARC) Injection
+		// Only for Classes
+		if isClass {
+			g.deferStack.Add(func(gen *Generator) {
+				// A. Load the object pointer from the stack variable
+				// %obj = load %MyClass*, %MyClass** %alloca
+				objPtr := gen.ctx.Builder.CreateLoad(storageType, alloca, name+".release_load")
+
+				// (Optional: Add null check here if variables can be nullable)
+
+				// B. Get Pointer to RefCount (Index 0)
+				// RefCount is always the first physical field (i64)
+				rcPtr := gen.ctx.Builder.CreateStructGEP(structType, objPtr, 0, "rc_ptr")
+
+				// C. Decrement RefCount
+				rc := gen.ctx.Builder.CreateLoad(types.I64, rcPtr, "rc_val")
+				one := gen.ctx.Builder.ConstInt(types.I64, 1)
+				newRc := gen.ctx.Builder.CreateSub(rc, one, "rc_dec")
+				gen.ctx.Builder.CreateStore(newRc, rcPtr)
+
+				// D. Check if RefCount == 0
+				zero := gen.ctx.Builder.ConstInt(types.I64, 0)
+				isZero := gen.ctx.Builder.CreateICmpEQ(newRc, zero, "is_zero")
+
+				// E. Create Blocks for Conditional Cleanup
+				// We need to manually split the basic block here
+				currentFunc := gen.ctx.CurrentFunction
+				
+				freeBlock := gen.ctx.Builder.CreateBlockInFunction("arc_free", currentFunc)
+				contBlock := gen.ctx.Builder.CreateBlockInFunction("arc_cont", currentFunc)
+
+				gen.ctx.Builder.CreateCondBr(isZero, freeBlock, contBlock)
+
+				// --- FREE BLOCK ---
+				gen.ctx.Builder.SetInsertPoint(freeBlock)
+
+				// 1. Call User Deinit (e.g. main.log_deinit)
+				// We must reconstruct the name. structType.Name usually implies namespace (e.g. "main.log")
+				deinitName := structType.Name + "_deinit"
+				
+				if deinitSym, ok := gen.currentScope.Resolve(deinitName); ok {
+					if fn, ok := deinitSym.IRValue.(*ir.Function); ok {
+						gen.ctx.Builder.CreateCall(fn, []ir.Value{objPtr}, "")
+					}
+				}
+
+				// 2. Call Free
+				// Cast %MyClass* to i8*
+				voidPtr := gen.ctx.Builder.CreateBitCast(objPtr, types.NewPointer(types.I8), "")
+				
+				// Resolve or Declare free
+				freeFn := gen.ctx.Module.GetFunction("free")
+				if freeFn == nil {
+					freeFn = gen.ctx.Builder.DeclareFunction("free", types.Void, []types.Type{types.NewPointer(types.I8)}, false)
+				}
+				gen.ctx.Builder.CreateCall(freeFn, []ir.Value{voidPtr}, "")
+
+				gen.ctx.Builder.CreateBr(contBlock)
+
+				// --- CONTINUE BLOCK ---
+				gen.ctx.Builder.SetInsertPoint(contBlock)
+			})
 		}
 	}
 	return nil
@@ -576,5 +650,70 @@ func (g *Generator) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 			sym.IRValue = constant
 		}
 	}
+	return nil
+}
+
+func (g *Generator) VisitDeinitDecl(ctx *parser.DeinitDeclContext) interface{} {
+	// Only generate code in Phase 2
+	if g.Phase != 2 { return nil }
+
+	// 1. Resolve Names
+	parentName := ""
+	if classDecl, ok := ctx.GetParent().(*parser.ClassMemberContext).GetParent().(*parser.ClassDeclContext); ok {
+		parentName = classDecl.IDENTIFIER().GetText()
+	}
+
+	// Name: main.log_deinit -> main_log_deinit
+	fullName := parentName + "_deinit"
+	if g.currentNamespace != "" {
+		fullName = g.currentNamespace + "_" + fullName
+	}
+
+	// 2. Lookup the symbol created by Semantics
+	// We need the qualified name for lookup (main.log_deinit)
+	lookupName := parentName + "_deinit"
+	if g.currentNamespace != "" {
+		lookupName = g.currentNamespace + "." + lookupName
+	}
+	
+	sym, ok := g.currentScope.Resolve(lookupName)
+	if !ok { return nil }
+
+	// 3. Create Function
+	// If Phase 1 didn't create it (because VisitDeinit wasn't in Phase 1 loop), create it now
+	var fn *ir.Function
+	if sym.IRValue == nil {
+		fnType := sym.Type.(*types.FunctionType)
+		fn = g.ctx.Builder.CreateFunction(fullName, types.Void, fnType.ParamTypes, false)
+		sym.IRValue = fn
+	} else {
+		fn = sym.IRValue.(*ir.Function)
+	}
+
+	// 4. Enter Function Body
+	g.ctx.EnterFunction(fn)
+	g.enterScope(ctx)
+	defer g.exitScope()
+
+	// 5. Setup 'self' argument
+	selfName := ctx.IDENTIFIER().GetText()
+	arg := fn.Arguments[0]
+	arg.SetName(selfName)
+	alloca := g.ctx.Builder.CreateAlloca(arg.Type(), selfName+".addr")
+	g.ctx.Builder.CreateStore(arg, alloca)
+	
+	if s, ok := g.currentScope.Resolve(selfName); ok {
+		s.IRValue = alloca
+	}
+
+	// 6. Generate Statements
+	if ctx.Block() != nil {
+		g.deferStack = NewDeferStack() // Deinit can also have defers!
+		g.Visit(ctx.Block())
+		g.deferStack.Emit(g)
+	}
+
+	g.ctx.Builder.CreateRetVoid()
+	g.ctx.ExitFunction()
 	return nil
 }

@@ -671,4 +671,51 @@ func (a *Analyzer) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 }
 
 func (a *Analyzer) VisitMethodDecl(ctx *parser.MethodDeclContext) interface{} { return nil }
-func (a *Analyzer) VisitDeinitDecl(ctx *parser.DeinitDeclContext) interface{} { return nil }
+
+func (a *Analyzer) VisitDeinitDecl(ctx *parser.DeinitDeclContext) interface{} {
+	// 1. Resolve Parent Class Name
+	// Deinit is always inside a class
+	parentName := ""
+	if classDecl, ok := ctx.GetParent().(*parser.ClassMemberContext).GetParent().(*parser.ClassDeclContext); ok {
+		parentName = classDecl.IDENTIFIER().GetText()
+	}
+
+	// 2. Mangle Name: main.log_deinit
+	methodName := parentName + "_deinit"
+	fullName := methodName
+	if a.currentNamespacePrefix != "" {
+		fullName = a.currentNamespacePrefix + "." + methodName
+	}
+
+	// 3. Resolve Self Parameter
+	// deinit(self c: *log)
+	var paramTypes []types.Type
+	selfParam := ctx.IDENTIFIER() // 'c'
+	selfTypeCtx := ctx.Type_()    // '*log'
+	
+	selfType := a.resolveType(selfTypeCtx)
+	paramTypes = append(paramTypes, selfType)
+
+	// 4. Define Symbol
+	// Deinit returns void
+	fnType := types.NewFunction(types.Void, paramTypes, false)
+	a.currentScope.Define(fullName, symbol.SymFunc, fnType)
+
+	// 5. Analyze Body (Phase 2)
+	if a.Phase == 2 || a.Phase == 0 {
+		a.pushScope(ctx)
+		defer a.popScope()
+
+		// Define 'c' (self) in the scope so you can use it inside deinit
+		a.currentScope.Define(selfParam.GetText(), symbol.SymVar, selfType)
+
+		if ctx.Block() != nil {
+			a.scopes[ctx.Block()] = a.currentScope
+			for _, stmt := range ctx.Block().AllStatement() {
+				a.Visit(stmt)
+			}
+		}
+	}
+
+	return nil
+}
