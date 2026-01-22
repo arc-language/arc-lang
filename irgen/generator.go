@@ -274,40 +274,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	return nil
 }
 
-func (g *Generator) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
-	if g.Phase == 1 {
-		name := ctx.IDENTIFIER().GetText()
-		lookupName := name
-		if g.currentNamespace != "" {
-			lookupName = g.currentNamespace + "." + name
-		}
-
-		if sym, ok := g.currentScope.Resolve(lookupName); ok {
-			if st, ok := sym.Type.(*types.StructType); ok {
-				if st.IsClass {
-					// 1. Create a new slice for IR definition: [RefCount, ...Fields]
-					irFields := make([]types.Type, len(st.Fields)+1)
-					irFields[0] = types.I64 // Header
-					copy(irFields[1:], st.Fields)
-					
-					// 2. Define struct
-					defSt := types.NewStruct(st.Name, irFields, st.Packed)
-					g.ctx.Builder.DefineStruct(defSt)
-				} else {
-					g.ctx.Builder.DefineStruct(st)
-				}
-			}
-		}
-	}
-	
-	for _, member := range ctx.AllClassMember() {
-		if member.FunctionDecl() != nil {
-			g.Visit(member.FunctionDecl())
-		}
-	}
-	return nil
-}
-
 // Visit acts as the main dispatcher for the AST nodes.
 func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 	if tree == nil {
