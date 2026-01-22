@@ -402,7 +402,6 @@ func (a *Analyzer) VisitStructLiteral(ctx *parser.StructLiteralContext) interfac
 	
 	// If it's a class with no user fields defined yet, indices might be empty/nil, which is fine
 	if !hasIndices && len(ctx.AllFieldInit()) > 0 {
-		// Only report error if we try to init fields that don't exist
 		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Type '%s' has no fields to initialize", name)
 		return sym.Type
 	}

@@ -343,8 +343,13 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		if ctx.ReturnType() != nil {
 			if ctx.ReturnType().Type_() != nil {
 				retType = a.resolveType(ctx.ReturnType().Type_())
+			} else if ctx.ReturnType().TypeList() != nil {
+				var tupleTypes []types.Type
+				for _, t := range ctx.ReturnType().TypeList().AllType_() {
+					tupleTypes = append(tupleTypes, a.resolveType(t))
+				}
+				retType = types.NewStruct("", tupleTypes, false)
 			}
-			// Handle tuple return types if needed...
 		}
 
 		var paramTypes []types.Type
@@ -611,15 +616,15 @@ func (a *Analyzer) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 	}
 
 	// Phase 1: Register the Type
-	// We use NewClass() here to set the IsClass flag to true
 	if a.Phase == 1 || a.Phase == 0 {
 		if _, ok := a.currentScope.ResolveLocal(name); !ok {
+			// NewClass sets IsClass=true
 			st := types.NewClass(name, nil, false)
 			a.currentScope.Define(name, symbol.SymType, st)
 		}
 	}
 
-	// Phase 2: Resolve Fields (Same logic as Struct, populating .Fields)
+	// Phase 2: Resolve Fields
 	if a.Phase == 1 || a.Phase == 0 {
 		sym, _ := a.currentScope.Resolve(name)
 		if sym != nil {

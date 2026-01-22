@@ -75,13 +75,16 @@ func (g *Generator) exitScope() {
 
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	// 1. Hardware Markers (Standard logic)
+	// Check generic parameters for hardware tags like <gpu>, <cuda>, etc.
 	isGPU := false
 	isROCm := false
 	isCUDA := false
 	isTPU := false
+
 	if gp := ctx.GenericParams(); gp != nil {
 		if gpl := gp.GenericParamList(); gpl != nil {
 			for _, param := range gpl.AllGenericParam() {
+				// Each param might be dotted, but usually tags are single identifiers
 				for _, id := range param.AllIDENTIFIER() {
 					tag := id.GetText()
 					if tag == "gpu" { 
@@ -104,6 +107,8 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	// Determine Parent Context (Struct/Class)
 	var parentName string
 	isMethod := false
+	
+	// Case A: Nested inside Class/Struct block
 	if parent := ctx.GetParent(); parent != nil {
 		if _, ok := parent.(*parser.ClassMemberContext); ok {
 			if classDecl, ok := parent.GetParent().(*parser.ClassDeclContext); ok {
@@ -118,7 +123,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
-	// Handle Flat Methods (func foo(self ...))
+	// Case B: Flat Methods (func foo(self ...))
 	if !isMethod && ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
 			if param.SELF() != nil {
@@ -127,7 +132,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 					t = ptr.ElementType
 				}
 				if st, ok := t.(*types.StructType); ok {
-					// st.Name is typically fully qualified (e.g., "main.log")
+					// st.Name might be fully qualified (e.g. "main.log")
 					parentName = st.Name 
 					isMethod = true
 				}
@@ -142,7 +147,8 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 
 	if isMethod {
 		// Clean parent name if it already has the namespace prefix
-		// This happens because resolveType returns fully qualified names
+		// This handles cases where 'parentName' came from resolveType (which returns qualified names)
+		// vs 'parentName' coming from AST (which is raw)
 		shortParent := parentName
 		if g.currentNamespace != "" {
 			prefix := g.currentNamespace + "."
@@ -157,7 +163,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		if g.currentNamespace != "" {
 			// Lookup: "main.log_printf" (Matches Semantic Symbol)
 			lookupName = g.currentNamespace + "." + methodPart
-			// IR: "main.log_printf" (or underscore if preferred)
+			// IR: "main.log_printf"
 			irName = g.currentNamespace + "_" + methodPart 
 		} else {
 			lookupName = methodPart
@@ -204,6 +210,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 
 		fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
 		
+		// Apply Hardware Markers to Calling Convention
 		if isTPU { 
 			fn.CallConv = ir.CC_TPU 
 		} else if isROCm { 
@@ -214,6 +221,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			fn.CallConv = ir.CC_PTX 
 		}
 
+		// Apply Concurrency Flags
 		if ctx.ASYNC() != nil {
 			fn.FuncType.IsAsync = true
 		} else if ctx.PROCESS() != nil {
@@ -244,6 +252,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			}
 		}
 
+		// Create Allocas for arguments
 		for i, arg := range fn.Arguments {
 			if i < len(paramNames) {
 				arg.SetName(paramNames[i])
@@ -260,6 +269,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			g.Visit(ctx.Block())
 		}
 
+		// Implicit Return
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			g.deferStack.Emit(g)
 			if fn.FuncType.ReturnType == types.Void {
