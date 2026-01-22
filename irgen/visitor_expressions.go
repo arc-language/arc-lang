@@ -1002,22 +1002,82 @@ func (g *Generator) VisitInitializerList(ctx *parser.InitializerListContext) int
 
 func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
+    if ctx.QualifiedIdentifier() != nil {
+        qCtx := ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
+        name = ""
+        for i, id := range qCtx.AllIDENTIFIER() {
+            if i > 0 { name += "." }
+            name += id.GetText()
+        }
+    }
+    
 	sym, ok := g.currentScope.Resolve(name)
 	if !ok {
 		return g.getZeroValue(types.I64)
 	}
 	structType := sym.Type.(*types.StructType)
-	var agg ir.Value = g.ctx.Builder.ConstZero(structType)
 	indices := g.analysis.StructIndices[structType.Name]
+
+	// --- PATH 1: Standard Struct (Value Type) ---
+	if !structType.IsClass {
+		var agg ir.Value = g.ctx.Builder.ConstZero(structType)
+		for _, field := range ctx.AllFieldInit() {
+			fName := field.IDENTIFIER().GetText()
+			fVal := g.Visit(field.Expression()).(ir.Value)
+			if idx, ok := indices[fName]; ok {
+				fVal = g.emitCast(fVal, structType.Fields[idx])
+				agg = g.ctx.Builder.CreateInsertValue(agg, fVal, []int{idx}, "")
+			}
+		}
+		return agg
+	}
+
+	// --- PATH 2: Class (Reference Type) ---
+	
+	// 1. Calculate Size of the underlying IR struct
+	// This includes the implicit i64 header because structType.Fields 
+	// (conceptually) are mapped to IR fields 1..N
+	size := g.ctx.Builder.CreateSizeOf(structType, "class_size")
+
+	// 2. Malloc
+	mallocFunc := g.getOrCreateMalloc()
+	rawPtr := g.ctx.Builder.CreateCall(mallocFunc, []ir.Value{size}, "raw_ptr")
+
+	// 3. Cast i8* to %MyClass*
+	classPtr := g.ctx.Builder.CreateBitCast(rawPtr, types.NewPointer(structType), "obj_ptr")
+
+	// 4. Initialize Ref Count (Index 0) to 1
+	rcPtr := g.ctx.Builder.CreateStructGEP(structType, classPtr, 0, "rc_ptr")
+	g.ctx.Builder.CreateStore(g.ctx.Builder.ConstInt(types.I64, 1), rcPtr)
+
+	// 5. Initialize User Fields (Index 1..N)
+	// We verify fields against the user-visible indices, but write to (index + 1)
 	for _, field := range ctx.AllFieldInit() {
 		fName := field.IDENTIFIER().GetText()
 		fVal := g.Visit(field.Expression()).(ir.Value)
+		
 		if idx, ok := indices[fName]; ok {
 			fVal = g.emitCast(fVal, structType.Fields[idx])
-			agg = g.ctx.Builder.CreateInsertValue(agg, fVal, []int{idx}, "")
+			
+			// Offset by 1 for the header
+			physicalIndex := idx + 1
+			
+			fieldPtr := g.ctx.Builder.CreateStructGEP(structType, classPtr, physicalIndex, fName)
+			g.ctx.Builder.CreateStore(fVal, fieldPtr)
 		}
 	}
-	return agg
+
+	// Return the pointer to the heap object
+	return classPtr
+}
+
+// Helper: Ensure malloc is available
+func (g *Generator) getOrCreateMalloc() *ir.Function {
+	if fn := g.ctx.Module.GetFunction("malloc"); fn != nil {
+		return fn
+	}
+	// declare i8* @malloc(i64)
+	return g.ctx.Builder.DeclareFunction("malloc", types.NewPointer(types.I8), []types.Type{types.I64}, false)
 }
 
 func (g *Generator) checkTypeMatch(val ir.Value, expected types.Type) bool {

@@ -601,6 +601,16 @@ func (a *Analyzer) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 		name = a.currentNamespacePrefix + "." + name
 	}
 
+	// Phase 1: Register the Type
+	// We use NewClass() here to set the IsClass flag to true
+	if a.Phase == 1 || a.Phase == 0 {
+		if _, ok := a.currentScope.ResolveLocal(name); !ok {
+			st := types.NewClass(name, nil, false)
+			a.currentScope.Define(name, symbol.SymType, st)
+		}
+	}
+
+	// Phase 2: Resolve Fields (Same logic as Struct, populating .Fields)
 	if a.Phase == 1 || a.Phase == 0 {
 		sym, _ := a.currentScope.Resolve(name)
 		if sym != nil {

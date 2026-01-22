@@ -291,10 +291,25 @@ func (g *Generator) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 		name := ctx.IDENTIFIER().GetText()
 		if sym, ok := g.currentScope.Resolve(name); ok {
 			if st, ok := sym.Type.(*types.StructType); ok {
-				g.ctx.Builder.DefineStruct(st)
+				// If it is a class, we do NOT use st.Fields directly for the IR definition.
+				// We must prepend the Reference Count header (i64).
+				if st.IsClass {
+					// 1. Create a new slice for IR definition: [RefCount, ...Fields]
+					irFields := make([]types.Type, len(st.Fields)+1)
+					irFields[0] = types.I64 // Header
+					copy(irFields[1:], st.Fields)
+					
+					// 2. Create a temporary type description for the backend definition
+					// We keep the name so it registers as %ClassName
+					defSt := types.NewStruct(st.Name, irFields, st.Packed)
+					g.ctx.Builder.DefineStruct(defSt)
+				} else {
+					g.ctx.Builder.DefineStruct(st)
+				}
 			}
 		}
 	}
+	
 	for _, member := range ctx.AllClassMember() {
 		if member.FunctionDecl() != nil {
 			g.Visit(member.FunctionDecl())
@@ -460,7 +475,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 
 	// --- Phase 2: Local Variable Declarations ---
 	if g.ctx.CurrentFunction != nil && g.Phase == 2 {
-		// 1. Handle Tuple Destructuring: let (a, b) = func()
+		// 1. Handle Tuple Destructuring
 		if ctx.TuplePattern() != nil {
 			if ctx.Expression() == nil {
 				return nil
@@ -492,37 +507,42 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		if ctx.Expression() != nil {
 			initVal = g.Visit(ctx.Expression()).(ir.Value)
 			
-			// FIX: Type Inference
-			// If the source code didn't specify a type (e.g. `let x = ...`), 
-			// we infer it from the initialization expression's type.
+			// Type Inference
 			if ctx.Type_() == nil && initVal != nil {
 				sym.Type = initVal.Type()
 			}
 		}
 
-		// Fallback: If type is still unknown or Void (and no expression provided), default to I64.
 		if sym.Type == nil || sym.Type == types.Void {
 			sym.Type = types.I64
 		}
 
+		// Determine Storage Type
+		// Struct: %MyStruct
+		// Class:  %MyClass* (Pointer to heap object)
+		var storageType types.Type = sym.Type
+		if st, ok := sym.Type.(*types.StructType); ok && st.IsClass {
+			// Variable holds a pointer to the object
+			storageType = types.NewPointer(sym.Type)
+		}
+
 		// Create stack allocation
-		alloca := g.ctx.Builder.CreateAlloca(sym.Type, name+".addr")
+		alloca := g.ctx.Builder.CreateAlloca(storageType, name+".addr")
 		sym.IRValue = alloca
 
 		// Initialize value
 		if initVal != nil {
-			// Edge case: If expression evaluated to Void (e.g. function call with no return),
-			// but we are assigning to a variable, substitute a zero value to maintain IR validity.
 			if initVal.Type() == types.Void {
 				initVal = g.getZeroValue(sym.Type)
 			}
 			
-			// Cast if necessary (e.g. assigning int32 to int64 var)
-			initVal = g.emitCast(initVal, sym.Type)
+			// If it's a class, initVal comes from VisitStructLiteral which returns %MyClass*.
+			// storageType is %MyClass*. This matches.
+			initVal = g.emitCast(initVal, storageType)
 			g.ctx.Builder.CreateStore(initVal, alloca)
 		} else {
-			// Default zero initialization
-			g.ctx.Builder.CreateStore(g.getZeroValue(sym.Type), alloca)
+			// Default zero initialization (Null for classes)
+			g.ctx.Builder.CreateStore(g.getZeroValue(storageType), alloca)
 		}
 	}
 	return nil

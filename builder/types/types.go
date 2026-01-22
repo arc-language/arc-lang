@@ -134,6 +134,11 @@ type StructType struct {
 	Name     string
 	Fields   []Type
 	Packed   bool // If true, no padding between fields
+
+	// IsClass changes the storage behavior:
+	// false = Value Type (Stack, direct fields)
+	// true  = Reference Type (Heap, RefCount Header + fields)
+	IsClass bool
 }
 
 func (t *StructType) Kind() TypeKind { return StructKind }
@@ -306,6 +311,10 @@ func NewPointerWithAddressSpace(elem Type, addrSpace int) *PointerType {
 // NewArray creates an array type
 func NewArray(elem Type, length int64) *ArrayType {
 	return &ArrayType{ElementType: elem, Length: length}
+}
+
+func NewClass(name string, fields []Type, packed bool) *StructType {
+	return &StructType{Name: name, Fields: fields, Packed: packed, IsClass: true}
 }
 
 // NewStruct creates a struct type

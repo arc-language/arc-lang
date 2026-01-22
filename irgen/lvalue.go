@@ -61,7 +61,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		}
 	case *parser.UnaryExpressionContext:
 		if ctx.STAR() != nil {
-			// Explicit dereference: *ptr -> The value of the ptr expression IS the L-Value address
+			// Explicit dereference
 			val := g.Visit(ctx.UnaryExpression()).(ir.Value)
 			return val
 		}
@@ -74,13 +74,10 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		// IDENTIFIER
 		if ctx.IDENTIFIER() != nil && ctx.DOT() == nil && ctx.STAR() == nil && ctx.LBRACKET() == nil {
 			name := ctx.IDENTIFIER().GetText()
-			
-			// Try resolve
 			sym, ok := g.currentScope.Resolve(name)
 			if !ok && g.currentNamespace != "" {
 				sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + name)
 			}
-
 			if ok {
 				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 					return alloca
@@ -106,6 +103,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		if ctx.DOT() != nil {
 			base := g.getLValue(ctx.PostfixExpression())
 			if base == nil {
+				// Base might be a pointer already (like a Class instance)
 				val := g.Visit(ctx.PostfixExpression()).(ir.Value)
 				if types.IsPointer(val.Type()) {
 					base = val
@@ -113,6 +111,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 			}
 			
 			if base != nil {
+				// Dereference pointer-to-pointer if necessary
 				if ptrType, ok := base.Type().(*types.PointerType); ok {
 					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 						base = g.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
@@ -123,7 +122,12 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 				ptrType := base.Type().(*types.PointerType)
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
 					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-						return g.ctx.Builder.CreateStructGEP(st, base, idx, "")
+						// Calculate physical index
+						physicalIndex := idx
+						if st.IsClass {
+							physicalIndex = idx + 1 // Offset for RefCount
+						}
+						return g.ctx.Builder.CreateStructGEP(st, base, physicalIndex, "")
 					}
 				}
 			}
@@ -148,7 +152,6 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 
 			if base != nil {
 				ptrType := base.Type().(*types.PointerType)
-				
 				if _, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
 					zero := g.ctx.Builder.ConstInt(types.I32, 0)
 					return g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, base, []ir.Value{zero, idxVal}, "")
@@ -203,7 +206,11 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 				
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
 					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-						addr = g.ctx.Builder.CreateStructGEP(st, addr, idx, "")
+						physicalIndex := idx
+						if st.IsClass {
+							physicalIndex = idx + 1
+						}
+						addr = g.ctx.Builder.CreateStructGEP(st, addr, physicalIndex, "")
 						continue
 					}
 				}
@@ -215,12 +222,10 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		// Single Identifier
 		if ctx.IDENTIFIER() != nil {
 			name := ctx.IDENTIFIER().GetText()
-			
 			sym, ok := g.currentScope.Resolve(name)
 			if !ok && g.currentNamespace != "" {
 				sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + name)
 			}
-
 			if ok {
 				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 					return alloca
@@ -246,6 +251,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		if addr == nil { return nil }
 		
 		for _, op := range ctx.AllPostfixOp() {
+			// Auto-dereference pointer-to-pointer
 			if ptrType, ok := addr.Type().(*types.PointerType); ok {
 				if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 					addr = g.ctx.Builder.CreateLoad(ptrType.ElementType, addr, "")
@@ -259,7 +265,12 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
 					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-						addr = g.ctx.Builder.CreateStructGEP(st, addr, idx, "")
+						// Calculate physical index (offset by 1 for classes)
+						physicalIndex := idx
+						if st.IsClass {
+							physicalIndex = idx + 1
+						}
+						addr = g.ctx.Builder.CreateStructGEP(st, addr, physicalIndex, "")
 						continue
 					}
 				}
