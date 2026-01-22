@@ -25,7 +25,7 @@ type SymbolDef struct {
 
 type compiler struct {
 	asm          *Assembler
-	runtime      *Runtime // Local type now
+	runtime      *Runtime 
 	data         *bytes.Buffer
 	stackMap     map[ir.Value]int // Value -> RBP offset (negative)
 	frameSize    int
@@ -47,14 +47,12 @@ func Compile(m *ir.Module) (*Artifact, error) {
 		stackMap: make(map[ir.Value]int),
 	}
 
-	// Initialize the runtime generator
 	c.runtime = NewRuntime(c.asm)
 
 	var syms []SymbolDef
 
 	// 1. Compile Globals
 	for _, g := range m.Globals {
-		// Align data to 8 bytes
 		for c.data.Len()%8 != 0 {
 			c.data.WriteByte(0)
 		}
@@ -75,7 +73,6 @@ func Compile(m *ir.Module) (*Artifact, error) {
 			continue
 		}
 
-		// Align text to 16 bytes (NOP padding)
 		for c.asm.Len()%16 != 0 {
 			c.asm.emitByte(0x90)
 		}
@@ -99,34 +96,12 @@ func Compile(m *ir.Module) (*Artifact, error) {
 	}, nil
 }
 
-// emitEntryPoint generates the _start stub.
-func (c *compiler) emitEntryPoint() int {
-	startOffset := c.asm.Len()
-
-	// 0. Initialize Runtime Environment
-	// This installs signal handlers for stack growth before user code runs.
-	c.runtime.EmitInitialization()
-
-	// 1. Call Main
-	c.asm.CallRelative("main")
-
-	// 2. Exit(0)
-	c.asm.Xor(RegOp(RDI), RegOp(RDI))
-	c.asm.Mov(RegOp(RAX), ImmOp(60), 64) // SYS_exit
-	c.asm.Syscall()
-
-	return startOffset
-}
-
 func (c *compiler) compileFunction(fn *ir.Function) error {
 	c.currentFunc = fn
 	c.stackMap = make(map[ir.Value]int)
 	c.blockOffsets = make(map[*ir.BasicBlock]int)
 	c.jumpsToFix = nil
 
-    // --- FIX: Initialize Runtime in Main ---
-    // Since we link with GCC, we don't control _start. 
-    // We inject the setup code (signal handlers) at the top of main.
     if fn.Name() == "main" {
         c.runtime.EmitInitialization()
     }
@@ -147,32 +122,23 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 	// Instructions
 	for _, block := range fn.Blocks {
 		for _, inst := range block.Instructions {
-			// Allocate extra space for AllocaInst underlying memory
 			if alloca, ok := inst.(*ir.AllocaInst); ok {
 				allocSize := SizeOf(alloca.AllocatedType)
 				if count, ok := alloca.NumElements.(*ir.ConstantInt); ok {
 					allocSize *= int(count.Value)
 				}
-				// Align alloca memory to 16 bytes
 				if offset%16 != 0 {
 					offset += 16 - (offset % 16)
 				}
 				offset += allocSize
 				c.stackMap[ir.Value(alloca)] = -offset
-
-				// AllocaInst is "special": the value of the instruction is the address of this slot.
 				continue
 			}
 
-			// Allocate space for result if it has a type (and is not void)
 			if inst.Type() != nil && inst.Type().BitSize() > 0 {
 				size := SizeOf(inst.Type())
-				if size == 0 {
-					size = 1
-				}
-
+				if size == 0 { size = 1 }
 				offset += size
-				// Align to 8 bytes for simple access
 				if offset%8 != 0 {
 					offset += 8 - (offset % 8)
 				}
@@ -181,7 +147,6 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 		}
 	}
 
-	// Align frame to 16 bytes
 	if offset%16 != 0 {
 		offset += 16 - (offset % 16)
 	}
@@ -194,7 +159,7 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 		c.asm.Sub(RegOp(RSP), ImmOp(c.frameSize))
 	}
 
-	// 3. Save Register Arguments (Standard convention)
+	// 3. Save Register Arguments
 	regs := []Register{RDI, RSI, RDX, RCX, R8, R9}
 	xmmRegs := []Register{0, 1, 2, 3, 4, 5, 6, 7}
 
@@ -245,54 +210,66 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 }
 
 func (c *compiler) compileInst(inst ir.Instruction) error {
-	// Route Async Task instructions to the Runtime
+	// Guard against panics
+	if inst == nil {
+		return fmt.Errorf("nil instruction encountered")
+	}
+
 	if inst.Opcode() == ir.OpAsyncTaskCreate {
 		return c.compileAsyncTaskCreate(inst.(*ir.AsyncTaskCreateInst))
 	}
 	if inst.Opcode() == ir.OpAsyncTaskAwait {
 		return c.compileAsyncTaskAwait(inst.(*ir.AsyncTaskAwaitInst))
 	}
-	
-	// NEW: Process check
 	if inst.Opcode() == ir.OpProcessCreate {
 		return c.compileProcessCreate(inst.(*ir.ProcessCreateInst))
 	}
 
+	// Helper to check operands
+	requireOps := func(n int) error {
+		if len(inst.Operands()) < n {
+			return fmt.Errorf("instruction %s (Op %d) requires %d operands, got %d", 
+				inst.String(), inst.Opcode(), n, len(inst.Operands()))
+		}
+		return nil
+	}
+
 	switch inst.Opcode() {
 	case ir.OpAdd:
+		if err := requireOps(2); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
 		c.asm.Add(RegOp(RAX), RegOp(RCX))
 		c.store(RAX, inst)
 
 	case ir.OpSub:
+		if err := requireOps(2); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
 		c.asm.Sub(RegOp(RAX), RegOp(RCX))
 		c.store(RAX, inst)
 
 	case ir.OpMul:
+		if err := requireOps(2); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
 		c.asm.Imul(RAX, RCX)
 		c.store(RAX, inst)
 
 	case ir.OpSDiv:
+		if err := requireOps(2); err != nil { return err }
 		op0 := inst.Operands()[0]
 		op1 := inst.Operands()[1]
 		c.load(RAX, op0)
-		if op0.Type().BitSize() == 32 {
-			c.asm.Movsxd(RAX, RAX)
-		}
+		if op0.Type().BitSize() == 32 { c.asm.Movsxd(RAX, RAX) }
 		c.load(RCX, op1)
-		if op1.Type().BitSize() == 32 {
-			c.asm.Movsxd(RCX, RCX)
-		}
+		if op1.Type().BitSize() == 32 { c.asm.Movsxd(RCX, RCX) }
 		c.asm.Cqo()
 		c.asm.Div(RCX, true)
 		c.store(RAX, inst)
 
 	case ir.OpUDiv:
+		if err := requireOps(2); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
 		c.asm.Xor(RegOp(RDX), RegOp(RDX))
@@ -300,21 +277,19 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.store(RAX, inst)
 
 	case ir.OpSRem:
+		if err := requireOps(2); err != nil { return err }
 		op0 := inst.Operands()[0]
 		op1 := inst.Operands()[1]
 		c.load(RAX, op0)
-		if op0.Type().BitSize() == 32 {
-			c.asm.Movsxd(RAX, RAX)
-		}
+		if op0.Type().BitSize() == 32 { c.asm.Movsxd(RAX, RAX) }
 		c.load(RCX, op1)
-		if op1.Type().BitSize() == 32 {
-			c.asm.Movsxd(RCX, RCX)
-		}
+		if op1.Type().BitSize() == 32 { c.asm.Movsxd(RCX, RCX) }
 		c.asm.Cqo()
 		c.asm.Div(RCX, true)
 		c.store(RDX, inst)
 
 	case ir.OpURem:
+		if err := requireOps(2); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
 		c.asm.Xor(RegOp(RDX), RegOp(RDX))
@@ -322,67 +297,65 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.store(RDX, inst)
 
 	case ir.OpAnd:
+		if err := requireOps(2); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
 		c.asm.And(RegOp(RAX), RegOp(RCX))
 		c.store(RAX, inst)
 
 	case ir.OpOr:
+		if err := requireOps(2); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
 		c.asm.Or(RegOp(RAX), RegOp(RCX))
 		c.store(RAX, inst)
 
 	case ir.OpXor:
+		if err := requireOps(2); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
 		c.asm.Xor(RegOp(RAX), RegOp(RCX))
 		c.store(RAX, inst)
 
 	case ir.OpShl:
+		if err := requireOps(2); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
 		c.asm.Shl(RAX, RCX)
 		c.store(RAX, inst)
 
 	case ir.OpLShr:
+		if err := requireOps(2); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
 		c.asm.Shr(RAX, RCX)
 		c.store(RAX, inst)
 
 	case ir.OpAShr:
+		if err := requireOps(2); err != nil { return err }
 		op0 := inst.Operands()[0]
 		c.load(RAX, op0)
-		if op0.Type().BitSize() == 32 {
-			c.asm.Movsxd(RAX, RAX)
-		}
+		if op0.Type().BitSize() == 32 { c.asm.Movsxd(RAX, RAX) }
 		c.load(RCX, inst.Operands()[1])
 		c.asm.Sar(RAX, RCX)
 		c.store(RAX, inst)
 
 	case ir.OpTrunc:
-		if len(inst.Operands()) == 0 { return fmt.Errorf("OpTrunc missing operand: %s", inst.String()) }
+		if err := requireOps(1); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.store(RAX, inst)
 
 	case ir.OpBitcast:
-		// DEBUG FIX: Panic protection for Bitcast
-		if len(inst.Operands()) == 0 {
-			return fmt.Errorf("OpBitcast missing operand! Inst: %s", inst.String())
-		}
+		if err := requireOps(1); err != nil { return err }
 		c.moveValue(RBP, c.stackMap[inst], inst.Operands()[0])
 
 	case ir.OpZExt:
-		// DEBUG FIX: Panic protection for ZExt
-		if len(inst.Operands()) == 0 {
-			return fmt.Errorf("OpZExt missing operand! Inst: %s", inst.String())
-		}
+		if err := requireOps(1); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.store(RAX, inst)
 
 	case ir.OpSExt:
-		if len(inst.Operands()) == 0 { return fmt.Errorf("OpSExt missing operand") }
+		if err := requireOps(1); err != nil { return err }
 		src := inst.Operands()[0]
 		srcSize := SizeOf(src.Type())
 		c.load(RAX, src)
@@ -394,6 +367,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.store(RAX, inst)
 
 	case ir.OpFPToSI:
+		if err := requireOps(1); err != nil { return err }
 		src := inst.Operands()[0]
 		c.load(RAX, src)
 		c.asm.Push(RAX)
@@ -402,6 +376,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.store(RAX, inst)
 
 	case ir.OpSIToFP:
+		if err := requireOps(1); err != nil { return err }
 		src := inst.Operands()[0]
 		c.load(RAX, src)
 		c.asm.Push(RAX)
@@ -411,24 +386,27 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.asm.Movss(destSlot, RAX)
 
 	case ir.OpAlloca:
-		// No-op: Address is calculated on demand in c.load() via LEA.
+		// No-op
 		return nil
 
 	case ir.OpLoad:
+		if err := requireOps(1); err != nil { return err }
 		ptr := inst.Operands()[0]
-		c.load(RCX, ptr) // RCX = Source Address
+		c.load(RCX, ptr) 
 		c.moveFromMem(RBP, c.stackMap[inst], RCX, 0, SizeOf(inst.Type()))
 
 	case ir.OpStore:
+		if err := requireOps(2); err != nil { return err }
 		val := inst.Operands()[0]
 		ptr := inst.Operands()[1]
-		c.load(RCX, ptr) // RCX = Dest Address
+		c.load(RCX, ptr)
 		c.moveValue(RCX, 0, val)
 
 	case ir.OpGetElementPtr:
 		gep := inst.(*ir.GetElementPtrInst)
+		if err := requireOps(1); err != nil { return err } // At least base ptr
 		base := gep.Operands()[0]
-		c.load(RAX, base) // RAX = Base Pointer
+		c.load(RAX, base)
 
 		indices := gep.Operands()[1:]
 		if len(indices) == 0 {
@@ -475,6 +453,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.store(RAX, inst)
 
 	case ir.OpInsertValue:
+		if err := requireOps(2); err != nil { return err }
 		iv := inst.(*ir.InsertValueInst)
 		agg := iv.Operands()[0]
 		val := iv.Operands()[1]
@@ -497,6 +476,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.moveValue(RBP, destOff+offset, val)
 
 	case ir.OpExtractValue:
+		if err := requireOps(1); err != nil { return err }
 		ev := inst.(*ir.ExtractValueInst)
 		agg := ev.Operands()[0]
 
@@ -528,6 +508,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 
 	case ir.OpSyscall:
 		ops := inst.Operands()
+		if len(ops) == 0 { return fmt.Errorf("syscall requires at least 1 operand") }
 		regs := []Register{RDI, RSI, RDX, R10, R8, R9}
 		c.load(RAX, ops[0])
 		for i, arg := range ops[1:] {
@@ -563,9 +544,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		}
 
 		for i, arg := range call.Operands() {
-			if arg == nil {
-				continue
-			}
+			if arg == nil { continue }
 			isVariadic := i >= fixedParams && calleeVariadic
 			if types.IsFloat(arg.Type()) {
 				if xmmIdx < len(xmmRegs) {
@@ -642,6 +621,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.jumpsToFix = append(c.jumpsToFix, jumpFixup{asmOffset: offTrue, target: cbr.TrueBlock})
 
 	case ir.OpICmp:
+		if err := requireOps(2); err != nil { return err }
 		c.load(RAX, inst.Operands()[0])
 		c.load(RCX, inst.Operands()[1])
 
@@ -696,40 +676,23 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	return nil
 }
 
-// compileAsyncTaskCreate delegates to the Runtime to spawn a smart thread.
 func (c *compiler) compileAsyncTaskCreate(inst *ir.AsyncTaskCreateInst) error {
-	// For V1, we only support direct function calls via async.
 	if inst.Callee == nil {
 		return fmt.Errorf("async_task_create requires direct function call")
 	}
-
-    // Lambda to load a value into a specific register for the Runtime
-    // This allows Runtime (which doesn't have compiler internal access) 
-    // to request value loads during assembly generation.
     loader := func(reg Register, val ir.Value) {
         c.load(reg, val)
     }
-
-    // Emit the runtime sequence to spawn the thread.
-    // We pass 64KB as initial stack reservation.
 	c.runtime.EmitAsyncTaskCreate(inst.Callee, inst.Operands(), 64*1024, loader)
-
-	// Store the result handle (AsyncResult*) returned in RAX
 	c.store(RAX, inst)
 	return nil
 }
 
-// compileAsyncTaskAwait delegates to the Runtime to wait for a task.
 func (c *compiler) compileAsyncTaskAwait(inst *ir.AsyncTaskAwaitInst) error {
+	if len(inst.Operands()) == 0 { return fmt.Errorf("await missing operand") }
 	handleOp := inst.Operands()[0]
-
-	// Load the handle (AsyncResult*) into RCX
 	c.load(RCX, handleOp)
-
-	// Emit the runtime sequence to wait on the futex
 	c.runtime.EmitAsyncTaskAwait(RCX)
-
-	// Runtime guarantees the return value is in RAX after wake-up.
 	c.store(RAX, inst)
 	return nil
 }
@@ -737,6 +700,7 @@ func (c *compiler) compileAsyncTaskAwait(inst *ir.AsyncTaskAwaitInst) error {
 func (c *compiler) getStackSlot(v ir.Value) MemOp {
 	off, ok := c.stackMap[v]
 	if !ok {
+		// Not panic, return error? No, logic error.
 		panic(fmt.Sprintf("Value %v (%s) not allocated in stack map", v, v.Name()))
 	}
 	return NewMem(RBP, off)
@@ -747,7 +711,6 @@ func (c *compiler) load(dst Register, src ir.Value) {
 	case *ir.ConstantInt:
 		c.asm.Mov(RegOp(dst), ImmOp(v.Value), 64)
 	case *ir.ConstantFloat:
-		// Load float bits into integer register (for passing to XMM later or ops)
 		bits := math.Float64bits(v.Value)
 		if v.Type().BitSize() == 32 {
 			bits = uint64(math.Float32bits(float32(v.Value)))
@@ -790,8 +753,6 @@ func (c *compiler) load(dst Register, src ir.Value) {
 }
 
 func (c *compiler) store(src Register, dst ir.Value) {
-	// Optimization: Skip store if stack slot wasn't allocated
-	// (e.g. zero-sized types that didn't get forced to 1 byte, or skipped intentionally)
 	if _, ok := c.stackMap[dst]; !ok {
 		return
 	}
@@ -809,7 +770,6 @@ func (c *compiler) store(src Register, dst ir.Value) {
 	}
 }
 
-// moveValue copies 'src' Value to [dstBase + dstDisp] handling any size
 func (c *compiler) moveValue(dstBase Register, dstDisp int, src ir.Value) {
 	if alloca, ok := src.(*ir.AllocaInst); ok {
 		off := c.stackMap[alloca]
@@ -951,15 +911,11 @@ func (c *compiler) emitConstant(k ir.Constant) error {
 		}
 	case *ir.ConstantArray:
 		for _, elem := range v.Elements {
-			if err := c.emitConstant(elem); err != nil {
-				return err
-			}
+			if err := c.emitConstant(elem); err != nil { return err }
 		}
 	case *ir.ConstantStruct:
 		st, ok := v.Type().(*types.StructType)
-		if !ok {
-			return fmt.Errorf("ConstantStruct has non-struct type")
-		}
+		if !ok { return fmt.Errorf("ConstantStruct has non-struct type") }
 
 		currentOffset := 0
 		for i, field := range v.Fields {
@@ -969,10 +925,7 @@ func (c *compiler) emitConstant(k ir.Constant) error {
 				c.data.Write(make([]byte, padding))
 				currentOffset += padding
 			}
-
-			if err := c.emitConstant(field); err != nil {
-				return err
-			}
+			if err := c.emitConstant(field); err != nil { return err }
 			currentOffset += SizeOf(field.Type())
 		}
 		totalSize := SizeOf(v.Type())
@@ -992,24 +945,14 @@ func (c *compiler) emitConstant(k ir.Constant) error {
 }
 
 func (c *compiler) compileProcessCreate(inst *ir.ProcessCreateInst) error {
-	// 1. Use preserved registers (R12-R15, RBX) to hold arguments across the fork.
-	// We map the first 5 args to R12, R13, R14, R15, RBX.
 	preservedRegs := []Register{R12, R13, R14, R15, RBX}
-	
-	// Only support 5 args for V1 process creation
 	if len(inst.Operands()) > len(preservedRegs) {
 		return fmt.Errorf("process_create currently supports max 5 arguments")
 	}
-
-	// Load args into preserved registers
 	for i, arg := range inst.Operands() {
 		c.load(preservedRegs[i], arg)
 	}
-
-	// 2. Emit the Fork/Clone logic
 	c.runtime.EmitProcessCreate(inst.Callee, len(inst.Operands()))
-
-	// 3. Store result (PID) to destination
 	c.store(RAX, inst)
 	return nil
 }
