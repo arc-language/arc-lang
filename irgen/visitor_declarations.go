@@ -459,7 +459,7 @@ func (g *Generator) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface
 }
 
 func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
-	// --- Phase 1: Global Variables ---
+	// --- Phase 1: Global Variable Declarations ---
 	if g.ctx.CurrentFunction == nil && g.Phase == 1 {
 		name := ctx.IDENTIFIER().GetText()
 		lookupName := name
@@ -468,18 +468,22 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		}
 
 		sym, ok := g.currentScope.Resolve(lookupName)
-		if !ok { return nil }
+		if !ok {
+			return nil
+		}
 		
 		var init ir.Constant = g.ctx.Builder.ConstZero(sym.Type)
+		// (Optional: constant expression evaluation here)
+		
 		glob := g.ctx.Builder.CreateGlobalVariable(name, sym.Type, init)
 		sym.IRValue = glob
 		return nil
 	}
 
-	// --- Phase 2: Local Variables ---
+	// --- Phase 2: Local Variable Declarations ---
 	if g.ctx.CurrentFunction != nil && g.Phase == 2 {
 		
-		// 1. Tuple Destructuring
+		// 1. Handle Tuple Destructuring: let (a, b) = ...
 		if ctx.TuplePattern() != nil {
 			if ctx.Expression() == nil { return nil }
 			val := g.Visit(ctx.Expression()).(ir.Value)
@@ -497,7 +501,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 			return nil
 		}
 
-		// 2. Standard Declaration
+		// 2. Handle Standard Declaration: let x = val
 		name := ctx.IDENTIFIER().GetText()
 		sym, ok := g.currentScope.Resolve(name)
 		if !ok { return nil }
@@ -506,7 +510,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		if ctx.Expression() != nil {
 			initVal = g.Visit(ctx.Expression()).(ir.Value)
 			
-			// Type Inference: Sync IR type with Expression type
+			// Type Inference
 			if ctx.Type_() == nil && initVal != nil {
 				sym.Type = initVal.Type()
 			}
@@ -516,35 +520,46 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 			sym.Type = types.I64
 		}
 
-		// 3. Determine Storage & Class Status
+		// 3. Determine Storage Strategy & Class Detection
 		var storageType types.Type = sym.Type
 		isClass := false
 		var structType *types.StructType
 
-		// DEBUG: Print detection info
-		fmt.Printf("[IRGen] Var '%s' Type: %s Kind: %d\n", name, sym.Type.String(), sym.Type.Kind())
-
-		// Check A: Type is directly a Class Struct
-		if st, ok := sym.Type.(*types.StructType); ok && st.IsClass {
-			fmt.Printf("[IRGen] '%s' detected as Direct Class\n", name)
-			isClass = true
-			structType = st
-			storageType = types.NewPointer(sym.Type)
-		} else if ptr, ok := sym.Type.(*types.PointerType); ok {
-			// Check B: Type is a Pointer to a Class
-			if st, ok := ptr.ElementType.(*types.StructType); ok && st.IsClass {
-				fmt.Printf("[IRGen] '%s' detected as Pointer to Class\n", name)
+		// Check A: Type is directly a StructType
+		if st, ok := sym.Type.(*types.StructType); ok {
+			// Primary Check: Is it flagged as a class in Semantics?
+			if st.IsClass {
 				isClass = true
 				structType = st
-				storageType = sym.Type 
+				storageType = types.NewPointer(sym.Type)
+			} else {
+				// Secondary Check: Consult the IR Module definitions
+				// If Semantics missed the flag but IRGen Declarations registered it as a Class, we sync up.
+				// This handles cases where scopes might have disjoint type definitions.
+				if modSt, found := g.ctx.Module.Types[st.Name]; found && modSt.IsClass {
+					fmt.Printf("[IRGen] Info: Syncing Class status for %s from Module\n", st.Name)
+					isClass = true
+					structType = modSt
+					storageType = types.NewPointer(modSt)
+					sym.Type = modSt // Update symbol to prevent future mismatches
+				}
+			}
+		} else if ptr, ok := sym.Type.(*types.PointerType); ok {
+			// Check B: Type is a Pointer to a Class (e.g. from 'new' or struct literal)
+			if st, ok := ptr.ElementType.(*types.StructType); ok && st.IsClass {
+				isClass = true
+				structType = st
+				storageType = sym.Type // Already a pointer
 			}
 		}
 
 		// 4. Allocate Stack Slot
+		// For structs, we allocate the size of the struct.
+		// For classes, we allocate the size of a pointer.
 		alloca := g.ctx.Builder.CreateAlloca(storageType, name+".addr")
 		sym.IRValue = alloca
 
-		// 5. Store Initial Value
+		// 5. Initialize Value
 		if initVal != nil {
 			if initVal.Type() == types.Void {
 				initVal = g.getZeroValue(storageType)
@@ -555,27 +570,28 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 			g.ctx.Builder.CreateStore(g.getZeroValue(storageType), alloca)
 		}
 
-		// 6. ARC Injection (Cleanup)
+		// 6. Automatic Reference Counting (ARC) Injection
 		if isClass {
-			fmt.Printf("[IRGen] Injecting ARC Defer for '%s'\n", name)
-			
 			g.deferStack.Add(func(gen *Generator) {
-				// A. Load pointer
+				// A. Load Object Pointer
+				// %obj = load %MyClass*, %MyClass** %alloca
 				objPtr := gen.ctx.Builder.CreateLoad(storageType, alloca, name+".arc_load")
 
-				// B. Get RefCount (Index 0)
+				// B. Get RefCount Pointer (Index 0)
+				// Note: Index 0 is the hidden i64 header
 				rcPtr := gen.ctx.Builder.CreateStructGEP(structType, objPtr, 0, "rc_ptr")
 
-				// C. Decrement
+				// C. Decrement RefCount
 				rc := gen.ctx.Builder.CreateLoad(types.I64, rcPtr, "rc_val")
 				one := gen.ctx.Builder.ConstInt(types.I64, 1)
 				newRc := gen.ctx.Builder.CreateSub(rc, one, "rc_dec")
 				gen.ctx.Builder.CreateStore(newRc, rcPtr)
 
-				// D. Branch on Zero
+				// D. Check if Zero
 				zero := gen.ctx.Builder.ConstInt(types.I64, 0)
 				isZero := gen.ctx.Builder.CreateICmpEQ(newRc, zero, "is_zero")
 
+				// E. Conditional Branch (Free vs Continue)
 				funcObj := gen.ctx.CurrentFunction
 				freeBlock := gen.ctx.Builder.CreateBlockInFunction("arc_free", funcObj)
 				contBlock := gen.ctx.Builder.CreateBlockInFunction("arc_cont", funcObj)
@@ -585,21 +601,18 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 				// --- FREE BLOCK ---
 				gen.ctx.Builder.SetInsertPoint(freeBlock)
 
-				// 1. Call Deinit (main.log_deinit)
-				// Note: Use string concatenation to ensure namespace matching
+				// 1. Call User Deinit (e.g. main.log_deinit)
 				deinitName := structType.Name + "_deinit"
-				
-				// Try full lookup first
-				deinitSym, ok := gen.currentScope.Resolve(deinitName)
-				
-				if ok && deinitSym.IRValue != nil {
+				if deinitSym, ok := gen.currentScope.Resolve(deinitName); ok {
 					if fn, ok := deinitSym.IRValue.(*ir.Function); ok {
 						gen.ctx.Builder.CreateCall(fn, []ir.Value{objPtr}, "")
 					}
 				}
 
 				// 2. Call Free
+				// Bitcast to i8* for free()
 				voidPtr := gen.ctx.Builder.CreateBitCast(objPtr, types.NewPointer(types.I8), "")
+				
 				freeFn := gen.ctx.Module.GetFunction("free")
 				if freeFn == nil {
 					freeFn = gen.ctx.Builder.DeclareFunction("free", types.Void, []types.Type{types.NewPointer(types.I8)}, false)
