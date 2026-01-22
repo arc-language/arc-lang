@@ -74,35 +74,29 @@ func (g *Generator) exitScope() {
 }
 
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
-	// 1. Hardware Markers
+	// 1. Hardware Markers (Standard logic)
 	isGPU := false
 	isROCm := false
 	isCUDA := false
 	isTPU := false
-
 	if gp := ctx.GenericParams(); gp != nil {
 		if gpl := gp.GenericParamList(); gpl != nil {
 			for _, param := range gpl.AllGenericParam() {
 				for _, id := range param.AllIDENTIFIER() {
 					tag := id.GetText()
-					if tag == "gpu" { 
-						isGPU = true 
-					} else if tag == "rocm" { 
-						isROCm = true 
-					} else if tag == "cuda" { 
-						isCUDA = true 
-					} else if tag == "tpu" { 
-						isTPU = true 
-					}
+					if tag == "gpu" { isGPU = true } 
+					else if tag == "rocm" { isROCm = true } 
+					else if tag == "cuda" { isCUDA = true } 
+					else if tag == "tpu" { isTPU = true }
 				}
 			}
 		}
 	}
 
-	// 2. Resolve Name (Clean Identifier)
+	// 2. Resolve Name
 	name := ctx.IDENTIFIER().GetText()
-	irName := name
-
+	
+	// Determine Parent Context (Struct/Class)
 	var parentName string
 	isMethod := false
 	if parent := ctx.GetParent(); parent != nil {
@@ -119,7 +113,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
-	// Flat Methods
+	// Handle Flat Methods (func foo(self ...))
 	if !isMethod && ctx.ParameterList() != nil {
 		for _, param := range ctx.ParameterList().AllParameter() {
 			if param.SELF() != nil {
@@ -128,7 +122,8 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 					t = ptr.ElementType
 				}
 				if st, ok := t.(*types.StructType); ok {
-					parentName = st.Name
+					// st.Name is typically fully qualified (e.g., "main.log")
+					parentName = st.Name 
 					isMethod = true
 				}
 				break
@@ -136,20 +131,50 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 	}
 
+	// 3. Construct Names (IR Name & Lookup Name)
+	var lookupName string
+	var irName string
+
 	if isMethod {
-		irName = parentName + "_" + name
-	} else if g.currentNamespace != "" && name != "main" {
-		irName = g.currentNamespace + "_" + name
+		// Clean parent name if it already has the namespace prefix
+		// This happens because resolveType returns fully qualified names
+		shortParent := parentName
+		if g.currentNamespace != "" {
+			prefix := g.currentNamespace + "."
+			if len(parentName) > len(prefix) && parentName[:len(prefix)] == prefix {
+				shortParent = parentName[len(prefix):]
+			}
+		}
+
+		// Base method name: "log_printf"
+		methodPart := shortParent + "_" + name
+		
+		if g.currentNamespace != "" {
+			// Lookup: "main.log_printf" (Matches Semantic Symbol)
+			lookupName = g.currentNamespace + "." + methodPart
+			// IR: "main.log_printf" (or underscore if preferred)
+			irName = g.currentNamespace + "_" + methodPart 
+		} else {
+			lookupName = methodPart
+			irName = methodPart
+		}
+	} else {
+		// Standard Function
+		if g.currentNamespace != "" && name != "main" {
+			lookupName = g.currentNamespace + "." + name
+			irName = g.currentNamespace + "_" + name
+		} else {
+			lookupName = name
+			irName = name
+		}
 	}
 
-	lookupName := name
-	if isMethod {
-		lookupName = parentName + "_" + name
-	} else if g.currentNamespace != "" && name != "main" {
-		lookupName = g.currentNamespace + "." + name
+	// 4. Resolve Symbol
+	sym, ok := g.currentScope.Resolve(lookupName)
+	if !ok {
+		// Fallback: Try without namespace (global scope legacy)
+		sym, ok = g.currentScope.Resolve(name)
 	}
-
-	sym, _ := g.currentScope.Resolve(lookupName)
 
 	// --- Phase 1: Prototype ---
 	if g.Phase == 1 {
@@ -173,18 +198,12 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 
 		fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
+		
+		if isTPU { fn.CallConv = ir.CC_TPU } 
+		else if isROCm { fn.CallConv = ir.CC_ROCM } 
+		else if isCUDA { fn.CallConv = ir.CC_PTX } 
+		else if isGPU { fn.CallConv = ir.CC_PTX }
 
-		if isTPU { 
-			fn.CallConv = ir.CC_TPU 
-		} else if isROCm { 
-			fn.CallConv = ir.CC_ROCM 
-		} else if isCUDA { 
-			fn.CallConv = ir.CC_PTX 
-		} else if isGPU { 
-			fn.CallConv = ir.CC_PTX 
-		}
-
-		// Set Flags (Clean Token Check)
 		if ctx.ASYNC() != nil {
 			fn.FuncType.IsAsync = true
 		} else if ctx.PROCESS() != nil {
@@ -241,6 +260,40 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 		
 		g.ctx.ExitFunction()
+	}
+	return nil
+}
+
+func (g *Generator) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
+	if g.Phase == 1 {
+		name := ctx.IDENTIFIER().GetText()
+		lookupName := name
+		if g.currentNamespace != "" {
+			lookupName = g.currentNamespace + "." + name
+		}
+
+		if sym, ok := g.currentScope.Resolve(lookupName); ok {
+			if st, ok := sym.Type.(*types.StructType); ok {
+				if st.IsClass {
+					// 1. Create a new slice for IR definition: [RefCount, ...Fields]
+					irFields := make([]types.Type, len(st.Fields)+1)
+					irFields[0] = types.I64 // Header
+					copy(irFields[1:], st.Fields)
+					
+					// 2. Define struct
+					defSt := types.NewStruct(st.Name, irFields, st.Packed)
+					g.ctx.Builder.DefineStruct(defSt)
+				} else {
+					g.ctx.Builder.DefineStruct(st)
+				}
+			}
+		}
+	}
+	
+	for _, member := range ctx.AllClassMember() {
+		if member.FunctionDecl() != nil {
+			g.Visit(member.FunctionDecl())
+		}
 	}
 	return nil
 }
