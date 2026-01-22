@@ -1,6 +1,7 @@
 package irgen
 
 import (
+	"fmt"
 
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
@@ -521,18 +522,18 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		var structType *types.StructType
 
 		// DEBUG: Print detection info
-		// fmt.Printf("[IRGen] Var '%s' Type: %s Kind: %d\n", name, sym.Type.String(), sym.Type.Kind())
+		fmt.Printf("[IRGen] Var '%s' Type: %s Kind: %d\n", name, sym.Type.String(), sym.Type.Kind())
 
 		// Check A: Type is directly a Class Struct
 		if st, ok := sym.Type.(*types.StructType); ok && st.IsClass {
-			// fmt.Printf("[IRGen] '%s' detected as Direct Class\n", name)
+			fmt.Printf("[IRGen] '%s' detected as Direct Class\n", name)
 			isClass = true
 			structType = st
 			storageType = types.NewPointer(sym.Type)
 		} else if ptr, ok := sym.Type.(*types.PointerType); ok {
 			// Check B: Type is a Pointer to a Class
 			if st, ok := ptr.ElementType.(*types.StructType); ok && st.IsClass {
-				// fmt.Printf("[IRGen] '%s' detected as Pointer to Class\n", name)
+				fmt.Printf("[IRGen] '%s' detected as Pointer to Class\n", name)
 				isClass = true
 				structType = st
 				storageType = sym.Type 
@@ -556,7 +557,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 
 		// 6. ARC Injection (Cleanup)
 		if isClass {
-			// fmt.Printf("[IRGen] Injecting ARC Defer for '%s'\n", name)
+			fmt.Printf("[IRGen] Injecting ARC Defer for '%s'\n", name)
 			
 			g.deferStack.Add(func(gen *Generator) {
 				// A. Load pointer
