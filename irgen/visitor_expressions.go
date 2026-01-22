@@ -371,6 +371,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	var currPtr ir.Value = g.getLValue(ctx.PrimaryExpression())
 	var curr ir.Value
 
+	// LValue vs RValue loading logic
 	if currPtr != nil {
 		if _, isFn := currPtr.(*ir.Function); isFn {
 			curr = currPtr
@@ -414,7 +415,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				}
 			}
 
-			// Handle implicit 'this' pointer load if needed
+			// Implicit 'this' load
 			if currPtr != nil && targetType != nil && len(targetType.ParamTypes) > 0 {
 				if g.checkTypeMatch(currPtr, targetType.ParamTypes[0]) {
 					args = append(args, currPtr)
@@ -450,30 +451,20 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			}
 
 			if curr != nil {
-				// --- UPDATED LOGIC START ---
-				isAsync := targetType != nil && targetType.IsAsync
-				isProcess := targetType != nil && targetType.IsProcess
-
-				if isAsync {
-					// 1. ASYNC THREAD
+				// Call Generation Logic
+				if targetType != nil && targetType.IsAsync {
 					if fn, ok := curr.(*ir.Function); ok {
 						curr = g.ctx.Builder.CreateAsyncTask(fn, args, "")
 					} else {
-						// Indirect async fallback
 						call := g.ctx.Builder.CreateIndirectCall(curr, args, "")
 						call.SetType(targetType.ReturnType)
 						curr = call
 					}
-				} else if isProcess {
-					// 2. PROCESS FORK
+				} else if targetType != nil && targetType.IsProcess {
 					if fn, ok := curr.(*ir.Function); ok {
 						curr = g.ctx.Builder.CreateProcess(fn, args, "")
-					} else {
-						// Indirect process calls not supported yet
-						fmt.Println("[IRGen] Error: Indirect calls to 'process' functions are not supported yet.")
 					}
 				} else {
-					// 3. STANDARD CALL
 					if fn, ok := curr.(*ir.Function); ok {
 						curr = g.ctx.Builder.CreateCall(fn, args, "")
 					} else {
@@ -484,8 +475,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 						curr = call
 					}
 				}
-				// --- UPDATED LOGIC END ---
-
 				currPtr = nil
 				pendingFnType = nil
 			}
@@ -510,20 +499,35 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				ptrType = basePtr.Type().(*types.PointerType)
 
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
+					// 1. Try Field Access
 					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-						currPtr = g.ctx.Builder.CreateStructGEP(st, basePtr, idx, "")
+						physicalIndex := idx
+						if st.IsClass {
+							physicalIndex = idx + 1
+						}
+						currPtr = g.ctx.Builder.CreateStructGEP(st, basePtr, physicalIndex, "")
 						curr = g.ctx.Builder.CreateLoad(st.Fields[idx], currPtr, "")
 						continue
 					}
 
+					// 2. Try Method Access
+					// Construct method name: StructName_MethodName
+					// st.Name typically already includes the namespace (e.g., "main.log")
 					methodName := st.Name + "_" + fieldName
+					
 					if methodSym, ok := g.currentScope.Resolve(methodName); ok {
 						if ft, ok := methodSym.Type.(*types.FunctionType); ok {
 							pendingFnType = ft
 						}
 						if methodSym.IRValue != nil {
-							curr = methodSym.IRValue
-							currPtr = basePtr
+							// Return a BoundMethod to hold the function + 'this' pointer
+							thisArg := basePtr
+							
+							curr = &BoundMethod{
+								Fn:   methodSym.IRValue.(*ir.Function),
+								This: thisArg,
+							}
+							currPtr = basePtr // Keep basePtr context
 							continue
 						}
 					}
@@ -565,7 +569,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			}
 			continue
 		}
-
+		
 		// --- Increment/Decrement ---
 		if op.INCREMENT() != nil || op.DECREMENT() != nil {
 			if currPtr == nil {
