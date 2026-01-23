@@ -553,6 +553,50 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			}
 			continue
 		}
+
+		// --- Increment/Decrement ---
+		if op.INCREMENT() != nil || op.DECREMENT() != nil {
+			if currPtr != nil {
+				oldVal := curr
+				var newVal ir.Value
+
+				if types.IsFloat(oldVal.Type()) {
+					one := g.ctx.Builder.ConstFloat(oldVal.Type().(*types.FloatType), 1.0)
+					if op.INCREMENT() != nil {
+						newVal = g.ctx.Builder.CreateFAdd(oldVal, one, "")
+					} else {
+						newVal = g.ctx.Builder.CreateFSub(oldVal, one, "")
+					}
+				} else if ptrType, ok := oldVal.Type().(*types.PointerType); ok {
+					// Pointer arithmetic
+					var offset int64 = 1
+					if op.DECREMENT() != nil {
+						offset = -1
+					}
+					idx := g.ctx.Builder.ConstInt(types.I64, offset)
+					newVal = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, oldVal, []ir.Value{idx}, "")
+				} else {
+					// Integer arithmetic
+					var one ir.Value
+					if intTy, ok := oldVal.Type().(*types.IntType); ok {
+						one = g.ctx.Builder.ConstInt(intTy, 1)
+					} else {
+						one = g.ctx.Builder.ConstInt(types.I64, 1)
+					}
+
+					if op.INCREMENT() != nil {
+						newVal = g.ctx.Builder.CreateAdd(oldVal, one, "")
+					} else {
+						newVal = g.ctx.Builder.CreateSub(oldVal, one, "")
+					}
+				}
+
+				g.ctx.Builder.CreateStore(newVal, currPtr)
+				curr = oldVal // Postfix returns original value
+				currPtr = nil // Result is R-Value
+			}
+			continue
+		}
 	}
 	return curr
 }
