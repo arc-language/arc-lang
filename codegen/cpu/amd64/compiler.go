@@ -629,13 +629,85 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	case ir.OpCondBr:
 		cbr := inst.(*ir.CondBrInst)
 		if cbr.Condition == nil { return fmt.Errorf("CondBr missing condition") }
-		c.load(RAX, cbr.Condition)
-		c.asm.Test(RAX, RAX)
-		offFalse := c.asm.JccRel(CondEq, 0)
-		c.jumpsToFix = append(c.jumpsToFix, jumpFixup{asmOffset: offFalse, target: cbr.FalseBlock})
-		c.handlePhi(inst.Parent(), cbr.TrueBlock)
-		offTrue := c.asm.JmpRel(0)
-		c.jumpsToFix = append(c.jumpsToFix, jumpFixup{asmOffset: offTrue, target: cbr.TrueBlock})
+		
+		// OPTIMIZATION: If condition is a comparison instruction, compile it directly
+		if icmp, ok := cbr.Condition.(*ir.ICmpInst); ok {
+			lhs := icmp.Operands()[0]
+			rhs := icmp.Operands()[1]
+			
+			// Load operands and perform comparison
+			c.load(RAX, lhs)
+			if types.IsFloat(lhs.Type()) {
+				// Float comparison would need special handling
+				c.load(RCX, rhs)
+				c.asm.Test(RAX, RAX) // Fallback to generic test
+			} else {
+				// Signed comparison handling
+				isSigned := false
+				switch icmp.Predicate {
+				case ir.ICmpSLT, ir.ICmpSLE, ir.ICmpSGT, ir.ICmpSGE:
+					isSigned = true
+				}
+				
+				if isSigned && lhs.Type().BitSize() == 32 {
+					c.asm.Movsxd(RAX, RAX)
+				}
+				
+				c.load(RCX, rhs)
+				
+				if isSigned && rhs.Type().BitSize() == 32 {
+					c.asm.Movsxd(RCX, RCX)
+				}
+				
+				c.asm.Cmp(RegOp(RAX), RegOp(RCX))
+			}
+			
+			// Map predicate to condition code
+			var cc CondCode
+			switch icmp.Predicate {
+			case ir.ICmpEQ:
+				cc = CondEq
+			case ir.ICmpNE:
+				cc = CondNe
+			case ir.ICmpSLT:
+				cc = CondLt
+			case ir.ICmpSLE:
+				cc = CondLe
+			case ir.ICmpSGT:
+				cc = CondGt
+			case ir.ICmpSGE:
+				cc = CondGe
+			case ir.ICmpULT:
+				cc = CondBlo
+			case ir.ICmpULE:
+				cc = CondBle
+			case ir.ICmpUGT:
+				cc = CondA
+			case ir.ICmpUGE:
+				cc = CondAe
+			default:
+				cc = CondNe
+			}
+			
+			// Jump to true block if condition is met
+			c.handlePhi(inst.Parent(), cbr.TrueBlock)
+			offTrue := c.asm.JccRel(cc, 0)
+			c.jumpsToFix = append(c.jumpsToFix, jumpFixup{asmOffset: offTrue, target: cbr.TrueBlock})
+			
+			// Fall through to false block
+			c.handlePhi(inst.Parent(), cbr.FalseBlock)
+			offFalse := c.asm.JmpRel(0)
+			c.jumpsToFix = append(c.jumpsToFix, jumpFixup{asmOffset: offFalse, target: cbr.FalseBlock})
+		} else {
+			// Generic condition: load and test
+			c.load(RAX, cbr.Condition)
+			c.asm.Test(RAX, RAX)
+			offFalse := c.asm.JccRel(CondEq, 0)
+			c.jumpsToFix = append(c.jumpsToFix, jumpFixup{asmOffset: offFalse, target: cbr.FalseBlock})
+			c.handlePhi(inst.Parent(), cbr.TrueBlock)
+			offTrue := c.asm.JmpRel(0)
+			c.jumpsToFix = append(c.jumpsToFix, jumpFixup{asmOffset: offTrue, target: cbr.TrueBlock})
+		}
 
 	case ir.OpICmp:
 		if err := requireOps(2); err != nil { return err }
@@ -687,13 +759,8 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	case ir.OpPhi:
 		return nil
 
-	// NEW: OpSelect support
 	case ir.OpSelect:
 		if err := requireOps(3); err != nil { return err }
-		// Op0: Cond, Op1: TrueVal, Op2: FalseVal
-		// CMOV is tricky because it requires same register size and specific conditions.
-		// Simplified fallback: Branching implementation.
-		
 		cond := inst.Operands()[0]
 		trueVal := inst.Operands()[1]
 		falseVal := inst.Operands()[2]
@@ -701,24 +768,17 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.load(RAX, cond)
 		c.asm.Test(RAX, RAX)
 		
-		// If 0, jump to false case
 		offFalse := c.asm.JccRel(CondEq, 0)
-		
-		// True Case
 		c.load(RAX, trueVal)
 		offDone := c.asm.JmpRel(0)
 		
-		// False Case
 		c.asm.PatchInt32(offFalse, int32(c.asm.Len() - (offFalse + 4)))
 		c.load(RAX, falseVal)
 		
-		// Merge
 		c.asm.PatchInt32(offDone, int32(c.asm.Len() - (offDone + 4)))
 		c.store(RAX, inst)
 
-	// NEW: OpUnreachable support
 	case ir.OpUnreachable:
-		// UD2 instruction (Undefined Operation) raises SIGILL
 		c.asm.emitByte(0x0F)
 		c.asm.emitByte(0x0B)
 
