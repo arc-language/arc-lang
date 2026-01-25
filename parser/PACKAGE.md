@@ -593,15 +593,15 @@ func (s *AlignofExpressionContext) ALIGNOF() antlr.TerminalNode
 
 func (s *AlignofExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *AlignofExpressionContext) GT() antlr.TerminalNode
-
 func (s *AlignofExpressionContext) GetParser() antlr.Parser
 
 func (s *AlignofExpressionContext) GetRuleContext() antlr.RuleContext
 
 func (*AlignofExpressionContext) IsAlignofExpressionContext()
 
-func (s *AlignofExpressionContext) LT() antlr.TerminalNode
+func (s *AlignofExpressionContext) LPAREN() antlr.TerminalNode
+
+func (s *AlignofExpressionContext) RPAREN() antlr.TerminalNode
 
 func (s *AlignofExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
@@ -4987,9 +4987,9 @@ type IAlignofExpressionContext interface {
 
 	// Getter signatures
 	ALIGNOF() antlr.TerminalNode
-	LT() antlr.TerminalNode
+	LPAREN() antlr.TerminalNode
 	Type_() ITypeContext
-	GT() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
 
 	// IsAlignofExpressionContext differentiates from other interfaces.
 	IsAlignofExpressionContext()
@@ -6862,9 +6862,9 @@ type ISizeofExpressionContext interface {
 
 	// Getter signatures
 	SIZEOF() antlr.TerminalNode
-	LT() antlr.TerminalNode
+	LPAREN() antlr.TerminalNode
 	Type_() ITypeContext
-	GT() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
 
 	// IsSizeofExpressionContext differentiates from other interfaces.
 	IsSizeofExpressionContext()
@@ -8259,15 +8259,15 @@ func NewSizeofExpressionContext(parser antlr.Parser, parent antlr.ParserRuleCont
 
 func (s *SizeofExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *SizeofExpressionContext) GT() antlr.TerminalNode
-
 func (s *SizeofExpressionContext) GetParser() antlr.Parser
 
 func (s *SizeofExpressionContext) GetRuleContext() antlr.RuleContext
 
 func (*SizeofExpressionContext) IsSizeofExpressionContext()
 
-func (s *SizeofExpressionContext) LT() antlr.TerminalNode
+func (s *SizeofExpressionContext) LPAREN() antlr.TerminalNode
+
+func (s *SizeofExpressionContext) RPAREN() antlr.TerminalNode
 
 func (s *SizeofExpressionContext) SIZEOF() antlr.TerminalNode
 

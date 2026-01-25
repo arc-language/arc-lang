@@ -407,8 +407,8 @@ computeContext
     | IDENTIFIER
     ;
 
-sizeofExpression: SIZEOF LT type GT;
-alignofExpression: ALIGNOF LT type GT;
+sizeofExpression: SIZEOF LPAREN type RPAREN;
+alignofExpression: ALIGNOF LPAREN type RPAREN;
 
 literal
     : INTEGER_LITERAL

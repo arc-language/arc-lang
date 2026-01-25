@@ -726,9 +726,9 @@ func arcparserParserInit() {
 		0, 1294, 1295, 1, 0, 0, 0, 1295, 1296, 5, 103, 0, 0, 1296, 209, 1, 0, 0,
 		0, 1297, 1300, 3, 130, 65, 0, 1298, 1300, 5, 118, 0, 0, 1299, 1297, 1,
 		0, 0, 0, 1299, 1298, 1, 0, 0, 0, 1300, 211, 1, 0, 0, 0, 1301, 1302, 5,
-		66, 0, 0, 1302, 1303, 5, 93, 0, 0, 1303, 1304, 3, 122, 61, 0, 1304, 1305,
-		5, 94, 0, 0, 1305, 213, 1, 0, 0, 0, 1306, 1307, 5, 67, 0, 0, 1307, 1308,
-		5, 93, 0, 0, 1308, 1309, 3, 122, 61, 0, 1309, 1310, 5, 94, 0, 0, 1310,
+		66, 0, 0, 1302, 1303, 5, 102, 0, 0, 1303, 1304, 3, 122, 61, 0, 1304, 1305,
+		5, 103, 0, 0, 1305, 213, 1, 0, 0, 0, 1306, 1307, 5, 67, 0, 0, 1307, 1308,
+		5, 102, 0, 0, 1308, 1309, 3, 122, 61, 0, 1309, 1310, 5, 103, 0, 0, 1310,
 		215, 1, 0, 0, 0, 1311, 1319, 5, 114, 0, 0, 1312, 1319, 5, 115, 0, 0, 1313,
 		1319, 5, 116, 0, 0, 1314, 1319, 5, 117, 0, 0, 1315, 1319, 5, 113, 0, 0,
 		1316, 1319, 5, 24, 0, 0, 1317, 1319, 3, 218, 109, 0, 1318, 1311, 1, 0,
@@ -22184,9 +22184,9 @@ type ISizeofExpressionContext interface {
 
 	// Getter signatures
 	SIZEOF() antlr.TerminalNode
-	LT() antlr.TerminalNode
+	LPAREN() antlr.TerminalNode
 	Type_() ITypeContext
-	GT() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
 
 	// IsSizeofExpressionContext differentiates from other interfaces.
 	IsSizeofExpressionContext()
@@ -22228,8 +22228,8 @@ func (s *SizeofExpressionContext) SIZEOF() antlr.TerminalNode {
 	return s.GetToken(ArcParserSIZEOF, 0)
 }
 
-func (s *SizeofExpressionContext) LT() antlr.TerminalNode {
-	return s.GetToken(ArcParserLT, 0)
+func (s *SizeofExpressionContext) LPAREN() antlr.TerminalNode {
+	return s.GetToken(ArcParserLPAREN, 0)
 }
 
 func (s *SizeofExpressionContext) Type_() ITypeContext {
@@ -22248,8 +22248,8 @@ func (s *SizeofExpressionContext) Type_() ITypeContext {
 	return t.(ITypeContext)
 }
 
-func (s *SizeofExpressionContext) GT() antlr.TerminalNode {
-	return s.GetToken(ArcParserGT, 0)
+func (s *SizeofExpressionContext) RPAREN() antlr.TerminalNode {
+	return s.GetToken(ArcParserRPAREN, 0)
 }
 
 func (s *SizeofExpressionContext) GetRuleContext() antlr.RuleContext {
@@ -22284,7 +22284,7 @@ func (p *ArcParser) SizeofExpression() (localctx ISizeofExpressionContext) {
 	}
 	{
 		p.SetState(1302)
-		p.Match(ArcParserLT)
+		p.Match(ArcParserLPAREN)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -22296,7 +22296,7 @@ func (p *ArcParser) SizeofExpression() (localctx ISizeofExpressionContext) {
 	}
 	{
 		p.SetState(1304)
-		p.Match(ArcParserGT)
+		p.Match(ArcParserRPAREN)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -22325,9 +22325,9 @@ type IAlignofExpressionContext interface {
 
 	// Getter signatures
 	ALIGNOF() antlr.TerminalNode
-	LT() antlr.TerminalNode
+	LPAREN() antlr.TerminalNode
 	Type_() ITypeContext
-	GT() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
 
 	// IsAlignofExpressionContext differentiates from other interfaces.
 	IsAlignofExpressionContext()
@@ -22369,8 +22369,8 @@ func (s *AlignofExpressionContext) ALIGNOF() antlr.TerminalNode {
 	return s.GetToken(ArcParserALIGNOF, 0)
 }
 
-func (s *AlignofExpressionContext) LT() antlr.TerminalNode {
-	return s.GetToken(ArcParserLT, 0)
+func (s *AlignofExpressionContext) LPAREN() antlr.TerminalNode {
+	return s.GetToken(ArcParserLPAREN, 0)
 }
 
 func (s *AlignofExpressionContext) Type_() ITypeContext {
@@ -22389,8 +22389,8 @@ func (s *AlignofExpressionContext) Type_() ITypeContext {
 	return t.(ITypeContext)
 }
 
-func (s *AlignofExpressionContext) GT() antlr.TerminalNode {
-	return s.GetToken(ArcParserGT, 0)
+func (s *AlignofExpressionContext) RPAREN() antlr.TerminalNode {
+	return s.GetToken(ArcParserRPAREN, 0)
 }
 
 func (s *AlignofExpressionContext) GetRuleContext() antlr.RuleContext {
@@ -22425,7 +22425,7 @@ func (p *ArcParser) AlignofExpression() (localctx IAlignofExpressionContext) {
 	}
 	{
 		p.SetState(1307)
-		p.Match(ArcParserLT)
+		p.Match(ArcParserLPAREN)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -22437,7 +22437,7 @@ func (p *ArcParser) AlignofExpression() (localctx IAlignofExpressionContext) {
 	}
 	{
 		p.SetState(1309)
-		p.Match(ArcParserGT)
+		p.Match(ArcParserRPAREN)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
