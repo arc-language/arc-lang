@@ -208,10 +208,13 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	g.enterScope(ctx)
 	defer g.exitScope()
 
-	condBlock := g.ctx.Builder.CreateBlock("loop.cond")
-	bodyBlock := g.ctx.Builder.CreateBlock("loop.body")
-	postBlock := g.ctx.Builder.CreateBlock("loop.post")
-	endBlock := g.ctx.Builder.CreateBlock("loop.end")
+	// Fix: Explicitly attach blocks to the current function to prevent detached blocks.
+	// Detached blocks are skipped by the backend's stack allocator, causing panics.
+	fn := g.ctx.CurrentFunction
+	condBlock := g.ctx.Builder.CreateBlockInFunction("loop.cond", fn)
+	bodyBlock := g.ctx.Builder.CreateBlockInFunction("loop.body", fn)
+	postBlock := g.ctx.Builder.CreateBlockInFunction("loop.post", fn)
+	endBlock := g.ctx.Builder.CreateBlockInFunction("loop.end", fn)
 
 	// --- Range-based Loop (for i in 0..5) ---
 	if ctx.IN() != nil {
