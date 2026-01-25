@@ -326,6 +326,10 @@ type BaseInstruction struct {
 	Ops     []Value
 	Parent_ *BasicBlock
 	Op      Opcode
+
+	// Self points to the outer concrete instruction struct (e.g., *AddInst).
+	// Required to register the correct identity in Use-Def chains.
+	Self User
 }
 
 func (i *BaseInstruction) Opcode() Opcode              { return i.Op }
@@ -334,6 +338,12 @@ func (i *BaseInstruction) SetParent(b *BasicBlock)     { i.Parent_ = b }
 func (i *BaseInstruction) Operands() []Value           { return i.Ops }
 func (i *BaseInstruction) NumOperands() int            { return len(i.Ops) }
 
+// String implements Value interface.
+// This is a fallback; concrete instructions should override this.
+func (i *BaseInstruction) String() string {
+	return fmt.Sprintf("<instruction %s>", i.Op)
+}
+
 // SetOperand sets the operand at the given index and updates Use-Def chains.
 func (i *BaseInstruction) SetOperand(idx int, v Value) {
 	// Grow slice if needed
@@ -341,10 +351,16 @@ func (i *BaseInstruction) SetOperand(idx int, v Value) {
 		i.Ops = append(i.Ops, nil)
 	}
 
+	// Use i.Self if available, otherwise fallback to i (mostly for early initialization)
+	var user User = i
+	if i.Self != nil {
+		user = i.Self
+	}
+
 	// Unregister from old operand
 	if old := i.Ops[idx]; old != nil {
 		if tracker, ok := old.(TrackableValue); ok {
-			tracker.RemoveUser(i)
+			tracker.RemoveUser(user)
 		}
 	}
 
@@ -354,7 +370,7 @@ func (i *BaseInstruction) SetOperand(idx int, v Value) {
 	// Register to new operand
 	if v != nil {
 		if tracker, ok := v.(TrackableValue); ok {
-			tracker.AddUser(i)
+			tracker.AddUser(user)
 		}
 	}
 }
