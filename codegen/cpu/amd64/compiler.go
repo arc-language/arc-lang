@@ -769,6 +769,35 @@ func (c *compiler) load(dst Register, src ir.Value) {
 	case *ir.AllocaInst:
 		off := c.stackMap[v]
 		c.asm.Lea(dst, NewMem(RBP, off))
+	case *ir.LoadInst:
+		// LoadInst that hasn't been compiled yet - compile it inline
+		if _, hasSlot := c.stackMap[v]; !hasSlot {
+			ptr := v.Operands()[0]
+			c.load(dst, ptr)
+			c.asm.Mov(RegOp(dst), NewMem(dst, 0), 64)
+			return
+		}
+		// LoadInst that was compiled - load from stack
+		slot := c.getStackSlot(v)
+		typ := v.Type()
+		size := SizeOf(typ)
+		if size == 8 {
+			c.asm.Mov(RegOp(dst), slot, 64)
+		} else if size == 4 {
+			c.asm.Mov(RegOp(dst), slot, 32)
+		} else if size == 1 {
+			isSigned := false
+			if intTy, ok := typ.(*types.IntType); ok && intTy.Signed {
+				isSigned = true
+			}
+			if isSigned {
+				c.asm.Movsx(dst, slot, 8)
+			} else {
+				c.asm.MovZX(dst, slot, 8)
+			}
+		} else {
+			c.asm.Mov(RegOp(dst), slot, 64)
+		}
 	default:
 		slot := c.getStackSlot(v)
 		typ := v.Type()
