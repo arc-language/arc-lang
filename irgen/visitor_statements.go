@@ -208,8 +208,6 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	g.enterScope(ctx)
 	defer g.exitScope()
 
-	// Fix: Explicitly attach blocks to the current function to prevent detached blocks.
-	// Detached blocks are skipped by the backend's stack allocator, causing panics.
 	fn := g.ctx.CurrentFunction
 	condBlock := g.ctx.Builder.CreateBlockInFunction("loop.cond", fn)
 	bodyBlock := g.ctx.Builder.CreateBlockInFunction("loop.body", fn)
@@ -220,7 +218,6 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	if ctx.IN() != nil {
 		if len(ctx.AllExpression()) == 0 { return nil }
 		
-		// Recursive helper to find RangeExpression deep in the tree
 		var findRange func(antlr.ParseTree) parser.IRangeExpressionContext
 		findRange = func(node antlr.ParseTree) parser.IRangeExpressionContext {
 			if r, ok := node.(parser.IRangeExpressionContext); ok {
@@ -242,41 +239,35 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 		startVal := g.Visit(rangeCtx.AdditiveExpression(0)).(ir.Value)
 		endVal := g.Visit(rangeCtx.AdditiveExpression(1)).(ir.Value)
-		
-		// Ensure types match (cast end to start type)
 		endVal = g.emitCast(endVal, startVal.Type())
 
-		// Define loop variable 'i'
 		varName := ctx.IDENTIFIER(0).GetText()
 		sym, ok := g.currentScope.Resolve(varName)
 		if !ok {
 			return nil
 		}
 		
-		// Create allocas for loop var if not already existing
 		if sym.IRValue == nil {
 			alloca := g.ctx.Builder.CreateAlloca(startVal.Type(), varName+".addr")
 			sym.IRValue = alloca
 		}
 		
-		// Init loop var = start
 		g.ctx.Builder.CreateStore(startVal, sym.IRValue)
 		g.ctx.Builder.CreateBr(condBlock)
 
-		// Condition Check (i < end)
+		// Condition
 		g.ctx.Builder.SetInsertPoint(condBlock)
-		currVal := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
+		currVal := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "loop.i")
 		
-		// Handle comparisons
 		var cmp ir.Value
 		if types.IsFloat(startVal.Type()) {
-			cmp = g.ctx.Builder.CreateFCmp(ir.FCmpOLT, currVal, endVal, "")
+			cmp = g.ctx.Builder.CreateFCmp(ir.FCmpOLT, currVal, endVal, "loop.cmp")
 		} else {
-			cmp = g.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
+			cmp = g.ctx.Builder.CreateICmpSLT(currVal, endVal, "loop.cmp")
 		}
 		g.ctx.Builder.CreateCondBr(cmp, bodyBlock, endBlock)
 
-		// Loop Body
+		// Body
 		g.ctx.Builder.SetInsertPoint(bodyBlock)
 		g.loopStack = append(g.loopStack, loopInfo{breakBlock: endBlock, continueBlock: postBlock})
 		g.Visit(ctx.Block())
@@ -286,17 +277,17 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 			g.ctx.Builder.CreateBr(postBlock)
 		}
 
-		// Post Step (i++)
+		// Post
 		g.ctx.Builder.SetInsertPoint(postBlock)
-		currVal = g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
+		currValPost := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "loop.i.inc")
 		
 		var nextVal ir.Value
 		if types.IsFloat(startVal.Type()) {
 			one := g.ctx.Builder.ConstFloat(startVal.Type().(*types.FloatType), 1.0)
-			nextVal = g.ctx.Builder.CreateFAdd(currVal, one, "")
+			nextVal = g.ctx.Builder.CreateFAdd(currValPost, one, "loop.inc")
 		} else {
 			one := g.ctx.Builder.ConstInt(startVal.Type().(*types.IntType), 1)
-			nextVal = g.ctx.Builder.CreateAdd(currVal, one, "")
+			nextVal = g.ctx.Builder.CreateAdd(currValPost, one, "loop.inc")
 		}
 		
 		g.ctx.Builder.CreateStore(nextVal, sym.IRValue)
@@ -306,7 +297,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		return nil
 	}
 
-	// --- C-style Loop (for var i=0; i<10; i++) ---
+	// --- C-style Loop ---
 	if len(ctx.AllSEMICOLON()) >= 2 {
 		if ctx.VariableDecl() != nil { g.Visit(ctx.VariableDecl()) }
 		if len(ctx.AllAssignmentStmt()) > 0 && ctx.AssignmentStmt(0).GetStart().GetTokenIndex() < ctx.SEMICOLON(0).GetSymbol().GetTokenIndex() {
