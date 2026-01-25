@@ -323,8 +323,30 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		}
 	}
 
+	// NEW: Check for flat method syntax (func get(self c: Counter))
+	if !isMethod && ctx.ParameterList() != nil {
+		params := ctx.ParameterList().AllParameter()
+		if len(params) > 0 {
+			firstParam := params[0]
+			// Check if first parameter uses SELF keyword
+			if firstParam.SELF() != nil {
+				// Extract struct type from self parameter
+				selfType := a.resolveType(firstParam.Type_())
+				// Unwrap pointer if needed
+				if ptr, ok := selfType.(*types.PointerType); ok {
+					selfType = ptr.ElementType
+				}
+				// Get struct name for method mangling
+				if st, ok := selfType.(*types.StructType); ok {
+					parentName = st.Name
+					isMethod = true
+				}
+			}
+		}
+	}
+
 	if isMethod {
-		// main.log_printf
+		// main.log_printf or Counter_get
 		if a.currentNamespacePrefix != "" {
 			fullName = a.currentNamespacePrefix + "." + parentName + "_" + rawName
 		} else {
