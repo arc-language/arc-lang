@@ -798,6 +798,62 @@ func (c *compiler) load(dst Register, src ir.Value) {
 		} else {
 			c.asm.Mov(RegOp(dst), slot, 64)
 		}
+	case *ir.ICmpInst:
+		// ICmpInst that hasn't been compiled yet - compile it inline
+		if _, hasSlot := c.stackMap[v]; !hasSlot {
+			lhs := v.Operands()[0]
+			rhs := v.Operands()[1]
+			
+			c.load(RAX, lhs)
+			
+			// Handle signed comparisons
+			isSigned := false
+			switch v.Predicate {
+			case ir.ICmpSLT, ir.ICmpSLE, ir.ICmpSGT, ir.ICmpSGE:
+				isSigned = true
+			}
+			if isSigned && lhs.Type().BitSize() == 32 {
+				c.asm.Movsxd(RAX, RAX)
+			}
+			
+			c.load(RCX, rhs)
+			if isSigned && rhs.Type().BitSize() == 32 {
+				c.asm.Movsxd(RCX, RCX)
+			}
+			
+			c.asm.Cmp(RegOp(RAX), RegOp(RCX))
+			
+			var cc CondCode
+			switch v.Predicate {
+			case ir.ICmpEQ:
+				cc = CondEq
+			case ir.ICmpNE:
+				cc = CondNe
+			case ir.ICmpSLT:
+				cc = CondLt
+			case ir.ICmpSLE:
+				cc = CondLe
+			case ir.ICmpSGT:
+				cc = CondGt
+			case ir.ICmpSGE:
+				cc = CondGe
+			case ir.ICmpULT:
+				cc = CondBlo
+			case ir.ICmpULE:
+				cc = CondBle
+			case ir.ICmpUGT:
+				cc = CondA
+			case ir.ICmpUGE:
+				cc = CondAe
+			}
+			c.asm.Setcc(cc, dst)
+			c.asm.MovZX(dst, RegOp(dst), 8)
+			return
+		}
+		// ICmpInst that was compiled - load from stack
+		slot := c.getStackSlot(v)
+		c.asm.Mov(RegOp(dst), slot, 8)
+		c.asm.MovZX(dst, RegOp(dst), 8)
 	default:
 		slot := c.getStackSlot(v)
 		typ := v.Type()
