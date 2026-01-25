@@ -208,11 +208,11 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	g.enterScope(ctx)
 	defer g.exitScope()
 
-	fn := g.ctx.CurrentFunction
-	condBlock := g.ctx.Builder.CreateBlockInFunction("loop.cond", fn)
-	bodyBlock := g.ctx.Builder.CreateBlockInFunction("loop.body", fn)
-	postBlock := g.ctx.Builder.CreateBlockInFunction("loop.post", fn)
-	endBlock := g.ctx.Builder.CreateBlockInFunction("loop.end", fn)
+	// Use CreateBlock to ensure blocks are attached to the current function in the builder context
+	condBlock := g.ctx.Builder.CreateBlock("loop.cond")
+	bodyBlock := g.ctx.Builder.CreateBlock("loop.body")
+	postBlock := g.ctx.Builder.CreateBlock("loop.post")
+	endBlock := g.ctx.Builder.CreateBlock("loop.end")
 
 	// --- Range-based Loop (for i in 0..5) ---
 	if ctx.IN() != nil {
@@ -255,19 +255,19 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		g.ctx.Builder.CreateStore(startVal, sym.IRValue)
 		g.ctx.Builder.CreateBr(condBlock)
 
-		// Condition
+		// Condition Check
 		g.ctx.Builder.SetInsertPoint(condBlock)
-		currVal := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "loop.i")
+		currVal := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
 		
 		var cmp ir.Value
 		if types.IsFloat(startVal.Type()) {
-			cmp = g.ctx.Builder.CreateFCmp(ir.FCmpOLT, currVal, endVal, "loop.cmp")
+			cmp = g.ctx.Builder.CreateFCmp(ir.FCmpOLT, currVal, endVal, "")
 		} else {
-			cmp = g.ctx.Builder.CreateICmpSLT(currVal, endVal, "loop.cmp")
+			cmp = g.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
 		}
 		g.ctx.Builder.CreateCondBr(cmp, bodyBlock, endBlock)
 
-		// Body
+		// Loop Body
 		g.ctx.Builder.SetInsertPoint(bodyBlock)
 		g.loopStack = append(g.loopStack, loopInfo{breakBlock: endBlock, continueBlock: postBlock})
 		g.Visit(ctx.Block())
@@ -277,17 +277,17 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 			g.ctx.Builder.CreateBr(postBlock)
 		}
 
-		// Post
+		// Post Step
 		g.ctx.Builder.SetInsertPoint(postBlock)
-		currValPost := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "loop.i.inc")
+		currVal = g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
 		
 		var nextVal ir.Value
 		if types.IsFloat(startVal.Type()) {
 			one := g.ctx.Builder.ConstFloat(startVal.Type().(*types.FloatType), 1.0)
-			nextVal = g.ctx.Builder.CreateFAdd(currValPost, one, "loop.inc")
+			nextVal = g.ctx.Builder.CreateFAdd(currVal, one, "")
 		} else {
 			one := g.ctx.Builder.ConstInt(startVal.Type().(*types.IntType), 1)
-			nextVal = g.ctx.Builder.CreateAdd(currValPost, one, "loop.inc")
+			nextVal = g.ctx.Builder.CreateAdd(currVal, one, "")
 		}
 		
 		g.ctx.Builder.CreateStore(nextVal, sym.IRValue)
@@ -297,7 +297,8 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		return nil
 	}
 
-	// --- C-style Loop ---
+	// --- C-style Loop (for var i=0; i<10; i++) ---
+	// 1. Initialization
 	if len(ctx.AllSEMICOLON()) >= 2 {
 		if ctx.VariableDecl() != nil { g.Visit(ctx.VariableDecl()) }
 		if len(ctx.AllAssignmentStmt()) > 0 && ctx.AssignmentStmt(0).GetStart().GetTokenIndex() < ctx.SEMICOLON(0).GetSymbol().GetTokenIndex() {
@@ -307,6 +308,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 	g.ctx.Builder.CreateBr(condBlock)
 
+	// 2. Condition
 	g.ctx.Builder.SetInsertPoint(condBlock)
 	var cond ir.Value = g.ctx.Builder.True()
 	
@@ -328,6 +330,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	}
 	g.ctx.Builder.CreateCondBr(cond, bodyBlock, endBlock)
 
+	// 3. Body
 	g.ctx.Builder.SetInsertPoint(bodyBlock)
 	g.loopStack = append(g.loopStack, loopInfo{breakBlock: endBlock, continueBlock: postBlock})
 	g.Visit(ctx.Block())
@@ -337,6 +340,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		g.ctx.Builder.CreateBr(postBlock)
 	}
 
+	// 4. Post
 	g.ctx.Builder.SetInsertPoint(postBlock)
 	if len(ctx.AllSEMICOLON()) >= 2 {
 		semi2 := ctx.SEMICOLON(1).GetSymbol().GetTokenIndex()
@@ -349,6 +353,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	}
 	g.ctx.Builder.CreateBr(condBlock)
 
+	// 5. End
 	g.ctx.Builder.SetInsertPoint(endBlock)
 	return nil
 }
