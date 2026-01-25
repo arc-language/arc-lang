@@ -1,5 +1,3 @@
-// Package ir defines the intermediate representation nodes.
-// This is the core data structure for the IR tree.
 package ir
 
 import (
@@ -13,20 +11,16 @@ import (
 type CallingConvention int
 
 const (
-	CC_C           CallingConvention = iota // Default C convention (sysv64 on Linux, etc)
-	CC_StdCall                              // Windows stdcall
-	CC_FastCall                             // Fastcall
-	CC_VectorCall                           // Vectorcall (SIMD)
-	CC_ThisCall                             // C++ member functions
-	CC_Arc                                  // Internal Arc convention
+	CC_C          CallingConvention = iota // Default C convention (sysv64 on Linux, etc)
+	CC_StdCall                             // Windows stdcall
+	CC_FastCall                            // Fastcall
+	CC_VectorCall                          // Vectorcall (SIMD)
+	CC_ThisCall                            // C++ member functions
+	CC_Arc                                 // Internal Arc convention
 
-	// Add this for GPU functions
-	CC_PTX 	
-	
-	// AMD ROCm/HIP functions
+	// GPU/Accelerator conventions
+	CC_PTX
 	CC_ROCM
-
-	// TPU functions
 	CC_TPU
 )
 
@@ -44,7 +38,6 @@ func (cc CallingConvention) String() string {
 		return "x86_thiscallcc"
 	case CC_Arc:
 		return "arc_cc"
-
 	case CC_PTX:
 		return "ptx_kernel"
 	case CC_ROCM:
@@ -55,7 +48,6 @@ func (cc CallingConvention) String() string {
 	return "ccc"
 }
 
-
 // Value is the interface all IR values implement
 type Value interface {
 	Type() types.Type
@@ -64,12 +56,19 @@ type Value interface {
 	String() string
 }
 
-// User is a Value that references other Values
+// User is a Value that references other Values (e.g. Instructions)
 type User interface {
 	Value
 	Operands() []Value
 	SetOperand(int, Value)
 	NumOperands() int
+}
+
+// TrackableValue is an interface for Values that track their Users (Use-Def chains).
+// Used for optimizations like Dead Code Elimination.
+type TrackableValue interface {
+	AddUser(User)
+	RemoveUser(User)
 }
 
 // Instruction is an operation that produces a value
@@ -161,11 +160,10 @@ const (
 	OpRaise
 
 	// Async Smart Thread operations
-	// Replaces previous Coroutine intrinsics
 	OpAsyncTaskCreate
 	OpAsyncTaskAwait
 
-   OpProcessCreate // New
+	OpProcessCreate
 )
 
 var opcodeNames = map[Opcode]string{
@@ -230,8 +228,7 @@ var opcodeNames = map[Opcode]string{
 	OpRaise:           "raise",
 	OpAsyncTaskCreate: "async_task_create",
 	OpAsyncTaskAwait:  "async_task_await",
-
-    OpProcessCreate: "process_create",
+	OpProcessCreate:   "process_create",
 }
 
 func (op Opcode) String() string {
@@ -300,12 +297,28 @@ func (p FCmpPredicate) String() string { return fcmpNames[p] }
 type BaseValue struct {
 	ValName string
 	ValType types.Type
+	Users   map[User]bool // Optimization: Tracks instructions using this value
 }
 
 func (v *BaseValue) Name() string         { return v.ValName }
 func (v *BaseValue) SetName(n string)     { v.ValName = n }
 func (v *BaseValue) Type() types.Type     { return v.ValType }
 func (v *BaseValue) SetType(t types.Type) { v.ValType = t }
+
+// AddUser registers a user (Instruction) that depends on this value.
+func (v *BaseValue) AddUser(u User) {
+	if v.Users == nil {
+		v.Users = make(map[User]bool)
+	}
+	v.Users[u] = true
+}
+
+// RemoveUser unregisters a user when it no longer depends on this value.
+func (v *BaseValue) RemoveUser(u User) {
+	if v.Users != nil {
+		delete(v.Users, u)
+	}
+}
 
 // BaseInstruction provides common functionality for instructions
 type BaseInstruction struct {
@@ -320,13 +333,32 @@ func (i *BaseInstruction) Parent() *BasicBlock         { return i.Parent_ }
 func (i *BaseInstruction) SetParent(b *BasicBlock)     { i.Parent_ = b }
 func (i *BaseInstruction) Operands() []Value           { return i.Ops }
 func (i *BaseInstruction) NumOperands() int            { return len(i.Ops) }
+
+// SetOperand sets the operand at the given index and updates Use-Def chains.
 func (i *BaseInstruction) SetOperand(idx int, v Value) {
 	// Grow slice if needed
 	for len(i.Ops) <= idx {
 		i.Ops = append(i.Ops, nil)
 	}
+
+	// Unregister from old operand
+	if old := i.Ops[idx]; old != nil {
+		if tracker, ok := old.(TrackableValue); ok {
+			tracker.RemoveUser(i)
+		}
+	}
+
+	// Set new operand
 	i.Ops[idx] = v
+
+	// Register to new operand
+	if v != nil {
+		if tracker, ok := v.(TrackableValue); ok {
+			tracker.AddUser(i)
+		}
+	}
 }
+
 func (i *BaseInstruction) IsTerminator() bool {
 	switch i.Op {
 	case OpRet, OpBr, OpCondBr, OpSwitch, OpUnreachable:
@@ -543,13 +575,13 @@ func (b *BasicBlock) Terminator() Instruction {
 // Function represents a function
 type Function struct {
 	BaseValue
-	FuncType    *types.FunctionType
-	Blocks      []*BasicBlock
-	Arguments   []*Argument
-	Linkage     Linkage
-	CallConv    CallingConvention
-	Parent      *Module
-	Attributes  []FuncAttribute
+	FuncType   *types.FunctionType
+	Blocks     []*BasicBlock
+	Arguments  []*Argument
+	Linkage    Linkage
+	CallConv   CallingConvention
+	Parent     *Module
+	Attributes []FuncAttribute
 }
 
 type FuncAttribute int

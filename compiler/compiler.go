@@ -11,6 +11,7 @@ import (
 	"github.com/arc-language/arc-lang/context"
 	"github.com/arc-language/arc-lang/diagnostic"
 	"github.com/arc-language/arc-lang/irgen"
+	"github.com/arc-language/arc-lang/optimizer" // <--- Import the optimizer package
 	"github.com/arc-language/arc-lang/semantics"
 	"github.com/arc-language/arc-lang/symbol"
 )
@@ -29,6 +30,10 @@ func NewCompiler() *Compiler {
 }
 
 // CompileProject handles the frontend pipeline:
+// 1. Discovery (Parsing)
+// 2. Semantics
+// 3. IR Gen
+// 4. Optimization (NEW)
 func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	absEntry, err := filepath.Abs(entryFile)
 	if err != nil {
@@ -40,9 +45,9 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	// --- PHASE 1: DISCOVERY ---
 	fileQueue := []string{absEntry}
 	processed := make(map[string]bool)
-	
+
 	// We collect source units to pass to IRGen
-	var units []*irgen.SourceUnit 
+	var units []*irgen.SourceUnit
 
 	for i := 0; i < len(fileQueue); i++ {
 		currentPath := fileQueue[i]
@@ -52,16 +57,16 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 		processed[currentPath] = true
 
 		c.logger.Debug("Parsing: %s", currentPath)
-		
+
 		// Call Parse from parser_helper.go
 		// Returns (parser.ICompilationUnitContext, *diagnostic.Bag)
-		tree, errs := Parse(currentPath) 
-		
+		tree, errs := Parse(currentPath)
+
 		if errs.HasErrors() {
 			c.printDiagnostics(errs)
 			return nil, fmt.Errorf("parsing failed in %s", currentPath)
 		}
-		
+
 		units = append(units, &irgen.SourceUnit{Path: currentPath, Tree: tree})
 
 		// Scan imports
@@ -121,8 +126,15 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	// --- PHASE 3: IR GENERATION ---
 	c.logger.Debug("Phase 3: IR Generation")
 	moduleName := filepath.Base(absEntry)
-	
+
 	module := irgen.GenerateProject(units, moduleName, analysisRes)
+
+	// --- PHASE 4: OPTIMIZATION ---
+	c.logger.Debug("Phase 4: Optimization")
+
+	// Apply Aggressive Dead Code Elimination
+	dce := optimizer.NewDCE()
+	dce.Run(module)
 
 	return module, nil
 }
