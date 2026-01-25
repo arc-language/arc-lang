@@ -52,7 +52,7 @@ func init() {
     }
     `,
 			Body: `
-    let size = sizeof<Padded>
+    let size = sizeof(Padded)
     printf("size=%zu\n", size)
     `,
 			Expected: "size=24",

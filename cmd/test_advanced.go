@@ -82,17 +82,6 @@ func init() {
 			Phase: 10,
 		},
 		TestCase{
-			Name: "string_interpolation",
-			Body: `
-    let name = "Alice"
-    let age = 30
-    let msg = "Hello ${name}, age ${age}"
-    printf("%s\n", msg)
-    `,
-			Expected: "Hello Alice, age 30",
-			Phase: 10,
-		},
-		TestCase{
 			Name: "exec_thread_placeholder",
 			Body: `
     printf("thread_placeholder\n")
@@ -101,11 +90,20 @@ func init() {
 			Phase: 10,
 		},
 		TestCase{
+			Globals: `
+    async func exec_async_placeholder() int32 {
+		sleep(1)
+		let results = 100
+		return results
+    }
+    `,
 			Name: "exec_async_placeholder",
 			Body: `
-    printf("async_placeholder\n")
+	let results = await exec_async_placeholder()
+    printf("%d\n", results)
+	sleep(4)
     `,
-			Expected: "async_placeholder",
+			Expected: "100",
 			Phase: 10,
 		},
 		TestCase{

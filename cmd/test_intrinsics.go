@@ -6,7 +6,7 @@ func init() {
 		TestCase{
 			Name: "intrinsic_sizeof_int32",
 			Body: `
-    let size = sizeof<int32>
+    let size = sizeof(int32)
     printf("size=%zu\n", size)
     `,
 			Expected: "size=4",
@@ -15,7 +15,7 @@ func init() {
 		TestCase{
 			Name: "intrinsic_sizeof_int64",
 			Body: `
-    let size = sizeof<int64>
+    let size = sizeof(int64)
     printf("size=%zu\n", size)
     `,
 			Expected: "size=8",
@@ -30,7 +30,7 @@ func init() {
     }
     `,
 			Body: `
-    let size = sizeof<Pair>
+    let size = sizeof(Pair)
     printf("size=%zu\n", size)
     `,
 			Expected: "size=8",
@@ -39,7 +39,7 @@ func init() {
 		TestCase{
 			Name: "intrinsic_alignof",
 			Body: `
-    let align = alignof<int64>
+    let align = alignof(int64)
     printf("align=%zu\n", align)
     `,
 			Expected: "align=8",
