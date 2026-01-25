@@ -217,36 +217,29 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	if ctx.IN() != nil {
 		if len(ctx.AllExpression()) == 0 { return nil }
 		
-		// Manually drill down to find RangeExpression
-		var rangeCtx parser.IRangeExpressionContext
-		
-		e := ctx.Expression(0)
-		if e != nil {
-			if l1 := e.LogicalOrExpression(); l1 != nil {
-				if l2 := l1.LogicalAndExpression(0); l2 != nil {
-					if l3 := l2.BitOrExpression(0); l3 != nil {
-						if l4 := l3.BitXorExpression(0); l4 != nil {
-							if l5 := l4.BitAndExpression(0); l5 != nil {
-								if l6 := l5.EqualityExpression(0); l6 != nil {
-									if l7 := l6.RelationalExpression(0); l7 != nil {
-										if l8 := l7.ShiftExpression(0); l8 != nil {
-											rangeCtx = l8.RangeExpression(0)
-										}
-									}
-								}
-							}
-						}
-					}
-				}
+		// Recursive helper to find RangeExpression deep in the tree
+		// This replaces the brittle manual drill-down
+		var findRange func(antlr.ParseTree) parser.IRangeExpressionContext
+		findRange = func(node antlr.ParseTree) parser.IRangeExpressionContext {
+			if r, ok := node.(parser.IRangeExpressionContext); ok {
+				return r
 			}
+			if node.GetChildCount() == 1 {
+				return findRange(node.GetChild(0))
+			}
+			return nil
 		}
-
+		
+		rangeCtx := findRange(ctx.Expression(0))
 		if rangeCtx == nil || rangeCtx.RANGE() == nil {
 			return nil
 		}
 
 		startVal := g.Visit(rangeCtx.AdditiveExpression(0)).(ir.Value)
 		endVal := g.Visit(rangeCtx.AdditiveExpression(1)).(ir.Value)
+		
+		// Ensure types match (cast end to start type)
+		endVal = g.emitCast(endVal, startVal.Type())
 
 		// Define loop variable 'i'
 		varName := ctx.IDENTIFIER(0).GetText()
@@ -269,7 +262,13 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		g.ctx.SetInsertBlock(condBlock)
 		currVal := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
 		
-		cmp := g.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
+		// Handle comparisons
+		var cmp ir.Value
+		if types.IsFloat(startVal.Type()) {
+			cmp = g.ctx.Builder.CreateFCmpOLT(currVal, endVal, "")
+		} else {
+			cmp = g.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
+		}
 		g.ctx.Builder.CreateCondBr(cmp, bodyBlock, endBlock)
 
 		// Loop Body
@@ -285,8 +284,16 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		// Post Step (i++)
 		g.ctx.SetInsertBlock(postBlock)
 		currVal = g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
-		one := g.ctx.Builder.ConstInt(startVal.Type().(*types.IntType), 1)
-		nextVal := g.ctx.Builder.CreateAdd(currVal, one, "")
+		
+		var nextVal ir.Value
+		if types.IsFloat(startVal.Type()) {
+			one := g.ctx.Builder.ConstFloat(startVal.Type().(*types.FloatType), 1.0)
+			nextVal = g.ctx.Builder.CreateFAdd(currVal, one, "")
+		} else {
+			one := g.ctx.Builder.ConstInt(startVal.Type().(*types.IntType), 1)
+			nextVal = g.ctx.Builder.CreateAdd(currVal, one, "")
+		}
+		
 		g.ctx.Builder.CreateStore(nextVal, sym.IRValue)
 		g.ctx.Builder.CreateBr(condBlock)
 
