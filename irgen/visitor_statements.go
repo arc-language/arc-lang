@@ -265,7 +265,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		// Handle comparisons
 		var cmp ir.Value
 		if types.IsFloat(startVal.Type()) {
-			cmp = g.ctx.Builder.CreateFCmpOLT(currVal, endVal, "")
+			cmp = g.ctx.Builder.CreateFCmp(ir.FCmpOLT, currVal, endVal, "")
 		} else {
 			cmp = g.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
 		}
