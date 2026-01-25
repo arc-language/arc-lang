@@ -224,7 +224,6 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 				return r
 			}
 			if node.GetChildCount() == 1 {
-				// Fix: Type assert antlr.Tree to antlr.ParseTree
 				child := node.GetChild(0)
 				if pt, ok := child.(antlr.ParseTree); ok {
 					return findRange(pt)
@@ -262,7 +261,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		g.ctx.Builder.CreateBr(condBlock)
 
 		// Condition Check (i < end)
-		g.ctx.SetInsertBlock(condBlock)
+		g.ctx.Builder.SetInsertPoint(condBlock)
 		currVal := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
 		
 		// Handle comparisons
@@ -275,7 +274,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		g.ctx.Builder.CreateCondBr(cmp, bodyBlock, endBlock)
 
 		// Loop Body
-		g.ctx.SetInsertBlock(bodyBlock)
+		g.ctx.Builder.SetInsertPoint(bodyBlock)
 		g.loopStack = append(g.loopStack, loopInfo{breakBlock: endBlock, continueBlock: postBlock})
 		g.Visit(ctx.Block())
 		g.loopStack = g.loopStack[:len(g.loopStack)-1]
@@ -285,7 +284,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		}
 
 		// Post Step (i++)
-		g.ctx.SetInsertBlock(postBlock)
+		g.ctx.Builder.SetInsertPoint(postBlock)
 		currVal = g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
 		
 		var nextVal ir.Value
@@ -300,7 +299,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		g.ctx.Builder.CreateStore(nextVal, sym.IRValue)
 		g.ctx.Builder.CreateBr(condBlock)
 
-		g.ctx.SetInsertBlock(endBlock)
+		g.ctx.Builder.SetInsertPoint(endBlock)
 		return nil
 	}
 
@@ -314,7 +313,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 	g.ctx.Builder.CreateBr(condBlock)
 
-	g.ctx.SetInsertBlock(condBlock)
+	g.ctx.Builder.SetInsertPoint(condBlock)
 	var cond ir.Value = g.ctx.Builder.True()
 	
 	if len(ctx.AllSEMICOLON()) >= 2 {
@@ -335,7 +334,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	}
 	g.ctx.Builder.CreateCondBr(cond, bodyBlock, endBlock)
 
-	g.ctx.SetInsertBlock(bodyBlock)
+	g.ctx.Builder.SetInsertPoint(bodyBlock)
 	g.loopStack = append(g.loopStack, loopInfo{breakBlock: endBlock, continueBlock: postBlock})
 	g.Visit(ctx.Block())
 	g.loopStack = g.loopStack[:len(g.loopStack)-1]
@@ -344,7 +343,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		g.ctx.Builder.CreateBr(postBlock)
 	}
 
-	g.ctx.SetInsertBlock(postBlock)
+	g.ctx.Builder.SetInsertPoint(postBlock)
 	if len(ctx.AllSEMICOLON()) >= 2 {
 		semi2 := ctx.SEMICOLON(1).GetSymbol().GetTokenIndex()
 		for _, assign := range ctx.AllAssignmentStmt() {
@@ -356,7 +355,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	}
 	g.ctx.Builder.CreateBr(condBlock)
 
-	g.ctx.SetInsertBlock(endBlock)
+	g.ctx.Builder.SetInsertPoint(endBlock)
 	return nil
 }
 
