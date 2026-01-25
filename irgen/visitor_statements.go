@@ -218,14 +218,17 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		if len(ctx.AllExpression()) == 0 { return nil }
 		
 		// Recursive helper to find RangeExpression deep in the tree
-		// This replaces the brittle manual drill-down
 		var findRange func(antlr.ParseTree) parser.IRangeExpressionContext
 		findRange = func(node antlr.ParseTree) parser.IRangeExpressionContext {
 			if r, ok := node.(parser.IRangeExpressionContext); ok {
 				return r
 			}
 			if node.GetChildCount() == 1 {
-				return findRange(node.GetChild(0))
+				// Fix: Type assert antlr.Tree to antlr.ParseTree
+				child := node.GetChild(0)
+				if pt, ok := child.(antlr.ParseTree); ok {
+					return findRange(pt)
+				}
 			}
 			return nil
 		}
