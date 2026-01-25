@@ -854,6 +854,64 @@ func (c *compiler) load(dst Register, src ir.Value) {
 		slot := c.getStackSlot(v)
 		c.asm.Mov(RegOp(dst), slot, 8)
 		c.asm.MovZX(dst, RegOp(dst), 8)
+	case *ir.BinaryInst:
+		// BinaryInst that hasn't been compiled yet - compile it inline
+		if _, hasSlot := c.stackMap[v]; !hasSlot {
+			lhs := v.Operands()[0]
+			rhs := v.Operands()[1]
+			
+			c.load(RAX, lhs)
+			c.load(RCX, rhs)
+			
+			switch v.Opcode() {
+			case ir.OpAdd:
+				c.asm.Add(RegOp(RAX), RegOp(RCX))
+			case ir.OpSub:
+				c.asm.Sub(RegOp(RAX), RegOp(RCX))
+			case ir.OpMul:
+				c.asm.Imul(RAX, RCX)
+			case ir.OpSDiv:
+				if lhs.Type().BitSize() == 32 { c.asm.Movsxd(RAX, RAX) }
+				if rhs.Type().BitSize() == 32 { c.asm.Movsxd(RCX, RCX) }
+				c.asm.Cqo()
+				c.asm.Div(RCX, true)
+			case ir.OpUDiv:
+				c.asm.Xor(RegOp(RDX), RegOp(RDX))
+				c.asm.Div(RCX, false)
+			case ir.OpSRem:
+				if lhs.Type().BitSize() == 32 { c.asm.Movsxd(RAX, RAX) }
+				if rhs.Type().BitSize() == 32 { c.asm.Movsxd(RCX, RCX) }
+				c.asm.Cqo()
+				c.asm.Div(RCX, true)
+				c.asm.Mov(RegOp(RAX), RegOp(RDX), 64)
+			case ir.OpURem:
+				c.asm.Xor(RegOp(RDX), RegOp(RDX))
+				c.asm.Div(RCX, false)
+				c.asm.Mov(RegOp(RAX), RegOp(RDX), 64)
+			case ir.OpAnd:
+				c.asm.And(RegOp(RAX), RegOp(RCX))
+			case ir.OpOr:
+				c.asm.Or(RegOp(RAX), RegOp(RCX))
+			case ir.OpXor:
+				c.asm.Xor(RegOp(RAX), RegOp(RCX))
+			case ir.OpShl:
+				c.asm.Shl(RAX, RCX)
+			case ir.OpLShr:
+				c.asm.Shr(RAX, RCX)
+			case ir.OpAShr:
+				if lhs.Type().BitSize() == 32 { c.asm.Movsxd(RAX, RAX) }
+				c.asm.Sar(RAX, RCX)
+			}
+			
+			if dst != RAX {
+				c.asm.Mov(RegOp(dst), RegOp(RAX), 64)
+			}
+			return
+		}
+		// BinaryInst that was compiled - load from stack
+		slot := c.getStackSlot(v)
+		c.asm.Mov(RegOp(dst), slot, 64)
+
 	default:
 		slot := c.getStackSlot(v)
 		typ := v.Type()
