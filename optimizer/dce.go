@@ -5,7 +5,7 @@ import (
 )
 
 // DCE implements Aggressive Dead Code Elimination.
-// It performs both Global DCE (removing unused functions/globals)
+// It performs Global DCE (removing unused functions/globals)
 // and Local DCE (removing unused instructions within functions).
 type DCE struct {
 	// Local DCE state
@@ -30,10 +30,10 @@ func NewDCE() *DCE {
 
 // Run executes the optimization pass on the entire module.
 func (opt *DCE) Run(module *ir.Module) {
-	// 1. Remove unused functions and globals first
+	// 1. Global DCE: Remove unused functions and globals
 	opt.runGlobalDCE(module)
 
-	// 2. Optimize the bodies of the remaining functions
+	// 2. Local DCE: Remove unused instructions inside the remaining functions
 	for _, fn := range module.Functions {
 		if len(fn.Blocks) > 0 {
 			opt.runLocalDCE(fn)
@@ -49,12 +49,20 @@ func (opt *DCE) runGlobalDCE(m *ir.Module) {
 	// Reset State
 	opt.reachableGlobals = make(map[*ir.Global]bool)
 	opt.reachableFunctions = make(map[*ir.Function]bool)
-	opt.globalWorklist = opt.globalWorklist[:0]
+	opt.globalWorklist = make([]ir.Value, 0)
 
-	// 1. Find Roots (Entry points)
+	// 1. Find Roots (Entry points and Exports)
 	for _, fn := range m.Functions {
-		if fn.Name() == "main" || fn.Name() == "_start" {
+		// Keep main, _start, and any externally visible function (libraries)
+		if fn.Name() == "main" || fn.Name() == "_start" || fn.Linkage == ir.ExternalLinkage {
 			opt.markFunctionReachable(fn)
+		}
+	}
+	
+	// Keep externally visible globals
+	for _, g := range m.Globals {
+		if g.Linkage == ir.ExternalLinkage {
+			opt.markGlobalReachable(g)
 		}
 	}
 
@@ -63,26 +71,23 @@ func (opt *DCE) runGlobalDCE(m *ir.Module) {
 		curr := opt.globalWorklist[len(opt.globalWorklist)-1]
 		opt.globalWorklist = opt.globalWorklist[:len(opt.globalWorklist)-1]
 
-		if fn, ok := curr.(*ir.Function); ok {
-			opt.scanFunctionDeps(fn)
-		} else if glob, ok := curr.(*ir.Global); ok {
-			opt.scanGlobalDeps(glob)
+		switch v := curr.(type) {
+		case *ir.Function:
+			opt.scanFunctionDeps(v)
+		case *ir.Global:
+			opt.scanGlobalDeps(v)
+		case ir.Constant:
+			opt.scanConstantDeps(v)
 		}
 	}
 
 	// 3. Prune Module
 	var activeFunctions []*ir.Function
 	for _, fn := range m.Functions {
-		if len(fn.Blocks) == 0 {
-			// Keep declarations if they are reachable
-			if opt.reachableFunctions[fn] {
-				activeFunctions = append(activeFunctions, fn)
-			}
-		} else {
-			// Keep definitions if they are reachable
-			if opt.reachableFunctions[fn] {
-				activeFunctions = append(activeFunctions, fn)
-			}
+		// Keep definitions if reachable.
+		// Note: We also keep declarations (functions with no blocks) if they are referenced.
+		if opt.reachableFunctions[fn] {
+			activeFunctions = append(activeFunctions, fn)
 		}
 	}
 	m.Functions = activeFunctions
@@ -97,25 +102,19 @@ func (opt *DCE) runGlobalDCE(m *ir.Module) {
 }
 
 func (opt *DCE) markFunctionReachable(fn *ir.Function) {
-	// FIX: Guard against nil pointers (typed nils from interfaces)
-	if fn == nil {
+	if fn == nil || opt.reachableFunctions[fn] {
 		return
 	}
-	if !opt.reachableFunctions[fn] {
-		opt.reachableFunctions[fn] = true
-		opt.globalWorklist = append(opt.globalWorklist, fn)
-	}
+	opt.reachableFunctions[fn] = true
+	opt.globalWorklist = append(opt.globalWorklist, fn)
 }
 
 func (opt *DCE) markGlobalReachable(g *ir.Global) {
-	// FIX: Guard against nil pointers
-	if g == nil {
+	if g == nil || opt.reachableGlobals[g] {
 		return
 	}
-	if !opt.reachableGlobals[g] {
-		opt.reachableGlobals[g] = true
-		opt.globalWorklist = append(opt.globalWorklist, g)
-	}
+	opt.reachableGlobals[g] = true
+	opt.globalWorklist = append(opt.globalWorklist, g)
 }
 
 func (opt *DCE) scanFunctionDeps(fn *ir.Function) {
@@ -124,36 +123,36 @@ func (opt *DCE) scanFunctionDeps(fn *ir.Function) {
 	}
 	for _, block := range fn.Blocks {
 		for _, inst := range block.Instructions {
-			// Scan Operands (handles Loaded Globals, Function pointers passed as args)
+			// 1. Scan Operands (handles standard values, args)
 			for _, op := range inst.Operands() {
 				opt.checkValue(op)
 			}
 
-			// Scan Special Fields (CallInst Targets)
-			if call, ok := inst.(*ir.CallInst); ok {
-				if call.Callee != nil {
-					opt.markFunctionReachable(call.Callee)
+			// 2. Scan Special Fields (Callee fields are not in Operands list)
+			// This is CRITICAL for Async/Process instructions to keep their targets alive.
+			switch t := inst.(type) {
+			case *ir.CallInst:
+				if t.Callee != nil {
+					opt.markFunctionReachable(t.Callee)
 				}
-				// Also check CalleeVal if it's a value (could be global/function pointer)
-				if call.CalleeVal != nil {
-					opt.checkValue(call.CalleeVal)
+				if t.CalleeVal != nil {
+					opt.checkValue(t.CalleeVal)
 				}
-			}
-			
-			// FIX: Trace Async Task Targets
-			if async, ok := inst.(*ir.AsyncTaskCreateInst); ok {
-				if async.Callee != nil {
-					opt.markFunctionReachable(async.Callee)
+			case *ir.AsyncTaskCreateInst:
+				if t.Callee != nil {
+					opt.markFunctionReachable(t.Callee)
 				}
-				if async.CalleeVal != nil {
-					opt.checkValue(async.CalleeVal)
+				if t.CalleeVal != nil {
+					opt.checkValue(t.CalleeVal)
 				}
-			}
-			
-			// FIX: Trace Process Targets (This fixes the segfault)
-			if proc, ok := inst.(*ir.ProcessCreateInst); ok {
-				if proc.Callee != nil {
-					opt.markFunctionReachable(proc.Callee)
+			case *ir.ProcessCreateInst:
+				if t.Callee != nil {
+					opt.markFunctionReachable(t.Callee)
+				}
+			case *ir.PhiInst:
+				// Phi nodes store values in 'Incoming', not 'Ops'
+				for _, inc := range t.Incoming {
+					opt.checkValue(inc.Value)
 				}
 			}
 		}
@@ -162,27 +161,40 @@ func (opt *DCE) scanFunctionDeps(fn *ir.Function) {
 
 func (opt *DCE) scanGlobalDeps(g *ir.Global) {
 	if g.Initializer != nil {
-		opt.checkValue(g.Initializer)
+		opt.scanConstantDeps(g.Initializer)
+	}
+}
+
+// scanConstantDeps recursively finds function/global pointers inside complex constants
+func (opt *DCE) scanConstantDeps(c ir.Constant) {
+	if c == nil { return }
+	
+	switch t := c.(type) {
+	case *ir.Function:
+		opt.markFunctionReachable(t)
+	case *ir.Global:
+		opt.markGlobalReachable(t)
+	case *ir.ConstantArray:
+		for _, elem := range t.Elements {
+			opt.scanConstantDeps(elem)
+		}
+	case *ir.ConstantStruct:
+		for _, field := range t.Fields {
+			opt.scanConstantDeps(field)
+		}
 	}
 }
 
 func (opt *DCE) checkValue(v ir.Value) {
-	if v == nil {
-		return
-	}
+	if v == nil { return }
+	
 	switch t := v.(type) {
 	case *ir.Function:
 		opt.markFunctionReachable(t)
 	case *ir.Global:
 		opt.markGlobalReachable(t)
-	case *ir.ConstantStruct:
-		for _, f := range t.Fields {
-			opt.checkValue(f)
-		}
-	case *ir.ConstantArray:
-		for _, e := range t.Elements {
-			opt.checkValue(e)
-		}
+	case ir.Constant:
+		opt.scanConstantDeps(t)
 	}
 }
 
@@ -193,12 +205,12 @@ func (opt *DCE) checkValue(v ir.Value) {
 func (opt *DCE) runLocalDCE(fn *ir.Function) {
 	// 1. Reset state
 	opt.alive = make(map[ir.Instruction]bool)
-	opt.worklist = opt.worklist[:0]
+	opt.worklist = make([]ir.Instruction, 0)
 
-	// 2. Cleanup Control Flow Graph
+	// 2. Cleanup Control Flow Graph (Remove unreachable blocks)
 	opt.removeUnreachableBlocks(fn)
 
-	// 3. Identification Phase: Find "Critical" instructions
+	// 3. Identification Phase: Find "Critical" instructions (Roots)
 	for _, block := range fn.Blocks {
 		for _, inst := range block.Instructions {
 			if opt.hasSideEffects(inst) {
@@ -212,9 +224,19 @@ func (opt *DCE) runLocalDCE(fn *ir.Function) {
 		inst := opt.worklist[len(opt.worklist)-1]
 		opt.worklist = opt.worklist[:len(opt.worklist)-1]
 
+		// Mark operands as alive
 		for _, op := range inst.Operands() {
 			if opInst, ok := op.(ir.Instruction); ok {
 				opt.markAlive(opInst)
+			}
+		}
+
+		// Handle Phi nodes specifically (operands are in Incoming structs)
+		if phi, ok := inst.(*ir.PhiInst); ok {
+			for _, inc := range phi.Incoming {
+				if def, ok := inc.Value.(ir.Instruction); ok {
+					opt.markAlive(def)
+				}
 			}
 		}
 	}
@@ -228,7 +250,7 @@ func (opt *DCE) runLocalDCE(fn *ir.Function) {
 			if opt.alive[inst] {
 				newInsts = append(newInsts, inst)
 			} else {
-				// Dead instruction cleanup
+				// Dead instruction cleanup: Unregister from tracking to keep Use-Def clean
 				for _, op := range inst.Operands() {
 					if tracker, ok := op.(ir.TrackableValue); ok {
 						tracker.RemoveUser(inst)
@@ -240,7 +262,6 @@ func (opt *DCE) runLocalDCE(fn *ir.Function) {
 	}
 }
 
-// markAlive marks an instruction as live and adds it to the worklist.
 func (opt *DCE) markAlive(inst ir.Instruction) {
 	if !opt.alive[inst] {
 		opt.alive[inst] = true
@@ -248,31 +269,33 @@ func (opt *DCE) markAlive(inst ir.Instruction) {
 	}
 }
 
-// hasSideEffects determines if an instruction MUST be kept.
+// hasSideEffects determines if an instruction affects state or control flow
 func (opt *DCE) hasSideEffects(inst ir.Instruction) bool {
+	if inst.IsTerminator() {
+		return true
+	}
+
 	switch inst.Opcode() {
-	case ir.OpRet, ir.OpBr, ir.OpCondBr, ir.OpSwitch, ir.OpUnreachable:
+	case ir.OpStore, ir.OpCall, ir.OpSyscall, ir.OpRaise:
 		return true
-	case ir.OpStore:
-		return true
-	case ir.OpCall, ir.OpSyscall, ir.OpRaise:
+	case ir.OpVaStart, ir.OpVaEnd:
 		return true
 	case ir.OpLoad:
-		if load, ok := inst.(*ir.LoadInst); ok && load.Volatile {
-			return true
+		if load, ok := inst.(*ir.LoadInst); ok {
+			return load.Volatile
 		}
 		return false
-	// FIX: Added Async/Process ops to side-effects.
-	// Even if the return value (Handle/PID) is unused, the task/process must still start.
-	// Await creates a synchronization point, so it must also be kept.
+	// Important: Async/Process creation implies side effects (spawning threads/processes)
 	case ir.OpAsyncTaskCreate, ir.OpProcessCreate, ir.OpAsyncTaskAwait:
+		return true
+	// Memory intrinsics
+	case ir.OpMemCpy, ir.OpMemMove, ir.OpMemSet:
 		return true
 	default:
 		return false
 	}
 }
 
-// removeUnreachableBlocks performs simple CFG cleanup.
 func (opt *DCE) removeUnreachableBlocks(fn *ir.Function) {
 	if fn.EntryBlock() == nil {
 		return
@@ -282,7 +305,7 @@ func (opt *DCE) removeUnreachableBlocks(fn *ir.Function) {
 	queue := []*ir.BasicBlock{fn.EntryBlock()}
 	reachable[fn.EntryBlock()] = true
 
-	// BFS
+	// BFS to find reachable blocks
 	for len(queue) > 0 {
 		curr := queue[0]
 		queue = queue[1:]
@@ -300,6 +323,8 @@ func (opt *DCE) removeUnreachableBlocks(fn *ir.Function) {
 	for _, block := range fn.Blocks {
 		if reachable[block] {
 			activeBlocks = append(activeBlocks, block)
+			
+			// Clean up predecessor lists for reachable blocks
 			var validPreds []*ir.BasicBlock
 			for _, pred := range block.Predecessors {
 				if reachable[pred] {
@@ -307,21 +332,7 @@ func (opt *DCE) removeUnreachableBlocks(fn *ir.Function) {
 				}
 			}
 			block.Predecessors = validPreds
-		} else {
-			for _, succ := range block.Successors {
-				opt.removePredecessor(succ, block)
-			}
 		}
 	}
 	fn.Blocks = activeBlocks
-}
-
-func (opt *DCE) removePredecessor(target *ir.BasicBlock, deadPred *ir.BasicBlock) {
-	var newPreds []*ir.BasicBlock
-	for _, pred := range target.Predecessors {
-		if pred != deadPred {
-			newPreds = append(newPreds, pred)
-		}
-	}
-	target.Predecessors = newPreds
 }
