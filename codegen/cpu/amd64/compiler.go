@@ -203,7 +203,7 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	if inst == nil { return fmt.Errorf("nil instruction encountered") }
 
 	// DEBUG LOGGING: Identify the crashing instruction
-	fmt.Printf("[CodeGen] Compiling Op %d: %s\n", inst.Opcode(), inst.String())
+	// fmt.Printf("[CodeGen] Compiling Op %d: %s\n", inst.Opcode(), inst.String())
 
 	if inst.Opcode() == ir.OpAsyncTaskCreate {
 		return c.compileAsyncTaskCreate(inst.(*ir.AsyncTaskCreateInst))
@@ -429,19 +429,17 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 						c.asm.Add(RegOp(RAX), ImmOp(int64(offset)))
 					}
 					
-					// --- FIX: Handle Class Header Type Resolution ---
+					// --- Handle Class Header Type Resolution ---
 					if st.IsClass {
 						if idx == 0 {
 							// Index 0 is the hidden RefCount header (i64)
 							currentType = types.I64
 						} else {
 							// Index N corresponds to User Field N-1
-							// We must check bounds safely
 							fieldIdx := idx - 1
 							if fieldIdx >= 0 && fieldIdx < len(st.Fields) {
 								currentType = st.Fields[fieldIdx]
 							} else {
-								// Fallback/Safety: Treat as i8 (should not happen in valid IR)
 								currentType = types.I8
 							}
 						}
@@ -454,7 +452,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 						}
 					}
 				} else {
-					// Dynamic struct indexing is not supported by standard GEP, usually requires Constants
 					return fmt.Errorf("non-constant struct index in GEP")
 				}
 			} else if at, ok := currentType.(*types.ArrayType); ok {
@@ -599,7 +596,9 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			return fmt.Errorf("invalid call instruction: no callee")
 		}
 
+		// Handle Return Values
 		if call.Type() != nil && call.Type().Kind() != types.VoidKind {
+			size := SizeOf(call.Type())
 			if types.IsFloat(call.Type()) {
 				if call.Type().BitSize() == 32 {
 					c.asm.MovdXmmToGpr(RAX, 0)
@@ -608,13 +607,31 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 				}
 				c.store(RAX, inst)
 			} else {
-				c.store(RAX, inst)
+				if size <= 8 {
+					c.store(RAX, inst)
+				} else if size <= 16 {
+					// Handle 16-byte structs returned in RAX:RDX
+					if off, ok := c.stackMap[inst]; ok {
+						c.asm.Mov(NewMem(RBP, off), RegOp(RAX), 64)
+						c.asm.Mov(NewMem(RBP, off+8), RegOp(RDX), 64)
+					}
+				}
 			}
 		}
 
 	case ir.OpRet:
 		if len(inst.Operands()) > 0 {
-			c.load(RAX, inst.Operands()[0])
+			val := inst.Operands()[0]
+			size := SizeOf(val.Type())
+			if size <= 8 {
+				c.load(RAX, val)
+			} else if size <= 16 {
+				// Return 16-byte struct in RAX:RDX
+				if off, ok := c.stackMap[val]; ok {
+					c.asm.Mov(RegOp(RAX), NewMem(RBP, off), 64)
+					c.asm.Mov(RegOp(RDX), NewMem(RBP, off+8), 64)
+				}
+			}
 		}
 		c.asm.Mov(RegOp(RSP), RegOp(RBP), 64)
 		c.asm.Pop(RBP)
@@ -630,7 +647,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		cbr := inst.(*ir.CondBrInst)
 		if cbr.Condition == nil { return fmt.Errorf("CondBr missing condition") }
 		
-		// Load condition and test it
 		c.load(RAX, cbr.Condition)
 		c.asm.Test(RAX, RAX)
 		offFalse := c.asm.JccRel(CondEq, 0)
