@@ -186,6 +186,7 @@ func (b *Builder) CreateBlockInFunction(name string, fn *ir.Function) *ir.BasicB
 
 func (b *Builder) CreateRet(v ir.Value) *ir.RetInst {
 	inst := &ir.RetInst{}
+	inst.Self = inst
 	inst.Op = ir.OpRet
 	if v != nil {
 		inst.SetOperand(0, v)
@@ -196,6 +197,7 @@ func (b *Builder) CreateRet(v ir.Value) *ir.RetInst {
 
 func (b *Builder) CreateRetVoid() *ir.RetInst {
 	inst := &ir.RetInst{}
+	inst.Self = inst
 	inst.Op = ir.OpRet
 	b.insert(inst)
 	return inst
@@ -203,6 +205,7 @@ func (b *Builder) CreateRetVoid() *ir.RetInst {
 
 func (b *Builder) CreateBr(target *ir.BasicBlock) *ir.BrInst {
 	inst := &ir.BrInst{Target: target}
+	inst.Self = inst
 	inst.Op = ir.OpBr
 	b.insert(inst)
 	b.currentBlock.Successors = append(b.currentBlock.Successors, target)
@@ -216,6 +219,7 @@ func (b *Builder) CreateCondBr(cond ir.Value, trueBlock, falseBlock *ir.BasicBlo
 		TrueBlock:  trueBlock,
 		FalseBlock: falseBlock,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpCondBr
 	b.insert(inst)
 	b.currentBlock.Successors = append(b.currentBlock.Successors, trueBlock, falseBlock)
@@ -230,6 +234,7 @@ func (b *Builder) CreateSwitch(cond ir.Value, defaultBlock *ir.BasicBlock, numCa
 		DefaultBlock: defaultBlock,
 		Cases:        make([]ir.SwitchCase, 0, numCases),
 	}
+	inst.Self = inst
 	inst.Op = ir.OpSwitch
 	b.insert(inst)
 	b.currentBlock.Successors = append(b.currentBlock.Successors, defaultBlock)
@@ -248,6 +253,7 @@ func (b *Builder) AddCase(sw *ir.SwitchInst, val *ir.ConstantInt, block *ir.Basi
 
 func (b *Builder) CreateUnreachable() *ir.UnreachableInst {
 	inst := &ir.UnreachableInst{}
+	inst.Self = inst
 	inst.Op = ir.OpUnreachable
 	b.insert(inst)
 	return inst
@@ -262,6 +268,7 @@ func (b *Builder) createBinaryOp(op ir.Opcode, lhs, rhs ir.Value, name string) *
 		name = b.generateName()
 	}
 	inst := &ir.BinaryInst{}
+	inst.Self = inst
 	inst.Op = op
 	inst.SetName(name)
 	inst.SetOperand(0, lhs)
@@ -394,6 +401,7 @@ func (b *Builder) CreateAlloca(typ types.Type, name string) *ir.AllocaInst {
 	inst := &ir.AllocaInst{
 		AllocatedType: typ,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpAlloca
 	inst.SetType(types.NewPointer(typ))
 	inst.SetName(name)
@@ -409,6 +417,7 @@ func (b *Builder) CreateAllocaWithCount(typ types.Type, count ir.Value, name str
 		AllocatedType: typ,
 		NumElements:   count,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpAlloca
 	inst.SetType(types.NewPointer(typ))
 	inst.SetName(name)
@@ -421,6 +430,7 @@ func (b *Builder) CreateLoad(typ types.Type, ptr ir.Value, name string) *ir.Load
 		name = b.generateName()
 	}
 	inst := &ir.LoadInst{}
+	inst.Self = inst
 	inst.Op = ir.OpLoad
 	inst.SetName(name)
 	inst.SetType(typ)
@@ -443,6 +453,7 @@ func (b *Builder) CreateAlignedLoad(typ types.Type, ptr ir.Value, align int, nam
 
 func (b *Builder) CreateStore(val ir.Value, ptr ir.Value) *ir.StoreInst {
 	inst := &ir.StoreInst{}
+	inst.Self = inst
 	inst.Op = ir.OpStore
 	inst.SetOperand(0, val)
 	inst.SetOperand(1, ptr)
@@ -473,6 +484,7 @@ func (b *Builder) CreateGEP(pointeeType types.Type, ptr ir.Value, indices []ir.V
 	inst := &ir.GetElementPtrInst{
 		SourceElementType: pointeeType,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpGetElementPtr
 	inst.SetName(name)
 
@@ -525,6 +537,7 @@ func (b *Builder) createCast(op ir.Opcode, v ir.Value, destTy types.Type, name s
 	inst := &ir.CastInst{
 		DestType: destTy,
 	}
+	inst.Self = inst
 	inst.Op = op
 	inst.SetName(name)
 	inst.SetType(destTy)
@@ -592,6 +605,7 @@ func (b *Builder) CreateICmp(pred ir.ICmpPredicate, lhs, rhs ir.Value, name stri
 	inst := &ir.ICmpInst{
 		Predicate: pred,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpICmp
 	inst.SetName(name)
 	inst.SetType(types.I1)
@@ -608,6 +622,7 @@ func (b *Builder) CreateFCmp(pred ir.FCmpPredicate, lhs, rhs ir.Value, name stri
 	inst := &ir.FCmpInst{
 		Predicate: pred,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpFCmp
 	inst.SetName(name)
 	inst.SetType(types.I1)
@@ -666,6 +681,7 @@ func (b *Builder) CreatePhi(typ types.Type, name string) *ir.PhiInst {
 		name = b.generateName()
 	}
 	inst := &ir.PhiInst{}
+	inst.Self = inst
 	inst.Op = ir.OpPhi
 	inst.SetName(name)
 	inst.SetType(typ)
@@ -678,6 +694,7 @@ func (b *Builder) CreateSelect(cond ir.Value, trueVal, falseVal ir.Value, name s
 		name = b.generateName()
 	}
 	inst := &ir.SelectInst{}
+	inst.Self = inst
 	inst.Op = ir.OpSelect
 	inst.SetName(name)
 	inst.SetType(trueVal.Type())
@@ -697,6 +714,7 @@ func (b *Builder) CreateCall(fn *ir.Function, args []ir.Value, name string) *ir.
 		CalleeVal: fn,
 		CallConv:  fn.CallConv,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpCall
 	inst.SetName(name)
 	inst.SetType(fn.FuncType.ReturnType)
@@ -726,6 +744,7 @@ func (b *Builder) CreateIndirectCall(callee ir.Value, args []ir.Value, name stri
 		CalleeVal: callee,
 		CallConv:  ir.CC_C, // Default, effectively dynamic
 	}
+	inst.Self = inst
 	inst.Op = ir.OpCall
 	inst.SetName(name)
 	inst.SetType(retType)
@@ -743,6 +762,7 @@ func (b *Builder) CreateCallByName(name string, retType types.Type, args []ir.Va
 	inst := &ir.CallInst{
 		CalleeName: name,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpCall
 	inst.SetName(resultName)
 	inst.SetType(retType)
@@ -759,6 +779,7 @@ func (b *Builder) CreateSyscall(args []ir.Value) *ir.SyscallInst {
 	}
 	name := b.generateName()
 	inst := &ir.SyscallInst{}
+	inst.Self = inst
 	inst.Op = ir.OpSyscall
 	inst.SetName(name)
 	inst.SetType(types.I64)
@@ -777,6 +798,7 @@ func (b *Builder) CreateExtractValue(agg ir.Value, indices []int, name string) *
 	inst := &ir.ExtractValueInst{
 		Indices: indices,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpExtractValue
 	inst.SetName(name)
 
@@ -804,6 +826,7 @@ func (b *Builder) CreateInsertValue(agg ir.Value, val ir.Value, indices []int, n
 	inst := &ir.InsertValueInst{
 		Indices: indices,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpInsertValue
 	inst.SetName(name)
 	inst.SetType(agg.Type())
@@ -859,8 +882,13 @@ func (b *Builder) False() *ir.ConstantInt {
 	return b.ConstInt(types.I1, 0)
 }
 
+// ============================================================================
+// Intrinsic operations
+// ============================================================================
+
 func (b *Builder) CreateVaStart(vaList ir.Value) *ir.VaStartInst {
 	inst := &ir.VaStartInst{}
+	inst.Self = inst
 	inst.Op = ir.OpVaStart
 	inst.SetOperand(0, vaList)
 	inst.SetType(types.Void)
@@ -875,6 +903,7 @@ func (b *Builder) CreateVaArg(vaList ir.Value, argType types.Type, name string) 
 	inst := &ir.VaArgInst{
 		ArgType: argType,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpVaArg
 	inst.SetName(name)
 	inst.SetType(argType)
@@ -885,16 +914,13 @@ func (b *Builder) CreateVaArg(vaList ir.Value, argType types.Type, name string) 
 
 func (b *Builder) CreateVaEnd(vaList ir.Value) *ir.VaEndInst {
 	inst := &ir.VaEndInst{}
+	inst.Self = inst
 	inst.Op = ir.OpVaEnd
 	inst.SetOperand(0, vaList)
 	inst.SetType(types.Void)
 	b.insert(inst)
 	return inst
 }
-
-// ============================================================================
-// Intrinsic operations
-// ============================================================================
 
 func (b *Builder) CreateSizeOf(typ types.Type, name string) *ir.SizeOfInst {
 	if name == "" {
@@ -903,6 +929,7 @@ func (b *Builder) CreateSizeOf(typ types.Type, name string) *ir.SizeOfInst {
 	inst := &ir.SizeOfInst{
 		QueryType: typ,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpSizeOf
 	inst.SetName(name)
 	inst.SetType(types.U64)
@@ -917,6 +944,7 @@ func (b *Builder) CreateAlignOf(typ types.Type, name string) *ir.AlignOfInst {
 	inst := &ir.AlignOfInst{
 		QueryType: typ,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpAlignOf
 	inst.SetName(name)
 	inst.SetType(types.U64)
@@ -926,6 +954,7 @@ func (b *Builder) CreateAlignOf(typ types.Type, name string) *ir.AlignOfInst {
 
 func (b *Builder) CreateMemSet(dest ir.Value, val ir.Value, count ir.Value) *ir.MemSetInst {
 	inst := &ir.MemSetInst{}
+	inst.Self = inst
 	inst.Op = ir.OpMemSet
 	inst.SetType(types.Void)
 	inst.SetOperand(0, dest)
@@ -937,6 +966,7 @@ func (b *Builder) CreateMemSet(dest ir.Value, val ir.Value, count ir.Value) *ir.
 
 func (b *Builder) CreateMemCpy(dest ir.Value, src ir.Value, count ir.Value) *ir.MemCpyInst {
 	inst := &ir.MemCpyInst{}
+	inst.Self = inst
 	inst.Op = ir.OpMemCpy
 	inst.SetType(types.Void)
 	inst.SetOperand(0, dest)
@@ -948,6 +978,7 @@ func (b *Builder) CreateMemCpy(dest ir.Value, src ir.Value, count ir.Value) *ir.
 
 func (b *Builder) CreateMemMove(dest ir.Value, src ir.Value, count ir.Value) *ir.MemMoveInst {
 	inst := &ir.MemMoveInst{}
+	inst.Self = inst
 	inst.Op = ir.OpMemMove
 	inst.SetType(types.Void)
 	inst.SetOperand(0, dest)
@@ -962,6 +993,7 @@ func (b *Builder) CreateStrLen(str ir.Value, name string) *ir.StrLenInst {
 		name = b.generateName()
 	}
 	inst := &ir.StrLenInst{}
+	inst.Self = inst
 	inst.Op = ir.OpStrLen
 	inst.SetName(name)
 	inst.SetType(types.U64)
@@ -975,6 +1007,7 @@ func (b *Builder) CreateMemChr(ptr ir.Value, val ir.Value, count ir.Value, name 
 		name = b.generateName()
 	}
 	inst := &ir.MemChrInst{}
+	inst.Self = inst
 	inst.Op = ir.OpMemChr
 	inst.SetName(name)
 	inst.SetType(types.NewPointer(types.Void))
@@ -990,6 +1023,7 @@ func (b *Builder) CreateMemCmp(ptr1 ir.Value, ptr2 ir.Value, count ir.Value, nam
 		name = b.generateName()
 	}
 	inst := &ir.MemCmpInst{}
+	inst.Self = inst
 	inst.Op = ir.OpMemCmp
 	inst.SetName(name)
 	inst.SetType(types.I32)
@@ -1002,6 +1036,7 @@ func (b *Builder) CreateMemCmp(ptr1 ir.Value, ptr2 ir.Value, count ir.Value, nam
 
 func (b *Builder) CreateRaise(message ir.Value) *ir.RaiseInst {
 	inst := &ir.RaiseInst{}
+	inst.Self = inst
 	inst.Op = ir.OpRaise
 	inst.SetType(types.Void)
 	inst.SetOperand(0, message)
@@ -1022,6 +1057,7 @@ func (b *Builder) CreateAsyncTask(fn *ir.Function, args []ir.Value, name string)
 	inst := &ir.AsyncTaskCreateInst{
 		Callee: fn,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpAsyncTaskCreate
 	inst.SetName(name)
 
@@ -1042,6 +1078,7 @@ func (b *Builder) CreateAwaitTask(handle ir.Value, resultType types.Type, name s
 		name = b.generateName()
 	}
 	inst := &ir.AsyncTaskAwaitInst{}
+	inst.Self = inst
 	inst.Op = ir.OpAsyncTaskAwait
 	inst.SetName(name)
 
@@ -1053,8 +1090,6 @@ func (b *Builder) CreateAwaitTask(handle ir.Value, resultType types.Type, name s
 	return inst
 }
 
-// builder/builder.go
-
 func (b *Builder) CreateProcess(fn *ir.Function, args []ir.Value, name string) *ir.ProcessCreateInst {
 	if name == "" {
 		name = b.generateName()
@@ -1062,6 +1097,7 @@ func (b *Builder) CreateProcess(fn *ir.Function, args []ir.Value, name string) *
 	inst := &ir.ProcessCreateInst{
 		Callee: fn,
 	}
+	inst.Self = inst
 	inst.Op = ir.OpProcessCreate
 	inst.SetName(name)
 	// Process returns an int32 PID
