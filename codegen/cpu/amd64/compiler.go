@@ -202,7 +202,7 @@ func (c *compiler) compileFunction(fn *ir.Function) error {
 func (c *compiler) compileInst(inst ir.Instruction) error {
 	if inst == nil { return fmt.Errorf("nil instruction encountered") }
 
-	// DEBUG LOGGING: Identify the crashing instruction
+	// DEBUG LOGGING
 	// fmt.Printf("[CodeGen] Compiling Op %d: %s\n", inst.Opcode(), inst.String())
 
 	if inst.Opcode() == ir.OpAsyncTaskCreate {
@@ -403,7 +403,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			return nil
 		}
 
-		// Handle First Index (Array/Pointer arithmetic)
 		firstIdx := indices[0]
 		baseType := gep.SourceElementType
 		baseSize := SizeOf(baseType)
@@ -418,7 +417,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 			c.asm.Add(RegOp(RAX), RegOp(RCX))
 		}
 
-		// Handle Subsequent Indices (Struct/Array drilling)
 		currentType := baseType
 		for _, idxVal := range indices[1:] {
 			if st, ok := currentType.(*types.StructType); ok {
@@ -429,13 +427,10 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 						c.asm.Add(RegOp(RAX), ImmOp(int64(offset)))
 					}
 					
-					// --- Handle Class Header Type Resolution ---
 					if st.IsClass {
 						if idx == 0 {
-							// Index 0 is the hidden RefCount header (i64)
 							currentType = types.I64
 						} else {
-							// Index N corresponds to User Field N-1
 							fieldIdx := idx - 1
 							if fieldIdx >= 0 && fieldIdx < len(st.Fields) {
 								currentType = st.Fields[fieldIdx]
@@ -444,7 +439,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 							}
 						}
 					} else {
-						// Standard Struct
 						if idx >= 0 && idx < len(st.Fields) {
 							currentType = st.Fields[idx]
 						} else {
@@ -520,6 +514,12 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	case ir.OpAlignOf:
 		val := AlignOf(inst.(*ir.AlignOfInst).QueryType)
 		c.asm.Mov(RegOp(RAX), ImmOp(int64(val)), 64)
+		c.store(RAX, inst)
+
+	case ir.OpStrLen:
+		if err := requireOps(1); err != nil { return err }
+		c.load(RDI, inst.Operands()[0])
+		c.asm.CallRelative("strlen")
 		c.store(RAX, inst)
 
 	case ir.OpSyscall:
@@ -727,12 +727,6 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 	case ir.OpUnreachable:
 		c.asm.emitByte(0x0F)
 		c.asm.emitByte(0x0B)
-
-	case ir.OpStrLen:
-		if err := requireOps(1); err != nil { return err }
-		c.load(RDI, inst.Operands()[0])
-		c.asm.CallRelative("strlen")
-		c.store(RAX, inst)
 
 	default:
 		return fmt.Errorf("unknown opcode: %s", inst.Opcode())
