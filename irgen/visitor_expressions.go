@@ -607,6 +607,7 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		name = fmt.Sprintf("%s_lambda_%d", g.ctx.CurrentFunction.Name(), len(g.ctx.Module.Functions))
 	}
 
+	// 1. Resolve Return Type
 	var retType types.Type = types.Void
 	if ctx.ReturnType() != nil {
 		if ctx.ReturnType().Type_() != nil {
@@ -614,6 +615,7 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		}
 	}
 
+	// 2. Resolve Parameters
 	var paramTypes []types.Type
 	var paramNames []string
 	if ctx.ParameterList() != nil {
@@ -623,26 +625,30 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		}
 	}
 
+	// 3. Create Function
 	fn := g.ctx.Builder.CreateFunction(name, retType, paramTypes, false)
 
-	// Clean Token Checks
 	if ctx.ASYNC() != nil {
 		fn.FuncType.IsAsync = true
 	} else if ctx.PROCESS() != nil {
 		fn.FuncType.IsProcess = true
 	}
 
+	// 4. Save Context
 	prevFunc := g.ctx.CurrentFunction
 	prevBlock := g.ctx.Builder.GetInsertBlock()
 	
+	// 5. Enter New Function Context
 	g.ctx.EnterFunction(fn)
 	g.enterScope(ctx)
 
-	// --- FIX START: Create Entry Block for the new function ---
+	// --- CRITICAL FIX START ---
+	// Create an entry block so instructions don't leak into 'main'
 	entryBlock := g.ctx.Builder.CreateBlock("entry")
 	g.ctx.Builder.SetInsertPoint(entryBlock)
-	// --- FIX END ---
+	// --- CRITICAL FIX END ---
 
+	// 6. Setup Arguments
 	for i, arg := range fn.Arguments {
 		arg.SetName(paramNames[i])
 		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
@@ -655,11 +661,13 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		}
 	}
 
+	// 7. Generate Body
 	if ctx.Block() != nil {
 		outerDefer := g.deferStack
 		g.deferStack = NewDeferStack()
 		g.Visit(ctx.Block())
 
+		// Handle implicit return
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			g.deferStack.Emit(g)
 			if retType == types.Void {
@@ -671,6 +679,7 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		g.deferStack = outerDefer
 	}
 
+	// 8. Restore Context
 	g.exitScope()
 	g.ctx.ExitFunction()
 	
@@ -689,11 +698,11 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		return g.Visit(ctx.StructLiteral())
 	}
 	
-	// --- FIX START: Ensure Anonymous Function is visited ---
+	// --- ENSURE THIS IS PRESENT ---
 	if ctx.AnonymousFuncExpression() != nil {
 		return g.Visit(ctx.AnonymousFuncExpression())
 	}
-	// --- FIX END ---
+	// ------------------------------
 
 	if ctx.Literal() != nil {
 		return g.Visit(ctx.Literal())
