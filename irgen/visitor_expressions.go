@@ -976,24 +976,70 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 }
 
 func (g *Generator) VisitInitializerList(ctx *parser.InitializerListContext) interface{} {
-	var elems []ir.Constant
+	var values []ir.Value
 	var elemType types.Type
+
+	// 1. Visit all expressions to get values and infer type
 	for _, expr := range ctx.AllExpression() {
-		val := g.Visit(expr)
-		if c, ok := val.(ir.Constant); ok {
-			elems = append(elems, c)
-			if elemType == nil {
-				elemType = c.Type()
-			}
-		} else {
-			panic("Non-constant initializer list not supported in this simplified compiler")
+		val := g.Visit(expr).(ir.Value)
+		values = append(values, val)
+		// Infer element type from the first expression
+		if elemType == nil {
+			elemType = val.Type()
 		}
 	}
-	if elemType == nil {
-		elemType = types.I64
+
+	// Handle empty list
+	if len(values) == 0 {
+		return g.getZeroValue(types.I64)
 	}
-	arrType := types.NewArray(elemType, int64(len(elems)))
-	return &ir.ConstantArray{BaseValue: ir.BaseValue{ValType: arrType}, Elements: elems}
+
+	arrType := types.NewArray(elemType, int64(len(values)))
+
+	// 2. Try to build a Constant Array (Optimization)
+	// We check if all elements are constants AND can be cast to elemType as constants.
+	allConstants := true
+	var constElems []ir.Constant
+
+	for _, val := range values {
+		if _, ok := val.(ir.Constant); !ok {
+			allConstants = false
+			break
+		}
+	}
+
+	if allConstants {
+		// Attempt to cast all elements. If any cast results in a non-constant instruction 
+		// (e.g. bitcast pointer), we must abort the constant path and use runtime initialization.
+		for _, val := range values {
+			casted := g.emitCast(val, elemType)
+			if c, ok := casted.(ir.Constant); ok {
+				constElems = append(constElems, c)
+			} else {
+				allConstants = false
+				break
+			}
+		}
+	}
+
+	if allConstants {
+		return &ir.ConstantArray{
+			BaseValue: ir.BaseValue{ValType: arrType},
+			Elements:  constElems,
+		}
+	}
+
+	// 3. Runtime Initialization (InsertValue)
+	// Create a zeroed array value
+	var agg ir.Value = g.ctx.Builder.ConstZero(arrType)
+
+	for i, val := range values {
+		val = g.emitCast(val, elemType)
+		// Insert value into the aggregate at index i
+		agg = g.ctx.Builder.CreateInsertValue(agg, val, []int{i}, "")
+	}
+
+	return agg
 }
 
 func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {

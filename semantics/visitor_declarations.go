@@ -87,12 +87,15 @@ func (a *Analyzer) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface{
 // --- Extern C Support ---
 
 func (a *Analyzer) VisitExternCDecl(ctx *parser.ExternCDeclContext) interface{} {
-	for _, member := range ctx.AllExternCMember() {
-		if fn := member.ExternCFunctionDecl(); fn != nil {
-			a.visitExternCFunction(fn.(*parser.ExternCFunctionDeclContext))
-		}
-	}
-	return nil
+    // Phase 1: Register C Functions
+    if a.Phase == 1 {
+        for _, member := range ctx.AllExternCMember() {
+            if fn := member.ExternCFunctionDecl(); fn != nil {
+                a.visitExternCFunction(fn.(*parser.ExternCFunctionDeclContext))
+            }
+        }
+    }
+    return nil
 }
 
 func (a *Analyzer) visitExternCFunction(ctx *parser.ExternCFunctionDeclContext) {
@@ -125,10 +128,35 @@ func (a *Analyzer) visitExternCFunction(ctx *parser.ExternCFunctionDeclContext) 
 // --- Extern C++ Support ---
 
 func (a *Analyzer) VisitExternCppDecl(ctx *parser.ExternCppDeclContext) interface{} {
-	for _, member := range ctx.AllExternCppMember() {
-		a.visitExternCppMember(member)
-	}
-	return nil
+    // Phase 0: Register Types (Opaque Classes / Namespaces / Classes)
+    if a.Phase == 0 {
+        for _, member := range ctx.AllExternCppMember() {
+            c := member.(*parser.ExternCppMemberContext)
+            if c.ExternCppClassDecl() != nil {
+                a.visitExternCppMember(member) // Registers struct name
+            } else if c.ExternCppOpaqueClassDecl() != nil {
+                a.visitExternCppMember(member) // Registers struct name
+            } else if c.ExternCppNamespaceDecl() != nil {
+                a.visitExternCppMember(member) // Recurse
+            }
+        }
+        return nil
+    }
+
+    // Phase 1: Register Functions & Methods
+    if a.Phase == 1 {
+        for _, member := range ctx.AllExternCppMember() {
+            c := member.(*parser.ExternCppMemberContext)
+            // Skip classes/opaque decls (handled in Phase 0)
+            if c.ExternCppClassDecl() == nil && c.ExternCppOpaqueClassDecl() == nil {
+                a.visitExternCppMember(member)
+            } else if c.ExternCppClassDecl() != nil {
+                // We still need to visit class members to register methods
+                 a.visitExternCppMember(member)
+            }
+        }
+    }
+    return nil
 }
 
 func (a *Analyzer) visitExternCppMember(ctx parser.IExternCppMemberContext) {
