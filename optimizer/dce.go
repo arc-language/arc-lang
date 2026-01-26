@@ -74,7 +74,7 @@ func (opt *DCE) runGlobalDCE(m *ir.Module) {
 	var activeFunctions []*ir.Function
 	for _, fn := range m.Functions {
 		if len(fn.Blocks) == 0 {
-			// Keep declarations if they are used
+			// Keep declarations if they are reachable
 			if opt.reachableFunctions[fn] {
 				activeFunctions = append(activeFunctions, fn)
 			}
@@ -97,7 +97,7 @@ func (opt *DCE) runGlobalDCE(m *ir.Module) {
 }
 
 func (opt *DCE) markFunctionReachable(fn *ir.Function) {
-	// FIX: Guard against nil pointers (typed nils from interfaces)
+	// Guard against nil pointers
 	if fn == nil {
 		return
 	}
@@ -108,7 +108,6 @@ func (opt *DCE) markFunctionReachable(fn *ir.Function) {
 }
 
 func (opt *DCE) markGlobalReachable(g *ir.Global) {
-	// FIX: Guard against nil pointers
 	if g == nil {
 		return
 	}
@@ -119,7 +118,6 @@ func (opt *DCE) markGlobalReachable(g *ir.Global) {
 }
 
 func (opt *DCE) scanFunctionDeps(fn *ir.Function) {
-	// FIX: Guard against processing a nil function
 	if fn == nil {
 		return
 	}
@@ -130,18 +128,26 @@ func (opt *DCE) scanFunctionDeps(fn *ir.Function) {
 				opt.checkValue(op)
 			}
 
-			// Scan Special Fields (CallInst Targets)
+			// Scan Special Fields
 			if call, ok := inst.(*ir.CallInst); ok {
 				if call.Callee != nil {
 					opt.markFunctionReachable(call.Callee)
 				}
+				// Also check CalleeVal if it's a value (could be global/function)
+				if call.CalleeVal != nil {
+					opt.checkValue(call.CalleeVal)
+				}
 			}
-			// Scan Async/Process Targets
+			
 			if async, ok := inst.(*ir.AsyncTaskCreateInst); ok {
 				if async.Callee != nil {
 					opt.markFunctionReachable(async.Callee)
 				}
+				if async.CalleeVal != nil {
+					opt.checkValue(async.CalleeVal)
+				}
 			}
+			
 			if proc, ok := inst.(*ir.ProcessCreateInst); ok {
 				if proc.Callee != nil {
 					opt.markFunctionReachable(proc.Callee)
@@ -253,7 +259,7 @@ func (opt *DCE) hasSideEffects(inst ir.Instruction) bool {
 			return true
 		}
 		return false
-	// FIX: Added OpAsyncTaskAwait to side-effects (synchronization point)
+	// FIX: Added OpAsyncTaskAwait to side-effects
 	case ir.OpAsyncTaskCreate, ir.OpProcessCreate, ir.OpAsyncTaskAwait:
 		return true
 	default:
