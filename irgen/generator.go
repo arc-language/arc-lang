@@ -217,11 +217,13 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			fn.CallConv = ir.CC_PTX 
 		}
 
-		// Apply Concurrency Flags
-		if ctx.ASYNC() != nil {
-			fn.FuncType.IsAsync = true
-		} else if ctx.PROCESS() != nil {
-			fn.FuncType.IsProcess = true
+		// Apply Concurrency Flags (Updated for ExecutionStrategy)
+		if es := ctx.ExecutionStrategy(); es != nil {
+			if es.ASYNC() != nil {
+				fn.FuncType.IsAsync = true
+			} else if es.PROCESS() != nil {
+				fn.FuncType.IsProcess = true
+			}
 		}
 
 		if sym != nil {

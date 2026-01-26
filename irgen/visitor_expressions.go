@@ -628,10 +628,13 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 	// 3. Create Function
 	fn := g.ctx.Builder.CreateFunction(name, retType, paramTypes, false)
 
-	if ctx.ASYNC() != nil {
-		fn.FuncType.IsAsync = true
-	} else if ctx.PROCESS() != nil {
-		fn.FuncType.IsProcess = true
+	// Updated for ExecutionStrategy
+	if es := ctx.ExecutionStrategy(); es != nil {
+		if es.ASYNC() != nil {
+			fn.FuncType.IsAsync = true
+		} else if es.PROCESS() != nil {
+			fn.FuncType.IsProcess = true
+		}
 	}
 
 	// 4. Save Context

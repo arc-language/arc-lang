@@ -386,10 +386,22 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 			}
 		}
 
+		// Updated for ExecutionStrategy
 		var fnType *types.FunctionType
-		if ctx.ASYNC() != nil {
+		isAsync := false
+		isProcess := false
+		
+		if es := ctx.ExecutionStrategy(); es != nil {
+			if es.ASYNC() != nil {
+				isAsync = true
+			} else if es.PROCESS() != nil {
+				isProcess = true
+			}
+		}
+
+		if isAsync {
 			fnType = types.NewAsyncFunction(retType, paramTypes, false)
-		} else if ctx.PROCESS() != nil {
+		} else if isProcess {
 			fnType = types.NewProcessFunction(retType, paramTypes, false)
 		} else {
 			fnType = types.NewFunction(retType, paramTypes, false)
