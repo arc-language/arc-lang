@@ -49,7 +49,24 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 			}
 		}
 		
-		return types.NewFunction(retType, paramTypes, ft.ASYNC() != nil)
+		// Updated for ExecutionStrategy
+		isAsync := false
+		isProcess := false
+		
+		if es := ft.ExecutionStrategy(); es != nil {
+			if es.ASYNC() != nil {
+				isAsync = true
+			} else if es.PROCESS() != nil {
+				isProcess = true
+			}
+		}
+
+		if isAsync {
+			return types.NewAsyncFunction(retType, paramTypes, false)
+		} else if isProcess {
+			return types.NewProcessFunction(retType, paramTypes, false)
+		}
+		return types.NewFunction(retType, paramTypes, false)
 	}
 
 	// 5. Generic/Qualified Types
@@ -72,7 +89,6 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 		// Resolve base symbol
 		s, ok := a.currentScope.Resolve(name)
 		
-		// Fix: Go-style namespace resolution.
 		if !ok && a.currentNamespacePrefix != "" && tc.QualifiedType() == nil {
 			s, ok = a.currentScope.Resolve(a.currentNamespacePrefix + "." + name)
 		}
@@ -110,8 +126,7 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 		return s.Type
 	}
 
-	// 6. FIXED: Array Types [Size]Type
-	// This was missing, causing [2]string to fall through to I64
+	// 6. Array Types [Size]Type
 	if tc.ArrayType() != nil {
 		at := tc.ArrayType()
 		elemType := a.resolveType(at.Type_())
