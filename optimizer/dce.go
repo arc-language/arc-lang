@@ -52,8 +52,6 @@ func (opt *DCE) runGlobalDCE(m *ir.Module) {
 	opt.globalWorklist = opt.globalWorklist[:0]
 
 	// 1. Find Roots (Entry points)
-	// In an executable, 'main' is the root.
-	// If we were building a library, all 'external' functions would be roots.
 	for _, fn := range m.Functions {
 		if fn.Name() == "main" || fn.Name() == "_start" {
 			opt.markFunctionReachable(fn)
@@ -75,19 +73,13 @@ func (opt *DCE) runGlobalDCE(m *ir.Module) {
 	// 3. Prune Module
 	var activeFunctions []*ir.Function
 	for _, fn := range m.Functions {
-		// Keep reachable functions AND declarations (e.g. printf)
-		// We treat declarations as "always available" but strictly speaking
-		// we could remove unused decls too. For safety, we keep decls if used OR if they are external deps.
-		// For this specific issue, we strictly check reachability for defined functions.
 		if len(fn.Blocks) == 0 {
-			// It's a declaration (like printf). Keep it only if used?
-			// Simplification: Keep all declarations to avoid link errors if logic misses something,
-			// OR check reachability. Let's check reachability to be clean.
+			// Keep declarations if they are used
 			if opt.reachableFunctions[fn] {
 				activeFunctions = append(activeFunctions, fn)
 			}
 		} else {
-			// It's a definition. Remove if dead.
+			// Keep definitions if they are reachable
 			if opt.reachableFunctions[fn] {
 				activeFunctions = append(activeFunctions, fn)
 			}
@@ -105,6 +97,10 @@ func (opt *DCE) runGlobalDCE(m *ir.Module) {
 }
 
 func (opt *DCE) markFunctionReachable(fn *ir.Function) {
+	// FIX: Guard against nil pointers (typed nils from interfaces)
+	if fn == nil {
+		return
+	}
 	if !opt.reachableFunctions[fn] {
 		opt.reachableFunctions[fn] = true
 		opt.globalWorklist = append(opt.globalWorklist, fn)
@@ -112,6 +108,10 @@ func (opt *DCE) markFunctionReachable(fn *ir.Function) {
 }
 
 func (opt *DCE) markGlobalReachable(g *ir.Global) {
+	// FIX: Guard against nil pointers
+	if g == nil {
+		return
+	}
 	if !opt.reachableGlobals[g] {
 		opt.reachableGlobals[g] = true
 		opt.globalWorklist = append(opt.globalWorklist, g)
@@ -119,6 +119,10 @@ func (opt *DCE) markGlobalReachable(g *ir.Global) {
 }
 
 func (opt *DCE) scanFunctionDeps(fn *ir.Function) {
+	// FIX: Guard against processing a nil function
+	if fn == nil {
+		return
+	}
 	for _, block := range fn.Blocks {
 		for _, inst := range block.Instructions {
 			// Scan Operands (handles Loaded Globals, Function pointers passed as args)
@@ -127,12 +131,12 @@ func (opt *DCE) scanFunctionDeps(fn *ir.Function) {
 			}
 
 			// Scan Special Fields (CallInst Targets)
-			// Direct calls store the function in .Callee, not in .Ops
 			if call, ok := inst.(*ir.CallInst); ok {
 				if call.Callee != nil {
 					opt.markFunctionReachable(call.Callee)
 				}
 			}
+			// Scan Async/Process Targets
 			if async, ok := inst.(*ir.AsyncTaskCreateInst); ok {
 				if async.Callee != nil {
 					opt.markFunctionReachable(async.Callee)
@@ -148,8 +152,6 @@ func (opt *DCE) scanFunctionDeps(fn *ir.Function) {
 }
 
 func (opt *DCE) scanGlobalDeps(g *ir.Global) {
-	// Globals might reference other things in their Initializer
-	// e.g. a global struct containing a pointer to a function
 	if g.Initializer != nil {
 		opt.checkValue(g.Initializer)
 	}
@@ -172,8 +174,6 @@ func (opt *DCE) checkValue(v ir.Value) {
 		for _, e := range t.Elements {
 			opt.checkValue(e)
 		}
-	case *ir.BaseInstruction:
-		// If we encounter an instruction as an operand (nested constraints?), recursion isn't usually needed here for Global scanning
 	}
 }
 
@@ -253,7 +253,8 @@ func (opt *DCE) hasSideEffects(inst ir.Instruction) bool {
 			return true
 		}
 		return false
-	case ir.OpAsyncTaskCreate, ir.OpProcessCreate:
+	// FIX: Added OpAsyncTaskAwait to side-effects (synchronization point)
+	case ir.OpAsyncTaskCreate, ir.OpProcessCreate, ir.OpAsyncTaskAwait:
 		return true
 	default:
 		return false
