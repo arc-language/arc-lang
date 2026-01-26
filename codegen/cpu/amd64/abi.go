@@ -69,8 +69,13 @@ func AlignOf(t types.Type) int {
 		return 8
 	case types.StructKind:
 		st := t.(*types.StructType)
-		max := 1
 		
+		// FIX: Packed structs must have alignment 1
+		if st.Packed {
+			return 1
+		}
+
+		max := 1
 		// Classes are always at least 8-byte aligned due to header
 		if st.IsClass {
 			max = 8

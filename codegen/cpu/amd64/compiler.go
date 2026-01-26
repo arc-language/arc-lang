@@ -785,6 +785,8 @@ func (c *compiler) load(dst Register, src ir.Value) {
 			c.asm.Mov(RegOp(dst), slot, 64)
 		} else if size == 4 {
 			c.asm.Mov(RegOp(dst), slot, 32)
+		} else if size == 2 {
+			c.asm.Mov(RegOp(dst), slot, 16)
 		} else if size == 1 {
 			isSigned := false
 			if intTy, ok := typ.(*types.IntType); ok && intTy.Signed {
@@ -921,6 +923,8 @@ func (c *compiler) load(dst Register, src ir.Value) {
 			c.asm.Mov(RegOp(dst), slot, 64)
 		} else if size == 4 {
 			c.asm.Mov(RegOp(dst), slot, 32)
+		} else if size == 2 {
+			c.asm.Mov(RegOp(dst), slot, 16)
 		} else if size == 1 {
 			isSigned := false
 			if intTy, ok := typ.(*types.IntType); ok && intTy.Signed {
