@@ -362,20 +362,20 @@ const (
 	ArcParserRULE_postfixExpression        = 101
 	ArcParserRULE_postfixOp                = 102
 	ArcParserRULE_primaryExpression        = 103
-	ArcParserRULE_computeExpression        = 104
-	ArcParserRULE_computeContext           = 105
-	ArcParserRULE_builtinExpression        = 106
-	ArcParserRULE_sizeofExpression         = 107
-	ArcParserRULE_alignofExpression        = 108
-	ArcParserRULE_literal                  = 109
-	ArcParserRULE_initializerList          = 110
-	ArcParserRULE_initializerEntry         = 111
-	ArcParserRULE_structLiteral            = 112
-	ArcParserRULE_fieldInit                = 113
-	ArcParserRULE_argumentList             = 114
-	ArcParserRULE_argument                 = 115
-	ArcParserRULE_lambdaExpression         = 116
-	ArcParserRULE_anonymousFuncExpression  = 117
+	ArcParserRULE_builtinExpression        = 104
+	ArcParserRULE_sizeofExpression         = 105
+	ArcParserRULE_alignofExpression        = 106
+	ArcParserRULE_literal                  = 107
+	ArcParserRULE_initializerList          = 108
+	ArcParserRULE_initializerEntry         = 109
+	ArcParserRULE_structLiteral            = 110
+	ArcParserRULE_fieldInit                = 111
+	ArcParserRULE_argumentList             = 112
+	ArcParserRULE_argument                 = 113
+	ArcParserRULE_lambdaExpression         = 114
+	ArcParserRULE_anonymousFuncExpression  = 115
+	ArcParserRULE_executionStrategy        = 116
+	ArcParserRULE_contextIdentifier        = 117
 	ArcParserRULE_lambdaParamList          = 118
 	ArcParserRULE_lambdaParam              = 119
 	ArcParserRULE_tupleExpression          = 120
@@ -444,10 +444,9 @@ func InitEmptyClassDeclContext(p *ClassDeclContext)
 func InitEmptyClassFieldContext(p *ClassFieldContext)
 func InitEmptyClassMemberContext(p *ClassMemberContext)
 func InitEmptyCompilationUnitContext(p *CompilationUnitContext)
-func InitEmptyComputeContextContext(p *ComputeContextContext)
 func InitEmptyComputeDeclContext(p *ComputeDeclContext)
-func InitEmptyComputeExpressionContext(p *ComputeExpressionContext)
 func InitEmptyConstDeclContext(p *ConstDeclContext)
+func InitEmptyContextIdentifierContext(p *ContextIdentifierContext)
 func InitEmptyContinueStmtContext(p *ContinueStmtContext)
 func InitEmptyCppCallingConventionContext(p *CppCallingConventionContext)
 func InitEmptyDefaultCaseContext(p *DefaultCaseContext)
@@ -457,6 +456,7 @@ func InitEmptyEnumDeclContext(p *EnumDeclContext)
 func InitEmptyEnumMemberContext(p *EnumMemberContext)
 func InitEmptyEqualityExpressionContext(p *EqualityExpressionContext)
 func InitEmptyExceptClauseContext(p *ExceptClauseContext)
+func InitEmptyExecutionStrategyContext(p *ExecutionStrategyContext)
 func InitEmptyExpressionContext(p *ExpressionContext)
 func InitEmptyExpressionStmtContext(p *ExpressionStmtContext)
 func InitEmptyExternCConstDeclContext(p *ExternCConstDeclContext)
@@ -616,11 +616,11 @@ func NewAnonymousFuncExpressionContext(parser antlr.Parser, parent antlr.ParserR
 
 func NewEmptyAnonymousFuncExpressionContext() *AnonymousFuncExpressionContext
 
-func (s *AnonymousFuncExpressionContext) ASYNC() antlr.TerminalNode
-
 func (s *AnonymousFuncExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
 func (s *AnonymousFuncExpressionContext) Block() IBlockContext
+
+func (s *AnonymousFuncExpressionContext) ExecutionStrategy() IExecutionStrategyContext
 
 func (s *AnonymousFuncExpressionContext) FUNC() antlr.TerminalNode
 
@@ -633,8 +633,6 @@ func (s *AnonymousFuncExpressionContext) GetRuleContext() antlr.RuleContext
 func (*AnonymousFuncExpressionContext) IsAnonymousFuncExpressionContext()
 
 func (s *AnonymousFuncExpressionContext) LPAREN() antlr.TerminalNode
-
-func (s *AnonymousFuncExpressionContext) PROCESS() antlr.TerminalNode
 
 func (s *AnonymousFuncExpressionContext) ParameterList() IParameterListContext
 
@@ -700,13 +698,11 @@ func (p *ArcParser) ClassMember() (localctx IClassMemberContext)
 
 func (p *ArcParser) CompilationUnit() (localctx ICompilationUnitContext)
 
-func (p *ArcParser) ComputeContext() (localctx IComputeContextContext)
-
 func (p *ArcParser) ComputeDecl() (localctx IComputeDeclContext)
 
-func (p *ArcParser) ComputeExpression() (localctx IComputeExpressionContext)
-
 func (p *ArcParser) ConstDecl() (localctx IConstDeclContext)
+
+func (p *ArcParser) ContextIdentifier() (localctx IContextIdentifierContext)
 
 func (p *ArcParser) ContinueStmt() (localctx IContinueStmtContext)
 
@@ -725,6 +721,8 @@ func (p *ArcParser) EnumMember() (localctx IEnumMemberContext)
 func (p *ArcParser) EqualityExpression() (localctx IEqualityExpressionContext)
 
 func (p *ArcParser) ExceptClause() (localctx IExceptClauseContext)
+
+func (p *ArcParser) ExecutionStrategy() (localctx IExecutionStrategyContext)
 
 func (p *ArcParser) Expression() (localctx IExpressionContext)
 
@@ -1219,12 +1217,6 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#primaryExpression.
 	VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#computeExpression.
-	VisitComputeExpression(ctx *ComputeExpressionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#computeContext.
-	VisitComputeContext(ctx *ComputeContextContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#builtinExpression.
 	VisitBuiltinExpression(ctx *BuiltinExpressionContext) interface{}
 
@@ -1260,6 +1252,12 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#anonymousFuncExpression.
 	VisitAnonymousFuncExpression(ctx *AnonymousFuncExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#executionStrategy.
+	VisitExecutionStrategy(ctx *ExecutionStrategyContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#contextIdentifier.
+	VisitContextIdentifier(ctx *ContextIdentifierContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#lambdaParamList.
 	VisitLambdaParamList(ctx *LambdaParamListContext) interface{}
@@ -1463,13 +1461,11 @@ func (v *BaseArcParserVisitor) VisitClassMember(ctx *ClassMemberContext) interfa
 
 func (v *BaseArcParserVisitor) VisitCompilationUnit(ctx *CompilationUnitContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitComputeContext(ctx *ComputeContextContext) interface{}
-
 func (v *BaseArcParserVisitor) VisitComputeDecl(ctx *ComputeDeclContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitComputeExpression(ctx *ComputeExpressionContext) interface{}
-
 func (v *BaseArcParserVisitor) VisitConstDecl(ctx *ConstDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitContextIdentifier(ctx *ContextIdentifierContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitContinueStmt(ctx *ContinueStmtContext) interface{}
 
@@ -1488,6 +1484,8 @@ func (v *BaseArcParserVisitor) VisitEnumMember(ctx *EnumMemberContext) interface
 func (v *BaseArcParserVisitor) VisitEqualityExpression(ctx *EqualityExpressionContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitExceptClause(ctx *ExceptClauseContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExecutionStrategy(ctx *ExecutionStrategyContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitExpression(ctx *ExpressionContext) interface{}
 
@@ -1968,29 +1966,6 @@ func (s *CompilationUnitContext) ToStringTree(ruleNames []string, recog antlr.Re
 
 func (s *CompilationUnitContext) TopLevelDecl(i int) ITopLevelDeclContext
 
-type ComputeContextContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewComputeContextContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ComputeContextContext
-
-func NewEmptyComputeContextContext() *ComputeContextContext
-
-func (s *ComputeContextContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ComputeContextContext) GetParser() antlr.Parser
-
-func (s *ComputeContextContext) GetRuleContext() antlr.RuleContext
-
-func (s *ComputeContextContext) IDENTIFIER() antlr.TerminalNode
-
-func (*ComputeContextContext) IsComputeContextContext()
-
-func (s *ComputeContextContext) QualifiedIdentifier() IQualifiedIdentifierContext
-
-func (s *ComputeContextContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
 type ComputeDeclContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
@@ -2022,51 +1997,6 @@ func (s *ComputeDeclContext) StructMember(i int) IStructMemberContext
 
 func (s *ComputeDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type ComputeExpressionContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewComputeExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ComputeExpressionContext
-
-func NewEmptyComputeExpressionContext() *ComputeExpressionContext
-
-func (s *ComputeExpressionContext) ASYNC() antlr.TerminalNode
-
-func (s *ComputeExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ComputeExpressionContext) AllLPAREN() []antlr.TerminalNode
-
-func (s *ComputeExpressionContext) AllRPAREN() []antlr.TerminalNode
-
-func (s *ComputeExpressionContext) ArgumentList() IArgumentListContext
-
-func (s *ComputeExpressionContext) Block() IBlockContext
-
-func (s *ComputeExpressionContext) ComputeContext() IComputeContextContext
-
-func (s *ComputeExpressionContext) FUNC() antlr.TerminalNode
-
-func (s *ComputeExpressionContext) GenericParams() IGenericParamsContext
-
-func (s *ComputeExpressionContext) GetParser() antlr.Parser
-
-func (s *ComputeExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (*ComputeExpressionContext) IsComputeExpressionContext()
-
-func (s *ComputeExpressionContext) LPAREN(i int) antlr.TerminalNode
-
-func (s *ComputeExpressionContext) PROCESS() antlr.TerminalNode
-
-func (s *ComputeExpressionContext) ParameterList() IParameterListContext
-
-func (s *ComputeExpressionContext) RPAREN(i int) antlr.TerminalNode
-
-func (s *ComputeExpressionContext) ReturnType() IReturnTypeContext
-
-func (s *ComputeExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
 type ConstDeclContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
@@ -2097,6 +2027,33 @@ func (*ConstDeclContext) IsConstDeclContext()
 func (s *ConstDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 func (s *ConstDeclContext) Type_() ITypeContext
+
+type ContextIdentifierContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewContextIdentifierContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ContextIdentifierContext
+
+func NewEmptyContextIdentifierContext() *ContextIdentifierContext
+
+func (s *ContextIdentifierContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ContextIdentifierContext) AllDOT() []antlr.TerminalNode
+
+func (s *ContextIdentifierContext) AllIDENTIFIER() []antlr.TerminalNode
+
+func (s *ContextIdentifierContext) DOT(i int) antlr.TerminalNode
+
+func (s *ContextIdentifierContext) GetParser() antlr.Parser
+
+func (s *ContextIdentifierContext) GetRuleContext() antlr.RuleContext
+
+func (s *ContextIdentifierContext) IDENTIFIER(i int) antlr.TerminalNode
+
+func (*ContextIdentifierContext) IsContextIdentifierContext()
+
+func (s *ContextIdentifierContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type ContinueStmtContext struct {
 	antlr.BaseParserRuleContext
@@ -2352,6 +2309,33 @@ func (*ExceptClauseContext) IsExceptClauseContext()
 func (s *ExceptClauseContext) QualifiedIdentifier() IQualifiedIdentifierContext
 
 func (s *ExceptClauseContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExecutionStrategyContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExecutionStrategyContext() *ExecutionStrategyContext
+
+func NewExecutionStrategyContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExecutionStrategyContext
+
+func (s *ExecutionStrategyContext) ASYNC() antlr.TerminalNode
+
+func (s *ExecutionStrategyContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExecutionStrategyContext) COMPUTE() antlr.TerminalNode
+
+func (s *ExecutionStrategyContext) ContextIdentifier() IContextIdentifierContext
+
+func (s *ExecutionStrategyContext) GetParser() antlr.Parser
+
+func (s *ExecutionStrategyContext) GetRuleContext() antlr.RuleContext
+
+func (*ExecutionStrategyContext) IsExecutionStrategyContext()
+
+func (s *ExecutionStrategyContext) PROCESS() antlr.TerminalNode
+
+func (s *ExecutionStrategyContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type ExpressionContext struct {
 	antlr.BaseParserRuleContext
@@ -3271,11 +3255,11 @@ func NewEmptyFunctionDeclContext() *FunctionDeclContext
 
 func NewFunctionDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *FunctionDeclContext
 
-func (s *FunctionDeclContext) ASYNC() antlr.TerminalNode
-
 func (s *FunctionDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
 func (s *FunctionDeclContext) Block() IBlockContext
+
+func (s *FunctionDeclContext) ExecutionStrategy() IExecutionStrategyContext
 
 func (s *FunctionDeclContext) FUNC() antlr.TerminalNode
 
@@ -3290,8 +3274,6 @@ func (s *FunctionDeclContext) IDENTIFIER() antlr.TerminalNode
 func (*FunctionDeclContext) IsFunctionDeclContext()
 
 func (s *FunctionDeclContext) LPAREN() antlr.TerminalNode
-
-func (s *FunctionDeclContext) PROCESS() antlr.TerminalNode
 
 func (s *FunctionDeclContext) ParameterList() IParameterListContext
 
@@ -3310,9 +3292,9 @@ func NewEmptyFunctionTypeContext() *FunctionTypeContext
 
 func NewFunctionTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *FunctionTypeContext
 
-func (s *FunctionTypeContext) ASYNC() antlr.TerminalNode
-
 func (s *FunctionTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *FunctionTypeContext) ExecutionStrategy() IExecutionStrategyContext
 
 func (s *FunctionTypeContext) FUNC() antlr.TerminalNode
 
@@ -3535,11 +3517,10 @@ type IAnonymousFuncExpressionContext interface {
 	LPAREN() antlr.TerminalNode
 	RPAREN() antlr.TerminalNode
 	Block() IBlockContext
+	ExecutionStrategy() IExecutionStrategyContext
 	GenericParams() IGenericParamsContext
 	ParameterList() IParameterListContext
 	ReturnType() IReturnTypeContext
-	ASYNC() antlr.TerminalNode
-	PROCESS() antlr.TerminalNode
 
 	// IsAnonymousFuncExpressionContext differentiates from other interfaces.
 	IsAnonymousFuncExpressionContext()
@@ -3827,21 +3808,6 @@ type ICompilationUnitContext interface {
 }
     ICompilationUnitContext is an interface to support dynamic dispatch.
 
-type IComputeContextContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	QualifiedIdentifier() IQualifiedIdentifierContext
-	IDENTIFIER() antlr.TerminalNode
-
-	// IsComputeContextContext differentiates from other interfaces.
-	IsComputeContextContext()
-}
-    IComputeContextContext is an interface to support dynamic dispatch.
-
 type IComputeDeclContext interface {
 	antlr.ParserRuleContext
 
@@ -3861,32 +3827,6 @@ type IComputeDeclContext interface {
 }
     IComputeDeclContext is an interface to support dynamic dispatch.
 
-type IComputeExpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	FUNC() antlr.TerminalNode
-	AllLPAREN() []antlr.TerminalNode
-	LPAREN(i int) antlr.TerminalNode
-	AllRPAREN() []antlr.TerminalNode
-	RPAREN(i int) antlr.TerminalNode
-	Block() IBlockContext
-	ComputeContext() IComputeContextContext
-	ASYNC() antlr.TerminalNode
-	PROCESS() antlr.TerminalNode
-	GenericParams() IGenericParamsContext
-	ParameterList() IParameterListContext
-	ReturnType() IReturnTypeContext
-	ArgumentList() IArgumentListContext
-
-	// IsComputeExpressionContext differentiates from other interfaces.
-	IsComputeExpressionContext()
-}
-    IComputeExpressionContext is an interface to support dynamic dispatch.
-
 type IConstDeclContext interface {
 	antlr.ParserRuleContext
 
@@ -3905,6 +3845,23 @@ type IConstDeclContext interface {
 	IsConstDeclContext()
 }
     IConstDeclContext is an interface to support dynamic dispatch.
+
+type IContextIdentifierContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllIDENTIFIER() []antlr.TerminalNode
+	IDENTIFIER(i int) antlr.TerminalNode
+	AllDOT() []antlr.TerminalNode
+	DOT(i int) antlr.TerminalNode
+
+	// IsContextIdentifierContext differentiates from other interfaces.
+	IsContextIdentifierContext()
+}
+    IContextIdentifierContext is an interface to support dynamic dispatch.
 
 type IContinueStmtContext interface {
 	antlr.ParserRuleContext
@@ -4064,6 +4021,23 @@ type IExceptClauseContext interface {
 	IsExceptClauseContext()
 }
     IExceptClauseContext is an interface to support dynamic dispatch.
+
+type IExecutionStrategyContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	ContextIdentifier() IContextIdentifierContext
+	ASYNC() antlr.TerminalNode
+	PROCESS() antlr.TerminalNode
+	COMPUTE() antlr.TerminalNode
+
+	// IsExecutionStrategyContext differentiates from other interfaces.
+	IsExecutionStrategyContext()
+}
+    IExecutionStrategyContext is an interface to support dynamic dispatch.
 
 type IExpressionContext interface {
 	antlr.ParserRuleContext
@@ -4642,11 +4616,10 @@ type IFunctionDeclContext interface {
 	LPAREN() antlr.TerminalNode
 	RPAREN() antlr.TerminalNode
 	Block() IBlockContext
+	ExecutionStrategy() IExecutionStrategyContext
 	GenericParams() IGenericParamsContext
 	ParameterList() IParameterListContext
 	ReturnType() IReturnTypeContext
-	ASYNC() antlr.TerminalNode
-	PROCESS() antlr.TerminalNode
 
 	// IsFunctionDeclContext differentiates from other interfaces.
 	IsFunctionDeclContext()
@@ -4663,7 +4636,7 @@ type IFunctionTypeContext interface {
 	FUNC() antlr.TerminalNode
 	LPAREN() antlr.TerminalNode
 	RPAREN() antlr.TerminalNode
-	ASYNC() antlr.TerminalNode
+	ExecutionStrategy() IExecutionStrategyContext
 	GenericParams() IGenericParamsContext
 	TypeList() ITypeListContext
 	ReturnType() IReturnTypeContext
@@ -4899,9 +4872,8 @@ type ILambdaExpressionContext interface {
 	RPAREN() antlr.TerminalNode
 	FAT_ARROW() antlr.TerminalNode
 	Block() IBlockContext
+	ExecutionStrategy() IExecutionStrategyContext
 	LambdaParamList() ILambdaParamListContext
-	ASYNC() antlr.TerminalNode
-	PROCESS() antlr.TerminalNode
 	Expression() IExpressionContext
 
 	// IsLambdaExpressionContext differentiates from other interfaces.
@@ -5032,7 +5004,7 @@ type IMethodDeclContext interface {
 	Type_() ITypeContext
 	RPAREN() antlr.TerminalNode
 	Block() IBlockContext
-	ASYNC() antlr.TerminalNode
+	ExecutionStrategy() IExecutionStrategyContext
 	GenericParams() IGenericParamsContext
 	AllCOMMA() []antlr.TerminalNode
 	COMMA(i int) antlr.TerminalNode
@@ -5206,7 +5178,6 @@ type IPrimaryExpressionContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	ComputeExpression() IComputeExpressionContext
 	BuiltinExpression() IBuiltinExpressionContext
 	Literal() ILiteralContext
 	StructLiteral() IStructLiteralContext
@@ -5961,11 +5932,11 @@ func NewEmptyLambdaExpressionContext() *LambdaExpressionContext
 
 func NewLambdaExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *LambdaExpressionContext
 
-func (s *LambdaExpressionContext) ASYNC() antlr.TerminalNode
-
 func (s *LambdaExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
 func (s *LambdaExpressionContext) Block() IBlockContext
+
+func (s *LambdaExpressionContext) ExecutionStrategy() IExecutionStrategyContext
 
 func (s *LambdaExpressionContext) Expression() IExpressionContext
 
@@ -5980,8 +5951,6 @@ func (*LambdaExpressionContext) IsLambdaExpressionContext()
 func (s *LambdaExpressionContext) LPAREN() antlr.TerminalNode
 
 func (s *LambdaExpressionContext) LambdaParamList() ILambdaParamListContext
-
-func (s *LambdaExpressionContext) PROCESS() antlr.TerminalNode
 
 func (s *LambdaExpressionContext) RPAREN() antlr.TerminalNode
 
@@ -6168,8 +6137,6 @@ func NewEmptyMethodDeclContext() *MethodDeclContext
 
 func NewMethodDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *MethodDeclContext
 
-func (s *MethodDeclContext) ASYNC() antlr.TerminalNode
-
 func (s *MethodDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
 func (s *MethodDeclContext) AllCOMMA() []antlr.TerminalNode
@@ -6183,6 +6150,8 @@ func (s *MethodDeclContext) Block() IBlockContext
 func (s *MethodDeclContext) COLON() antlr.TerminalNode
 
 func (s *MethodDeclContext) COMMA(i int) antlr.TerminalNode
+
+func (s *MethodDeclContext) ExecutionStrategy() IExecutionStrategyContext
 
 func (s *MethodDeclContext) FUNC() antlr.TerminalNode
 
@@ -6478,8 +6447,6 @@ func (s *PrimaryExpressionContext) AnonymousFuncExpression() IAnonymousFuncExpre
 func (s *PrimaryExpressionContext) ArgumentList() IArgumentListContext
 
 func (s *PrimaryExpressionContext) BuiltinExpression() IBuiltinExpressionContext
-
-func (s *PrimaryExpressionContext) ComputeExpression() IComputeExpressionContext
 
 func (s *PrimaryExpressionContext) Expression() IExpressionContext
 

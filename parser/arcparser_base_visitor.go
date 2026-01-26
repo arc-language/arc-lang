@@ -424,14 +424,6 @@ func (v *BaseArcParserVisitor) VisitPrimaryExpression(ctx *PrimaryExpressionCont
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitComputeExpression(ctx *ComputeExpressionContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitComputeContext(ctx *ComputeContextContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseArcParserVisitor) VisitBuiltinExpression(ctx *BuiltinExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -477,6 +469,14 @@ func (v *BaseArcParserVisitor) VisitLambdaExpression(ctx *LambdaExpressionContex
 }
 
 func (v *BaseArcParserVisitor) VisitAnonymousFuncExpression(ctx *AnonymousFuncExpressionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExecutionStrategy(ctx *ExecutionStrategyContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitContextIdentifier(ctx *ContextIdentifierContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

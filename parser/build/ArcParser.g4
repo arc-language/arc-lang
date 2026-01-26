@@ -190,7 +190,7 @@ genericArg: type | expression;
 // Functions
 // =============================================================================
 
-functionDecl: (ASYNC | PROCESS)? FUNC IDENTIFIER genericParams? LPAREN parameterList? RPAREN returnType? block;
+functionDecl: executionStrategy? FUNC IDENTIFIER genericParams? LPAREN parameterList? RPAREN returnType? block;
 
 returnType: type | LPAREN typeList RPAREN;
 typeList: type (COMMA type)*;
@@ -232,7 +232,7 @@ enumMember: IDENTIFIER (ASSIGN expression)?;
 // Methods
 // =============================================================================
 
-methodDecl: ASYNC? FUNC IDENTIFIER genericParams? LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN returnType? block;
+methodDecl: executionStrategy? FUNC IDENTIFIER genericParams? LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN returnType? block;
 mutatingDecl: MUTATING IDENTIFIER LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN returnType? block;
 deinitDecl: DEINIT LPAREN SELF IDENTIFIER COLON type RPAREN block;
 
@@ -265,7 +265,7 @@ type
 
 qualifiedType: IDENTIFIER (DOT IDENTIFIER)+ genericArgs?;
 
-functionType: ASYNC? FUNC genericParams? LPAREN typeList? RPAREN returnType?;
+functionType: executionStrategy? FUNC genericParams? LPAREN typeList? RPAREN returnType?;
 
 arrayType: LBRACKET expression RBRACKET type;
 
@@ -388,8 +388,7 @@ postfixOp
     ;
 
 primaryExpression
-    : computeExpression
-    | builtinExpression
+    : builtinExpression
     | literal
     | structLiteral
     | sizeofExpression
@@ -402,15 +401,6 @@ primaryExpression
     | IDENTIFIER genericArgs? (LPAREN argumentList? RPAREN)?
     | IDENTIFIER genericArgs?
     | qualifiedIdentifier genericArgs?
-    ;
-
-computeExpression
-    : (computeContext | ASYNC | PROCESS)? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block LPAREN argumentList? RPAREN
-    ;
-
-computeContext
-    : qualifiedIdentifier
-    | IDENTIFIER
     ;
 
 // =============================================================================
@@ -450,13 +440,31 @@ fieldInit: IDENTIFIER COLON expression;
 argumentList: argument (COMMA argument)*;
 argument: expression | lambdaExpression | anonymousFuncExpression;
 
+// --- Unified Execution Strategy Pattern ---
+
+// Handles: async(x) => ... OR vm(x) => ...
 lambdaExpression
-    : (ASYNC | PROCESS)? LPAREN lambdaParamList? RPAREN FAT_ARROW block
-    | (ASYNC | PROCESS)? LPAREN lambdaParamList? RPAREN FAT_ARROW expression
+    : executionStrategy? LPAREN lambdaParamList? RPAREN FAT_ARROW block
+    | executionStrategy? LPAREN lambdaParamList? RPAREN FAT_ARROW expression
     ;
 
+// Handles: async func... OR vm func... OR pkg.Run func...
+// Immediate invocation is handled by this rule + postfixExpression's call syntax '(...)'
 anonymousFuncExpression
-    : (ASYNC | PROCESS)? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
+    : executionStrategy? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
+    ;
+
+// Generic Prefix: 'async', 'process', 'compute', 'vm', 'pkg.vm', etc.
+executionStrategy
+    : contextIdentifier
+    | ASYNC
+    | PROCESS
+    | COMPUTE
+    ;
+
+// Allows single 'ID' or 'ID.ID' pattern for the execution context prefix
+contextIdentifier
+    : IDENTIFIER (DOT IDENTIFIER)*
     ;
 
 lambdaParamList: lambdaParam (COMMA lambdaParam)*;

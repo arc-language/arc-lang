@@ -320,12 +320,6 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#primaryExpression.
 	VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#computeExpression.
-	VisitComputeExpression(ctx *ComputeExpressionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#computeContext.
-	VisitComputeContext(ctx *ComputeContextContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#builtinExpression.
 	VisitBuiltinExpression(ctx *BuiltinExpressionContext) interface{}
 
@@ -361,6 +355,12 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#anonymousFuncExpression.
 	VisitAnonymousFuncExpression(ctx *AnonymousFuncExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#executionStrategy.
+	VisitExecutionStrategy(ctx *ExecutionStrategyContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#contextIdentifier.
+	VisitContextIdentifier(ctx *ContextIdentifierContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#lambdaParamList.
 	VisitLambdaParamList(ctx *LambdaParamListContext) interface{}
