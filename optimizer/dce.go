@@ -14,15 +14,19 @@ type DCE struct {
 	reachableGlobals   map[*ir.Global]bool
 	reachableFunctions map[*ir.Function]bool
 	globalWorklist     []ir.Value
+	
+	// Track functions called by async/process to protect their bodies
+	asyncCalledFunctions map[*ir.Function]bool
 }
 
 func NewDCE() *DCE {
 	return &DCE{
-		alive:              make(map[ir.Instruction]bool),
-		worklist:           make([]ir.Instruction, 0),
-		reachableGlobals:   make(map[*ir.Global]bool),
-		reachableFunctions: make(map[*ir.Function]bool),
-		globalWorklist:     make([]ir.Value, 0),
+		alive:                make(map[ir.Instruction]bool),
+		worklist:             make([]ir.Instruction, 0),
+		reachableGlobals:     make(map[*ir.Global]bool),
+		reachableFunctions:   make(map[*ir.Function]bool),
+		globalWorklist:       make([]ir.Value, 0),
+		asyncCalledFunctions: make(map[*ir.Function]bool),
 	}
 }
 
@@ -43,6 +47,7 @@ func (opt *DCE) runGlobalDCE(m *ir.Module) {
 	opt.reachableGlobals = make(map[*ir.Global]bool)
 	opt.reachableFunctions = make(map[*ir.Function]bool)
 	opt.globalWorklist = make([]ir.Value, 0)
+	opt.asyncCalledFunctions = make(map[*ir.Function]bool)
 
 	// 1. Find Roots
 	for _, fn := range m.Functions {
@@ -110,7 +115,7 @@ func (opt *DCE) scanFunctionDeps(fn *ir.Function) {
 	}
 	for _, block := range fn.Blocks {
 		for _, inst := range block.Instructions {
-			// Extract function references from instruction
+			// Extract and track function references
 			opt.extractFunctionRefs(inst)
 			
 			// Scan all operands
@@ -128,9 +133,8 @@ func (opt *DCE) scanFunctionDeps(fn *ir.Function) {
 	}
 }
 
-// extractFunctionRefs extracts and marks reachable any function references in the instruction
+// extractFunctionRefs extracts and marks reachable any function references
 func (opt *DCE) extractFunctionRefs(inst ir.Instruction) {
-	// Use opcode-based dispatch for robustness
 	switch inst.Opcode() {
 	case ir.OpCall:
 		if call, ok := inst.(*ir.CallInst); ok {
@@ -143,10 +147,11 @@ func (opt *DCE) extractFunctionRefs(inst ir.Instruction) {
 		}
 		
 	case ir.OpAsyncTaskCreate:
-		// CRITICAL: Must keep async task target functions alive
+		// CRITICAL: Functions called by async must have their bodies fully preserved
 		if async, ok := inst.(*ir.AsyncTaskCreateInst); ok {
 			if async.Callee != nil {
 				opt.markFunctionReachable(async.Callee)
+				opt.asyncCalledFunctions[async.Callee] = true
 			}
 			if async.CalleeVal != nil {
 				opt.checkValue(async.CalleeVal)
@@ -154,10 +159,11 @@ func (opt *DCE) extractFunctionRefs(inst ir.Instruction) {
 		}
 		
 	case ir.OpProcessCreate:
-		// CRITICAL: Must keep process target functions alive  
+		// CRITICAL: Functions called by process must have their bodies fully preserved
 		if proc, ok := inst.(*ir.ProcessCreateInst); ok {
 			if proc.Callee != nil {
 				opt.markFunctionReachable(proc.Callee)
+				opt.asyncCalledFunctions[proc.Callee] = true
 			}
 		}
 	}
@@ -169,7 +175,6 @@ func (opt *DCE) scanGlobalDeps(g *ir.Global) {
 	}
 }
 
-// scanConstantDeps recursively scans constant values
 func (opt *DCE) scanConstantDeps(c ir.Constant) {
 	if c == nil {
 		return
@@ -185,11 +190,8 @@ func (opt *DCE) scanConstantDeps(c ir.Constant) {
 			opt.scanConstantDeps(field)
 		}
 	}
-	// Note: Constants like ConstantInt, ConstantFloat, ConstantNull, etc.
-	// don't reference other values, so no action needed
 }
 
-// checkValue checks if a value is a function or global and marks it reachable
 func (opt *DCE) checkValue(v ir.Value) {
 	if v == nil {
 		return
@@ -210,6 +212,12 @@ func (opt *DCE) checkValue(v ir.Value) {
 // ============================================================================
 
 func (opt *DCE) runLocalDCE(fn *ir.Function) {
+	// CRITICAL: Skip local DCE for functions called by async/process operations
+	// Their bodies must be preserved exactly as written
+	if opt.asyncCalledFunctions[fn] {
+		return
+	}
+	
 	opt.alive = make(map[ir.Instruction]bool)
 	opt.worklist = make([]ir.Instruction, 0)
 
@@ -279,14 +287,12 @@ func (opt *DCE) isCritical(inst ir.Instruction) bool {
 		return true
 	}
 
-	// Check by opcode for explicit side effects
 	switch inst.Opcode() {
 	case ir.OpStore:
-		// All stores are critical (may be volatile or affect memory)
 		return true
 		
 	case ir.OpCall:
-		// All calls are critical (may have side effects)
+		// All calls are critical
 		return true
 		
 	case ir.OpSyscall, ir.OpRaise:
@@ -296,18 +302,16 @@ func (opt *DCE) isCritical(inst ir.Instruction) bool {
 		return true
 		
 	case ir.OpLoad:
-		// Volatile loads are critical
 		if load, ok := inst.(*ir.LoadInst); ok {
 			return load.Volatile
 		}
 		return false
 		
-	// CRITICAL: Async/Process operations create side effects (spawning execution)
-	// Even if the handle is unused, the task/process must execute
+	// Async/Process operations have side effects
 	case ir.OpAsyncTaskCreate, ir.OpAsyncTaskAwait, ir.OpProcessCreate:
 		return true
 		
-	// Memory intrinsics have side effects
+	// Memory intrinsics
 	case ir.OpMemCpy, ir.OpMemMove, ir.OpMemSet:
 		return true
 		
