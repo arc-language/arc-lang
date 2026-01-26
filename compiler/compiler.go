@@ -42,11 +42,10 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 
 	c.logger.Info("Compiling project starting at: %s", absEntry)
 
-	// --- PHASE 1: DISCOVERY ---
+	// --- PHASE 1: DISCOVERY (Parsing) ---
 	fileQueue := []string{absEntry}
 	processed := make(map[string]bool)
 
-	// We collect source units to pass to IRGen
 	var units []*irgen.SourceUnit
 
 	for i := 0; i < len(fileQueue); i++ {
@@ -58,8 +57,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 
 		c.logger.Debug("Parsing: %s", currentPath)
 
-		// Call Parse from parser_helper.go
-		// Returns (parser.ICompilationUnitContext, *diagnostic.Bag)
 		tree, errs := Parse(currentPath)
 
 		if errs.HasErrors() {
@@ -69,7 +66,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 
 		units = append(units, &irgen.SourceUnit{Path: currentPath, Tree: tree})
 
-		// Scan imports
 		for _, decl := range tree.AllImportDecl() {
 			if decl.STRING_LITERAL() == nil {
 				continue
@@ -90,7 +86,7 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 		}
 	}
 
-	// --- PHASE 2: SEMANTIC ANALYSIS ---
+	// --- SETUP SEMANTICS ---
 	globalScope := symbol.NewScope(nil)
 	symbol.InitGlobalScope(globalScope)
 
@@ -102,7 +98,17 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	}
 	semanticErrors := diagnostic.NewBag()
 
-	// Pass 1: Declaration Scan
+	// --- PHASE 2.0: TYPE DISCOVERY (NEW) ---
+	// Just register Struct/Class/Enum names. No field resolution yet.
+	c.logger.Debug("Phase 2.0: Type Discovery")
+	for _, unit := range units {
+		analyzer := semantics.NewAnalyzer(globalScope, unit.Path, semanticErrors)
+		analyzer.Phase = 0
+		analyzer.Analyze(unit.Tree, analysisRes)
+	}
+
+	// --- PHASE 2.1: DECLARATION SCAN ---
+	// Resolve Struct Fields and Function Signatures.
 	c.logger.Debug("Phase 2.1: Semantic Declarations")
 	for _, unit := range units {
 		analyzer := semantics.NewAnalyzer(globalScope, unit.Path, semanticErrors)
@@ -110,7 +116,8 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 		analyzer.Analyze(unit.Tree, analysisRes)
 	}
 
-	// Pass 2: Body Analysis
+	// --- PHASE 2.2: BODY ANALYSIS ---
+	// Compile statements and expressions.
 	c.logger.Debug("Phase 2.2: Semantic Bodies")
 	for _, unit := range units {
 		analyzer := semantics.NewAnalyzer(globalScope, unit.Path, semanticErrors)
@@ -131,8 +138,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 
 	// --- PHASE 4: OPTIMIZATION ---
 	c.logger.Debug("Phase 4: Optimization")
-
-	// Apply Aggressive Dead Code Elimination
 	dce := optimizer.NewDCE()
 	dce.Run(module)
 

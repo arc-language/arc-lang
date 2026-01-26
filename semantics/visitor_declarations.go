@@ -8,8 +8,10 @@ import (
 )
 
 func (a *Analyzer) VisitCompilationUnit(ctx *parser.CompilationUnitContext) interface{} {
-	// Fix: Determine namespace prefix BEFORE registering types
+	// Preserve the previous prefix in case of nested imports (though rare in this structure)
 	savedPrefix := a.currentNamespacePrefix
+
+	// Determine namespace prefix for this file
 	for _, ns := range ctx.AllNamespaceDecl() {
 		if ns.IDENTIFIER() != nil {
 			name := ns.IDENTIFIER().GetText()
@@ -21,46 +23,11 @@ func (a *Analyzer) VisitCompilationUnit(ctx *parser.CompilationUnitContext) inte
 		}
 	}
 
-	// Pass 1: Register Types (Structs/Classes/Enums)
-	for _, decl := range ctx.AllTopLevelDecl() {
-		if decl.StructDecl() != nil {
-			name := decl.StructDecl().IDENTIFIER().GetText()
-			if a.currentNamespacePrefix != "" {
-				name = a.currentNamespacePrefix + "." + name
-			}
-			st := types.NewStruct(name, nil, false)
-			if _, ok := a.currentScope.ResolveLocal(name); !ok {
-				a.currentScope.Define(name, symbol.SymType, st)
-			}
-		} else if decl.ClassDecl() != nil {
-			name := decl.ClassDecl().IDENTIFIER().GetText()
-			if a.currentNamespacePrefix != "" {
-				name = a.currentNamespacePrefix + "." + name
-			}
-			
-			// --- CRITICAL FIX HERE ---
-			// Must use NewClass so IsClass=true
-			st := types.NewClass(name, nil, false)
-			
-			if _, ok := a.currentScope.ResolveLocal(name); !ok {
-				a.currentScope.Define(name, symbol.SymType, st)
-			}
-		} else if decl.EnumDecl() != nil {
-			name := decl.EnumDecl().IDENTIFIER().GetText()
-			if a.currentNamespacePrefix != "" {
-				name = a.currentNamespacePrefix + "." + name
-			}
-			if _, ok := a.currentScope.ResolveLocal(name); !ok {
-				a.currentScope.Define(name, symbol.SymType, types.I32)
-			}
-		}
-	}
-
-	// Visit declarations based on current Phase
+	// Visit all declarations. The specific logic performed depends on a.Phase
 	for _, decl := range ctx.AllTopLevelDecl() {
 		a.Visit(decl)
 	}
-	
+
 	// Restore prefix
 	a.currentNamespacePrefix = savedPrefix
 	return nil
@@ -79,26 +46,41 @@ func (a *Analyzer) VisitNamespaceDecl(ctx *parser.NamespaceDeclContext) interfac
 }
 
 func (a *Analyzer) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface{} {
-	if ctx.FunctionDecl() != nil { return a.Visit(ctx.FunctionDecl()) }
-	
-	if a.Phase == 1 || a.Phase == 0 {
+	// Phase 0: Type Discovery (Register Struct/Class/Enum names only)
+	if a.Phase == 0 {
+		if ctx.StructDecl() != nil { return a.Visit(ctx.StructDecl()) }
+		if ctx.ClassDecl() != nil { return a.Visit(ctx.ClassDecl()) }
+		if ctx.EnumDecl() != nil { return a.Visit(ctx.EnumDecl()) }
+		// C++ externs might define opaque classes
+		if ctx.ExternCppDecl() != nil { return a.Visit(ctx.ExternCppDecl()) }
+		return nil
+	}
+
+	// Phase 1: Signatures & Fields (Resolve types inside structs, function args, global vars)
+	if a.Phase == 1 {
+		if ctx.FunctionDecl() != nil { return a.Visit(ctx.FunctionDecl()) }
 		if ctx.StructDecl() != nil { return a.Visit(ctx.StructDecl()) }
 		if ctx.ClassDecl() != nil { return a.Visit(ctx.ClassDecl()) }
 		if ctx.EnumDecl() != nil { return a.Visit(ctx.EnumDecl()) }
 		if ctx.ExternCDecl() != nil { return a.Visit(ctx.ExternCDecl()) }
 		if ctx.ExternCppDecl() != nil { return a.Visit(ctx.ExternCppDecl()) }
 		if ctx.ConstDecl() != nil { return a.Visit(ctx.ConstDecl()) }
+		if ctx.VariableDecl() != nil { return a.Visit(ctx.VariableDecl()) }
+		if ctx.MutatingDecl() != nil { return a.Visit(ctx.MutatingDecl()) }
+		return nil
 	}
-	
-	// In Phase 2, we visit structs/classes to process methods
+
+	// Phase 2: Bodies & Initializers
 	if a.Phase == 2 {
-		if ctx.StructDecl() != nil { return a.Visit(ctx.StructDecl()) }
-		if ctx.ClassDecl() != nil { return a.Visit(ctx.ClassDecl()) }
+		if ctx.FunctionDecl() != nil { return a.Visit(ctx.FunctionDecl()) }
+		if ctx.MutatingDecl() != nil { return a.Visit(ctx.MutatingDecl()) }
+		if ctx.StructDecl() != nil { return a.Visit(ctx.StructDecl()) } // To visit methods inside
+		if ctx.ClassDecl() != nil { return a.Visit(ctx.ClassDecl()) }   // To visit methods inside
+		if ctx.VariableDecl() != nil { return a.Visit(ctx.VariableDecl()) } // To check initializers
+		if ctx.ConstDecl() != nil { return a.Visit(ctx.ConstDecl()) }       // To check initializers
+		return nil
 	}
-	
-	if ctx.VariableDecl() != nil { return a.Visit(ctx.VariableDecl()) }
-	if ctx.MutatingDecl() != nil { return a.Visit(ctx.MutatingDecl()) }
-	
+
 	return nil
 }
 
@@ -303,12 +285,12 @@ func (a *Analyzer) visitExternCppMethod(ctx *parser.ExternCppMethodDeclContext, 
 func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	rawName := ctx.IDENTIFIER().GetText()
 	
-	// 1. Determine Full Name (Mangling for Methods)
+	// Determine Full Name (Mangling logic)
 	var fullName string
 	var parentName string
 	isMethod := false
 
-	// Check parent context
+	// Check parent context for nested methods
 	if parent := ctx.GetParent(); parent != nil {
 		if _, ok := parent.(*parser.ClassMemberContext); ok {
 			if cd, ok := parent.GetParent().(*parser.ClassDeclContext); ok {
@@ -323,20 +305,15 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		}
 	}
 
-	// NEW: Check for flat method syntax (func get(self c: Counter))
+	// Check for flat method syntax (func get(self c: Counter))
 	if !isMethod && ctx.ParameterList() != nil {
 		params := ctx.ParameterList().AllParameter()
 		if len(params) > 0 {
-			firstParam := params[0]
-			// Check if first parameter uses SELF keyword
-			if firstParam.SELF() != nil {
-				// Extract struct type from self parameter
-				selfType := a.resolveType(firstParam.Type_())
-				// Unwrap pointer if needed
+			if params[0].SELF() != nil {
+				selfType := a.resolveType(params[0].Type_())
 				if ptr, ok := selfType.(*types.PointerType); ok {
 					selfType = ptr.ElementType
 				}
-				// Get struct name for method mangling
 				if st, ok := selfType.(*types.StructType); ok {
 					parentName = st.Name
 					isMethod = true
@@ -346,14 +323,12 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 	}
 
 	if isMethod {
-		// main.log_printf or Counter_get
 		if a.currentNamespacePrefix != "" {
 			fullName = a.currentNamespacePrefix + "." + parentName + "_" + rawName
 		} else {
 			fullName = parentName + "_" + rawName
 		}
 	} else {
-		// Standard Function
 		if a.currentNamespacePrefix != "" && rawName != "main" {
 			fullName = a.currentNamespacePrefix + "." + rawName
 		} else {
@@ -361,8 +336,8 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		}
 	}
 
-	// 2. Phase 1: Register Declaration
-	if a.Phase == 1 || a.Phase == 0 {
+	// Phase 1: Define Function Signature
+	if a.Phase == 1 {
 		var retType types.Type = types.Void
 		if ctx.ReturnType() != nil {
 			if ctx.ReturnType().Type_() != nil {
@@ -379,11 +354,7 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		var paramTypes []types.Type
 		if ctx.ParameterList() != nil {
 			for _, param := range ctx.ParameterList().AllParameter() {
-				if param.SELF() != nil {
-					paramTypes = append(paramTypes, a.resolveType(param.Type_()))
-				} else {
-					paramTypes = append(paramTypes, a.resolveType(param.Type_()))
-				}
+				paramTypes = append(paramTypes, a.resolveType(param.Type_()))
 			}
 		}
 
@@ -401,8 +372,8 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		}
 	}
 
-	// 3. Phase 2: Analyze Body
-	if a.Phase == 2 || a.Phase == 0 {
+	// Phase 2: Analyze Body
+	if a.Phase == 2 {
 		sym, ok := a.currentScope.Resolve(fullName)
 		var retType types.Type = types.Void
 		if ok {
@@ -489,32 +460,22 @@ func (a *Analyzer) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface{
 }
 
 func (a *Analyzer) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
-	// 1. Handle Tuple Destructuring: let (result, ok) = ...
+	// Tuple Destructuring (Only valid in function bodies/locals, Phase 2)
 	if ctx.TuplePattern() != nil {
-		if a.Phase == 2 || a.Phase == 0 {
+		if a.Phase == 2 {
 			var rhsType types.Type = types.Void
 			if ctx.Expression() != nil {
 				rhsType = a.Visit(ctx.Expression()).(types.Type)
 			}
-
-			// Expecting a StructType (how tuples are represented internally)
 			st, isStruct := rhsType.(*types.StructType)
-
 			ids := ctx.TuplePattern().AllIDENTIFIER()
 			for i, id := range ids {
 				name := id.GetText()
-				var fieldType types.Type = types.I64 // Default fallback
-
+				var fieldType types.Type = types.I64
 				if isStruct && i < len(st.Fields) {
 					fieldType = st.Fields[i]
-				} else if !isStruct && rhsType != types.Void {
-					// Fallback: if RHS isn't a struct/tuple, report mismatch
-					// but define var to avoid cascading errors
-					a.bag.Report(a.file, ctx.GetStart().GetLine(), 0,
-						"Cannot destructure non-tuple type '%s'", rhsType.String())
 				}
-
-				// Register the variable in the current scope
+				// Locals are defined in Phase 2
 				if _, ok := a.currentScope.ResolveLocal(name); !ok {
 					a.currentScope.Define(name, symbol.SymVar, fieldType)
 				}
@@ -523,27 +484,25 @@ func (a *Analyzer) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{
 		return nil
 	}
 
-	// 2. Handle Standard Declaration: let x = ...
-	// Critical Fix: Check for nil IDENTIFIER to prevent panic
-	if ctx.IDENTIFIER() == nil {
-		return nil
-	}
-
+	if ctx.IDENTIFIER() == nil { return nil }
 	name := ctx.IDENTIFIER().GetText()
-	
-	if a.Phase == 1 || a.Phase == 0 {
+
+	// Phase 1: Define Global Variables
+	if a.Phase == 1 && a.currentScope.Parent == nil {
 		if _, ok := a.currentScope.ResolveLocal(name); !ok {
 			var typ types.Type
 			if ctx.Type_() != nil { typ = a.resolveType(ctx.Type_()) }
 			if typ == nil { typ = types.I64 }
 			a.currentScope.Define(name, symbol.SymVar, typ)
 		}
+		return nil
 	}
 
-	if a.Phase == 2 || a.Phase == 0 {
+	// Phase 2: Local Definitions & Global Initialization Checks
+	if a.Phase == 2 {
 		sym, _ := a.currentScope.ResolveLocal(name)
 		
-		// Ensure local variables with explicit types are defined in Phase 2
+		// If it's a local variable (not found in Phase 1 or inside a function), define it
 		if sym == nil && ctx.Type_() != nil {
 			typ := a.resolveType(ctx.Type_())
 			sym = a.currentScope.Define(name, symbol.SymVar, typ)
@@ -552,9 +511,11 @@ func (a *Analyzer) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{
 		var typ types.Type
 		if sym != nil { typ = sym.Type }
 		
+		// Check Initializer Expression
 		if ctx.Expression() != nil {
 			exprType := a.Visit(ctx.Expression()).(types.Type)
 			if typ == nil {
+				// Inference
 				typ = exprType
 				if sym == nil { a.currentScope.Define(name, symbol.SymVar, typ) }
 			} else {
@@ -564,6 +525,7 @@ func (a *Analyzer) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{
 				}
 			}
 		}
+		// Default to I64 if no info available
 		if sym == nil && typ == nil { a.currentScope.Define(name, symbol.SymVar, types.I64) }
 	}
 	return nil
@@ -571,21 +533,22 @@ func (a *Analyzer) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{
 
 func (a *Analyzer) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
-	
 	if a.currentNamespacePrefix != "" && name != "main" {
 		name = a.currentNamespacePrefix + "." + name
 	}
 
-	if a.Phase == 1 || a.Phase == 0 {
+	// Phase 1: Register Constant Symbol
+	if a.Phase == 1 {
 		if _, ok := a.currentScope.ResolveLocal(name); !ok {
 			var typ types.Type
 			if ctx.Type_() != nil { typ = a.resolveType(ctx.Type_()) }
-			if typ == nil { typ = types.I64 } 
+			if typ == nil { typ = types.I64 }
 			a.currentScope.Define(name, symbol.SymConst, typ)
 		}
 	}
-	
-	if a.Phase == 2 || a.Phase == 0 {
+
+	// Phase 2: Check Initializer / Infer Type
+	if a.Phase == 2 {
 		sym, _ := a.currentScope.ResolveLocal(name)
 		if ctx.Expression() != nil {
 			exprType := a.Visit(ctx.Expression()).(types.Type)
@@ -603,26 +566,41 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 		name = a.currentNamespacePrefix + "." + name
 	}
 
-	if a.Phase == 1 || a.Phase == 0 {
+	// Phase 0: Register Name
+	if a.Phase == 0 {
+		if _, ok := a.currentScope.ResolveLocal(name); !ok {
+			// Define StructType with empty fields initially
+			st := types.NewStruct(name, nil, false)
+			a.currentScope.Define(name, symbol.SymType, st)
+		}
+		return nil
+	}
+
+	// Phase 1: Resolve Fields
+	if a.Phase == 1 {
 		sym, _ := a.currentScope.Resolve(name)
 		if sym != nil {
 			st := sym.Type.(*types.StructType)
-			var fields []types.Type
-			indices := make(map[string]int)
-			fieldCount := 0
+			// Only parse fields if we haven't already (prevents double work)
+			if len(st.Fields) == 0 {
+				var fields []types.Type
+				indices := make(map[string]int)
+				fieldCount := 0
 
-			for _, member := range ctx.AllStructMember() {
-				if f := member.StructField(); f != nil {
-					fields = append(fields, a.resolveType(f.Type_()))
-					indices[f.IDENTIFIER().GetText()] = fieldCount
-					fieldCount++
+				for _, member := range ctx.AllStructMember() {
+					if f := member.StructField(); f != nil {
+						fields = append(fields, a.resolveType(f.Type_()))
+						indices[f.IDENTIFIER().GetText()] = fieldCount
+						fieldCount++
+					}
 				}
+				st.Fields = fields
+				a.structIndices[name] = indices
 			}
-			st.Fields = fields
-			a.structIndices[name] = indices
 		}
 	}
-	
+
+	// Phase 1 & 2: Visit Methods (FunctionDecl/MutatingDecl handle their own Phase checks)
 	for _, member := range ctx.AllStructMember() {
 		if m := member.FunctionDecl(); m != nil { a.Visit(m) }
 		if m := member.MutatingDecl(); m != nil { a.Visit(m) }
@@ -636,26 +614,40 @@ func (a *Analyzer) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 		name = a.currentNamespacePrefix + "." + name
 	}
 
-	if a.Phase == 1 || a.Phase == 0 {
+	// Phase 0: Register Name
+	if a.Phase == 0 {
+		if _, ok := a.currentScope.ResolveLocal(name); !ok {
+			// Define Class (IsClass=true)
+			st := types.NewClass(name, nil, false)
+			a.currentScope.Define(name, symbol.SymType, st)
+		}
+		return nil
+	}
+
+	// Phase 1: Resolve Fields
+	if a.Phase == 1 {
 		sym, _ := a.currentScope.Resolve(name)
 		if sym != nil {
 			st := sym.Type.(*types.StructType)
-			var fields []types.Type
-			indices := make(map[string]int)
-			fieldCount := 0
+			if len(st.Fields) == 0 {
+				var fields []types.Type
+				indices := make(map[string]int)
+				fieldCount := 0
 
-			for _, member := range ctx.AllClassMember() {
-				if f := member.ClassField(); f != nil {
-					fields = append(fields, a.resolveType(f.Type_()))
-					indices[f.IDENTIFIER().GetText()] = fieldCount
-					fieldCount++
+				for _, member := range ctx.AllClassMember() {
+					if f := member.ClassField(); f != nil {
+						fields = append(fields, a.resolveType(f.Type_()))
+						indices[f.IDENTIFIER().GetText()] = fieldCount
+						fieldCount++
+					}
 				}
+				st.Fields = fields
+				a.structIndices[name] = indices
 			}
-			st.Fields = fields
-			a.structIndices[name] = indices
 		}
 	}
 
+	// Phase 1 & 2: Visit Methods/Deinit
 	for _, member := range ctx.AllClassMember() {
 		if m := member.FunctionDecl(); m != nil { a.Visit(m) }
 		if d := member.DeinitDecl(); d != nil { a.Visit(d) }
@@ -664,17 +656,25 @@ func (a *Analyzer) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 }
 
 func (a *Analyzer) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
-	if a.Phase == 1 || a.Phase == 0 {
-		name := ctx.IDENTIFIER().GetText()
-		prefix := name
-		if a.currentNamespacePrefix != "" {
-			prefix = a.currentNamespacePrefix + "." + name
-		}
+	name := ctx.IDENTIFIER().GetText()
+	if a.currentNamespacePrefix != "" {
+		name = a.currentNamespacePrefix + "." + name
+	}
 
+	// Phase 0: Register Enum Type Name
+	if a.Phase == 0 {
+		if _, ok := a.currentScope.ResolveLocal(name); !ok {
+			a.currentScope.Define(name, symbol.SymType, types.I32)
+		}
+		return nil
+	}
+
+	// Phase 1: Register Enum Members (Constants)
+	if a.Phase == 1 {
 		for _, m := range ctx.AllEnumMember() {
-			fullName := prefix+"."+m.IDENTIFIER().GetText()
-			if _, ok := a.currentScope.ResolveLocal(fullName); !ok {
-				a.currentScope.Define(fullName, symbol.SymConst, types.I32)
+			memberName := name + "." + m.IDENTIFIER().GetText()
+			if _, ok := a.currentScope.ResolveLocal(memberName); !ok {
+				a.currentScope.Define(memberName, symbol.SymConst, types.I32)
 			}
 		}
 	}
