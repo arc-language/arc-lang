@@ -67,8 +67,6 @@ func (opt *DCE) runGlobalDCE(m *ir.Module) {
 			opt.scanFunctionDeps(v)
 		case *ir.Global:
 			opt.scanGlobalDeps(v)
-		case ir.Constant:
-			opt.scanConstantDeps(v)
 		}
 	}
 
@@ -171,16 +169,13 @@ func (opt *DCE) scanGlobalDeps(g *ir.Global) {
 	}
 }
 
+// scanConstantDeps recursively scans constant values
 func (opt *DCE) scanConstantDeps(c ir.Constant) {
 	if c == nil {
 		return
 	}
 	
 	switch t := c.(type) {
-	case *ir.Function:
-		opt.markFunctionReachable(t)
-	case *ir.Global:
-		opt.markGlobalReachable(t)
 	case *ir.ConstantArray:
 		for _, elem := range t.Elements {
 			opt.scanConstantDeps(elem)
@@ -190,8 +185,11 @@ func (opt *DCE) scanConstantDeps(c ir.Constant) {
 			opt.scanConstantDeps(field)
 		}
 	}
+	// Note: Constants like ConstantInt, ConstantFloat, ConstantNull, etc.
+	// don't reference other values, so no action needed
 }
 
+// checkValue checks if a value is a function or global and marks it reachable
 func (opt *DCE) checkValue(v ir.Value) {
 	if v == nil {
 		return
