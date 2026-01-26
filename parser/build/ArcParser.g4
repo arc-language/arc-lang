@@ -22,6 +22,7 @@ topLevelDecl
     | structDecl
     | classDecl
     | enumDecl
+    | computeDecl
     | methodDecl
     | mutatingDecl
     | deinitDecl
@@ -189,8 +190,7 @@ genericArg: type | expression;
 // Functions
 // =============================================================================
 
-// Hardcoded keywords for concurrency models
-functionDecl: (ASYNC | PROCESS | CONTAINER)? FUNC IDENTIFIER genericParams? LPAREN parameterList? RPAREN returnType? block;
+functionDecl: (ASYNC | PROCESS)? FUNC IDENTIFIER genericParams? LPAREN parameterList? RPAREN returnType? block;
 
 returnType: type | LPAREN typeList RPAREN;
 typeList: type (COMMA type)*;
@@ -201,12 +201,17 @@ parameter: SELF? IDENTIFIER COLON type;
 // Structs
 // =============================================================================
 
-structDecl: STRUCT IDENTIFIER computeMarker? genericParams? LBRACE structMember* RBRACE;
-computeMarker: LT COMPUTE GT;
+structDecl: STRUCT IDENTIFIER genericParams? LBRACE structMember* RBRACE;
 structMember: structField | functionDecl | mutatingDecl | initDecl;
 structField: IDENTIFIER COLON type;
 
 initDecl: INIT LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* (COMMA ELLIPSIS)? RPAREN block;
+
+// =============================================================================
+// Compute Templates
+// =============================================================================
+
+computeDecl: COMPUTE IDENTIFIER LBRACE structMember* RBRACE;
 
 // =============================================================================
 // Classes
@@ -384,6 +389,7 @@ postfixOp
 
 primaryExpression
     : computeExpression
+    | builtinExpression
     | literal
     | structLiteral
     | sizeofExpression
@@ -399,12 +405,21 @@ primaryExpression
     ;
 
 computeExpression
-    : computeContext ASYNC? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block LPAREN argumentList? RPAREN
+    : (computeContext | ASYNC | PROCESS)? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block LPAREN argumentList? RPAREN
     ;
 
 computeContext
     : qualifiedIdentifier
     | IDENTIFIER
+    ;
+
+// =============================================================================
+// Compiler Builtins
+// =============================================================================
+
+builtinExpression
+    : AT IDENTIFIER LPAREN argumentList? RPAREN  // @compute_id(), @type_id(), etc.
+    | AT IDENTIFIER                               // @constant, etc.
     ;
 
 sizeofExpression: SIZEOF LPAREN type RPAREN;
@@ -436,13 +451,12 @@ argumentList: argument (COMMA argument)*;
 argument: expression | lambdaExpression | anonymousFuncExpression;
 
 lambdaExpression
-    : (ASYNC | PROCESS | CONTAINER)? LPAREN lambdaParamList? RPAREN FAT_ARROW block
-    | (ASYNC | PROCESS | CONTAINER)? LPAREN lambdaParamList? RPAREN FAT_ARROW expression
+    : (ASYNC | PROCESS)? LPAREN lambdaParamList? RPAREN FAT_ARROW block
+    | (ASYNC | PROCESS)? LPAREN lambdaParamList? RPAREN FAT_ARROW expression
     ;
 
-// Hardcoded keywords here too
 anonymousFuncExpression
-    : (ASYNC | PROCESS | CONTAINER)? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
+    : (ASYNC | PROCESS)? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
     ;
 
 lambdaParamList: lambdaParam (COMMA lambdaParam)*;

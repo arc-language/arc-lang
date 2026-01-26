@@ -908,19 +908,6 @@ func find<T>(arr: *T, len: usize, val: T) isize {
 }
 ```
 
-## Execution Context, thread
-```arc
-// With args and return
-let handle = thread func(x: int) { 
-    work(x) 
-}(1000)
-
-// Without args and return
-thread func() {  
-    work(x)
-}()
-```
-
 ## Execution Context, process
 ```arc
 // With args and return
@@ -930,19 +917,6 @@ let handle = process func(x: int) {
 
 // Without args and return
 process func() {  
-    work(x)
-}()
-```
-
-## Execution Context, container
-```arc
-// With args and return
-let handle = container func(x: int) { 
-    work(x) 
-}(1000)
-
-// Without args and return
-container func() {  
     work(x)
 }()
 ```
@@ -958,4 +932,159 @@ async func(x: int) {
 async func() {  
     work(x)
 }()
+```
+
+## Async Event Handlers (property assignment)
+```arc
+// Async handler - ergonomic shorthand, no await keyword allowed
+handler.onEvent = (data: EventData) => { 
+    process_immediate(data)
+    update_state()
+}
+
+// Another example
+stream.onData = (chunk: bytes) => {
+    buffer.append(chunk)
+    validate(chunk)
+}
+```
+
+## Async Event Handlers (with await capability)
+```arc
+// Async handler with await - explicit async keyword required
+handler.onEvent = async (data: EventData) => { 
+    let result = await process_async(data)
+    fmt.print(result.status)
+    await store.save(result)
+}
+
+// Multiple awaits allowed
+stream.onData = async (chunk: bytes) => {
+    let validated = await validate_async(chunk)
+    await buffer.write(validated)
+    await notify_listeners(validated)
+}
+```
+
+## Async Method Calls (callback parameter)
+```arc
+// Async callback - ergonomic shorthand, no await keyword allowed
+service.request(args, (result: Result) => {
+    fmt.print("Request completed")
+    handle_result(result)
+})
+
+// Multiple arguments before callback
+network.fetch(url, timeout, (response: Response) => {
+    fmt.printf("Status: %d\n", response.status)
+})
+```
+
+## Async Method Calls (callback with await capability)
+```arc
+// Async callback with await - explicit async keyword required
+service.request(args, async (result: Result) => {
+    let processed = await transform(result)
+    fmt.print(processed.data)
+})
+
+// Async callback with multiple params
+router.handle("/api/data", async (req: Request, res: Response) => {
+    let data = await db.query("SELECT * FROM records")
+    await res.send_json(data)
+})
+```
+
+**Note:** Both forms are async (run on smart threads). The `async` keyword only determines whether `await` is allowed inside the lambda body. Omitting `async` is ergonomic shorthand for callbacks that don't need to suspend.
+
+
+## Functions, async callback (indirect invocation)
+
+```arc
+// Define a simple event system with callback
+class Event {
+    // Store the async callback as a function pointer
+    onTrigger: async func(string) void
+    
+    // Method to register the callback
+    func register(self evt: *Event, handler: async func(string) void) {
+        evt.onTrigger = handler
+    }
+    
+    // Method that invokes the callback indirectly
+    func send(self evt: *Event, message: string) {
+        // Indirect call through function pointer
+        // Returns Future<void>, but we fire-and-forget
+        evt.onTrigger(message)
+    }
+}
+
+// Usage
+let evt = Event{}
+
+// Register async callback
+evt.register(async (msg: string) => {
+    let processed = await process_message(msg)
+    fmt.printf("Processed: %s\n", processed)
+})
+
+// Trigger the event - invokes callback indirectly
+evt.send("Hello, World!")
+```
+
+## Functions, async callback (property assignment style)
+
+```arc
+class TcpServer {
+    port: int32
+    // Function pointer field for the callback
+    onReceive: async func(bytes) void
+    
+    // Internal method that invokes the callback
+    func handle_data(self s: *TcpServer, data: bytes) {
+        // Check if callback is set
+        if s.onReceive != null {
+            // INDIRECT CALL - invoke whatever function was assigned
+            s.onReceive(data)
+        }
+    }
+}
+
+// Usage
+let server = TcpServer{port: 8080}
+
+// Assign async callback directly to property
+server.onReceive = async (data: bytes) => {
+    let decoded = await decode_packet(data)
+    await store_in_db(decoded)
+}
+
+// Server invokes it indirectly when data arrives
+server.handle_data(received_bytes)
+```
+
+## Functions, sync callback (indirect invocation)
+
+```arc
+class Button {
+    // Sync callback (no await allowed inside)
+    onClick: func(int32, int32) void
+    
+    // Invoke the callback when button is pressed
+    func press(self b: *Button, x: int32, y: int32) {
+        if b.onClick != null {
+            // INDIRECT CALL
+            b.onClick(x, y)
+        }
+    }
+}
+
+// Usage
+let button = Button{}
+
+button.onClick = (x: int32, y: int32) => {
+    fmt.printf("Clicked at (%d, %d)\n", x, y)
+}
+
+button.press(100, 200)  // Triggers the callback
 ```

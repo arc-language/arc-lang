@@ -188,10 +188,6 @@ func (v *BaseArcParserVisitor) VisitStructDecl(ctx *StructDeclContext) interface
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitComputeMarker(ctx *ComputeMarkerContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseArcParserVisitor) VisitStructMember(ctx *StructMemberContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -201,6 +197,10 @@ func (v *BaseArcParserVisitor) VisitStructField(ctx *StructFieldContext) interfa
 }
 
 func (v *BaseArcParserVisitor) VisitInitDecl(ctx *InitDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitComputeDecl(ctx *ComputeDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -429,6 +429,10 @@ func (v *BaseArcParserVisitor) VisitComputeExpression(ctx *ComputeExpressionCont
 }
 
 func (v *BaseArcParserVisitor) VisitComputeContext(ctx *ComputeContextContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitBuiltinExpression(ctx *BuiltinExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

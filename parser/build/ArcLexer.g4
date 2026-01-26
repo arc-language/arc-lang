@@ -10,8 +10,7 @@ CONST: 'const';
 FUNC: 'func';
 ASYNC: 'async';
 AWAIT: 'await';
-PROCESS: 'process';         // NEW
-CONTAINER: 'container';     // NEW
+PROCESS: 'process';
 STRUCT: 'struct';
 CLASS: 'class';
 MUTATING: 'mutating';

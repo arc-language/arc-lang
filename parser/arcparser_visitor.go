@@ -143,9 +143,6 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#structDecl.
 	VisitStructDecl(ctx *StructDeclContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#computeMarker.
-	VisitComputeMarker(ctx *ComputeMarkerContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#structMember.
 	VisitStructMember(ctx *StructMemberContext) interface{}
 
@@ -154,6 +151,9 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#initDecl.
 	VisitInitDecl(ctx *InitDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#computeDecl.
+	VisitComputeDecl(ctx *ComputeDeclContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#classDecl.
 	VisitClassDecl(ctx *ClassDeclContext) interface{}
@@ -325,6 +325,9 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#computeContext.
 	VisitComputeContext(ctx *ComputeContextContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#builtinExpression.
+	VisitBuiltinExpression(ctx *BuiltinExpressionContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#sizeofExpression.
 	VisitSizeofExpression(ctx *SizeofExpressionContext) interface{}
