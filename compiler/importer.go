@@ -38,7 +38,7 @@ func (imp *Importer) ResolveImport(baseFile, importPath string) (string, error) 
 	return abs, nil
 }
 
-// GetSourceFiles returns all .arc files in a specific directory
+// GetSourceFiles returns all .ax files in a specific directory
 func (imp *Importer) GetSourceFiles(dirPath string) ([]string, error) {
 	info, err := os.Stat(dirPath)
 	if err != nil {
@@ -55,7 +55,8 @@ func (imp *Importer) GetSourceFiles(dirPath string) ([]string, error) {
 
 	var files []string
 	for _, entry := range entries {
-		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".arc") {
+		// FIXED: Check for .ax extension instead of .arc
+		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".ax") {
 			files = append(files, filepath.Join(dirPath, entry.Name()))
 		}
 	}
