@@ -8,7 +8,6 @@ import (
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
-	"github.com/arc-language/arc-lang/symbol"
 )
 
 // Helper: Safely get operator token type
