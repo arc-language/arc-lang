@@ -601,87 +601,84 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 }
 
 func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpressionContext) interface{} {
-    name := fmt.Sprintf("lambda_%d", len(g.ctx.Module.Functions))
-    if g.ctx.CurrentFunction != nil {
-        name = fmt.Sprintf("%s_lambda_%d", g.ctx.CurrentFunction.Name(), len(g.ctx.Module.Functions))
-    }
+	name := fmt.Sprintf("lambda_%d", len(g.ctx.Module.Functions))
+	if g.ctx.CurrentFunction != nil {
+		name = fmt.Sprintf("%s_lambda_%d", g.ctx.CurrentFunction.Name(), len(g.ctx.Module.Functions))
+	}
 
-    // 1. Resolve Return Type
-    var retType types.Type = types.Void
-    if ctx.ReturnType() != nil && ctx.ReturnType().Type_() != nil {
-        retType = g.resolveType(ctx.ReturnType().Type_())
-    }
+	var retType types.Type = types.Void
+	if ctx.ReturnType() != nil {
+		if ctx.ReturnType().Type_() != nil {
+			retType = g.resolveType(ctx.ReturnType().Type_())
+		}
+	}
 
-    // 2. Resolve Parameters
-    var paramTypes []types.Type
-    var paramNames []string
-    if ctx.ParameterList() != nil {
-        for _, param := range ctx.ParameterList().AllParameter() {
-            paramTypes = append(paramTypes, g.resolveType(param.Type_()))
-            paramNames = append(paramNames, param.IDENTIFIER().GetText())
-        }
-    }
+	var paramTypes []types.Type
+	var paramNames []string
+	if ctx.ParameterList() != nil {
+		for _, param := range ctx.ParameterList().AllParameter() {
+			paramTypes = append(paramTypes, g.resolveType(param.Type_()))
+			paramNames = append(paramNames, param.IDENTIFIER().GetText())
+		}
+	}
 
-    // 3. Create Function
-    fn := g.ctx.Builder.CreateFunction(name, retType, paramTypes, false)
+	fn := g.ctx.Builder.CreateFunction(name, retType, paramTypes, false)
 
-    // Apply Concurrency Flags
-    if ctx.ASYNC() != nil {
-        fn.FuncType.IsAsync = true
-    } else if ctx.PROCESS() != nil {
-        fn.FuncType.IsProcess = true
-    }
+	// Clean Token Checks
+	if ctx.ASYNC() != nil {
+		fn.FuncType.IsAsync = true
+	} else if ctx.PROCESS() != nil {
+		fn.FuncType.IsProcess = true
+	}
 
-    // 4. Save Context & Enter Function
-    prevFunc := g.ctx.CurrentFunction
-    prevBlock := g.ctx.Builder.GetInsertBlock()
-    
-    g.ctx.EnterFunction(fn)
-    g.enterScope(ctx)
+	prevFunc := g.ctx.CurrentFunction
+	prevBlock := g.ctx.Builder.GetInsertBlock()
+	
+	g.ctx.EnterFunction(fn)
+	g.enterScope(ctx)
 
-    // --- FIX START: Create Entry Block ---
-    entryBlock := g.ctx.Builder.CreateBlock("entry")
-    g.ctx.Builder.SetInsertPoint(entryBlock)
-    // --- FIX END ---
+	// --- FIX START: Create Entry Block for the new function ---
+	entryBlock := g.ctx.Builder.CreateBlock("entry")
+	g.ctx.Builder.SetInsertPoint(entryBlock)
+	// --- FIX END ---
 
-    // 5. Create Argument Allocas
-    for i, arg := range fn.Arguments {
-        arg.SetName(paramNames[i])
-        alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
-        g.ctx.Builder.CreateStore(arg, alloca)
-        
-        if s, ok := g.currentScope.Resolve(paramNames[i]); ok {
-            s.IRValue = alloca
-        }
-    }
+	for i, arg := range fn.Arguments {
+		arg.SetName(paramNames[i])
+		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
+		g.ctx.Builder.CreateStore(arg, alloca)
+		
+		if s, ok := g.currentScope.ResolveLocal(paramNames[i]); ok {
+			s.IRValue = alloca
+		} else {
+			g.currentScope.Define(paramNames[i], symbol.SymVar, arg.Type()).IRValue = alloca
+		}
+	}
 
-    // 6. Generate Body
-    if ctx.Block() != nil {
-        outerDefer := g.deferStack
-        g.deferStack = NewDeferStack()
-        g.Visit(ctx.Block())
+	if ctx.Block() != nil {
+		outerDefer := g.deferStack
+		g.deferStack = NewDeferStack()
+		g.Visit(ctx.Block())
 
-        if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
-            g.deferStack.Emit(g)
-            if retType == types.Void {
-                g.ctx.Builder.CreateRetVoid()
-            } else {
-                g.ctx.Builder.CreateRet(g.getZeroValue(retType))
-            }
-        }
-        g.deferStack = outerDefer
-    }
+		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
+			g.deferStack.Emit(g)
+			if retType == types.Void {
+				g.ctx.Builder.CreateRetVoid()
+			} else {
+				g.ctx.Builder.CreateRet(g.getZeroValue(retType))
+			}
+		}
+		g.deferStack = outerDefer
+	}
 
-    // 7. Restore Context
-    g.exitScope()
-    g.ctx.ExitFunction()
-    
-    if prevFunc != nil {
-        g.ctx.CurrentFunction = prevFunc
-        g.ctx.SetInsertBlock(prevBlock)
-    }
+	g.exitScope()
+	g.ctx.ExitFunction()
+	
+	if prevFunc != nil {
+		g.ctx.CurrentFunction = prevFunc
+		g.ctx.SetInsertBlock(prevBlock)
+	}
 
-    return fn
+	return fn
 }
 
 // --- Primary Expressions ---
@@ -691,10 +688,11 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		return g.Visit(ctx.StructLiteral())
 	}
 	
-	// --- ADD THIS BLOCK ---
+	// --- FIX START: Ensure Anonymous Function is visited ---
 	if ctx.AnonymousFuncExpression() != nil {
 		return g.Visit(ctx.AnonymousFuncExpression())
 	}
+	// --- FIX END ---
 
 	if ctx.Literal() != nil {
 		return g.Visit(ctx.Literal())
@@ -786,14 +784,12 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			}
 			entity = g.ctx.Builder.CreateLoad(glob.Type().(*types.PointerType).ElementType, glob, "")
 		} else if isQualified {
-			// ... (Qualified resolution logic remains same)
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
 
 			var basePtr ir.Value
 			sym, ok := g.currentScope.Resolve(baseName)
 			
-			// Fallback for base symbol with namespace
 			if !ok && g.currentNamespace != "" {
 				sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + baseName)
 			}
@@ -833,11 +829,9 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 							continue
 						}
 						
-						// Try Method Resolution
 						methodName := st.Name + "_" + fieldName
 						if methodSym, ok := g.currentScope.Resolve(methodName); ok {
 							if fn, ok := methodSym.IRValue.(*ir.Function); ok {
-								// Auto-load 'this' if needed
 								thisArg := currPtr
 								ft := fn.FuncType
 								if len(ft.ParamTypes) > 0 && !ft.ParamTypes[0].Equal(thisArg.Type()) {
@@ -853,7 +847,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 									valid = true
 									break
 								} else if i == len(ids)-1 {
-									// Return BoundMethod
 									return &BoundMethod{Fn: fn, This: thisArg}
 								}
 							}
