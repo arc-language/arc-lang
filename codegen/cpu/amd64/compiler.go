@@ -728,6 +728,12 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 		c.asm.emitByte(0x0F)
 		c.asm.emitByte(0x0B)
 
+	case ir.OpStrLen:
+		if err := requireOps(1); err != nil { return err }
+		c.load(RDI, inst.Operands()[0])
+		c.asm.CallRelative("strlen")
+		c.store(RAX, inst)
+
 	default:
 		return fmt.Errorf("unknown opcode: %s", inst.Opcode())
 	}
