@@ -73,7 +73,6 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 		s, ok := a.currentScope.Resolve(name)
 		
 		// Fix: Go-style namespace resolution.
-		// If we are inside 'namespace X', and 'Name' is not found, try 'X.Name'.
 		if !ok && a.currentNamespacePrefix != "" && tc.QualifiedType() == nil {
 			s, ok = a.currentScope.Resolve(a.currentNamespacePrefix + "." + name)
 		}
@@ -109,6 +108,22 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 		}
 
 		return s.Type
+	}
+
+	// 6. FIXED: Array Types [Size]Type
+	// This was missing, causing [2]string to fall through to I64
+	if tc.ArrayType() != nil {
+		at := tc.ArrayType()
+		elemType := a.resolveType(at.Type_())
+		
+		var length int64 = 0
+		if expr := at.Expression(); expr != nil {
+			txt := expr.GetText()
+			if val, err := strconv.ParseInt(txt, 0, 64); err == nil {
+				length = val
+			}
+		}
+		return types.NewArray(elemType, length)
 	}
 	
 	return types.I64
