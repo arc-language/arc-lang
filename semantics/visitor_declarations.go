@@ -606,11 +606,19 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 		name = a.currentNamespacePrefix + "." + name
 	}
 
-	// Phase 0: Register Name
+	// Phase 0: Register Name and Attributes
 	if a.Phase == 0 {
 		if _, ok := a.currentScope.ResolveLocal(name); !ok {
-			// Define StructType with empty fields initially
-			st := types.NewStruct(name, nil, false)
+			// Check for @packed attribute
+			isPacked := false
+			for _, attr := range ctx.AllAttribute() {
+				if attr.IDENTIFIER().GetText() == "packed" {
+					isPacked = true
+				}
+			}
+
+			// Define StructType (Value Type)
+			st := types.NewStruct(name, nil, isPacked)
 			a.currentScope.Define(name, symbol.SymType, st)
 		}
 		return nil
@@ -621,7 +629,7 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 		sym, _ := a.currentScope.Resolve(name)
 		if sym != nil {
 			st := sym.Type.(*types.StructType)
-			// Only parse fields if we haven't already (prevents double work)
+			// Only parse fields if we haven't already
 			if len(st.Fields) == 0 {
 				var fields []types.Type
 				indices := make(map[string]int)
@@ -640,7 +648,7 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 		}
 	}
 
-	// Phase 1 & 2: Visit Methods (FunctionDecl/MutatingDecl handle their own Phase checks)
+	// Phase 1 & 2: Visit Methods
 	for _, member := range ctx.AllStructMember() {
 		if m := member.FunctionDecl(); m != nil { a.Visit(m) }
 		if m := member.MutatingDecl(); m != nil { a.Visit(m) }
