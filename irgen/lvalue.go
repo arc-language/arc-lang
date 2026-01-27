@@ -118,7 +118,6 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 				if !isPtr { return nil }
 				
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
-					// Robust Indices Lookup
 					indices, hasIndices := g.analysis.StructIndices[st.Name]
 					if !hasIndices && g.currentNamespace != "" {
 						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
@@ -192,7 +191,6 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 				if !isPtr { return nil }
 
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
-					// Robust Indices Lookup
 					indices, hasIndices := g.analysis.StructIndices[st.Name]
 					if !hasIndices && g.currentNamespace != "" {
 						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]

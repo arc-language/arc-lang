@@ -469,7 +469,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
 					indices, hasIndices := g.analysis.StructIndices[st.Name]
 					if !hasIndices && g.currentNamespace != "" {
-						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace+"."+st.Name]
 					}
 					if !hasIndices && g.currentNamespace != "" {
 						prefix := g.currentNamespace + "."
@@ -511,7 +511,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				if st, ok := curr.Type().(*types.StructType); ok {
 					indices, hasIndices := g.analysis.StructIndices[st.Name]
 					if !hasIndices && g.currentNamespace != "" {
-						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace+"."+st.Name]
 					}
 					if !hasIndices && g.currentNamespace != "" {
 						prefix := g.currentNamespace + "."
@@ -773,10 +773,13 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
 			var basePtr ir.Value
+			
+			// Try resolving baseName as a variable first
 			sym, ok := g.currentScope.Resolve(baseName)
 			if !ok && g.currentNamespace != "" {
 				sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + baseName)
 			}
+			
 			if ok {
 				if constant, ok := sym.IRValue.(ir.Constant); ok {
 					return constant
