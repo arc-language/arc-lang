@@ -270,7 +270,16 @@ func (g *Generator) applyCppCallConv(fn *ir.Function, ctx parser.ICppCallingConv
 func (g *Generator) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 	if g.Phase == 1 {
 		name := ctx.IDENTIFIER().GetText()
-		if sym, ok := g.currentScope.Resolve(name); ok {
+		
+		// Try resolving raw name first
+		sym, ok := g.currentScope.Resolve(name)
+		
+		// Fallback: Try with namespace prefix
+		if !ok && g.currentNamespace != "" {
+			sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + name)
+		}
+
+		if ok {
 			if st, ok := sym.Type.(*types.StructType); ok {
 				g.ctx.Builder.DefineStruct(st)
 			}

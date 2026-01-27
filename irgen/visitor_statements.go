@@ -81,9 +81,16 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 	lhsCtx := ctx.LeftHandSide()
 	var destPtr ir.Value
 
+	// Optimization for simple identifier assignments
 	if lhsCtx.IDENTIFIER() != nil && lhsCtx.DOT() == nil && lhsCtx.STAR() == nil && lhsCtx.LBRACKET() == nil {
 		name := lhsCtx.IDENTIFIER().GetText()
 		sym, ok := g.currentScope.Resolve(name)
+		
+		// Fallback for namespace resolution
+		if !ok && g.currentNamespace != "" {
+			sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + name)
+		}
+
 		if ok && sym.IRValue != nil {
 			if alloca, isAlloca := sym.IRValue.(*ir.AllocaInst); isAlloca {
 				destPtr = alloca
@@ -99,14 +106,14 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 	}
 
 	if destPtr == nil {
+		fmt.Printf("[IRGen] Error: Invalid assignment target (L-Value resolution failed) at line %d\n", ctx.GetStart().GetLine())
 		return nil
 	}
 
 	// SAFETY CHECK: Ensure assignment target is actually a pointer
 	ptrType, isPtr := destPtr.Type().(*types.PointerType)
 	if !isPtr {
-		// This happens if trying to assign to a Constant or non-lvalue
-		// We ignore it or report error to prevent panic
+		fmt.Printf("[IRGen] Error: Assignment target is not a pointer (type: %s) at line %d\n", destPtr.Type().String(), ctx.GetStart().GetLine())
 		return nil
 	}
 
