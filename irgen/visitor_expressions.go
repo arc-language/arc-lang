@@ -715,11 +715,9 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		return g.Visit(ctx.StructLiteral())
 	}
 	
-	// --- ENSURE THIS IS PRESENT ---
 	if ctx.AnonymousFuncExpression() != nil {
 		return g.Visit(ctx.AnonymousFuncExpression())
 	}
-	// ------------------------------
 
 	if ctx.Literal() != nil {
 		return g.Visit(ctx.Literal())
@@ -782,13 +780,11 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		}
 
 		if ok {
-			// Fix: Capture function type from variable symbols too, not just SymFunc
 			if ft, ok := sym.Type.(*types.FunctionType); ok {
 				pendingFnType = ft
 			}
 
 			if sym.IRValue != nil {
-				// Handle Constants directly (Phase 1 resolution)
 				if constant, ok := sym.IRValue.(ir.Constant); ok {
 					return constant
 				}
@@ -834,6 +830,8 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 
 			if basePtr != nil {
 				currPtr := basePtr
+				
+				// Load the pointer if it points to a pointer
 				if ptrType, ok := currPtr.Type().(*types.PointerType); ok {
 					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 						currPtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
@@ -844,6 +842,8 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 
 				for i := 1; i < len(ids); i++ {
 					fieldName := ids[i].GetText()
+					
+					// Check if currPtr is a pointer to a struct
 					ptrType, isPtr := currPtr.Type().(*types.PointerType)
 					if !isPtr {
 						valid = false
@@ -851,13 +851,31 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					}
 
 					if st, ok := ptrType.ElementType.(*types.StructType); ok {
-						if indices, ok := g.analysis.StructIndices[st.Name]; ok {
+						// Try to find field indices
+						// First try with the struct's registered name
+						indices, hasIndices := g.analysis.StructIndices[st.Name]
+						
+						// Fallback: try without namespace prefix
+						if !hasIndices && g.currentNamespace != "" {
+							prefix := g.currentNamespace + "."
+							if len(st.Name) > len(prefix) && st.Name[:len(prefix)] == prefix {
+								shortName := st.Name[len(prefix):]
+								indices, hasIndices = g.analysis.StructIndices[shortName]
+							}
+						}
+						
+						if hasIndices {
 							if idx, ok := indices[fieldName]; ok {
-								currPtr = g.ctx.Builder.CreateStructGEP(st, currPtr, idx, "")
+								physicalIndex := idx
+								if st.IsClass {
+									physicalIndex = idx + 1
+								}
+								currPtr = g.ctx.Builder.CreateStructGEP(st, currPtr, physicalIndex, "")
 								continue
 							}
 						}
 						
+						// Try method resolution
 						methodName := st.Name + "_" + fieldName
 						if methodSym, ok := g.currentScope.Resolve(methodName); ok {
 							if fn, ok := methodSym.IRValue.(*ir.Function); ok {
