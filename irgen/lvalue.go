@@ -1,6 +1,8 @@
 package irgen
 
 import (
+	"strings"
+
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
@@ -123,7 +125,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 					}
 					if !hasIndices && g.currentNamespace != "" {
 						prefix := g.currentNamespace + "."
-						if len(st.Name) > len(prefix) && st.Name[:len(prefix)] == prefix {
+						if len(st.Name) > len(prefix) && strings.HasPrefix(st.Name, prefix) {
 							indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
 						}
 					}
@@ -197,7 +199,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 					}
 					if !hasIndices && g.currentNamespace != "" {
 						prefix := g.currentNamespace + "."
-						if len(st.Name) > len(prefix) && st.Name[:len(prefix)] == prefix {
+						if len(st.Name) > len(prefix) && strings.HasPrefix(st.Name, prefix) {
 							indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
 						}
 					}
