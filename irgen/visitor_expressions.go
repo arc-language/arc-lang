@@ -290,8 +290,6 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 			// This ensures 'BitSize > 0', so codegen allocates a stack slot.
 			fmt.Printf("[IRGen] Warning: Await result type missing for %s. Defaulting to I32 to prevent panic.\n", ctx.GetText())
 			resultType = types.I32
-		} else {
-			fmt.Printf("[IRGen] Await result type: %s\n", resultType.String())
 		}
 		
 		return g.ctx.Builder.CreateAwaitTask(handle, resultType, "")
@@ -493,20 +491,39 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				ptrType = basePtr.Type().(*types.PointerType)
 
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
-					// 1. Field Access
-					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-						physicalIndex := idx
-						if st.IsClass {
-							physicalIndex = idx + 1
+					// 1. Field Access - Robust Lookup
+					indices, hasIndices := g.analysis.StructIndices[st.Name]
+					if !hasIndices && g.currentNamespace != "" {
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+					}
+					// Fallback: try removing prefix
+					if !hasIndices && g.currentNamespace != "" {
+						prefix := g.currentNamespace + "."
+						if len(st.Name) > len(prefix) && st.Name[:len(prefix)] == prefix {
+							indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
 						}
-						currPtr = g.ctx.Builder.CreateStructGEP(st, basePtr, physicalIndex, "")
-						curr = g.ctx.Builder.CreateLoad(st.Fields[idx], currPtr, "")
-						continue
+					}
+
+					if hasIndices {
+						if idx, ok := indices[fieldName]; ok {
+							physicalIndex := idx
+							if st.IsClass {
+								physicalIndex = idx + 1
+							}
+							currPtr = g.ctx.Builder.CreateStructGEP(st, basePtr, physicalIndex, "")
+							curr = g.ctx.Builder.CreateLoad(st.Fields[idx], currPtr, "")
+							continue
+						}
 					}
 
 					// 2. Method Access
 					methodName := st.Name + "_" + fieldName
-					if methodSym, ok := g.currentScope.Resolve(methodName); ok {
+					methodSym, ok := g.currentScope.Resolve(methodName)
+					if !ok && g.currentNamespace != "" {
+						methodSym, ok = g.currentScope.Resolve(g.currentNamespace + "." + methodName)
+					}
+					
+					if ok {
 						if ft, ok := methodSym.Type.(*types.FunctionType); ok {
 							pendingFnType = ft
 						}
@@ -521,16 +538,24 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					}
 				}
 			} else if curr != nil {
-				// Path B: Value-based field access (NEW CODE)
+				// Path B: Value-based field access
 				if st, ok := curr.Type().(*types.StructType); ok {
-					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-						physicalIndex := idx
-						if st.IsClass {
-							physicalIndex = idx + 1
+					// Robust Lookup
+					indices, hasIndices := g.analysis.StructIndices[st.Name]
+					if !hasIndices && g.currentNamespace != "" {
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+					}
+					
+					if hasIndices {
+						if idx, ok := indices[fieldName]; ok {
+							physicalIndex := idx
+							if st.IsClass {
+								physicalIndex = idx + 1
+							}
+							curr = g.ctx.Builder.CreateExtractValue(curr, []int{physicalIndex}, "")
+							currPtr = nil
+							continue
 						}
-						curr = g.ctx.Builder.CreateExtractValue(curr, []int{physicalIndex}, "")
-						currPtr = nil
-						continue
 					}
 				}
 			}
@@ -851,16 +876,15 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					}
 
 					if st, ok := ptrType.ElementType.(*types.StructType); ok {
-						// Try to find field indices
-						// First try with the struct's registered name
+						// Robust Indices Lookup
 						indices, hasIndices := g.analysis.StructIndices[st.Name]
-						
-						// Fallback: try without namespace prefix
+						if !hasIndices && g.currentNamespace != "" {
+							indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+						}
 						if !hasIndices && g.currentNamespace != "" {
 							prefix := g.currentNamespace + "."
 							if len(st.Name) > len(prefix) && st.Name[:len(prefix)] == prefix {
-								shortName := st.Name[len(prefix):]
-								indices, hasIndices = g.analysis.StructIndices[shortName]
+								indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
 							}
 						}
 						
@@ -877,7 +901,12 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 						
 						// Try method resolution
 						methodName := st.Name + "_" + fieldName
-						if methodSym, ok := g.currentScope.Resolve(methodName); ok {
+						methodSym, ok := g.currentScope.Resolve(methodName)
+						if !ok && g.currentNamespace != "" {
+							methodSym, ok = g.currentScope.Resolve(g.currentNamespace + "." + methodName)
+						}
+
+						if ok {
 							if fn, ok := methodSym.IRValue.(*ir.Function); ok {
 								thisArg := currPtr
 								ft := fn.FuncType
@@ -1110,7 +1139,18 @@ func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 	if !ok { return g.getZeroValue(types.I64) }
 
 	structType := sym.Type.(*types.StructType)
-	indices := g.analysis.StructIndices[structType.Name]
+	
+	// Robust Indices Lookup
+	indices, hasIndices := g.analysis.StructIndices[structType.Name]
+	if !hasIndices && g.currentNamespace != "" {
+		indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + structType.Name]
+	}
+	if !hasIndices && g.currentNamespace != "" {
+		prefix := g.currentNamespace + "."
+		if len(structType.Name) > len(prefix) && structType.Name[:len(prefix)] == prefix {
+			indices, hasIndices = g.analysis.StructIndices[structType.Name[len(prefix):]]
+		}
+	}
 
 	// --- PATH 1: Struct ---
 	if !structType.IsClass {

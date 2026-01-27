@@ -116,13 +116,27 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 				if !isPtr { return nil }
 				
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
-					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-						physicalIndex := idx
-						if st.IsClass {
-							physicalIndex = idx + 1
+					// Robust Indices Lookup
+					indices, hasIndices := g.analysis.StructIndices[st.Name]
+					if !hasIndices && g.currentNamespace != "" {
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+					}
+					if !hasIndices && g.currentNamespace != "" {
+						prefix := g.currentNamespace + "."
+						if len(st.Name) > len(prefix) && st.Name[:len(prefix)] == prefix {
+							indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
 						}
-						addr = g.ctx.Builder.CreateStructGEP(st, addr, physicalIndex, "")
-						continue
+					}
+					
+					if hasIndices {
+						if idx, ok := indices[fieldName]; ok {
+							physicalIndex := idx
+							if st.IsClass {
+								physicalIndex = idx + 1
+							}
+							addr = g.ctx.Builder.CreateStructGEP(st, addr, physicalIndex, "")
+							continue
+						}
 					}
 				}
 				return nil
@@ -176,13 +190,27 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 				if !isPtr { return nil }
 
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
-					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-						physicalIndex := idx
-						if st.IsClass {
-							physicalIndex = idx + 1
+					// Robust Indices Lookup
+					indices, hasIndices := g.analysis.StructIndices[st.Name]
+					if !hasIndices && g.currentNamespace != "" {
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+					}
+					if !hasIndices && g.currentNamespace != "" {
+						prefix := g.currentNamespace + "."
+						if len(st.Name) > len(prefix) && st.Name[:len(prefix)] == prefix {
+							indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
 						}
-						addr = g.ctx.Builder.CreateStructGEP(st, addr, physicalIndex, "")
-						continue
+					}
+
+					if hasIndices {
+						if idx, ok := indices[fieldName]; ok {
+							physicalIndex := idx
+							if st.IsClass {
+								physicalIndex = idx + 1
+							}
+							addr = g.ctx.Builder.CreateStructGEP(st, addr, physicalIndex, "")
+							continue
+						}
 					}
 				}
 				return nil
