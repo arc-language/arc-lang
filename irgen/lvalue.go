@@ -127,7 +127,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 							indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
 						}
 					}
-					
+
 					if hasIndices {
 						if idx, ok := indices[fieldName]; ok {
 							physicalIndex := idx
