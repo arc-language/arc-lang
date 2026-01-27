@@ -485,6 +485,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			}
 
 			if basePtr != nil {
+				// Path A: Pointer-based field access (existing code)
 				ptrType := basePtr.Type().(*types.PointerType)
 				if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 					basePtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, basePtr, "")
@@ -517,6 +518,19 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 							currPtr = basePtr
 							continue
 						}
+					}
+				}
+			} else if curr != nil {
+				// Path B: Value-based field access (NEW CODE)
+				if st, ok := curr.Type().(*types.StructType); ok {
+					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
+						physicalIndex := idx
+						if st.IsClass {
+							physicalIndex = idx + 1
+						}
+						curr = g.ctx.Builder.CreateExtractValue(curr, []int{physicalIndex}, "")
+						currPtr = nil
+						continue
 					}
 				}
 			}
