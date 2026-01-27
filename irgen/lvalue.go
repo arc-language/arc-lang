@@ -61,7 +61,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		}
 	case *parser.UnaryExpressionContext:
 		if ctx.STAR() != nil {
-			// Explicit dereference
+			// Explicit dereference: *ptr
 			val := g.Visit(ctx.UnaryExpression()).(ir.Value)
 			return val
 		}
@@ -69,104 +69,14 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 			return g.getLValue(ctx.PostfixExpression())
 		}
 
-	// --- LeftHandSide ---
-	case *parser.LeftHandSideContext:
-		// IDENTIFIER
-		if ctx.IDENTIFIER() != nil && ctx.DOT() == nil && ctx.STAR() == nil && ctx.LBRACKET() == nil {
-			name := ctx.IDENTIFIER().GetText()
-			sym, ok := g.currentScope.Resolve(name)
-			if !ok && g.currentNamespace != "" {
-				sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + name)
-			}
-			if ok {
-				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
-					return alloca
-				}
-				if glob := g.ctx.Module.GetGlobal(name); glob != nil {
-					return glob
-				}
-				if fn, ok := sym.IRValue.(*ir.Function); ok {
-					return fn
-				}
-				return sym.IRValue
-			}
-			return nil
-		}
-
-		// STAR postfixExpression
-		if ctx.STAR() != nil {
-			val := g.Visit(ctx.PostfixExpression()).(ir.Value)
-			return val
-		}
-
-		// postfixExpression DOT IDENTIFIER
-		if ctx.DOT() != nil {
-			base := g.getLValue(ctx.PostfixExpression())
-			if base == nil {
-				// Base might be a pointer already (like a Class instance)
-				val := g.Visit(ctx.PostfixExpression()).(ir.Value)
-				if types.IsPointer(val.Type()) {
-					base = val
-				}
-			}
-			
-			if base != nil {
-				// Dereference pointer-to-pointer if necessary
-				if ptrType, ok := base.Type().(*types.PointerType); ok {
-					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
-						base = g.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
-					}
-				}
-
-				fieldName := ctx.IDENTIFIER().GetText()
-				ptrType := base.Type().(*types.PointerType)
-				if st, ok := ptrType.ElementType.(*types.StructType); ok {
-					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-						// Calculate physical index
-						physicalIndex := idx
-						if st.IsClass {
-							physicalIndex = idx + 1 // Offset for RefCount
-						}
-						return g.ctx.Builder.CreateStructGEP(st, base, physicalIndex, "")
-					}
-				}
-			}
-			return nil
-		}
-
-		// postfixExpression LBRACKET expression RBRACKET
-		if ctx.LBRACKET() != nil {
-			idxVal := g.Visit(ctx.Expression()).(ir.Value)
-			base := g.getLValue(ctx.PostfixExpression())
-			if base == nil {
-				val := g.Visit(ctx.PostfixExpression()).(ir.Value)
-				if types.IsPointer(val.Type()) {
-					base = val
-				}
-			} else {
-				ptrType := base.Type().(*types.PointerType)
-				if _, ok := ptrType.ElementType.(*types.PointerType); ok {
-					base = g.ctx.Builder.CreateLoad(ptrType.ElementType, base, "")
-				}
-			}
-
-			if base != nil {
-				ptrType := base.Type().(*types.PointerType)
-				if _, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
-					zero := g.ctx.Builder.ConstInt(types.I32, 0)
-					return g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, base, []ir.Value{zero, idxVal}, "")
-				} else {
-					return g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, base, []ir.Value{idxVal}, "")
-				}
-			}
-			return nil
-		}
-
-	// --- Actual L-Value Logic ---
-
 	case *parser.PrimaryExpressionContext:
+		// Handle parenthesized L-Values: (x) = 1
+		if ctx.Expression() != nil && ctx.LPAREN() != nil {
+			return g.getLValue(ctx.Expression())
+		}
+		
+		// Function calls (LPAREN but no Expression) are not L-Values
 		if ctx.LPAREN() != nil { return nil }
-		if ctx.Expression() != nil { return g.getLValue(ctx.Expression()) }
 		
 		// Qualified Identifier
 		if ctx.QualifiedIdentifier() != nil {
@@ -194,6 +104,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 			if addr == nil { return nil }
 
 			for i := 1; i < len(ids); i++ {
+				// Auto-dereference double pointers
 				if ptrType, ok := addr.Type().(*types.PointerType); ok {
 					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 						addr = g.ctx.Builder.CreateLoad(ptrType.ElementType, addr, "")
@@ -241,6 +152,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 		}
 
 	case *parser.PostfixExpressionContext:
+		// Filter out function calls at this level too
 		for _, op := range ctx.AllPostfixOp() {
 			if op.LPAREN() != nil { return nil }
 		}
@@ -265,7 +177,6 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
 					if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-						// Calculate physical index (offset by 1 for classes)
 						physicalIndex := idx
 						if st.IsClass {
 							physicalIndex = idx + 1

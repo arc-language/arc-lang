@@ -78,35 +78,14 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 
 
 func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) interface{} {
-	lhsCtx := ctx.LeftHandSide()
-	var destPtr ir.Value
-
-	// Optimization for simple identifier assignments
-	if lhsCtx.IDENTIFIER() != nil && lhsCtx.DOT() == nil && lhsCtx.STAR() == nil && lhsCtx.LBRACKET() == nil {
-		name := lhsCtx.IDENTIFIER().GetText()
-		sym, ok := g.currentScope.Resolve(name)
-		
-		// Fallback for namespace resolution
-		if !ok && g.currentNamespace != "" {
-			sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + name)
-		}
-
-		if ok && sym.IRValue != nil {
-			if alloca, isAlloca := sym.IRValue.(*ir.AllocaInst); isAlloca {
-				destPtr = alloca
-			} else {
-				destPtr = sym.IRValue
-			}
-		} else {
-			fmt.Printf("[IRGen] Error: Cannot resolve assignment target '%s'\n", name)
-			return nil
-		}
-	} else {
-		destPtr = g.getLValue(lhsCtx)
-	}
+	// Updated: Use UnaryExpression instead of LeftHandSide
+	lhsCtx := ctx.UnaryExpression()
+	
+	// Resolve L-Value
+	destPtr := g.getLValue(lhsCtx)
 
 	if destPtr == nil {
-		fmt.Printf("[IRGen] Error: Invalid assignment target (L-Value resolution failed) at line %d\n", ctx.GetStart().GetLine())
+		fmt.Printf("[IRGen] Error: Invalid assignment target at line %d\n", ctx.GetStart().GetLine())
 		return nil
 	}
 
