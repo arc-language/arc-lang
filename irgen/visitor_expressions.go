@@ -837,9 +837,11 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					}
 
 					if st, ok := ptrType.ElementType.(*types.StructType); ok {
-						if idx, ok := g.analysis.StructIndices[st.Name][fieldName]; ok {
-							currPtr = g.ctx.Builder.CreateStructGEP(st, currPtr, idx, "")
-							continue
+						if indices, ok := g.analysis.StructIndices[st.Name]; ok {
+							if idx, ok := indices[fieldName]; ok {
+								currPtr = g.ctx.Builder.CreateStructGEP(st, currPtr, idx, "")
+								continue
+							}
 						}
 						
 						methodName := st.Name + "_" + fieldName
@@ -868,7 +870,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					valid = false
 					break
 				}
-
+				
 				if valid && entity == nil {
 					ptrType := currPtr.Type().(*types.PointerType)
 					entity = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
