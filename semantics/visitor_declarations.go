@@ -606,25 +606,24 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 		name = a.currentNamespacePrefix + "." + name
 	}
 
-	// Phase 0: Register Name and Attributes
-	if a.Phase == 0 {
-		if _, ok := a.currentScope.ResolveLocal(name); !ok {
-			// Check for @packed attribute
-			isPacked := false
-			for _, attr := range ctx.AllAttribute() {
-				if attr.IDENTIFIER().GetText() == "packed" {
-					isPacked = true
-				}
+	// 1. Definition / Registration (Run in Phase 0 OR Phase 1 if missing)
+	// We check !ok to ensure we only define it once, but we do it lazily
+	// so it works even if the driver skips Phase 0.
+	if _, ok := a.currentScope.ResolveLocal(name); !ok {
+		// Check for @packed attribute
+		isPacked := false
+		for _, attr := range ctx.AllAttribute() {
+			if attr.IDENTIFIER().GetText() == "packed" {
+				isPacked = true
 			}
-
-			// Define StructType (Value Type)
-			st := types.NewStruct(name, nil, isPacked)
-			a.currentScope.Define(name, symbol.SymType, st)
 		}
-		return nil
+
+		// Define StructType (Value Type)
+		st := types.NewStruct(name, nil, isPacked)
+		a.currentScope.Define(name, symbol.SymType, st)
 	}
 
-	// Phase 1: Resolve Fields
+	// 2. Field Resolution (Phase 1)
 	if a.Phase == 1 {
 		sym, _ := a.currentScope.Resolve(name)
 		if sym != nil {
@@ -648,7 +647,7 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 		}
 	}
 
-	// Phase 1 & 2: Visit Methods
+	// 3. Method Analysis (Phase 1 & 2)
 	for _, member := range ctx.AllStructMember() {
 		if m := member.FunctionDecl(); m != nil { a.Visit(m) }
 		if m := member.MutatingDecl(); m != nil { a.Visit(m) }
