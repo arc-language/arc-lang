@@ -3,6 +3,7 @@ package irgen
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
@@ -31,10 +32,8 @@ func (g *Generator) VisitLogicalOrExpression(ctx *parser.LogicalOrExpressionCont
 	for i := 1; i < len(ctx.AllLogicalAndExpression()); i++ {
 		rhs := g.Visit(ctx.LogicalAndExpression(i)).(ir.Value)
 		
-		// Constant Folding
 		if lConst, ok := lhs.(*ir.ConstantInt); ok {
 			if rConst, ok := rhs.(*ir.ConstantInt); ok {
-				// Logical OR on integers (0/1) or bitwise
 				res := lConst.Value
 				if rConst.Value != 0 { res = 1 }
 				lhs = g.ctx.Builder.ConstInt(lConst.Type().(*types.IntType), res)
@@ -200,7 +199,6 @@ func (g *Generator) VisitAdditiveExpression(ctx *parser.AdditiveExpressionContex
 		rhs := g.Visit(ctx.MultiplicativeExpression(i)).(ir.Value)
 		op := getOp(ctx, i)
 
-		// Pointer Arithmetic handled by Builder instructions (not constant folded usually)
 		if _, ok := lhs.Type().(*types.PointerType); ok {
 			if op == parser.ArcParserPLUS {
 				lhs = g.ctx.Builder.CreateInBoundsGEP(lhs.Type().(*types.PointerType).ElementType, lhs, []ir.Value{rhs}, "")
@@ -211,7 +209,6 @@ func (g *Generator) VisitAdditiveExpression(ctx *parser.AdditiveExpressionContex
 			continue
 		}
 
-		// Constant Folding
 		if lConst, ok := lhs.(*ir.ConstantInt); ok {
 			if rConst, ok := rhs.(*ir.ConstantInt); ok {
 				if op == parser.ArcParserPLUS {
@@ -246,7 +243,6 @@ func (g *Generator) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 		rhs := g.Visit(ctx.UnaryExpression(i)).(ir.Value)
 		op := getOp(ctx, i)
 
-		// Constant Folding
 		if lConst, ok := lhs.(*ir.ConstantInt); ok {
 			if rConst, ok := rhs.(*ir.ConstantInt); ok {
 				if op == parser.ArcParserSTAR {
@@ -280,18 +276,12 @@ func (g *Generator) VisitMultiplicativeExpression(ctx *parser.MultiplicativeExpr
 }
 
 func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) interface{} {
-	// --- AWAIT Operator ---
 	if ctx.AWAIT() != nil {
 		handle := g.Visit(ctx.UnaryExpression()).(ir.Value)
-		
 		resultType := g.analysis.NodeTypes[ctx]
 		if resultType == nil || resultType == types.Void {
-			// Panic Prevention: If semantics didn't store the type, assume I32 for now.
-			// This ensures 'BitSize > 0', so codegen allocates a stack slot.
-			fmt.Printf("[IRGen] Warning: Await result type missing for %s. Defaulting to I32 to prevent panic.\n", ctx.GetText())
 			resultType = types.I32
 		}
-		
 		return g.ctx.Builder.CreateAwaitTask(handle, resultType, "")
 	}
 
@@ -314,11 +304,9 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 
 	if ctx.MINUS() != nil {
 		val := g.Visit(ctx.UnaryExpression()).(ir.Value)
-		
 		if c, ok := val.(*ir.ConstantInt); ok {
 			return g.ctx.Builder.ConstInt(c.Type().(*types.IntType), -c.Value)
 		}
-
 		if types.IsFloat(val.Type()) {
 			return g.ctx.Builder.CreateFSub(g.getZeroValue(val.Type()), val, "")
 		}
@@ -389,17 +377,13 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 
 	for _, op := range ctx.AllPostfixOp() {
 		
-		// --- Function Call ---
 		if op.LPAREN() != nil {
 			var args []ir.Value
-
-			// Handle BoundMethod
 			if bm, ok := curr.(*BoundMethod); ok {
 				curr = bm.Fn
 				pendingFnType = bm.Fn.FuncType
 				args = append(args, bm.This)
 			}
-
 			var targetType *types.FunctionType = pendingFnType
 			if targetType == nil {
 				if fn, ok := curr.(*ir.Function); ok {
@@ -412,8 +396,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					}
 				}
 			}
-
-			// Implicit 'this'
 			if currPtr != nil && targetType != nil && len(targetType.ParamTypes) > 0 {
 				if g.checkTypeMatch(currPtr, targetType.ParamTypes[0]) {
 					args = append(args, currPtr)
@@ -424,8 +406,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					}
 				}
 			}
-
-			// Arguments
 			if op.ArgumentList() != nil {
 				for _, arg := range op.ArgumentList().AllArgument() {
 					if v := g.Visit(arg.Expression()); v != nil {
@@ -441,7 +421,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					}
 				}
 			}
-
 			if curr != nil {
 				if targetType != nil && targetType.IsAsync {
 					if fn, ok := curr.(*ir.Function); ok {
@@ -472,18 +451,15 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			continue
 		}
 
-		// --- Member Access ---
 		if op.DOT() != nil {
 			pendingFnType = nil
 			fieldName := op.IDENTIFIER().GetText()
-
 			var basePtr ir.Value = currPtr
 			if basePtr == nil && curr != nil && types.IsPointer(curr.Type()) {
 				basePtr = curr
 			}
 
 			if basePtr != nil {
-				// Path A: Pointer-based field access
 				ptrType := basePtr.Type().(*types.PointerType)
 				if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 					basePtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, basePtr, "")
@@ -491,18 +467,16 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				ptrType = basePtr.Type().(*types.PointerType)
 
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
-					// 1. Field Access - Robust Lookup
 					indices, hasIndices := g.analysis.StructIndices[st.Name]
 					if !hasIndices && g.currentNamespace != "" {
-						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace+"."+st.Name]
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
 					}
 					if !hasIndices && g.currentNamespace != "" {
 						prefix := g.currentNamespace + "."
-						if len(st.Name) > len(prefix) && st.Name[:len(prefix)] == prefix {
+						if len(st.Name) > len(prefix) && strings.HasPrefix(st.Name, prefix) {
 							indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
 						}
 					}
-
 					if hasIndices {
 						if idx, ok := indices[fieldName]; ok {
 							physicalIndex := idx
@@ -514,14 +488,11 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 							continue
 						}
 					}
-
-					// 2. Method Access
 					methodName := st.Name + "_" + fieldName
 					methodSym, ok := g.currentScope.Resolve(methodName)
 					if !ok && g.currentNamespace != "" {
 						methodSym, ok = g.currentScope.Resolve(g.currentNamespace + "." + methodName)
 					}
-
 					if ok {
 						if ft, ok := methodSym.Type.(*types.FunctionType); ok {
 							pendingFnType = ft
@@ -537,20 +508,17 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					}
 				}
 			} else if curr != nil {
-				// Path B: Value-based field access
 				if st, ok := curr.Type().(*types.StructType); ok {
-					// Robust Lookup for Value Types
 					indices, hasIndices := g.analysis.StructIndices[st.Name]
 					if !hasIndices && g.currentNamespace != "" {
-						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace+"."+st.Name]
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
 					}
 					if !hasIndices && g.currentNamespace != "" {
 						prefix := g.currentNamespace + "."
-						if len(st.Name) > len(prefix) && st.Name[:len(prefix)] == prefix {
+						if len(st.Name) > len(prefix) && strings.HasPrefix(st.Name, prefix) {
 							indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
 						}
 					}
-
 					if hasIndices {
 						if idx, ok := indices[fieldName]; ok {
 							physicalIndex := idx
@@ -567,7 +535,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			continue
 		}
 
-		// --- Indexing ---
 		if op.LBRACKET() != nil {
 			idx := g.Visit(op.Expression()).(ir.Value)
 			var basePtr ir.Value
@@ -598,12 +565,10 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			continue
 		}
 
-		// --- Increment/Decrement ---
 		if op.INCREMENT() != nil || op.DECREMENT() != nil {
 			if currPtr != nil {
 				oldVal := curr
 				var newVal ir.Value
-
 				if types.IsFloat(oldVal.Type()) {
 					one := g.ctx.Builder.ConstFloat(oldVal.Type().(*types.FloatType), 1.0)
 					if op.INCREMENT() != nil {
@@ -612,7 +577,6 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 						newVal = g.ctx.Builder.CreateFSub(oldVal, one, "")
 					}
 				} else if ptrType, ok := oldVal.Type().(*types.PointerType); ok {
-					// Pointer arithmetic
 					var offset int64 = 1
 					if op.DECREMENT() != nil {
 						offset = -1
@@ -620,24 +584,21 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					idx := g.ctx.Builder.ConstInt(types.I64, offset)
 					newVal = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, oldVal, []ir.Value{idx}, "")
 				} else {
-					// Integer arithmetic
 					var one ir.Value
 					if intTy, ok := oldVal.Type().(*types.IntType); ok {
 						one = g.ctx.Builder.ConstInt(intTy, 1)
 					} else {
 						one = g.ctx.Builder.ConstInt(types.I64, 1)
 					}
-
 					if op.INCREMENT() != nil {
 						newVal = g.ctx.Builder.CreateAdd(oldVal, one, "")
 					} else {
 						newVal = g.ctx.Builder.CreateSub(oldVal, one, "")
 					}
 				}
-
 				g.ctx.Builder.CreateStore(newVal, currPtr)
-				curr = oldVal // Postfix returns original value
-				currPtr = nil // Result is R-Value
+				curr = oldVal
+				currPtr = nil
 			}
 			continue
 		}
@@ -651,7 +612,6 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		name = fmt.Sprintf("%s_lambda_%d", g.ctx.CurrentFunction.Name(), len(g.ctx.Module.Functions))
 	}
 
-	// 1. Resolve Return Type
 	var retType types.Type = types.Void
 	if ctx.ReturnType() != nil {
 		if ctx.ReturnType().Type_() != nil {
@@ -659,7 +619,6 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		}
 	}
 
-	// 2. Resolve Parameters
 	var paramTypes []types.Type
 	var paramNames []string
 	if ctx.ParameterList() != nil {
@@ -669,10 +628,8 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		}
 	}
 
-	// 3. Create Function
 	fn := g.ctx.Builder.CreateFunction(name, retType, paramTypes, false)
 
-	// Updated for ExecutionStrategy
 	if es := ctx.ExecutionStrategy(); es != nil {
 		if es.ASYNC() != nil {
 			fn.FuncType.IsAsync = true
@@ -681,26 +638,19 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		}
 	}
 
-	// 4. Save Context
 	prevFunc := g.ctx.CurrentFunction
 	prevBlock := g.ctx.Builder.GetInsertBlock()
 	
-	// 5. Enter New Function Context
 	g.ctx.EnterFunction(fn)
 	g.enterScope(ctx)
 
-	// --- CRITICAL FIX START ---
-	// Create an entry block so instructions don't leak into 'main'
 	entryBlock := g.ctx.Builder.CreateBlock("entry")
 	g.ctx.Builder.SetInsertPoint(entryBlock)
-	// --- CRITICAL FIX END ---
 
-	// 6. Setup Arguments
 	for i, arg := range fn.Arguments {
 		arg.SetName(paramNames[i])
 		alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
 		g.ctx.Builder.CreateStore(arg, alloca)
-		
 		if s, ok := g.currentScope.ResolveLocal(paramNames[i]); ok {
 			s.IRValue = alloca
 		} else {
@@ -708,13 +658,11 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		}
 	}
 
-	// 7. Generate Body
 	if ctx.Block() != nil {
 		outerDefer := g.deferStack
 		g.deferStack = NewDeferStack()
 		g.Visit(ctx.Block())
 
-		// Handle implicit return
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			g.deferStack.Emit(g)
 			if retType == types.Void {
@@ -726,7 +674,6 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 		g.deferStack = outerDefer
 	}
 
-	// 8. Restore Context
 	g.exitScope()
 	g.ctx.ExitFunction()
 	
@@ -738,21 +685,16 @@ func (g *Generator) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpres
 	return fn
 }
 
-// --- Primary Expressions ---
-
 func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
 	if ctx.StructLiteral() != nil {
 		return g.Visit(ctx.StructLiteral())
 	}
-	
 	if ctx.AnonymousFuncExpression() != nil {
 		return g.Visit(ctx.AnonymousFuncExpression())
 	}
-
 	if ctx.Literal() != nil {
 		return g.Visit(ctx.Literal())
 	}
-
 	if ctx.SizeofExpression() != nil {
 		t := g.resolveType(ctx.SizeofExpression().Type_())
 		return g.ctx.Builder.CreateSizeOf(t, "")
@@ -761,7 +703,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		t := g.resolveType(ctx.AlignofExpression().Type_())
 		return g.ctx.Builder.CreateAlignOf(t, "")
 	}
-
 	if ctx.Expression() != nil && ctx.LPAREN() != nil && ctx.IDENTIFIER() == nil && ctx.QualifiedIdentifier() == nil {
 		return g.Visit(ctx.Expression())
 	}
@@ -773,9 +714,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	if ctx.QualifiedIdentifier() != nil {
 		qCtx = ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
 		for i, id := range qCtx.AllIDENTIFIER() {
-			if i > 0 {
-				name += "."
-			}
+			if i > 0 { name += "." }
 			name += id.GetText()
 		}
 		isQualified = true
@@ -785,7 +724,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 
 	if name != "" {
 		isCall := ctx.LPAREN() != nil
-
 		var args []ir.Value
 		if isCall {
 			if ctx.ArgumentList() != nil {
@@ -801,10 +739,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		var argsToPass []ir.Value = args
 		var pendingFnType *types.FunctionType
 
-		// 1. Try resolving symbol directly
 		sym, ok := g.currentScope.Resolve(name)
-		
-		// 2. Fallback: Try resolving with current namespace prefix
 		if !ok && g.currentNamespace != "" && !isQualified {
 			sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + name)
 		}
@@ -813,12 +748,10 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			if ft, ok := sym.Type.(*types.FunctionType); ok {
 				pendingFnType = ft
 			}
-
 			if sym.IRValue != nil {
 				if constant, ok := sym.IRValue.(ir.Constant); ok {
 					return constant
 				}
-
 				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 					if !isCall {
 						return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
@@ -839,14 +772,11 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		} else if isQualified {
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
-
 			var basePtr ir.Value
 			sym, ok := g.currentScope.Resolve(baseName)
-			
 			if !ok && g.currentNamespace != "" {
 				sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + baseName)
 			}
-
 			if ok {
 				if constant, ok := sym.IRValue.(ir.Constant); ok {
 					return constant
@@ -860,39 +790,30 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 
 			if basePtr != nil {
 				currPtr := basePtr
-				
-				// Load the pointer if it points to a pointer
 				if ptrType, ok := currPtr.Type().(*types.PointerType); ok {
 					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 						currPtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 					}
 				}
-
 				valid := true
-
 				for i := 1; i < len(ids); i++ {
 					fieldName := ids[i].GetText()
-					
-					// Check if currPtr is a pointer to a struct
 					ptrType, isPtr := currPtr.Type().(*types.PointerType)
 					if !isPtr {
 						valid = false
 						break
 					}
-
 					if st, ok := ptrType.ElementType.(*types.StructType); ok {
-						// Robust Indices Lookup
 						indices, hasIndices := g.analysis.StructIndices[st.Name]
 						if !hasIndices && g.currentNamespace != "" {
 							indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
 						}
 						if !hasIndices && g.currentNamespace != "" {
 							prefix := g.currentNamespace + "."
-							if len(st.Name) > len(prefix) && st.Name[:len(prefix)] == prefix {
+							if len(st.Name) > len(prefix) && strings.HasPrefix(st.Name, prefix) {
 								indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
 							}
 						}
-						
 						if hasIndices {
 							if idx, ok := indices[fieldName]; ok {
 								physicalIndex := idx
@@ -904,13 +825,11 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 							}
 						}
 						
-						// Try method resolution
 						methodName := st.Name + "_" + fieldName
 						methodSym, ok := g.currentScope.Resolve(methodName)
 						if !ok && g.currentNamespace != "" {
 							methodSym, ok = g.currentScope.Resolve(g.currentNamespace + "." + methodName)
 						}
-
 						if ok {
 							if fn, ok := methodSym.IRValue.(*ir.Function); ok {
 								thisArg := currPtr
@@ -920,7 +839,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 										thisArg = g.ctx.Builder.CreateLoad(pt.ElementType, thisArg, "")
 									}
 								}
-
 								if isCall && i == len(ids)-1 {
 									pendingFnType = ft
 									argsToPass = append([]ir.Value{thisArg}, argsToPass...)
@@ -936,7 +854,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					valid = false
 					break
 				}
-				
 				if valid && entity == nil {
 					ptrType := currPtr.Type().(*types.PointerType)
 					entity = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
@@ -957,12 +874,10 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 						}
 					}
 				}
-
 				if intrinsicVal := g.GenerateIntrinsicCall(name, args, typeArgs); intrinsicVal != nil {
 					return intrinsicVal
 				}
 			}
-
 			if isCall {
 				fmt.Printf("[IRGen] Error: Call to undefined function '%s'\n", name)
 			} else {
@@ -980,7 +895,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					}
 				}
 			}
-
 			if pendingFnType != nil && pendingFnType.IsAsync {
 				if fn, ok := entity.(*ir.Function); ok {
 					return g.ctx.Builder.CreateAsyncTask(fn, argsToPass, "")
@@ -989,7 +903,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				call.SetType(pendingFnType.ReturnType)
 				return call
 			}
-
 			if fn, ok := entity.(*ir.Function); ok {
 				return g.ctx.Builder.CreateCall(fn, argsToPass, "")
 			} else {
@@ -1000,10 +913,8 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				return call
 			}
 		}
-
 		return entity
 	}
-
 	return g.getZeroValue(types.I64)
 }
 
@@ -1061,39 +972,26 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 func (g *Generator) VisitInitializerList(ctx *parser.InitializerListContext) interface{} {
 	var values []ir.Value
 	var elemType types.Type
-
-	// 1. Visit all expressions to get values and infer type
 	for _, expr := range ctx.AllExpression() {
 		val := g.Visit(expr).(ir.Value)
 		values = append(values, val)
-		// Infer element type from the first expression
 		if elemType == nil {
 			elemType = val.Type()
 		}
 	}
-
-	// Handle empty list
 	if len(values) == 0 {
 		return g.getZeroValue(types.I64)
 	}
-
 	arrType := types.NewArray(elemType, int64(len(values)))
-
-	// 2. Try to build a Constant Array (Optimization)
-	// We check if all elements are constants AND can be cast to elemType as constants.
 	allConstants := true
 	var constElems []ir.Constant
-
 	for _, val := range values {
 		if _, ok := val.(ir.Constant); !ok {
 			allConstants = false
 			break
 		}
 	}
-
 	if allConstants {
-		// Attempt to cast all elements. If any cast results in a non-constant instruction 
-		// (e.g. bitcast pointer), we must abort the constant path and use runtime initialization.
 		for _, val := range values {
 			casted := g.emitCast(val, elemType)
 			if c, ok := casted.(ir.Constant); ok {
@@ -1104,37 +1002,30 @@ func (g *Generator) VisitInitializerList(ctx *parser.InitializerListContext) int
 			}
 		}
 	}
-
 	if allConstants {
 		return &ir.ConstantArray{
 			BaseValue: ir.BaseValue{ValType: arrType},
 			Elements:  constElems,
 		}
 	}
-
-	// 3. Runtime Initialization (InsertValue)
-	// Create a zeroed array value
 	var agg ir.Value = g.ctx.Builder.ConstZero(arrType)
-
 	for i, val := range values {
 		val = g.emitCast(val, elemType)
-		// Insert value into the aggregate at index i
 		agg = g.ctx.Builder.CreateInsertValue(agg, val, []int{i}, "")
 	}
-
 	return agg
 }
 
 func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
-    if ctx.QualifiedIdentifier() != nil {
-        qCtx := ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
-        name = ""
-        for i, id := range qCtx.AllIDENTIFIER() {
-            if i > 0 { name += "." }
-            name += id.GetText()
-        }
-    }
+	if ctx.QualifiedIdentifier() != nil {
+		qCtx := ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
+		name = ""
+		for i, id := range qCtx.AllIDENTIFIER() {
+			if i > 0 { name += "." }
+			name += id.GetText()
+		}
+	}
     
 	sym, ok := g.currentScope.Resolve(name)
 	if !ok && g.currentNamespace != "" && ctx.QualifiedIdentifier() == nil {
@@ -1144,20 +1035,17 @@ func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 	if !ok { return g.getZeroValue(types.I64) }
 
 	structType := sym.Type.(*types.StructType)
-	
-	// Robust Indices Lookup
-	indices, hasIndices := g.analysis.StructIndices[structType.Name]
-	if !hasIndices && g.currentNamespace != "" {
-		indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + structType.Name]
+	indices := g.analysis.StructIndices[structType.Name]
+	if indices == nil && g.currentNamespace != "" {
+		indices = g.analysis.StructIndices[g.currentNamespace + "." + structType.Name]
 	}
-	if !hasIndices && g.currentNamespace != "" {
+	if indices == nil && g.currentNamespace != "" {
 		prefix := g.currentNamespace + "."
-		if len(structType.Name) > len(prefix) && structType.Name[:len(prefix)] == prefix {
-			indices, hasIndices = g.analysis.StructIndices[structType.Name[len(prefix):]]
+		if len(structType.Name) > len(prefix) && strings.HasPrefix(structType.Name, prefix) {
+			indices = g.analysis.StructIndices[structType.Name[len(prefix):]]
 		}
 	}
 
-	// --- PATH 1: Struct ---
 	if !structType.IsClass {
 		var agg ir.Value = g.ctx.Builder.ConstZero(structType)
 		for _, field := range ctx.AllFieldInit() {
@@ -1171,7 +1059,6 @@ func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 		return agg
 	}
 
-	// --- PATH 2: Class ---
 	size := g.ctx.Builder.CreateSizeOf(structType, "class_size")
 	mallocFunc := g.getOrCreateMalloc()
 	rawPtr := g.ctx.Builder.CreateCall(mallocFunc, []ir.Value{size}, "raw_ptr")
@@ -1193,12 +1080,10 @@ func (g *Generator) VisitStructLiteral(ctx *parser.StructLiteralContext) interfa
 	return classPtr
 }
 
-// Helper: Ensure malloc is available
 func (g *Generator) getOrCreateMalloc() *ir.Function {
 	if fn := g.ctx.Module.GetFunction("malloc"); fn != nil {
 		return fn
 	}
-	// declare i8* @malloc(i64)
 	return g.ctx.Builder.DeclareFunction("malloc", types.NewPointer(types.I8), []types.Type{types.I64}, false)
 }
 
