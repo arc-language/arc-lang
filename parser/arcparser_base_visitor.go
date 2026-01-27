@@ -28,6 +28,10 @@ func (v *BaseArcParserVisitor) VisitTopLevelDecl(ctx *TopLevelDeclContext) inter
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseArcParserVisitor) VisitAttribute(ctx *AttributeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseArcParserVisitor) VisitExternCDecl(ctx *ExternCDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -297,10 +301,6 @@ func (v *BaseArcParserVisitor) VisitAssignmentStmt(ctx *AssignmentStmtContext) i
 }
 
 func (v *BaseArcParserVisitor) VisitAssignmentOp(ctx *AssignmentOpContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitLeftHandSide(ctx *LeftHandSideContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

@@ -33,6 +33,13 @@ topLevelDecl
     ;
 
 // =============================================================================
+// Attributes (New Rule)
+// =============================================================================
+
+// Allows @packed, @align(16), etc.
+attribute: AT IDENTIFIER (LPAREN expression RPAREN)?;
+
+// =============================================================================
 // Extern C Declarations
 // =============================================================================
 
@@ -198,10 +205,10 @@ parameterList: parameter (COMMA parameter)* (COMMA ELLIPSIS)? | ELLIPSIS;
 parameter: SELF? IDENTIFIER COLON type;
 
 // =============================================================================
-// Structs
+// Structs (Updated to accept attributes)
 // =============================================================================
 
-structDecl: STRUCT IDENTIFIER genericParams? LBRACE structMember* RBRACE;
+structDecl: attribute* STRUCT IDENTIFIER genericParams? LBRACE structMember* RBRACE;
 structMember: structField | functionDecl | mutatingDecl | initDecl;
 structField: IDENTIFIER COLON type;
 
@@ -306,7 +313,9 @@ statement
     | expressionStmt
     ;
 
-assignmentStmt: leftHandSide assignmentOp expression;
+// FIXED: Uses unaryExpression to handle member access properly
+assignmentStmt: unaryExpression assignmentOp expression;
+
 assignmentOp
     : ASSIGN
     | PLUS_ASSIGN
@@ -319,12 +328,6 @@ assignmentOp
     | BIT_XOR_ASSIGN
     | LT LE
     | GT GE
-    ;
-leftHandSide
-    : STAR postfixExpression
-    | postfixExpression DOT IDENTIFIER
-    | postfixExpression LBRACKET expression RBRACKET
-    | IDENTIFIER
     ;
 
 expressionStmt: expression;

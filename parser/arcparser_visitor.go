@@ -23,6 +23,9 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#topLevelDecl.
 	VisitTopLevelDecl(ctx *TopLevelDeclContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#attribute.
+	VisitAttribute(ctx *AttributeContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#externCDecl.
 	VisitExternCDecl(ctx *ExternCDeclContext) interface{}
 
@@ -226,9 +229,6 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#assignmentOp.
 	VisitAssignmentOp(ctx *AssignmentOpContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#leftHandSide.
-	VisitLeftHandSide(ctx *LeftHandSideContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#expressionStmt.
 	VisitExpressionStmt(ctx *ExpressionStmtContext) interface{}
