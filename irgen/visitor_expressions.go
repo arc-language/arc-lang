@@ -469,7 +469,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
 					indices, hasIndices := g.analysis.StructIndices[st.Name]
 					if !hasIndices && g.currentNamespace != "" {
-						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace+"."+st.Name]
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
 					}
 					if !hasIndices && g.currentNamespace != "" {
 						prefix := g.currentNamespace + "."
@@ -511,7 +511,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				if st, ok := curr.Type().(*types.StructType); ok {
 					indices, hasIndices := g.analysis.StructIndices[st.Name]
 					if !hasIndices && g.currentNamespace != "" {
-						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace+"."+st.Name]
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
 					}
 					if !hasIndices && g.currentNamespace != "" {
 						prefix := g.currentNamespace + "."
@@ -773,14 +773,12 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
 			var basePtr ir.Value
-			
-			// Try resolving baseName as a variable first
 			sym, ok := g.currentScope.Resolve(baseName)
 			if !ok && g.currentNamespace != "" {
 				sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + baseName)
 			}
-			
 			if ok {
+                fmt.Printf("[DEBUG] IRGen: Resolved qualified base '%s' to %s\n", baseName, sym.Type.String())
 				if constant, ok := sym.IRValue.(ir.Constant); ok {
 					return constant
 				}
@@ -789,7 +787,9 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				} else {
 					basePtr = sym.IRValue
 				}
-			}
+			} else {
+                fmt.Printf("[DEBUG] IRGen: Failed to resolve qualified base '%s'\n", baseName)
+            }
 
 			if basePtr != nil {
 				currPtr := basePtr
@@ -803,6 +803,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					fieldName := ids[i].GetText()
 					ptrType, isPtr := currPtr.Type().(*types.PointerType)
 					if !isPtr {
+                        fmt.Printf("[DEBUG] IRGen: Expected pointer for field '%s', got %s\n", fieldName, currPtr.Type().String())
 						valid = false
 						break
 					}
@@ -825,8 +826,12 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 								}
 								currPtr = g.ctx.Builder.CreateStructGEP(st, currPtr, physicalIndex, "")
 								continue
-							}
-						}
+							} else {
+                                fmt.Printf("[DEBUG] IRGen: Field '%s' not found in struct %s (indices avail)\n", fieldName, st.Name)
+                            }
+						} else {
+                            fmt.Printf("[DEBUG] IRGen: No struct indices found for %s (current ns: %s)\n", st.Name, g.currentNamespace)
+                        }
 						
 						methodName := st.Name + "_" + fieldName
 						methodSym, ok := g.currentScope.Resolve(methodName)
@@ -853,7 +858,9 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 								}
 							}
 						}
-					}
+					} else {
+                        fmt.Printf("[DEBUG] IRGen: Element type not struct: %s\n", ptrType.ElementType.String())
+                    }
 					valid = false
 					break
 				}
