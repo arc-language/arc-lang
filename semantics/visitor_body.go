@@ -19,8 +19,6 @@ func (a *Analyzer) VisitStatement(ctx *parser.StatementContext) interface{} {
 	if ctx.IfStmt() != nil { return a.Visit(ctx.IfStmt()) }
 	if ctx.ForStmt() != nil { return a.Visit(ctx.ForStmt()) }
 	if ctx.SwitchStmt() != nil { return a.Visit(ctx.SwitchStmt()) }
-	if ctx.TryStmt() != nil { return a.Visit(ctx.TryStmt()) }
-	if ctx.ThrowStmt() != nil { return a.Visit(ctx.ThrowStmt()) }
 	if ctx.BreakStmt() != nil { return a.Visit(ctx.BreakStmt()) }
 	if ctx.ContinueStmt() != nil { return a.Visit(ctx.ContinueStmt()) }
 	if ctx.DeferStmt() != nil { return a.Visit(ctx.DeferStmt()) }
@@ -96,6 +94,4 @@ func (a *Analyzer) VisitBreakStmt(ctx *parser.BreakStmtContext) interface{} { re
 func (a *Analyzer) VisitContinueStmt(ctx *parser.ContinueStmtContext) interface{} { return nil }
 func (a *Analyzer) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} { return nil }
 func (a *Analyzer) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} { return nil }
-func (a *Analyzer) VisitTryStmt(ctx *parser.TryStmtContext) interface{} { return nil }
-func (a *Analyzer) VisitThrowStmt(ctx *parser.ThrowStmtContext) interface{} { return nil }
 func (a *Analyzer) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) interface{} { return nil }
