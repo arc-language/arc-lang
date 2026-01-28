@@ -35,97 +35,101 @@ const (
 	ArcLexerFINALLY         = 30
 	ArcLexerENUM            = 31
 	ArcLexerCOMPUTE         = 32
-	ArcLexerEXTERN          = 33
-	ArcLexerOPAQUE          = 34
-	ArcLexerVIRTUAL         = 35
-	ArcLexerSTATIC          = 36
-	ArcLexerABSTRACT        = 37
-	ArcLexerNEW             = 38
-	ArcLexerDELETE          = 39
-	ArcLexerTYPE            = 40
-	ArcLexerSTDCALL         = 41
-	ArcLexerCDECL           = 42
-	ArcLexerFASTCALL        = 43
-	ArcLexerVECTORCALL      = 44
-	ArcLexerTHISCALL        = 45
-	ArcLexerINT8            = 46
-	ArcLexerINT16           = 47
-	ArcLexerINT32           = 48
-	ArcLexerINT64           = 49
-	ArcLexerUINT8           = 50
-	ArcLexerUINT16          = 51
-	ArcLexerUINT32          = 52
-	ArcLexerUINT64          = 53
-	ArcLexerUSIZE           = 54
-	ArcLexerISIZE           = 55
-	ArcLexerFLOAT32         = 56
-	ArcLexerFLOAT64         = 57
-	ArcLexerBYTE            = 58
-	ArcLexerBOOL            = 59
-	ArcLexerCHAR            = 60
-	ArcLexerSTRING          = 61
-	ArcLexerVOID            = 62
-	ArcLexerFLOAT16         = 63
-	ArcLexerBFLOAT16        = 64
-	ArcLexerSIZEOF          = 65
-	ArcLexerALIGNOF         = 66
-	ArcLexerARROW           = 67
-	ArcLexerRANGE           = 68
-	ArcLexerELLIPSIS        = 69
-	ArcLexerEQ              = 70
-	ArcLexerNE              = 71
-	ArcLexerLE              = 72
-	ArcLexerGE              = 73
-	ArcLexerAND             = 74
-	ArcLexerOR              = 75
-	ArcLexerPLUS_ASSIGN     = 76
-	ArcLexerMINUS_ASSIGN    = 77
-	ArcLexerSTAR_ASSIGN     = 78
-	ArcLexerSLASH_ASSIGN    = 79
-	ArcLexerPERCENT_ASSIGN  = 80
-	ArcLexerBIT_OR_ASSIGN   = 81
-	ArcLexerBIT_AND_ASSIGN  = 82
-	ArcLexerBIT_XOR_ASSIGN  = 83
-	ArcLexerINCREMENT       = 84
-	ArcLexerDECREMENT       = 85
-	ArcLexerFAT_ARROW       = 86
-	ArcLexerPLUS            = 87
-	ArcLexerMINUS           = 88
-	ArcLexerSTAR            = 89
-	ArcLexerSLASH           = 90
-	ArcLexerPERCENT         = 91
-	ArcLexerLT              = 92
-	ArcLexerGT              = 93
-	ArcLexerNOT             = 94
-	ArcLexerAMP             = 95
-	ArcLexerBIT_OR          = 96
-	ArcLexerBIT_XOR         = 97
-	ArcLexerBIT_NOT         = 98
-	ArcLexerAT              = 99
-	ArcLexerASSIGN          = 100
-	ArcLexerLPAREN          = 101
-	ArcLexerRPAREN          = 102
-	ArcLexerLBRACE          = 103
-	ArcLexerRBRACE          = 104
-	ArcLexerLBRACKET        = 105
-	ArcLexerRBRACKET        = 106
-	ArcLexerCOMMA           = 107
-	ArcLexerCOLON           = 108
-	ArcLexerSEMICOLON       = 109
-	ArcLexerDOT             = 110
-	ArcLexerUNDERSCORE      = 111
-	ArcLexerBOOLEAN_LITERAL = 112
-	ArcLexerINTEGER_LITERAL = 113
-	ArcLexerFLOAT_LITERAL   = 114
-	ArcLexerSTRING_LITERAL  = 115
-	ArcLexerCHAR_LITERAL    = 116
-	ArcLexerIDENTIFIER      = 117
-	ArcLexerWS              = 118
-	ArcLexerLINE_COMMENT    = 119
-	ArcLexerBLOCK_COMMENT   = 120
-	ArcLexerEXTERN_WS       = 121
-	ArcLexerC_LANG          = 122
-	ArcLexerCPP_LANG        = 123
+	ArcLexerPROPERTY        = 33
+	ArcLexerPROTOCOL        = 34
+	ArcLexerOPTIONAL        = 35
+	ArcLexerEXTERN          = 36
+	ArcLexerOPAQUE          = 37
+	ArcLexerVIRTUAL         = 38
+	ArcLexerSTATIC          = 39
+	ArcLexerABSTRACT        = 40
+	ArcLexerNEW             = 41
+	ArcLexerDELETE          = 42
+	ArcLexerTYPE            = 43
+	ArcLexerSTDCALL         = 44
+	ArcLexerCDECL           = 45
+	ArcLexerFASTCALL        = 46
+	ArcLexerVECTORCALL      = 47
+	ArcLexerTHISCALL        = 48
+	ArcLexerINT8            = 49
+	ArcLexerINT16           = 50
+	ArcLexerINT32           = 51
+	ArcLexerINT64           = 52
+	ArcLexerUINT8           = 53
+	ArcLexerUINT16          = 54
+	ArcLexerUINT32          = 55
+	ArcLexerUINT64          = 56
+	ArcLexerUSIZE           = 57
+	ArcLexerISIZE           = 58
+	ArcLexerFLOAT32         = 59
+	ArcLexerFLOAT64         = 60
+	ArcLexerBYTE            = 61
+	ArcLexerBOOL            = 62
+	ArcLexerCHAR            = 63
+	ArcLexerSTRING          = 64
+	ArcLexerVOID            = 65
+	ArcLexerFLOAT16         = 66
+	ArcLexerBFLOAT16        = 67
+	ArcLexerSIZEOF          = 68
+	ArcLexerALIGNOF         = 69
+	ArcLexerARROW           = 70
+	ArcLexerRANGE           = 71
+	ArcLexerELLIPSIS        = 72
+	ArcLexerEQ              = 73
+	ArcLexerNE              = 74
+	ArcLexerLE              = 75
+	ArcLexerGE              = 76
+	ArcLexerAND             = 77
+	ArcLexerOR              = 78
+	ArcLexerPLUS_ASSIGN     = 79
+	ArcLexerMINUS_ASSIGN    = 80
+	ArcLexerSTAR_ASSIGN     = 81
+	ArcLexerSLASH_ASSIGN    = 82
+	ArcLexerPERCENT_ASSIGN  = 83
+	ArcLexerBIT_OR_ASSIGN   = 84
+	ArcLexerBIT_AND_ASSIGN  = 85
+	ArcLexerBIT_XOR_ASSIGN  = 86
+	ArcLexerINCREMENT       = 87
+	ArcLexerDECREMENT       = 88
+	ArcLexerFAT_ARROW       = 89
+	ArcLexerPLUS            = 90
+	ArcLexerMINUS           = 91
+	ArcLexerSTAR            = 92
+	ArcLexerSLASH           = 93
+	ArcLexerPERCENT         = 94
+	ArcLexerLT              = 95
+	ArcLexerGT              = 96
+	ArcLexerNOT             = 97
+	ArcLexerAMP             = 98
+	ArcLexerBIT_OR          = 99
+	ArcLexerBIT_XOR         = 100
+	ArcLexerBIT_NOT         = 101
+	ArcLexerAT              = 102
+	ArcLexerASSIGN          = 103
+	ArcLexerLPAREN          = 104
+	ArcLexerRPAREN          = 105
+	ArcLexerLBRACE          = 106
+	ArcLexerRBRACE          = 107
+	ArcLexerLBRACKET        = 108
+	ArcLexerRBRACKET        = 109
+	ArcLexerCOMMA           = 110
+	ArcLexerCOLON           = 111
+	ArcLexerSEMICOLON       = 112
+	ArcLexerDOT             = 113
+	ArcLexerUNDERSCORE      = 114
+	ArcLexerBOOLEAN_LITERAL = 115
+	ArcLexerINTEGER_LITERAL = 116
+	ArcLexerFLOAT_LITERAL   = 117
+	ArcLexerSTRING_LITERAL  = 118
+	ArcLexerCHAR_LITERAL    = 119
+	ArcLexerIDENTIFIER      = 120
+	ArcLexerWS              = 121
+	ArcLexerLINE_COMMENT    = 122
+	ArcLexerBLOCK_COMMENT   = 123
+	ArcLexerEXTERN_WS       = 124
+	ArcLexerC_LANG          = 125
+	ArcLexerCPP_LANG        = 126
+	ArcLexerOBJC_LANG       = 127
 )
     ArcLexer tokens.
 
@@ -163,222 +167,242 @@ const (
 	ArcParserFINALLY         = 30
 	ArcParserENUM            = 31
 	ArcParserCOMPUTE         = 32
-	ArcParserEXTERN          = 33
-	ArcParserOPAQUE          = 34
-	ArcParserVIRTUAL         = 35
-	ArcParserSTATIC          = 36
-	ArcParserABSTRACT        = 37
-	ArcParserNEW             = 38
-	ArcParserDELETE          = 39
-	ArcParserTYPE            = 40
-	ArcParserSTDCALL         = 41
-	ArcParserCDECL           = 42
-	ArcParserFASTCALL        = 43
-	ArcParserVECTORCALL      = 44
-	ArcParserTHISCALL        = 45
-	ArcParserINT8            = 46
-	ArcParserINT16           = 47
-	ArcParserINT32           = 48
-	ArcParserINT64           = 49
-	ArcParserUINT8           = 50
-	ArcParserUINT16          = 51
-	ArcParserUINT32          = 52
-	ArcParserUINT64          = 53
-	ArcParserUSIZE           = 54
-	ArcParserISIZE           = 55
-	ArcParserFLOAT32         = 56
-	ArcParserFLOAT64         = 57
-	ArcParserBYTE            = 58
-	ArcParserBOOL            = 59
-	ArcParserCHAR            = 60
-	ArcParserSTRING          = 61
-	ArcParserVOID            = 62
-	ArcParserFLOAT16         = 63
-	ArcParserBFLOAT16        = 64
-	ArcParserSIZEOF          = 65
-	ArcParserALIGNOF         = 66
-	ArcParserARROW           = 67
-	ArcParserRANGE           = 68
-	ArcParserELLIPSIS        = 69
-	ArcParserEQ              = 70
-	ArcParserNE              = 71
-	ArcParserLE              = 72
-	ArcParserGE              = 73
-	ArcParserAND             = 74
-	ArcParserOR              = 75
-	ArcParserPLUS_ASSIGN     = 76
-	ArcParserMINUS_ASSIGN    = 77
-	ArcParserSTAR_ASSIGN     = 78
-	ArcParserSLASH_ASSIGN    = 79
-	ArcParserPERCENT_ASSIGN  = 80
-	ArcParserBIT_OR_ASSIGN   = 81
-	ArcParserBIT_AND_ASSIGN  = 82
-	ArcParserBIT_XOR_ASSIGN  = 83
-	ArcParserINCREMENT       = 84
-	ArcParserDECREMENT       = 85
-	ArcParserFAT_ARROW       = 86
-	ArcParserPLUS            = 87
-	ArcParserMINUS           = 88
-	ArcParserSTAR            = 89
-	ArcParserSLASH           = 90
-	ArcParserPERCENT         = 91
-	ArcParserLT              = 92
-	ArcParserGT              = 93
-	ArcParserNOT             = 94
-	ArcParserAMP             = 95
-	ArcParserBIT_OR          = 96
-	ArcParserBIT_XOR         = 97
-	ArcParserBIT_NOT         = 98
-	ArcParserAT              = 99
-	ArcParserASSIGN          = 100
-	ArcParserLPAREN          = 101
-	ArcParserRPAREN          = 102
-	ArcParserLBRACE          = 103
-	ArcParserRBRACE          = 104
-	ArcParserLBRACKET        = 105
-	ArcParserRBRACKET        = 106
-	ArcParserCOMMA           = 107
-	ArcParserCOLON           = 108
-	ArcParserSEMICOLON       = 109
-	ArcParserDOT             = 110
-	ArcParserUNDERSCORE      = 111
-	ArcParserBOOLEAN_LITERAL = 112
-	ArcParserINTEGER_LITERAL = 113
-	ArcParserFLOAT_LITERAL   = 114
-	ArcParserSTRING_LITERAL  = 115
-	ArcParserCHAR_LITERAL    = 116
-	ArcParserIDENTIFIER      = 117
-	ArcParserWS              = 118
-	ArcParserLINE_COMMENT    = 119
-	ArcParserBLOCK_COMMENT   = 120
-	ArcParserEXTERN_WS       = 121
-	ArcParserC_LANG          = 122
-	ArcParserCPP_LANG        = 123
+	ArcParserPROPERTY        = 33
+	ArcParserPROTOCOL        = 34
+	ArcParserOPTIONAL        = 35
+	ArcParserEXTERN          = 36
+	ArcParserOPAQUE          = 37
+	ArcParserVIRTUAL         = 38
+	ArcParserSTATIC          = 39
+	ArcParserABSTRACT        = 40
+	ArcParserNEW             = 41
+	ArcParserDELETE          = 42
+	ArcParserTYPE            = 43
+	ArcParserSTDCALL         = 44
+	ArcParserCDECL           = 45
+	ArcParserFASTCALL        = 46
+	ArcParserVECTORCALL      = 47
+	ArcParserTHISCALL        = 48
+	ArcParserINT8            = 49
+	ArcParserINT16           = 50
+	ArcParserINT32           = 51
+	ArcParserINT64           = 52
+	ArcParserUINT8           = 53
+	ArcParserUINT16          = 54
+	ArcParserUINT32          = 55
+	ArcParserUINT64          = 56
+	ArcParserUSIZE           = 57
+	ArcParserISIZE           = 58
+	ArcParserFLOAT32         = 59
+	ArcParserFLOAT64         = 60
+	ArcParserBYTE            = 61
+	ArcParserBOOL            = 62
+	ArcParserCHAR            = 63
+	ArcParserSTRING          = 64
+	ArcParserVOID            = 65
+	ArcParserFLOAT16         = 66
+	ArcParserBFLOAT16        = 67
+	ArcParserSIZEOF          = 68
+	ArcParserALIGNOF         = 69
+	ArcParserARROW           = 70
+	ArcParserRANGE           = 71
+	ArcParserELLIPSIS        = 72
+	ArcParserEQ              = 73
+	ArcParserNE              = 74
+	ArcParserLE              = 75
+	ArcParserGE              = 76
+	ArcParserAND             = 77
+	ArcParserOR              = 78
+	ArcParserPLUS_ASSIGN     = 79
+	ArcParserMINUS_ASSIGN    = 80
+	ArcParserSTAR_ASSIGN     = 81
+	ArcParserSLASH_ASSIGN    = 82
+	ArcParserPERCENT_ASSIGN  = 83
+	ArcParserBIT_OR_ASSIGN   = 84
+	ArcParserBIT_AND_ASSIGN  = 85
+	ArcParserBIT_XOR_ASSIGN  = 86
+	ArcParserINCREMENT       = 87
+	ArcParserDECREMENT       = 88
+	ArcParserFAT_ARROW       = 89
+	ArcParserPLUS            = 90
+	ArcParserMINUS           = 91
+	ArcParserSTAR            = 92
+	ArcParserSLASH           = 93
+	ArcParserPERCENT         = 94
+	ArcParserLT              = 95
+	ArcParserGT              = 96
+	ArcParserNOT             = 97
+	ArcParserAMP             = 98
+	ArcParserBIT_OR          = 99
+	ArcParserBIT_XOR         = 100
+	ArcParserBIT_NOT         = 101
+	ArcParserAT              = 102
+	ArcParserASSIGN          = 103
+	ArcParserLPAREN          = 104
+	ArcParserRPAREN          = 105
+	ArcParserLBRACE          = 106
+	ArcParserRBRACE          = 107
+	ArcParserLBRACKET        = 108
+	ArcParserRBRACKET        = 109
+	ArcParserCOMMA           = 110
+	ArcParserCOLON           = 111
+	ArcParserSEMICOLON       = 112
+	ArcParserDOT             = 113
+	ArcParserUNDERSCORE      = 114
+	ArcParserBOOLEAN_LITERAL = 115
+	ArcParserINTEGER_LITERAL = 116
+	ArcParserFLOAT_LITERAL   = 117
+	ArcParserSTRING_LITERAL  = 118
+	ArcParserCHAR_LITERAL    = 119
+	ArcParserIDENTIFIER      = 120
+	ArcParserWS              = 121
+	ArcParserLINE_COMMENT    = 122
+	ArcParserBLOCK_COMMENT   = 123
+	ArcParserEXTERN_WS       = 124
+	ArcParserC_LANG          = 125
+	ArcParserCPP_LANG        = 126
+	ArcParserOBJC_LANG       = 127
 )
     ArcParser tokens.
 
 const (
-	ArcParserRULE_compilationUnit          = 0
-	ArcParserRULE_importDecl               = 1
-	ArcParserRULE_importSpec               = 2
-	ArcParserRULE_namespaceDecl            = 3
-	ArcParserRULE_topLevelDecl             = 4
-	ArcParserRULE_attribute                = 5
-	ArcParserRULE_externCDecl              = 6
-	ArcParserRULE_externCMember            = 7
-	ArcParserRULE_externCFunctionDecl      = 8
-	ArcParserRULE_cCallingConvention       = 9
-	ArcParserRULE_externCParameterList     = 10
-	ArcParserRULE_externCParameter         = 11
-	ArcParserRULE_externCConstDecl         = 12
-	ArcParserRULE_externCTypeAlias         = 13
-	ArcParserRULE_externCOpaqueStructDecl  = 14
-	ArcParserRULE_externCppDecl            = 15
-	ArcParserRULE_externCppMember          = 16
-	ArcParserRULE_externCppNamespaceDecl   = 17
-	ArcParserRULE_externNamespacePath      = 18
-	ArcParserRULE_externCppFunctionDecl    = 19
-	ArcParserRULE_cppCallingConvention     = 20
-	ArcParserRULE_externCppParameterList   = 21
-	ArcParserRULE_externCppParameter       = 22
-	ArcParserRULE_externCppParamType       = 23
-	ArcParserRULE_externCppConstDecl       = 24
-	ArcParserRULE_externCppTypeAlias       = 25
-	ArcParserRULE_externCppOpaqueClassDecl = 26
-	ArcParserRULE_externCppClassDecl       = 27
-	ArcParserRULE_externCppClassMember     = 28
-	ArcParserRULE_externCppConstructorDecl = 29
-	ArcParserRULE_externCppDestructorDecl  = 30
-	ArcParserRULE_externCppMethodDecl      = 31
-	ArcParserRULE_externCppMethodParams    = 32
-	ArcParserRULE_externCppSelfParam       = 33
-	ArcParserRULE_genericParams            = 34
-	ArcParserRULE_genericParamList         = 35
-	ArcParserRULE_genericParam             = 36
-	ArcParserRULE_genericArgs              = 37
-	ArcParserRULE_genericArgList           = 38
-	ArcParserRULE_genericArg               = 39
-	ArcParserRULE_functionDecl             = 40
-	ArcParserRULE_returnType               = 41
-	ArcParserRULE_typeList                 = 42
-	ArcParserRULE_parameterList            = 43
-	ArcParserRULE_parameter                = 44
-	ArcParserRULE_structDecl               = 45
-	ArcParserRULE_structMember             = 46
-	ArcParserRULE_structField              = 47
-	ArcParserRULE_initDecl                 = 48
-	ArcParserRULE_computeDecl              = 49
-	ArcParserRULE_classDecl                = 50
-	ArcParserRULE_classMember              = 51
-	ArcParserRULE_classField               = 52
-	ArcParserRULE_enumDecl                 = 53
-	ArcParserRULE_enumMember               = 54
-	ArcParserRULE_methodDecl               = 55
-	ArcParserRULE_mutatingDecl             = 56
-	ArcParserRULE_deinitDecl               = 57
-	ArcParserRULE_variableDecl             = 58
-	ArcParserRULE_constDecl                = 59
-	ArcParserRULE_tuplePattern             = 60
-	ArcParserRULE_tupleType                = 61
-	ArcParserRULE_type                     = 62
-	ArcParserRULE_qualifiedType            = 63
-	ArcParserRULE_functionType             = 64
-	ArcParserRULE_arrayType                = 65
-	ArcParserRULE_qualifiedIdentifier      = 66
-	ArcParserRULE_primitiveType            = 67
-	ArcParserRULE_pointerType              = 68
-	ArcParserRULE_referenceType            = 69
-	ArcParserRULE_block                    = 70
-	ArcParserRULE_statement                = 71
-	ArcParserRULE_assignmentStmt           = 72
-	ArcParserRULE_assignmentOp             = 73
-	ArcParserRULE_expressionStmt           = 74
-	ArcParserRULE_returnStmt               = 75
-	ArcParserRULE_deferStmt                = 76
-	ArcParserRULE_breakStmt                = 77
-	ArcParserRULE_continueStmt             = 78
-	ArcParserRULE_throwStmt                = 79
-	ArcParserRULE_ifStmt                   = 80
-	ArcParserRULE_forStmt                  = 81
-	ArcParserRULE_switchStmt               = 82
-	ArcParserRULE_switchCase               = 83
-	ArcParserRULE_defaultCase              = 84
-	ArcParserRULE_tryStmt                  = 85
-	ArcParserRULE_exceptClause             = 86
-	ArcParserRULE_finallyClause            = 87
-	ArcParserRULE_expression               = 88
-	ArcParserRULE_logicalOrExpression      = 89
-	ArcParserRULE_logicalAndExpression     = 90
-	ArcParserRULE_bitOrExpression          = 91
-	ArcParserRULE_bitXorExpression         = 92
-	ArcParserRULE_bitAndExpression         = 93
-	ArcParserRULE_equalityExpression       = 94
-	ArcParserRULE_relationalExpression     = 95
-	ArcParserRULE_shiftExpression          = 96
-	ArcParserRULE_rangeExpression          = 97
-	ArcParserRULE_additiveExpression       = 98
-	ArcParserRULE_multiplicativeExpression = 99
-	ArcParserRULE_unaryExpression          = 100
-	ArcParserRULE_postfixExpression        = 101
-	ArcParserRULE_postfixOp                = 102
-	ArcParserRULE_primaryExpression        = 103
-	ArcParserRULE_builtinExpression        = 104
-	ArcParserRULE_sizeofExpression         = 105
-	ArcParserRULE_alignofExpression        = 106
-	ArcParserRULE_literal                  = 107
-	ArcParserRULE_initializerList          = 108
-	ArcParserRULE_initializerEntry         = 109
-	ArcParserRULE_structLiteral            = 110
-	ArcParserRULE_fieldInit                = 111
-	ArcParserRULE_argumentList             = 112
-	ArcParserRULE_argument                 = 113
-	ArcParserRULE_lambdaExpression         = 114
-	ArcParserRULE_anonymousFuncExpression  = 115
-	ArcParserRULE_executionStrategy        = 116
-	ArcParserRULE_contextIdentifier        = 117
-	ArcParserRULE_lambdaParamList          = 118
-	ArcParserRULE_lambdaParam              = 119
-	ArcParserRULE_tupleExpression          = 120
+	ArcParserRULE_compilationUnit           = 0
+	ArcParserRULE_importDecl                = 1
+	ArcParserRULE_importSpec                = 2
+	ArcParserRULE_namespaceDecl             = 3
+	ArcParserRULE_topLevelDecl              = 4
+	ArcParserRULE_attribute                 = 5
+	ArcParserRULE_externCDecl               = 6
+	ArcParserRULE_externCMember             = 7
+	ArcParserRULE_externCFunctionDecl       = 8
+	ArcParserRULE_cCallingConvention        = 9
+	ArcParserRULE_externCParameterList      = 10
+	ArcParserRULE_externCParameter          = 11
+	ArcParserRULE_externCConstDecl          = 12
+	ArcParserRULE_externCTypeAlias          = 13
+	ArcParserRULE_externCOpaqueStructDecl   = 14
+	ArcParserRULE_externCppDecl             = 15
+	ArcParserRULE_externCppMember           = 16
+	ArcParserRULE_externCppNamespaceDecl    = 17
+	ArcParserRULE_externNamespacePath       = 18
+	ArcParserRULE_externCppFunctionDecl     = 19
+	ArcParserRULE_cppCallingConvention      = 20
+	ArcParserRULE_externCppParameterList    = 21
+	ArcParserRULE_externCppParameter        = 22
+	ArcParserRULE_externCppParamType        = 23
+	ArcParserRULE_externCppConstDecl        = 24
+	ArcParserRULE_externCppTypeAlias        = 25
+	ArcParserRULE_externCppOpaqueClassDecl  = 26
+	ArcParserRULE_externCppClassDecl        = 27
+	ArcParserRULE_externCppClassMember      = 28
+	ArcParserRULE_externCppConstructorDecl  = 29
+	ArcParserRULE_externCppDestructorDecl   = 30
+	ArcParserRULE_externCppMethodDecl       = 31
+	ArcParserRULE_externCppMethodParams     = 32
+	ArcParserRULE_externCppSelfParam        = 33
+	ArcParserRULE_externObjCDecl            = 34
+	ArcParserRULE_externObjCMember          = 35
+	ArcParserRULE_externObjCStructDecl      = 36
+	ArcParserRULE_externObjCClassDecl       = 37
+	ArcParserRULE_externObjCProtocolDecl    = 38
+	ArcParserRULE_externObjCClassMember     = 39
+	ArcParserRULE_externObjCProtocolMember  = 40
+	ArcParserRULE_externObjCNewDecl         = 41
+	ArcParserRULE_externObjCPropertyDecl    = 42
+	ArcParserRULE_propertyAttributes        = 43
+	ArcParserRULE_propertyAttribute         = 44
+	ArcParserRULE_externObjCMethodDecl      = 45
+	ArcParserRULE_externObjCMethodParams    = 46
+	ArcParserRULE_externObjCSelfParam       = 47
+	ArcParserRULE_externObjCOpaqueClassDecl = 48
+	ArcParserRULE_externObjCFunctionDecl    = 49
+	ArcParserRULE_genericParams             = 50
+	ArcParserRULE_genericParamList          = 51
+	ArcParserRULE_genericParam              = 52
+	ArcParserRULE_genericArgs               = 53
+	ArcParserRULE_genericArgList            = 54
+	ArcParserRULE_genericArg                = 55
+	ArcParserRULE_functionDecl              = 56
+	ArcParserRULE_returnType                = 57
+	ArcParserRULE_typeList                  = 58
+	ArcParserRULE_parameterList             = 59
+	ArcParserRULE_parameter                 = 60
+	ArcParserRULE_structDecl                = 61
+	ArcParserRULE_structMember              = 62
+	ArcParserRULE_structField               = 63
+	ArcParserRULE_initDecl                  = 64
+	ArcParserRULE_computeDecl               = 65
+	ArcParserRULE_classDecl                 = 66
+	ArcParserRULE_classMember               = 67
+	ArcParserRULE_classField                = 68
+	ArcParserRULE_enumDecl                  = 69
+	ArcParserRULE_enumMember                = 70
+	ArcParserRULE_methodDecl                = 71
+	ArcParserRULE_mutatingDecl              = 72
+	ArcParserRULE_deinitDecl                = 73
+	ArcParserRULE_variableDecl              = 74
+	ArcParserRULE_constDecl                 = 75
+	ArcParserRULE_tuplePattern              = 76
+	ArcParserRULE_tupleType                 = 77
+	ArcParserRULE_type                      = 78
+	ArcParserRULE_qualifiedType             = 79
+	ArcParserRULE_functionType              = 80
+	ArcParserRULE_arrayType                 = 81
+	ArcParserRULE_qualifiedIdentifier       = 82
+	ArcParserRULE_primitiveType             = 83
+	ArcParserRULE_pointerType               = 84
+	ArcParserRULE_referenceType             = 85
+	ArcParserRULE_block                     = 86
+	ArcParserRULE_statement                 = 87
+	ArcParserRULE_assignmentStmt            = 88
+	ArcParserRULE_assignmentOp              = 89
+	ArcParserRULE_expressionStmt            = 90
+	ArcParserRULE_returnStmt                = 91
+	ArcParserRULE_deferStmt                 = 92
+	ArcParserRULE_breakStmt                 = 93
+	ArcParserRULE_continueStmt              = 94
+	ArcParserRULE_throwStmt                 = 95
+	ArcParserRULE_ifStmt                    = 96
+	ArcParserRULE_forStmt                   = 97
+	ArcParserRULE_switchStmt                = 98
+	ArcParserRULE_switchCase                = 99
+	ArcParserRULE_defaultCase               = 100
+	ArcParserRULE_tryStmt                   = 101
+	ArcParserRULE_exceptClause              = 102
+	ArcParserRULE_finallyClause             = 103
+	ArcParserRULE_expression                = 104
+	ArcParserRULE_logicalOrExpression       = 105
+	ArcParserRULE_logicalAndExpression      = 106
+	ArcParserRULE_bitOrExpression           = 107
+	ArcParserRULE_bitXorExpression          = 108
+	ArcParserRULE_bitAndExpression          = 109
+	ArcParserRULE_equalityExpression        = 110
+	ArcParserRULE_relationalExpression      = 111
+	ArcParserRULE_shiftExpression           = 112
+	ArcParserRULE_rangeExpression           = 113
+	ArcParserRULE_additiveExpression        = 114
+	ArcParserRULE_multiplicativeExpression  = 115
+	ArcParserRULE_unaryExpression           = 116
+	ArcParserRULE_postfixExpression         = 117
+	ArcParserRULE_postfixOp                 = 118
+	ArcParserRULE_primaryExpression         = 119
+	ArcParserRULE_builtinExpression         = 120
+	ArcParserRULE_sizeofExpression          = 121
+	ArcParserRULE_alignofExpression         = 122
+	ArcParserRULE_literal                   = 123
+	ArcParserRULE_initializerList           = 124
+	ArcParserRULE_initializerEntry          = 125
+	ArcParserRULE_structLiteral             = 126
+	ArcParserRULE_fieldInit                 = 127
+	ArcParserRULE_argumentList              = 128
+	ArcParserRULE_argument                  = 129
+	ArcParserRULE_lambdaExpression          = 130
+	ArcParserRULE_anonymousFuncExpression   = 131
+	ArcParserRULE_executionStrategy         = 132
+	ArcParserRULE_contextIdentifier         = 133
+	ArcParserRULE_lambdaParamList           = 134
+	ArcParserRULE_lambdaParam               = 135
+	ArcParserRULE_tupleExpression           = 136
 )
     ArcParser rules.
 
@@ -486,6 +510,20 @@ func InitEmptyExternCppParameterListContext(p *ExternCppParameterListContext)
 func InitEmptyExternCppSelfParamContext(p *ExternCppSelfParamContext)
 func InitEmptyExternCppTypeAliasContext(p *ExternCppTypeAliasContext)
 func InitEmptyExternNamespacePathContext(p *ExternNamespacePathContext)
+func InitEmptyExternObjCClassDeclContext(p *ExternObjCClassDeclContext)
+func InitEmptyExternObjCClassMemberContext(p *ExternObjCClassMemberContext)
+func InitEmptyExternObjCDeclContext(p *ExternObjCDeclContext)
+func InitEmptyExternObjCFunctionDeclContext(p *ExternObjCFunctionDeclContext)
+func InitEmptyExternObjCMemberContext(p *ExternObjCMemberContext)
+func InitEmptyExternObjCMethodDeclContext(p *ExternObjCMethodDeclContext)
+func InitEmptyExternObjCMethodParamsContext(p *ExternObjCMethodParamsContext)
+func InitEmptyExternObjCNewDeclContext(p *ExternObjCNewDeclContext)
+func InitEmptyExternObjCOpaqueClassDeclContext(p *ExternObjCOpaqueClassDeclContext)
+func InitEmptyExternObjCPropertyDeclContext(p *ExternObjCPropertyDeclContext)
+func InitEmptyExternObjCProtocolDeclContext(p *ExternObjCProtocolDeclContext)
+func InitEmptyExternObjCProtocolMemberContext(p *ExternObjCProtocolMemberContext)
+func InitEmptyExternObjCSelfParamContext(p *ExternObjCSelfParamContext)
+func InitEmptyExternObjCStructDeclContext(p *ExternObjCStructDeclContext)
 func InitEmptyFieldInitContext(p *FieldInitContext)
 func InitEmptyFinallyClauseContext(p *FinallyClauseContext)
 func InitEmptyForStmtContext(p *ForStmtContext)
@@ -520,6 +558,8 @@ func InitEmptyPostfixExpressionContext(p *PostfixExpressionContext)
 func InitEmptyPostfixOpContext(p *PostfixOpContext)
 func InitEmptyPrimaryExpressionContext(p *PrimaryExpressionContext)
 func InitEmptyPrimitiveTypeContext(p *PrimitiveTypeContext)
+func InitEmptyPropertyAttributeContext(p *PropertyAttributeContext)
+func InitEmptyPropertyAttributesContext(p *PropertyAttributesContext)
 func InitEmptyQualifiedIdentifierContext(p *QualifiedIdentifierContext)
 func InitEmptyQualifiedTypeContext(p *QualifiedTypeContext)
 func InitEmptyRangeExpressionContext(p *RangeExpressionContext)
@@ -782,6 +822,34 @@ func (p *ArcParser) ExternCppTypeAlias() (localctx IExternCppTypeAliasContext)
 
 func (p *ArcParser) ExternNamespacePath() (localctx IExternNamespacePathContext)
 
+func (p *ArcParser) ExternObjCClassDecl() (localctx IExternObjCClassDeclContext)
+
+func (p *ArcParser) ExternObjCClassMember() (localctx IExternObjCClassMemberContext)
+
+func (p *ArcParser) ExternObjCDecl() (localctx IExternObjCDeclContext)
+
+func (p *ArcParser) ExternObjCFunctionDecl() (localctx IExternObjCFunctionDeclContext)
+
+func (p *ArcParser) ExternObjCMember() (localctx IExternObjCMemberContext)
+
+func (p *ArcParser) ExternObjCMethodDecl() (localctx IExternObjCMethodDeclContext)
+
+func (p *ArcParser) ExternObjCMethodParams() (localctx IExternObjCMethodParamsContext)
+
+func (p *ArcParser) ExternObjCNewDecl() (localctx IExternObjCNewDeclContext)
+
+func (p *ArcParser) ExternObjCOpaqueClassDecl() (localctx IExternObjCOpaqueClassDeclContext)
+
+func (p *ArcParser) ExternObjCPropertyDecl() (localctx IExternObjCPropertyDeclContext)
+
+func (p *ArcParser) ExternObjCProtocolDecl() (localctx IExternObjCProtocolDeclContext)
+
+func (p *ArcParser) ExternObjCProtocolMember() (localctx IExternObjCProtocolMemberContext)
+
+func (p *ArcParser) ExternObjCSelfParam() (localctx IExternObjCSelfParamContext)
+
+func (p *ArcParser) ExternObjCStructDecl() (localctx IExternObjCStructDeclContext)
+
 func (p *ArcParser) FieldInit() (localctx IFieldInitContext)
 
 func (p *ArcParser) FinallyClause() (localctx IFinallyClauseContext)
@@ -849,6 +917,10 @@ func (p *ArcParser) PostfixOp() (localctx IPostfixOpContext)
 func (p *ArcParser) PrimaryExpression() (localctx IPrimaryExpressionContext)
 
 func (p *ArcParser) PrimitiveType() (localctx IPrimitiveTypeContext)
+
+func (p *ArcParser) PropertyAttribute() (localctx IPropertyAttributeContext)
+
+func (p *ArcParser) PropertyAttributes() (localctx IPropertyAttributesContext)
 
 func (p *ArcParser) QualifiedIdentifier() (localctx IQualifiedIdentifierContext)
 
@@ -1006,6 +1078,54 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#externCppSelfParam.
 	VisitExternCppSelfParam(ctx *ExternCppSelfParamContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCDecl.
+	VisitExternObjCDecl(ctx *ExternObjCDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCMember.
+	VisitExternObjCMember(ctx *ExternObjCMemberContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCStructDecl.
+	VisitExternObjCStructDecl(ctx *ExternObjCStructDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCClassDecl.
+	VisitExternObjCClassDecl(ctx *ExternObjCClassDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCProtocolDecl.
+	VisitExternObjCProtocolDecl(ctx *ExternObjCProtocolDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCClassMember.
+	VisitExternObjCClassMember(ctx *ExternObjCClassMemberContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCProtocolMember.
+	VisitExternObjCProtocolMember(ctx *ExternObjCProtocolMemberContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCNewDecl.
+	VisitExternObjCNewDecl(ctx *ExternObjCNewDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCPropertyDecl.
+	VisitExternObjCPropertyDecl(ctx *ExternObjCPropertyDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#propertyAttributes.
+	VisitPropertyAttributes(ctx *PropertyAttributesContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#propertyAttribute.
+	VisitPropertyAttribute(ctx *PropertyAttributeContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCMethodDecl.
+	VisitExternObjCMethodDecl(ctx *ExternObjCMethodDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCMethodParams.
+	VisitExternObjCMethodParams(ctx *ExternObjCMethodParamsContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCSelfParam.
+	VisitExternObjCSelfParam(ctx *ExternObjCSelfParamContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCOpaqueClassDecl.
+	VisitExternObjCOpaqueClassDecl(ctx *ExternObjCOpaqueClassDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCFunctionDecl.
+	VisitExternObjCFunctionDecl(ctx *ExternObjCFunctionDeclContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#genericParams.
 	VisitGenericParams(ctx *GenericParamsContext) interface{}
@@ -1574,6 +1694,34 @@ func (v *BaseArcParserVisitor) VisitExternCppTypeAlias(ctx *ExternCppTypeAliasCo
 
 func (v *BaseArcParserVisitor) VisitExternNamespacePath(ctx *ExternNamespacePathContext) interface{}
 
+func (v *BaseArcParserVisitor) VisitExternObjCClassDecl(ctx *ExternObjCClassDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCClassMember(ctx *ExternObjCClassMemberContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCDecl(ctx *ExternObjCDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCFunctionDecl(ctx *ExternObjCFunctionDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCMember(ctx *ExternObjCMemberContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCMethodDecl(ctx *ExternObjCMethodDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCMethodParams(ctx *ExternObjCMethodParamsContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCNewDecl(ctx *ExternObjCNewDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCOpaqueClassDecl(ctx *ExternObjCOpaqueClassDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCPropertyDecl(ctx *ExternObjCPropertyDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCProtocolDecl(ctx *ExternObjCProtocolDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCProtocolMember(ctx *ExternObjCProtocolMemberContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCSelfParam(ctx *ExternObjCSelfParamContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternObjCStructDecl(ctx *ExternObjCStructDeclContext) interface{}
+
 func (v *BaseArcParserVisitor) VisitFieldInit(ctx *FieldInitContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitFinallyClause(ctx *FinallyClauseContext) interface{}
@@ -1641,6 +1789,10 @@ func (v *BaseArcParserVisitor) VisitPostfixOp(ctx *PostfixOpContext) interface{}
 func (v *BaseArcParserVisitor) VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitPropertyAttribute(ctx *PropertyAttributeContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitPropertyAttributes(ctx *PropertyAttributesContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
 
@@ -3182,6 +3334,432 @@ func (*ExternNamespacePathContext) IsExternNamespacePathContext()
 
 func (s *ExternNamespacePathContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
+type ExternObjCClassDeclContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCClassDeclContext() *ExternObjCClassDeclContext
+
+func NewExternObjCClassDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCClassDeclContext
+
+func (s *ExternObjCClassDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCClassDeclContext) AllExternObjCClassMember() []IExternObjCClassMemberContext
+
+func (s *ExternObjCClassDeclContext) CLASS() antlr.TerminalNode
+
+func (s *ExternObjCClassDeclContext) COLON() antlr.TerminalNode
+
+func (s *ExternObjCClassDeclContext) ExternObjCClassMember(i int) IExternObjCClassMemberContext
+
+func (s *ExternObjCClassDeclContext) GetParser() antlr.Parser
+
+func (s *ExternObjCClassDeclContext) GetRuleContext() antlr.RuleContext
+
+func (s *ExternObjCClassDeclContext) IDENTIFIER() antlr.TerminalNode
+
+func (*ExternObjCClassDeclContext) IsExternObjCClassDeclContext()
+
+func (s *ExternObjCClassDeclContext) LBRACE() antlr.TerminalNode
+
+func (s *ExternObjCClassDeclContext) RBRACE() antlr.TerminalNode
+
+func (s *ExternObjCClassDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *ExternObjCClassDeclContext) TypeList() ITypeListContext
+
+type ExternObjCClassMemberContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCClassMemberContext() *ExternObjCClassMemberContext
+
+func NewExternObjCClassMemberContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCClassMemberContext
+
+func (s *ExternObjCClassMemberContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCClassMemberContext) ExternObjCMethodDecl() IExternObjCMethodDeclContext
+
+func (s *ExternObjCClassMemberContext) ExternObjCNewDecl() IExternObjCNewDeclContext
+
+func (s *ExternObjCClassMemberContext) ExternObjCPropertyDecl() IExternObjCPropertyDeclContext
+
+func (s *ExternObjCClassMemberContext) GetParser() antlr.Parser
+
+func (s *ExternObjCClassMemberContext) GetRuleContext() antlr.RuleContext
+
+func (*ExternObjCClassMemberContext) IsExternObjCClassMemberContext()
+
+func (s *ExternObjCClassMemberContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternObjCDeclContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCDeclContext() *ExternObjCDeclContext
+
+func NewExternObjCDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCDeclContext
+
+func (s *ExternObjCDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCDeclContext) AllExternObjCMember() []IExternObjCMemberContext
+
+func (s *ExternObjCDeclContext) EXTERN() antlr.TerminalNode
+
+func (s *ExternObjCDeclContext) ExternObjCMember(i int) IExternObjCMemberContext
+
+func (s *ExternObjCDeclContext) GetParser() antlr.Parser
+
+func (s *ExternObjCDeclContext) GetRuleContext() antlr.RuleContext
+
+func (*ExternObjCDeclContext) IsExternObjCDeclContext()
+
+func (s *ExternObjCDeclContext) LBRACE() antlr.TerminalNode
+
+func (s *ExternObjCDeclContext) OBJC_LANG() antlr.TerminalNode
+
+func (s *ExternObjCDeclContext) RBRACE() antlr.TerminalNode
+
+func (s *ExternObjCDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternObjCFunctionDeclContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCFunctionDeclContext() *ExternObjCFunctionDeclContext
+
+func NewExternObjCFunctionDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCFunctionDeclContext
+
+func (s *ExternObjCFunctionDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCFunctionDeclContext) ExternCParameterList() IExternCParameterListContext
+
+func (s *ExternObjCFunctionDeclContext) FUNC() antlr.TerminalNode
+
+func (s *ExternObjCFunctionDeclContext) GetParser() antlr.Parser
+
+func (s *ExternObjCFunctionDeclContext) GetRuleContext() antlr.RuleContext
+
+func (s *ExternObjCFunctionDeclContext) IDENTIFIER() antlr.TerminalNode
+
+func (*ExternObjCFunctionDeclContext) IsExternObjCFunctionDeclContext()
+
+func (s *ExternObjCFunctionDeclContext) LPAREN() antlr.TerminalNode
+
+func (s *ExternObjCFunctionDeclContext) RPAREN() antlr.TerminalNode
+
+func (s *ExternObjCFunctionDeclContext) STRING_LITERAL() antlr.TerminalNode
+
+func (s *ExternObjCFunctionDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *ExternObjCFunctionDeclContext) Type_() ITypeContext
+
+type ExternObjCMemberContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCMemberContext() *ExternObjCMemberContext
+
+func NewExternObjCMemberContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCMemberContext
+
+func (s *ExternObjCMemberContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCMemberContext) ExternCConstDecl() IExternCConstDeclContext
+
+func (s *ExternObjCMemberContext) ExternCOpaqueStructDecl() IExternCOpaqueStructDeclContext
+
+func (s *ExternObjCMemberContext) ExternCTypeAlias() IExternCTypeAliasContext
+
+func (s *ExternObjCMemberContext) ExternObjCClassDecl() IExternObjCClassDeclContext
+
+func (s *ExternObjCMemberContext) ExternObjCFunctionDecl() IExternObjCFunctionDeclContext
+
+func (s *ExternObjCMemberContext) ExternObjCOpaqueClassDecl() IExternObjCOpaqueClassDeclContext
+
+func (s *ExternObjCMemberContext) ExternObjCProtocolDecl() IExternObjCProtocolDeclContext
+
+func (s *ExternObjCMemberContext) ExternObjCStructDecl() IExternObjCStructDeclContext
+
+func (s *ExternObjCMemberContext) GetParser() antlr.Parser
+
+func (s *ExternObjCMemberContext) GetRuleContext() antlr.RuleContext
+
+func (*ExternObjCMemberContext) IsExternObjCMemberContext()
+
+func (s *ExternObjCMemberContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternObjCMethodDeclContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCMethodDeclContext() *ExternObjCMethodDeclContext
+
+func NewExternObjCMethodDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCMethodDeclContext
+
+func (s *ExternObjCMethodDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCMethodDeclContext) ExternObjCMethodParams() IExternObjCMethodParamsContext
+
+func (s *ExternObjCMethodDeclContext) FUNC() antlr.TerminalNode
+
+func (s *ExternObjCMethodDeclContext) GetParser() antlr.Parser
+
+func (s *ExternObjCMethodDeclContext) GetRuleContext() antlr.RuleContext
+
+func (s *ExternObjCMethodDeclContext) IDENTIFIER() antlr.TerminalNode
+
+func (*ExternObjCMethodDeclContext) IsExternObjCMethodDeclContext()
+
+func (s *ExternObjCMethodDeclContext) LPAREN() antlr.TerminalNode
+
+func (s *ExternObjCMethodDeclContext) RPAREN() antlr.TerminalNode
+
+func (s *ExternObjCMethodDeclContext) STATIC() antlr.TerminalNode
+
+func (s *ExternObjCMethodDeclContext) STRING_LITERAL() antlr.TerminalNode
+
+func (s *ExternObjCMethodDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *ExternObjCMethodDeclContext) Type_() ITypeContext
+
+type ExternObjCMethodParamsContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCMethodParamsContext() *ExternObjCMethodParamsContext
+
+func NewExternObjCMethodParamsContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCMethodParamsContext
+
+func (s *ExternObjCMethodParamsContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCMethodParamsContext) AllCOMMA() []antlr.TerminalNode
+
+func (s *ExternObjCMethodParamsContext) AllExternCParameter() []IExternCParameterContext
+
+func (s *ExternObjCMethodParamsContext) COMMA(i int) antlr.TerminalNode
+
+func (s *ExternObjCMethodParamsContext) ExternCParameter(i int) IExternCParameterContext
+
+func (s *ExternObjCMethodParamsContext) ExternCParameterList() IExternCParameterListContext
+
+func (s *ExternObjCMethodParamsContext) ExternObjCSelfParam() IExternObjCSelfParamContext
+
+func (s *ExternObjCMethodParamsContext) GetParser() antlr.Parser
+
+func (s *ExternObjCMethodParamsContext) GetRuleContext() antlr.RuleContext
+
+func (*ExternObjCMethodParamsContext) IsExternObjCMethodParamsContext()
+
+func (s *ExternObjCMethodParamsContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternObjCNewDeclContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCNewDeclContext() *ExternObjCNewDeclContext
+
+func NewExternObjCNewDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCNewDeclContext
+
+func (s *ExternObjCNewDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCNewDeclContext) ExternCParameterList() IExternCParameterListContext
+
+func (s *ExternObjCNewDeclContext) GetParser() antlr.Parser
+
+func (s *ExternObjCNewDeclContext) GetRuleContext() antlr.RuleContext
+
+func (*ExternObjCNewDeclContext) IsExternObjCNewDeclContext()
+
+func (s *ExternObjCNewDeclContext) LPAREN() antlr.TerminalNode
+
+func (s *ExternObjCNewDeclContext) NEW() antlr.TerminalNode
+
+func (s *ExternObjCNewDeclContext) RPAREN() antlr.TerminalNode
+
+func (s *ExternObjCNewDeclContext) STRING_LITERAL() antlr.TerminalNode
+
+func (s *ExternObjCNewDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *ExternObjCNewDeclContext) Type_() ITypeContext
+
+type ExternObjCOpaqueClassDeclContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCOpaqueClassDeclContext() *ExternObjCOpaqueClassDeclContext
+
+func NewExternObjCOpaqueClassDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCOpaqueClassDeclContext
+
+func (s *ExternObjCOpaqueClassDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCOpaqueClassDeclContext) CLASS() antlr.TerminalNode
+
+func (s *ExternObjCOpaqueClassDeclContext) GetParser() antlr.Parser
+
+func (s *ExternObjCOpaqueClassDeclContext) GetRuleContext() antlr.RuleContext
+
+func (s *ExternObjCOpaqueClassDeclContext) IDENTIFIER() antlr.TerminalNode
+
+func (*ExternObjCOpaqueClassDeclContext) IsExternObjCOpaqueClassDeclContext()
+
+func (s *ExternObjCOpaqueClassDeclContext) LBRACE() antlr.TerminalNode
+
+func (s *ExternObjCOpaqueClassDeclContext) OPAQUE() antlr.TerminalNode
+
+func (s *ExternObjCOpaqueClassDeclContext) RBRACE() antlr.TerminalNode
+
+func (s *ExternObjCOpaqueClassDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternObjCPropertyDeclContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCPropertyDeclContext() *ExternObjCPropertyDeclContext
+
+func NewExternObjCPropertyDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCPropertyDeclContext
+
+func (s *ExternObjCPropertyDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCPropertyDeclContext) COLON() antlr.TerminalNode
+
+func (s *ExternObjCPropertyDeclContext) GetParser() antlr.Parser
+
+func (s *ExternObjCPropertyDeclContext) GetRuleContext() antlr.RuleContext
+
+func (s *ExternObjCPropertyDeclContext) IDENTIFIER() antlr.TerminalNode
+
+func (*ExternObjCPropertyDeclContext) IsExternObjCPropertyDeclContext()
+
+func (s *ExternObjCPropertyDeclContext) LPAREN() antlr.TerminalNode
+
+func (s *ExternObjCPropertyDeclContext) PROPERTY() antlr.TerminalNode
+
+func (s *ExternObjCPropertyDeclContext) PropertyAttributes() IPropertyAttributesContext
+
+func (s *ExternObjCPropertyDeclContext) RPAREN() antlr.TerminalNode
+
+func (s *ExternObjCPropertyDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *ExternObjCPropertyDeclContext) Type_() ITypeContext
+
+type ExternObjCProtocolDeclContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCProtocolDeclContext() *ExternObjCProtocolDeclContext
+
+func NewExternObjCProtocolDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCProtocolDeclContext
+
+func (s *ExternObjCProtocolDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCProtocolDeclContext) AllExternObjCProtocolMember() []IExternObjCProtocolMemberContext
+
+func (s *ExternObjCProtocolDeclContext) COLON() antlr.TerminalNode
+
+func (s *ExternObjCProtocolDeclContext) ExternObjCProtocolMember(i int) IExternObjCProtocolMemberContext
+
+func (s *ExternObjCProtocolDeclContext) GetParser() antlr.Parser
+
+func (s *ExternObjCProtocolDeclContext) GetRuleContext() antlr.RuleContext
+
+func (s *ExternObjCProtocolDeclContext) IDENTIFIER() antlr.TerminalNode
+
+func (*ExternObjCProtocolDeclContext) IsExternObjCProtocolDeclContext()
+
+func (s *ExternObjCProtocolDeclContext) LBRACE() antlr.TerminalNode
+
+func (s *ExternObjCProtocolDeclContext) PROTOCOL() antlr.TerminalNode
+
+func (s *ExternObjCProtocolDeclContext) RBRACE() antlr.TerminalNode
+
+func (s *ExternObjCProtocolDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *ExternObjCProtocolDeclContext) TypeList() ITypeListContext
+
+type ExternObjCProtocolMemberContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCProtocolMemberContext() *ExternObjCProtocolMemberContext
+
+func NewExternObjCProtocolMemberContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCProtocolMemberContext
+
+func (s *ExternObjCProtocolMemberContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCProtocolMemberContext) ExternObjCMethodDecl() IExternObjCMethodDeclContext
+
+func (s *ExternObjCProtocolMemberContext) ExternObjCPropertyDecl() IExternObjCPropertyDeclContext
+
+func (s *ExternObjCProtocolMemberContext) GetParser() antlr.Parser
+
+func (s *ExternObjCProtocolMemberContext) GetRuleContext() antlr.RuleContext
+
+func (*ExternObjCProtocolMemberContext) IsExternObjCProtocolMemberContext()
+
+func (s *ExternObjCProtocolMemberContext) OPTIONAL() antlr.TerminalNode
+
+func (s *ExternObjCProtocolMemberContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternObjCSelfParamContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCSelfParamContext() *ExternObjCSelfParamContext
+
+func NewExternObjCSelfParamContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCSelfParamContext
+
+func (s *ExternObjCSelfParamContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCSelfParamContext) COLON() antlr.TerminalNode
+
+func (s *ExternObjCSelfParamContext) GetParser() antlr.Parser
+
+func (s *ExternObjCSelfParamContext) GetRuleContext() antlr.RuleContext
+
+func (s *ExternObjCSelfParamContext) IDENTIFIER() antlr.TerminalNode
+
+func (*ExternObjCSelfParamContext) IsExternObjCSelfParamContext()
+
+func (s *ExternObjCSelfParamContext) SELF() antlr.TerminalNode
+
+func (s *ExternObjCSelfParamContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *ExternObjCSelfParamContext) Type_() ITypeContext
+
+type ExternObjCStructDeclContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyExternObjCStructDeclContext() *ExternObjCStructDeclContext
+
+func NewExternObjCStructDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternObjCStructDeclContext
+
+func (s *ExternObjCStructDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ExternObjCStructDeclContext) GetParser() antlr.Parser
+
+func (s *ExternObjCStructDeclContext) GetRuleContext() antlr.RuleContext
+
+func (*ExternObjCStructDeclContext) IsExternObjCStructDeclContext()
+
+func (s *ExternObjCStructDeclContext) StructDecl() IStructDeclContext
+
+func (s *ExternObjCStructDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
 type FieldInitContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
@@ -4594,6 +5172,270 @@ type IExternNamespacePathContext interface {
 }
     IExternNamespacePathContext is an interface to support dynamic dispatch.
 
+type IExternObjCClassDeclContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	CLASS() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	LBRACE() antlr.TerminalNode
+	RBRACE() antlr.TerminalNode
+	COLON() antlr.TerminalNode
+	TypeList() ITypeListContext
+	AllExternObjCClassMember() []IExternObjCClassMemberContext
+	ExternObjCClassMember(i int) IExternObjCClassMemberContext
+
+	// IsExternObjCClassDeclContext differentiates from other interfaces.
+	IsExternObjCClassDeclContext()
+}
+    IExternObjCClassDeclContext is an interface to support dynamic dispatch.
+
+type IExternObjCClassMemberContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	ExternObjCMethodDecl() IExternObjCMethodDeclContext
+	ExternObjCPropertyDecl() IExternObjCPropertyDeclContext
+	ExternObjCNewDecl() IExternObjCNewDeclContext
+
+	// IsExternObjCClassMemberContext differentiates from other interfaces.
+	IsExternObjCClassMemberContext()
+}
+    IExternObjCClassMemberContext is an interface to support dynamic dispatch.
+
+type IExternObjCDeclContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	EXTERN() antlr.TerminalNode
+	OBJC_LANG() antlr.TerminalNode
+	LBRACE() antlr.TerminalNode
+	RBRACE() antlr.TerminalNode
+	AllExternObjCMember() []IExternObjCMemberContext
+	ExternObjCMember(i int) IExternObjCMemberContext
+
+	// IsExternObjCDeclContext differentiates from other interfaces.
+	IsExternObjCDeclContext()
+}
+    IExternObjCDeclContext is an interface to support dynamic dispatch.
+
+type IExternObjCFunctionDeclContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	FUNC() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	LPAREN() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
+	STRING_LITERAL() antlr.TerminalNode
+	ExternCParameterList() IExternCParameterListContext
+	Type_() ITypeContext
+
+	// IsExternObjCFunctionDeclContext differentiates from other interfaces.
+	IsExternObjCFunctionDeclContext()
+}
+    IExternObjCFunctionDeclContext is an interface to support dynamic dispatch.
+
+type IExternObjCMemberContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	ExternObjCClassDecl() IExternObjCClassDeclContext
+	ExternObjCProtocolDecl() IExternObjCProtocolDeclContext
+	ExternObjCOpaqueClassDecl() IExternObjCOpaqueClassDeclContext
+	ExternCOpaqueStructDecl() IExternCOpaqueStructDeclContext
+	ExternObjCStructDecl() IExternObjCStructDeclContext
+	ExternObjCFunctionDecl() IExternObjCFunctionDeclContext
+	ExternCTypeAlias() IExternCTypeAliasContext
+	ExternCConstDecl() IExternCConstDeclContext
+
+	// IsExternObjCMemberContext differentiates from other interfaces.
+	IsExternObjCMemberContext()
+}
+    IExternObjCMemberContext is an interface to support dynamic dispatch.
+
+type IExternObjCMethodDeclContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	FUNC() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	LPAREN() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
+	STATIC() antlr.TerminalNode
+	STRING_LITERAL() antlr.TerminalNode
+	ExternObjCMethodParams() IExternObjCMethodParamsContext
+	Type_() ITypeContext
+
+	// IsExternObjCMethodDeclContext differentiates from other interfaces.
+	IsExternObjCMethodDeclContext()
+}
+    IExternObjCMethodDeclContext is an interface to support dynamic dispatch.
+
+type IExternObjCMethodParamsContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	ExternObjCSelfParam() IExternObjCSelfParamContext
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
+	AllExternCParameter() []IExternCParameterContext
+	ExternCParameter(i int) IExternCParameterContext
+	ExternCParameterList() IExternCParameterListContext
+
+	// IsExternObjCMethodParamsContext differentiates from other interfaces.
+	IsExternObjCMethodParamsContext()
+}
+    IExternObjCMethodParamsContext is an interface to support dynamic dispatch.
+
+type IExternObjCNewDeclContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	NEW() antlr.TerminalNode
+	LPAREN() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
+	Type_() ITypeContext
+	STRING_LITERAL() antlr.TerminalNode
+	ExternCParameterList() IExternCParameterListContext
+
+	// IsExternObjCNewDeclContext differentiates from other interfaces.
+	IsExternObjCNewDeclContext()
+}
+    IExternObjCNewDeclContext is an interface to support dynamic dispatch.
+
+type IExternObjCOpaqueClassDeclContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	OPAQUE() antlr.TerminalNode
+	CLASS() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	LBRACE() antlr.TerminalNode
+	RBRACE() antlr.TerminalNode
+
+	// IsExternObjCOpaqueClassDeclContext differentiates from other interfaces.
+	IsExternObjCOpaqueClassDeclContext()
+}
+    IExternObjCOpaqueClassDeclContext is an interface to support dynamic
+    dispatch.
+
+type IExternObjCPropertyDeclContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	PROPERTY() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	COLON() antlr.TerminalNode
+	Type_() ITypeContext
+	LPAREN() antlr.TerminalNode
+	PropertyAttributes() IPropertyAttributesContext
+	RPAREN() antlr.TerminalNode
+
+	// IsExternObjCPropertyDeclContext differentiates from other interfaces.
+	IsExternObjCPropertyDeclContext()
+}
+    IExternObjCPropertyDeclContext is an interface to support dynamic dispatch.
+
+type IExternObjCProtocolDeclContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	PROTOCOL() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	LBRACE() antlr.TerminalNode
+	RBRACE() antlr.TerminalNode
+	COLON() antlr.TerminalNode
+	TypeList() ITypeListContext
+	AllExternObjCProtocolMember() []IExternObjCProtocolMemberContext
+	ExternObjCProtocolMember(i int) IExternObjCProtocolMemberContext
+
+	// IsExternObjCProtocolDeclContext differentiates from other interfaces.
+	IsExternObjCProtocolDeclContext()
+}
+    IExternObjCProtocolDeclContext is an interface to support dynamic dispatch.
+
+type IExternObjCProtocolMemberContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	ExternObjCMethodDecl() IExternObjCMethodDeclContext
+	OPTIONAL() antlr.TerminalNode
+	ExternObjCPropertyDecl() IExternObjCPropertyDeclContext
+
+	// IsExternObjCProtocolMemberContext differentiates from other interfaces.
+	IsExternObjCProtocolMemberContext()
+}
+    IExternObjCProtocolMemberContext is an interface to support dynamic
+    dispatch.
+
+type IExternObjCSelfParamContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	SELF() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	COLON() antlr.TerminalNode
+	Type_() ITypeContext
+
+	// IsExternObjCSelfParamContext differentiates from other interfaces.
+	IsExternObjCSelfParamContext()
+}
+    IExternObjCSelfParamContext is an interface to support dynamic dispatch.
+
+type IExternObjCStructDeclContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	StructDecl() IStructDeclContext
+
+	// IsExternObjCStructDeclContext differentiates from other interfaces.
+	IsExternObjCStructDeclContext()
+}
+    IExternObjCStructDeclContext is an interface to support dynamic dispatch.
+
 type IFieldInitContext interface {
 	antlr.ParserRuleContext
 
@@ -4823,6 +5665,7 @@ type IImportDeclContext interface {
 	STRING_LITERAL() antlr.TerminalNode
 	LPAREN() antlr.TerminalNode
 	RPAREN() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
 	AllImportSpec() []IImportSpecContext
 	ImportSpec(i int) IImportSpecContext
 
@@ -5258,6 +6101,39 @@ type IPrimitiveTypeContext interface {
 }
     IPrimitiveTypeContext is an interface to support dynamic dispatch.
 
+type IPropertyAttributeContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllIDENTIFIER() []antlr.TerminalNode
+	IDENTIFIER(i int) antlr.TerminalNode
+	COLON() antlr.TerminalNode
+
+	// IsPropertyAttributeContext differentiates from other interfaces.
+	IsPropertyAttributeContext()
+}
+    IPropertyAttributeContext is an interface to support dynamic dispatch.
+
+type IPropertyAttributesContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllPropertyAttribute() []IPropertyAttributeContext
+	PropertyAttribute(i int) IPropertyAttributeContext
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
+
+	// IsPropertyAttributesContext differentiates from other interfaces.
+	IsPropertyAttributesContext()
+}
+    IPropertyAttributesContext is an interface to support dynamic dispatch.
+
 type IQualifiedIdentifierContext interface {
 	antlr.ParserRuleContext
 
@@ -5596,6 +6472,7 @@ type ITopLevelDeclContext interface {
 	ConstDecl() IConstDeclContext
 	ExternCDecl() IExternCDeclContext
 	ExternCppDecl() IExternCppDeclContext
+	ExternObjCDecl() IExternObjCDeclContext
 
 	// IsTopLevelDeclContext differentiates from other interfaces.
 	IsTopLevelDeclContext()
@@ -5811,6 +6688,8 @@ func (s *ImportDeclContext) AllImportSpec() []IImportSpecContext
 func (s *ImportDeclContext) GetParser() antlr.Parser
 
 func (s *ImportDeclContext) GetRuleContext() antlr.RuleContext
+
+func (s *ImportDeclContext) IDENTIFIER() antlr.TerminalNode
 
 func (s *ImportDeclContext) IMPORT() antlr.TerminalNode
 
@@ -6531,6 +7410,58 @@ func (s *PrimitiveTypeContext) USIZE() antlr.TerminalNode
 
 func (s *PrimitiveTypeContext) VOID() antlr.TerminalNode
 
+type PropertyAttributeContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyPropertyAttributeContext() *PropertyAttributeContext
+
+func NewPropertyAttributeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *PropertyAttributeContext
+
+func (s *PropertyAttributeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *PropertyAttributeContext) AllIDENTIFIER() []antlr.TerminalNode
+
+func (s *PropertyAttributeContext) COLON() antlr.TerminalNode
+
+func (s *PropertyAttributeContext) GetParser() antlr.Parser
+
+func (s *PropertyAttributeContext) GetRuleContext() antlr.RuleContext
+
+func (s *PropertyAttributeContext) IDENTIFIER(i int) antlr.TerminalNode
+
+func (*PropertyAttributeContext) IsPropertyAttributeContext()
+
+func (s *PropertyAttributeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type PropertyAttributesContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyPropertyAttributesContext() *PropertyAttributesContext
+
+func NewPropertyAttributesContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *PropertyAttributesContext
+
+func (s *PropertyAttributesContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *PropertyAttributesContext) AllCOMMA() []antlr.TerminalNode
+
+func (s *PropertyAttributesContext) AllPropertyAttribute() []IPropertyAttributeContext
+
+func (s *PropertyAttributesContext) COMMA(i int) antlr.TerminalNode
+
+func (s *PropertyAttributesContext) GetParser() antlr.Parser
+
+func (s *PropertyAttributesContext) GetRuleContext() antlr.RuleContext
+
+func (*PropertyAttributesContext) IsPropertyAttributesContext()
+
+func (s *PropertyAttributesContext) PropertyAttribute(i int) IPropertyAttributeContext
+
+func (s *PropertyAttributesContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
 type QualifiedIdentifierContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
@@ -7074,6 +8005,8 @@ func (s *TopLevelDeclContext) EnumDecl() IEnumDeclContext
 func (s *TopLevelDeclContext) ExternCDecl() IExternCDeclContext
 
 func (s *TopLevelDeclContext) ExternCppDecl() IExternCppDeclContext
+
+func (s *TopLevelDeclContext) ExternObjCDecl() IExternObjCDeclContext
 
 func (s *TopLevelDeclContext) FunctionDecl() IFunctionDeclContext
 

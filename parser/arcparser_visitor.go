@@ -110,6 +110,54 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#externCppSelfParam.
 	VisitExternCppSelfParam(ctx *ExternCppSelfParamContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#externObjCDecl.
+	VisitExternObjCDecl(ctx *ExternObjCDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCMember.
+	VisitExternObjCMember(ctx *ExternObjCMemberContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCStructDecl.
+	VisitExternObjCStructDecl(ctx *ExternObjCStructDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCClassDecl.
+	VisitExternObjCClassDecl(ctx *ExternObjCClassDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCProtocolDecl.
+	VisitExternObjCProtocolDecl(ctx *ExternObjCProtocolDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCClassMember.
+	VisitExternObjCClassMember(ctx *ExternObjCClassMemberContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCProtocolMember.
+	VisitExternObjCProtocolMember(ctx *ExternObjCProtocolMemberContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCNewDecl.
+	VisitExternObjCNewDecl(ctx *ExternObjCNewDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCPropertyDecl.
+	VisitExternObjCPropertyDecl(ctx *ExternObjCPropertyDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#propertyAttributes.
+	VisitPropertyAttributes(ctx *PropertyAttributesContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#propertyAttribute.
+	VisitPropertyAttribute(ctx *PropertyAttributeContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCMethodDecl.
+	VisitExternObjCMethodDecl(ctx *ExternObjCMethodDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCMethodParams.
+	VisitExternObjCMethodParams(ctx *ExternObjCMethodParamsContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCSelfParam.
+	VisitExternObjCSelfParam(ctx *ExternObjCSelfParamContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCOpaqueClassDecl.
+	VisitExternObjCOpaqueClassDecl(ctx *ExternObjCOpaqueClassDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externObjCFunctionDecl.
+	VisitExternObjCFunctionDecl(ctx *ExternObjCFunctionDeclContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#genericParams.
 	VisitGenericParams(ctx *GenericParamsContext) interface{}
 

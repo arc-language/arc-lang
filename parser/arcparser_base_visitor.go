@@ -144,6 +144,70 @@ func (v *BaseArcParserVisitor) VisitExternCppSelfParam(ctx *ExternCppSelfParamCo
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseArcParserVisitor) VisitExternObjCDecl(ctx *ExternObjCDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCMember(ctx *ExternObjCMemberContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCStructDecl(ctx *ExternObjCStructDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCClassDecl(ctx *ExternObjCClassDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCProtocolDecl(ctx *ExternObjCProtocolDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCClassMember(ctx *ExternObjCClassMemberContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCProtocolMember(ctx *ExternObjCProtocolMemberContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCNewDecl(ctx *ExternObjCNewDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCPropertyDecl(ctx *ExternObjCPropertyDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitPropertyAttributes(ctx *PropertyAttributesContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitPropertyAttribute(ctx *PropertyAttributeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCMethodDecl(ctx *ExternObjCMethodDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCMethodParams(ctx *ExternObjCMethodParamsContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCSelfParam(ctx *ExternObjCSelfParamContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCOpaqueClassDecl(ctx *ExternObjCOpaqueClassDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternObjCFunctionDecl(ctx *ExternObjCFunctionDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseArcParserVisitor) VisitGenericParams(ctx *GenericParamsContext) interface{} {
 	return v.VisitChildren(ctx)
 }
