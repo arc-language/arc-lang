@@ -35,6 +35,9 @@ EXCEPT: 'except';
 FINALLY: 'finally';
 ENUM: 'enum';
 COMPUTE: 'compute';
+PROPERTY: 'property';
+PROTOCOL: 'protocol';
+OPTIONAL: 'optional';
 
 // Extern triggers mode switch
 EXTERN: 'extern' -> pushMode(EXTERN_LANG_MODE);
@@ -180,3 +183,4 @@ mode EXTERN_LANG_MODE;
 EXTERN_WS: [ \t\r\n]+ -> skip;
 C_LANG: 'c' -> popMode;
 CPP_LANG: 'cpp' -> popMode;
+OBJC_LANG: 'objc' -> popMode;

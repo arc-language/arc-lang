@@ -12,7 +12,8 @@ compilationUnit
 // Declarations
 // =============================================================================
 
-importDecl: IMPORT (STRING_LITERAL | LPAREN importSpec* RPAREN);
+// Supports: import "...", import c "...", import objc "..."
+importDecl: IMPORT (IDENTIFIER)? (STRING_LITERAL | LPAREN importSpec* RPAREN);
 importSpec: STRING_LITERAL;
 
 namespaceDecl: NAMESPACE IDENTIFIER;
@@ -30,13 +31,13 @@ topLevelDecl
     | constDecl
     | externCDecl
     | externCppDecl
+    | externObjCDecl
     ;
 
 // =============================================================================
-// Attributes (New Rule)
+// Attributes
 // =============================================================================
 
-// Allows @packed, @align(16), etc.
 attribute: AT IDENTIFIER (LPAREN expression RPAREN)?;
 
 // =============================================================================
@@ -182,6 +183,83 @@ externCppSelfParam
     ;
 
 // =============================================================================
+// Extern Objective-C Declarations
+// =============================================================================
+
+externObjCDecl: EXTERN OBJC_LANG LBRACE externObjCMember* RBRACE;
+
+externObjCMember
+    : externObjCClassDecl
+    | externObjCProtocolDecl
+    | externObjCOpaqueClassDecl
+    | externCOpaqueStructDecl // Opaque structs
+    | externObjCStructDecl    // Standard structs (e.g. NSRect)
+    | externObjCFunctionDecl  // Global functions (e.g. NSMakeRect)
+    | externCTypeAlias        // type NSUInteger = uint64
+    | externCConstDecl        // const Constants
+    ;
+
+externObjCStructDecl: structDecl;
+
+externObjCClassDecl
+    : CLASS IDENTIFIER (COLON typeList)? LBRACE externObjCClassMember* RBRACE
+    ;
+
+externObjCProtocolDecl
+    : PROTOCOL IDENTIFIER (COLON typeList)? LBRACE externObjCProtocolMember* RBRACE
+    ;
+
+externObjCClassMember
+    : externObjCMethodDecl
+    | externObjCPropertyDecl
+    | externObjCNewDecl
+    ;
+
+externObjCProtocolMember
+    : OPTIONAL? externObjCMethodDecl
+    | externObjCPropertyDecl
+    ;
+
+externObjCNewDecl
+    : NEW (STRING_LITERAL)? LPAREN externCParameterList? RPAREN type
+    ;
+
+externObjCPropertyDecl
+    : PROPERTY (LPAREN propertyAttributes RPAREN)? IDENTIFIER COLON type
+    ;
+
+propertyAttributes
+    : propertyAttribute (COMMA propertyAttribute)*
+    ;
+
+propertyAttribute
+    : IDENTIFIER                  // readonly
+    | IDENTIFIER COLON IDENTIFIER // getter: isKeyWindow
+    ;
+
+externObjCMethodDecl
+    : STATIC? FUNC IDENTIFIER (STRING_LITERAL)? LPAREN externObjCMethodParams? RPAREN type?
+    ;
+
+externObjCMethodParams
+    : externObjCSelfParam (COMMA externCParameter)*
+    | externCParameterList
+    ;
+
+externObjCSelfParam
+    : SELF IDENTIFIER COLON type // func foo(self d: *Delegate)
+    | SELF type                  // func foo(self *Class)
+    ;
+
+externObjCOpaqueClassDecl
+    : OPAQUE CLASS IDENTIFIER LBRACE RBRACE
+    ;
+
+externObjCFunctionDecl
+    : FUNC IDENTIFIER (STRING_LITERAL)? LPAREN externCParameterList? RPAREN type?
+    ;
+
+// =============================================================================
 // Generics
 // =============================================================================
 
@@ -205,7 +283,7 @@ parameterList: parameter (COMMA parameter)* (COMMA ELLIPSIS)? | ELLIPSIS;
 parameter: SELF? IDENTIFIER COLON type;
 
 // =============================================================================
-// Structs (Updated to accept attributes)
+// Structs
 // =============================================================================
 
 structDecl: attribute* STRUCT IDENTIFIER genericParams? LBRACE structMember* RBRACE;
@@ -313,7 +391,6 @@ statement
     | expressionStmt
     ;
 
-// FIXED: Uses unaryExpression to handle member access properly
 assignmentStmt: unaryExpression assignmentOp expression;
 
 assignmentOp
@@ -411,8 +488,8 @@ primaryExpression
 // =============================================================================
 
 builtinExpression
-    : AT IDENTIFIER LPAREN argumentList? RPAREN  // @compute_id(), @type_id(), etc.
-    | AT IDENTIFIER                               // @constant, etc.
+    : AT IDENTIFIER LPAREN argumentList? RPAREN
+    | AT IDENTIFIER
     ;
 
 sizeofExpression: SIZEOF LPAREN type RPAREN;
@@ -443,21 +520,15 @@ fieldInit: IDENTIFIER COLON expression;
 argumentList: argument (COMMA argument)*;
 argument: expression | lambdaExpression | anonymousFuncExpression;
 
-// --- Unified Execution Strategy Pattern ---
-
-// Handles: async(x) => ... OR vm(x) => ...
 lambdaExpression
     : executionStrategy? LPAREN lambdaParamList? RPAREN FAT_ARROW block
     | executionStrategy? LPAREN lambdaParamList? RPAREN FAT_ARROW expression
     ;
 
-// Handles: async func... OR vm func... OR pkg.Run func...
-// Immediate invocation is handled by this rule + postfixExpression's call syntax '(...)'
 anonymousFuncExpression
     : executionStrategy? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
     ;
 
-// Generic Prefix: 'async', 'process', 'compute', 'vm', 'pkg.vm', etc.
 executionStrategy
     : contextIdentifier
     | ASYNC
@@ -465,7 +536,6 @@ executionStrategy
     | COMPUTE
     ;
 
-// Allows single 'ID' or 'ID.ID' pattern for the execution context prefix
 contextIdentifier
     : IDENTIFIER (DOT IDENTIFIER)*
     ;
