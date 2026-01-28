@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	// Assuming these packages exist based on your prompt context
 	"github.com/arc-language/nix"
