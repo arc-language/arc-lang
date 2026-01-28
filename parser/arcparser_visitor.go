@@ -293,9 +293,6 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#continueStmt.
 	VisitContinueStmt(ctx *ContinueStmtContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#throwStmt.
-	VisitThrowStmt(ctx *ThrowStmtContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#ifStmt.
 	VisitIfStmt(ctx *IfStmtContext) interface{}
 
@@ -310,15 +307,6 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#defaultCase.
 	VisitDefaultCase(ctx *DefaultCaseContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#tryStmt.
-	VisitTryStmt(ctx *TryStmtContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#exceptClause.
-	VisitExceptClause(ctx *ExceptClauseContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#finallyClause.
-	VisitFinallyClause(ctx *FinallyClauseContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#expression.
 	VisitExpression(ctx *ExpressionContext) interface{}

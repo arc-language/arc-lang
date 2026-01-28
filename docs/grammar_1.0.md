@@ -1,7 +1,7 @@
 # arc Language Grammar (Version 1.2 - Core Syntax)
 
 Grammar rules:
- * type declaration can only have one dot.
+ * type declaration can only have dot.
 
 Grammar to not add to the parser files:
     * Empty initializer
@@ -593,87 +593,6 @@ switch status {
 
     default:
         io.print("Unknown")
-}
-```
-
-## Control Flow, try-except with throw
-```arc
-// Function that throws exceptions
-func divide(s: int32, d: int32) int32 {
-    if d == 0 {
-        throw "Division by zero"  // throw a recoverable exception
-    }
-    return s / d
-}
-
-// Basic try-except block
-try {
-    let result = divide(10, 0)  // This will throw
-    io.printf("Result: %d\n", result)
-} except err {
-    io.printf("Error: %s\n", err)  // Handle the thrown exception
-}
-
-// Function throwing typed exceptions
-func read_file(path: string) string {
-    if !file_exists(path) {
-        throw FileError.NotFound  // Throw specific error type
-    }
-    if !has_permission(path) {
-        throw FileError.PermissionDenied  // Throw different error type
-    }
-    return load_contents(path)
-}
-
-// Multiple except clauses for different exception types
-try {
-    let data = read_file("/tmp/config.txt")
-    process(data)
-} except FileError.NotFound {
-    io.printf("File not found\n")
-} except FileError.PermissionDenied {
-    io.printf("Permission denied\n")
-} except err {
-    // Handle-all for other errors
-    io.printf("Unexpected error: %s\n", err)
-}
-
-// Try-except with finally (always executes)
-func process_file(filename: string) void {
-    let file: File
-    try {
-        file = open(filename)
-        if file.size() > MAX_SIZE {
-            throw "File too large"  // Throw from within try block
-        }
-        process(file)
-    } except err {
-        io.printf("Error: %s\n", err)
-    } finally {
-        // Cleanup code always runs, even if exception was thrown
-        if file != null {
-            file.close()
-        }
-    }
-}
-
-// Comparison: throw vs raise()
-func validate_data(data: ptr<byte>) void {
-    if data == null {
-        raise("Fatal: null pointer passed to validate_data")  // Unrecoverable, aborts program
-    }
-    
-    if !is_valid_format(data) {
-        throw "Invalid data format" // throw a recoverable exception
-    }
-}
-
-// Re-throwing exceptions
-try {
-    risky_operation()
-} except err {
-    io.printf("Logging error: %s\n", err)
-    throw err  // Re-throw the exception to caller
 }
 ```
 

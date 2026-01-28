@@ -382,8 +382,6 @@ statement
     | ifStmt
     | forStmt
     | switchStmt
-    | tryStmt
-    | throwStmt
     | deferStmt
     | variableDecl
     | constDecl
@@ -412,7 +410,6 @@ returnStmt: RETURN tupleExpression | RETURN expression?;
 deferStmt: DEFER (assignmentStmt | expression);
 breakStmt: BREAK;
 continueStmt: CONTINUE;
-throwStmt: THROW expression;
 
 ifStmt: IF expression block (ELSE IF expression block)* (ELSE block)?;
 
@@ -427,10 +424,6 @@ forStmt
 switchStmt: SWITCH expression LBRACE switchCase* defaultCase? RBRACE;
 switchCase: CASE expression (COMMA expression)* COLON statement*;
 defaultCase: DEFAULT COLON statement*;
-
-tryStmt: TRY block exceptClause+ finallyClause? | TRY block finallyClause;
-exceptClause: EXCEPT qualifiedIdentifier block | EXCEPT IDENTIFIER block;
-finallyClause: FINALLY block;
 
 // =============================================================================
 // Expressions

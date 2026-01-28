@@ -388,10 +388,6 @@ func (v *BaseArcParserVisitor) VisitContinueStmt(ctx *ContinueStmtContext) inter
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitThrowStmt(ctx *ThrowStmtContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseArcParserVisitor) VisitIfStmt(ctx *IfStmtContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -409,18 +405,6 @@ func (v *BaseArcParserVisitor) VisitSwitchCase(ctx *SwitchCaseContext) interface
 }
 
 func (v *BaseArcParserVisitor) VisitDefaultCase(ctx *DefaultCaseContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitTryStmt(ctx *TryStmtContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExceptClause(ctx *ExceptClauseContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitFinallyClause(ctx *FinallyClauseContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
