@@ -439,42 +439,6 @@ func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 	return nil
 }
 
-func (g *Generator) VisitTryStmt(ctx *parser.TryStmtContext) interface{} {
-	tryBlock := g.ctx.Builder.CreateBlock("try.start")
-	endBlock := g.ctx.Builder.CreateBlock("try.end")
-	
-	var catchBlock *ir.BasicBlock
-	if len(ctx.AllExceptClause()) > 0 {
-		catchBlock = g.ctx.Builder.CreateBlock("try.catch")
-	}
-
-	g.ctx.Builder.CreateBr(tryBlock)
-	g.ctx.SetInsertBlock(tryBlock)
-	g.Visit(ctx.Block())
-	
-	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
-		g.ctx.Builder.CreateBr(endBlock)
-	}
-
-	if catchBlock != nil {
-		g.ctx.SetInsertBlock(catchBlock)
-		g.Visit(ctx.ExceptClause(0).Block())
-		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
-			g.ctx.Builder.CreateBr(endBlock)
-		}
-	}
-
-	g.ctx.SetInsertBlock(endBlock)
-	return nil
-}
-
-func (g *Generator) VisitThrowStmt(ctx *parser.ThrowStmtContext) interface{} {
-	val := g.Visit(ctx.Expression()).(ir.Value)
-	_ = val 
-	g.ctx.Builder.CreateRet(g.ctx.Builder.ConstInt(types.I32, -1))
-	return nil
-}
-
 func (g *Generator) VisitExpressionStmt(ctx *parser.ExpressionStmtContext) interface{} {
 	return g.Visit(ctx.Expression())
 }

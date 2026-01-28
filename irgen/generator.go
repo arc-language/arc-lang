@@ -1,7 +1,6 @@
 package irgen
 
 import (
-
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
@@ -86,14 +85,14 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			for _, param := range gpl.AllGenericParam() {
 				for _, id := range param.AllIDENTIFIER() {
 					tag := id.GetText()
-					if tag == "gpu" { 
-						isGPU = true 
-					} else if tag == "rocm" { 
-						isROCm = true 
-					} else if tag == "cuda" { 
-						isCUDA = true 
-					} else if tag == "tpu" { 
-						isTPU = true 
+					if tag == "gpu" {
+						isGPU = true
+					} else if tag == "rocm" {
+						isROCm = true
+					} else if tag == "cuda" {
+						isCUDA = true
+					} else if tag == "tpu" {
+						isTPU = true
 					}
 				}
 			}
@@ -104,7 +103,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	name := ctx.IDENTIFIER().GetText()
 	var parentName string
 	isMethod := false
-	
+
 	// Case A: Nested inside Class/Struct block
 	if parent := ctx.GetParent(); parent != nil {
 		if _, ok := parent.(*parser.ClassMemberContext); ok {
@@ -130,7 +129,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 					t = ptr.ElementType
 				}
 				if st, ok := t.(*types.StructType); ok {
-					parentName = st.Name 
+					parentName = st.Name
 					isMethod = true
 				}
 				break
@@ -155,12 +154,12 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 
 		// Base method name: "log_printf"
 		methodPart := shortParent + "_" + name
-		
+
 		if g.currentNamespace != "" {
 			// Lookup: "main.log_printf" (Matches Semantic Symbol)
 			lookupName = g.currentNamespace + "." + methodPart
 			// IR: "main.log_printf"
-			irName = g.currentNamespace + "_" + methodPart 
+			irName = g.currentNamespace + "_" + methodPart
 		} else {
 			lookupName = methodPart
 			irName = methodPart
@@ -205,16 +204,16 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		}
 
 		fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
-		
+
 		// Apply Hardware Markers
-		if isTPU { 
-			fn.CallConv = ir.CC_TPU 
-		} else if isROCm { 
-			fn.CallConv = ir.CC_ROCM 
-		} else if isCUDA { 
-			fn.CallConv = ir.CC_PTX 
-		} else if isGPU { 
-			fn.CallConv = ir.CC_PTX 
+		if isTPU {
+			fn.CallConv = ir.CC_TPU
+		} else if isROCm {
+			fn.CallConv = ir.CC_ROCM
+		} else if isCUDA {
+			fn.CallConv = ir.CC_PTX
+		} else if isGPU {
+			fn.CallConv = ir.CC_PTX
 		}
 
 		// Apply Concurrency Flags (Updated for ExecutionStrategy)
@@ -234,7 +233,9 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 
 	// --- Phase 2: Body ---
 	if g.Phase == 2 {
-		if sym == nil || sym.IRValue == nil { return nil }
+		if sym == nil || sym.IRValue == nil {
+			return nil
+		}
 
 		fn := sym.IRValue.(*ir.Function)
 		g.ctx.EnterFunction(fn)
@@ -349,12 +350,6 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 		if ctx.Block() != nil {
 			return g.VisitBlock(ctx.Block().(*parser.BlockContext))
 		}
-		if ctx.TryStmt() != nil {
-			return g.VisitTryStmt(ctx.TryStmt().(*parser.TryStmtContext))
-		}
-		if ctx.ThrowStmt() != nil {
-			return g.VisitThrowStmt(ctx.ThrowStmt().(*parser.ThrowStmtContext))
-		}
 		return nil
 
 	case *parser.ReturnStmtContext:
@@ -373,10 +368,6 @@ func (g *Generator) Visit(tree antlr.ParseTree) interface{} {
 		return g.VisitDeferStmt(ctx)
 	case *parser.AssignmentStmtContext:
 		return g.VisitAssignmentStmt(ctx)
-	case *parser.TryStmtContext:
-		return g.VisitTryStmt(ctx)
-	case *parser.ThrowStmtContext:
-		return g.VisitThrowStmt(ctx)
 
 	case *parser.ExpressionContext:
 		return g.VisitExpression(ctx)
