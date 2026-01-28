@@ -21,15 +21,15 @@ let buffer = alloca<byte>(1024)
 ```arc
 // Compile-time size in bytes (returns usize)
 // Essential for passing buffer sizes to read/write/mmap
-let sz = sizeof<int32>       // 4
-let st_sz = sizeof<Stat>     // Struct size (with padding)
+let sz = sizeof(int32)       // 4
+let st_sz = sizeof(Stat)     // Struct size (with padding)
 ```
 
 ### alignof - Compile-Time Alignment
 ```arc
 // Compile-time alignment requirement (returns usize)
-let align = alignof<float64> // 8
-let align_struct = alignof<Point> // Alignment of struct
+let align = alignof(float64) // 8
+let align_struct = alignof(Point) // Alignment of struct
 ```
 
 ## Memory Block Operations
@@ -44,7 +44,7 @@ memset(buf, 0, 1024)
 
 // Example: Zero-initialize a struct
 let stat_buf = alloca(Stat)
-memset(stat_buf, 0, sizeof<Stat>)
+memset(stat_buf, 0, sizeof(Stat))
 ```
 
 ### memcpy - Copy Memory (Non-Overlapping)
@@ -57,7 +57,7 @@ memcpy(dest_ptr, src_ptr, 1024)
 // Example: Copy struct data
 let src = Point{x: 10, y: 20}
 let dest = alloca(Point)
-memcpy(dest, &src, sizeof<Point>)
+memcpy(dest, &src, sizeof(Point))
 ```
 
 ### memmove - Copy Memory (Safe for Overlap)
@@ -79,7 +79,7 @@ memmove(buffer, buffer + 100, 900)  // Safe overlap
 // Essential for implementing '==' for strings and structs
 let diff = memcmp(ptr1, ptr2, 1024)
 
-if memcmp(&struct1, &struct2, sizeof<Point>) == 0 {
+if memcmp(&struct1, &struct2, sizeof(Point)) == 0 {
     // Structs are equal
 }
 ```
@@ -244,7 +244,7 @@ memset(buf, 0, 1024)
 
 // Struct copy pattern
 let copy = alloca(Point)
-memcpy(copy, &original, sizeof<Point>)
+memcpy(copy, &original, sizeof(Point))
 
 // Syscall buffer pattern
 let buffer = alloca(byte, 4096)
