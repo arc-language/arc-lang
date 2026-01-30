@@ -2,11 +2,11 @@
   <img src="./.github/arc_logo.jpeg" alt="Arc Language" width="200px">
 </h1>
 
-<h4 align="center">AI Language<br>Native GPU/TPU AI development. Zero-overhead systems programming.</h4>
+<h4 align="center">Systems Programming Language<br>Multi-target compilation from a single codebase</h4>
 
 <p align="center">
     <img src="https://img.shields.io/badge/Version-2.0-blue" alt="Version">
-    <img src="https://img.shields.io/badge/Targets-CPU%20%7C%20GPU%20%7C%20TPU%20%7C%20QPU-purple" alt="Targets">
+    <img src="https://img.shields.io/badge/Targets-CPU%20%7C%20GPU%20%7C%20TPU-purple" alt="Targets">
     <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
 </p>
 
@@ -14,32 +14,461 @@
 
 ## What is Arc?
 
-Arc lets you write AI models and deploy them to **any hardware—GPUs, TPUs, or quantum processors—from a single codebase.** No context switching between Python and C++.
+Arc is a systems programming language for building servers, native applications, kernel drivers, and high-performance compute workloads including AI model inference and training.
 
-Write your model once. Deploy everywhere. With full systems control when you need it.
+The language compiles to native code for multiple hardware targets. Write code once and compile it for CPUs, GPUs, TPUs, or custom accelerators.
+
+Arc provides direct hardware access, manual memory management, and C/C++/Objective-C interoperability.
 
 ---
 
-## Write Once. Run Anywhere.
+## Language Overview
+
+### AI Model Integration
+
+```arc
+import "ai"
+import "io"
+
+func main() {
+    // Load model from file
+    let model = ai.load_model("models/model-7b.gguf")
+    defer model.free()
+    
+    // Configure inference
+    let config = ai.InferenceConfig{
+        temperature: 0.7,
+        top_p: 0.9,
+        max_tokens: 512
+    }
+    
+    // Run inference
+    let prompt = "Explain quantum computing in simple terms:"
+    let tokens = model.tokenize(prompt)
+    
+    for token in model.generate(tokens, config) {
+        let text = model.decode(token)
+        io.printf("%s", text)
+    }
+}
+```
+
+### Foreign Function Interface
+
+Direct interop with C, C++, and Objective-C:
+
+```arc
+// C libraries
+extern c {
+    func printf(*byte, ...) int32
+    func sqlite3_open(*byte, **sqlite3) int32
+}
+
+// C++ libraries
+extern cpp {
+    namespace DirectX {
+        class ID3D11Device {
+            virtual func CreateBuffer(
+                self *ID3D11Device,
+                *D3D11_BUFFER_DESC,
+                **ID3D11Buffer
+            ) HRESULT
+        }
+    }
+}
+
+// Objective-C frameworks
+extern objc {
+    class NSWindow {
+        new "initWithContentRect:styleMask:backing:defer:" (
+            NSRect, uint64, uint64, bool
+        ) *NSWindow
+    }
+}
+```
+
+### Type System
+
+```arc
+// Fixed-width integers
+let i: int32 = -500
+let u: uint64 = 10000
+
+// Pointer-sized integers
+let size: usize = 100      // Unsigned (array indexing, sizes)
+let offset: isize = -4     // Signed (offsets)
+
+// Floating point
+let f: float32 = 3.14
+let d: float64 = 2.71828
+
+// Pointers and references
+let ptr: *int32 = &value
+let ref: &int32 = value
+
+// Structs (value types)
+struct Point {
+    x: int32
+    y: int32
+}
+
+// Classes (reference types)
+class Client {
+    name: string
+    port: int32
+}
+```
+
+### Async/Await
+
+```arc
+async func fetch_data(url: string) string {
+    let response = await http.get(url)
+    return response.body
+}
+
+async func main() {
+    let data = await fetch_data("https://api.example.com")
+    io.print(data)
+}
+```
+
+### Generics
+
+Monomorphized at compile time:
+
+```arc
+func swap<T>(a: *T, b: *T) {
+    let tmp: T = *a
+    *a = *b
+    *b = tmp
+}
+
+struct Box<T> {
+    value: T
+    
+    func get(self b: Box<T>) T {
+        return b.value
+    }
+}
+```
+
+### Memory Management
+
+Arc uses manual memory management with explicit allocation and deallocation:
+
+```arc
+// Stack allocation
+let buffer = alloca<byte>(4096)
+memset(buffer, 0, 4096)
+
+// Heap allocation (via FFI)
+extern c {
+    func malloc(usize) *void
+    func free(*void) void
+}
+
+let ptr = malloc(1024)
+defer free(ptr)  // Cleanup on scope exit
+
+// Direct pointer manipulation
+let next = ptr + 1
+let value = *ptr
+*ptr = 42
+```
+
+### Multi-Target Compilation
+
+Functions can be compiled for different hardware using target annotations:
+
+```arc
+// CPU target (default)
+func process_data(data: *float32, size: usize) {
+    for let i: usize = 0; i < size; i++ {
+        data[i] = data[i] * 2.0
+    }
+}
+
+// GPU target
+async func process_gpu<gpu.cuda>(data: *float32, size: usize) {
+    let idx = gpu.thread_id()
+    if idx < size {
+        data[idx] = data[idx] * 2.0
+    }
+}
+
+// TPU target
+async func process_tpu<tpu>(data: Tensor) Tensor {
+    return data.multiply(2.0)
+}
+```
+
+---
+
+## Example Programs
+
+### AI Model Inference
 
 ```arc
 namespace main
 
 import "ai"
+import "io"
 
-model NeuralNet {
+func main() {
+    // Load model
+    let model = ai.load_model("models/model-7b.gguf")
+    defer model.free()
+    
+    // Configure
+    let config = ai.InferenceConfig{
+        temperature: 0.7,
+        top_p: 0.9,
+        max_tokens: 512
+    }
+    
+    // Generate
+    let prompt = "Explain quantum computing:"
+    let tokens = model.tokenize(prompt)
+    
+    io.printf("Generating...\n")
+    
+    for token in model.generate(tokens, config) {
+        let text = model.decode(token)
+        io.printf("%s", text)
+    }
+    
+    io.printf("\n")
+}
+```
 
-    async func train_model<gpu.cuda>(self model: *NeuralNet, data: Tensor) string {
-        for epoch in 0..100 {
-            let loss = model.forward(data)
-            model.backward(loss)
-            model.step()
-        }
+### HTTP Server
+
+```arc
+namespace main
+
+import "net"
+import "io"
+
+async func handle_request(conn: *net.TcpStream) {
+    let buffer: array<byte, 4096> = {}
+    let bytes_read = await conn.read(&buffer)
+    
+    let response = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK"
+    await conn.write(response.as_bytes())
+}
+
+async func main() {
+    let listener = net.TcpListener.bind("0.0.0.0:8080")
+    io.print("Server listening on port 8080")
+    
+    for {
+        let (conn, addr) = await listener.accept()
+        spawn handle_request(conn)
+    }
+}
+```
+
+### Native GUI Application
+
+```arc
+namespace main
+
+import objc "AppKit"
+
+class AppDelegate: NSApplicationDelegate {
+    window: *NSWindow
+    
+    func applicationDidFinishLaunching(self d: *AppDelegate, notif: *NSNotification) {
+        let rect = NSMakeRect(0, 0, 800, 600)
+        let style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
+        
+        d.window = NSWindow.new(rect, style, NSBackingStoreBuffered, false)
+        d.window.title = NSString.from("Arc Application")
+        d.window.center()
+        d.window.makeKeyAndOrderFront(null)
     }
 }
 
-// Train on NVIDIA GPUs
-async func train_model<gpu.cuda>(model: NeuralNet, data: Tensor) {
+func main() {
+    let app = NSApplication.sharedApplication()
+    let delegate = AppDelegate{}
+    app.delegate = &delegate
+    app.run()
+}
+```
+
+### Database Application
+
+```arc
+namespace main
+
+extern c {
+    opaque struct sqlite3 {}
+    opaque struct sqlite3_stmt {}
+    
+    const SQLITE_OK: int32 = 0
+    const SQLITE_ROW: int32 = 100
+    
+    func sqlite3_open(*byte, **sqlite3) int32
+    func sqlite3_close(*sqlite3) int32
+    func sqlite3_prepare_v2(*sqlite3, *byte, int32, **sqlite3_stmt, **byte) int32
+    func sqlite3_step(*sqlite3_stmt) int32
+    func sqlite3_column_text(*sqlite3_stmt, int32) *byte
+    func printf(*byte, ...) int32
+}
+
+func main() {
+    let db: *sqlite3 = null
+    
+    if sqlite3_open("app.db", &db) != SQLITE_OK {
+        printf("Failed to open database\n")
+        return
+    }
+    defer sqlite3_close(db)
+    
+    let stmt: *sqlite3_stmt = null
+    sqlite3_prepare_v2(db, "SELECT name FROM users", -1, &stmt, null)
+    
+    for sqlite3_step(stmt) == SQLITE_ROW {
+        let name = sqlite3_column_text(stmt, 0)
+        printf("User: %s\n", name)
+    }
+}
+```
+
+### Kernel Module
+
+```arc
+namespace driver
+
+import "linux/kernel/driver"
+import "linux/kernel/log"
+
+func init_module() int32 {
+    log.info("Driver loading")
+    
+    let dev = driver.CharDevice.new("custom_device", 0)
+    
+    dev.on_read(func(file: *driver.File, buffer: *byte, size: uint64) int64 {
+        let data = "Hello from kernel"
+        memcpy(buffer, data.as_bytes(), data.len())
+        return cast<int64>(data.len())
+    })
+    
+    return 0
+}
+
+func cleanup_module() {
+    log.info("Driver unloading")
+}
+```
+
+---
+
+## Package Management
+
+Arc downloads packages via HTTPS to a local cache (`~/.arc/`). No system package managers required.
+
+### Source Code
+
+```arc
+// main.ax
+namespace main
+
+import c "sqlite3"
+import c "curl"
+import "io"
+import "ai"
+
+func main() {
+    // Use imported libraries
+}
+```
+
+### Configuration
+
+```go
+// ax.mod
+module myapp
+arc 1.0
+
+require (
+    io v1.2
+    ai v2.0
+)
+
+require c (
+    sqlite3 v3.36 (
+        debian   "debian.org/libsqlite3-dev"
+        ubuntu   "ubuntu.org/libsqlite3-dev"
+        macos    "brew.sh/sqlite"
+        windows  "vcpkg.io/sqlite3"
+        default  "vcpkg.io/sqlite3"
+    )
+    
+    curl v7.80 (
+        default  "vcpkg.io/curl"
+    )
+)
+```
+
+The compiler detects your platform and downloads the appropriate packages to `~/.arc/cache/`.
+
+---
+
+## Supported Targets
+
+### CPU Architectures
+- x86-64 (Intel, AMD)
+- ARM64 (Apple Silicon, ARM servers)
+- RISC-V (in progress)
+
+### Operating Systems
+- Linux (Ubuntu, Debian, Arch, Fedora, Alpine, etc.)
+- macOS (Intel and Apple Silicon)
+- Windows (x64)
+- FreeBSD
+
+### Accelerators
+- NVIDIA GPUs (`<gpu.cuda>`)
+- AMD GPUs (`<gpu.rocm>`)
+- Apple Silicon (`<gpu.metal>`)
+- Intel GPUs (`<gpu.oneapi>`)
+- Google TPUs (`<tpu>`)
+- AWS Trainium (`<aws.trainium>`)
+
+---
+
+## Installation
+
+```bash
+git clone https://github.com/arc-language/arc-lang
+cd arc-lang/cmd
+./build build
+./test_runner
+```
+
+### Build a Program
+
+```bash
+./arc build main.ax -o main
+./main
+```
+
+---
+
+## GPU/TPU Programming
+
+Arc can compile functions to run on specialized hardware:
+
+```arc
+namespace compute
+
+import "ai"
+
+// Train model on GPU
+async func train<gpu.cuda>(model: *ai.Model, data: *Tensor) {
     for epoch in 0..100 {
         let loss = model.forward(data)
         model.backward(loss)
@@ -47,175 +476,65 @@ async func train_model<gpu.cuda>(model: NeuralNet, data: Tensor) {
     }
 }
 
-// Deploy to Google TPUs
-async func inference<tpu>(model: NeuralNet, input: Tensor) Tensor {
+// Deploy to TPU for inference
+async func inference<tpu>(model: *ai.Model, input: *Tensor) *Tensor {
     return model.forward(input)
 }
 
-// Or run on quantum hardware
-async func quantum_circuit<qpu.ibm>() Result {
-    let qubits = qpu.alloc(2)
-    qpu.h(qubits[0])           // Hadamard gate
-    qpu.cx(qubits[0], qubits[1])  // Entanglement
-    return qpu.measure(qubits)
+// Custom GPU kernel
+async func vector_add<gpu.cuda>(a: *float32, b: *float32, c: *float32, n: usize) {
+    let idx = gpu.thread_id()
+    if idx < n {
+        c[idx] = a[idx] + b[idx]
+    }
 }
 
 func main() {
-    let model = NeuralNet.create([784, 128, 10])
+    let model = ai.load_model("models/model-13b.gguf")
+    let data = ai.load_tensor("training_data.bin")
     
-    // Train on GPU
-    await train_model(model, training_data)
+    // Train on NVIDIA GPU
+    await train<gpu.cuda>(&model, &data)
     
-    // Deploy to TPU for inference
-    let result = await inference(model, test_input)
-}
-```
-
-**That's it.** Same language. Same model. Different hardware. Zero friction.
-
----
-
-## Core Features
-
-### Multi-Target Compilation
-Write `async func<target>` and Arc compiles to native code for your hardware:
-- **`<gpu.cuda>`** → NVIDIA GPUs
-- **`<gpu.rocm>`** → AMD GPUs  
-- **`<tpu>`** → Google Cloud TPUs
-- **`<qpu.ibm>`** → IBM Quantum Processors
-
-### ML-Native Types & Operations
-```arc
-import "ai"
-
-let model = Sequential([
-    Dense(784, 128, activation: relu),
-    Dropout(0.2),
-    Dense(128, 10, activation: softmax)
-])
-
-// Automatic differentiation
-let loss = cross_entropy(model(x), y)
-loss.backward()  // Gradients computed automatically
-```
-
-### GPU Kernels Made Simple
-```arc
-async func matrix_multiply<gpu>(A: Tensor, B: Tensor) Tensor {
-    let i = gpu.thread_id()
-    let result = Tensor.zeros(A.shape[0], B.shape[1])
+    // Deploy to Google TPU
+    let input = ai.load_tensor("input.bin")
+    let output = await inference<tpu>(&model, &input)
     
-    // Arc handles memory, scheduling, synchronization
-    result[i] = dot(A[i], B.transpose())
-    return result
-}
-```
-
-### Systems Programming When Needed
-Need to write a custom device driver or optimize memory allocation? Arc is a real systems language:
-
-```arc
-import "kernel/driver"
-
-func init() driver.Status {
-    let device = driver.create("CustomAccelerator")
-    device.on_interrupt(func() {
-        // Handle hardware interrupt
-    })
-    return driver.OK
-}
-```
-
-### Distributed Training
-```arc
-// Run training across a cluster
-async func distributed_train<cloud>(model: NeuralNet) {
-    let rank = cloud.rank()
-    let size = cloud.world_size()
-    
-    // Automatic data parallelism
-    let shard = data.partition(rank, size)
-    await train(model, shard)
-    
-    // Gradient synchronization handled automatically
-    cloud.all_reduce(model.gradients)
+    io.printf("Result: %f\n", output.data[0])
 }
 ```
 
 ---
 
-## Supported Hardware
+## Documentation
 
-| Platform | Target | Hardware |
-|:---|:---|:---|
-| **NVIDIA GPUs** | `<gpu.cuda>` | Maxwell → Hopper (RTX, A100, H100) |
-| **AMD GPUs** | `<gpu.rocm>` | RDNA / CDNA (RX 7000, MI300) |
-| **Apple Silicon** | `<gpu.metal>` | M1 → M4 |
-| **Intel GPUs** | `<gpu.oneapi>` | Arc / Data Center Max |
-| **Google TPUs** | `<tpu>` | Cloud TPU v2-v5p |
-| **IBM Quantum** | `<qpu.ibm>` | Eagle / Heron (Superconducting) |
-| **IonQ Quantum** | `<qpu.ionq>` | Harmony / Aria (Trapped Ion) |
-| **AWS Trainium** | `<aws.trainium>` | Trn1 / Inf2 |
-
----
-
-## Getting Started
-
-### Compile and Run (BETA)
-It's in beta so you can only run the test_runner and some .ax files.
-
-```bash
-git clone https://github.com/arc-language/arc-lang
-cd arc-lang/cmd
-./build build
-./test_runner
-
-./arc build main.ax -o main
-./main
-```
-
-### Write Your Program
-
-Create `main.ax`:
-
-```arc
-namespace main
-
-extern c {
-  func printf(*byte, ...)
-}
-
-func main() {
-  printf("main\n")
-}
-```
-
-**No external dependencies.** No CUDA toolkit. No Python environment. Just Arc.
-
----
-
-## Why Arc?
-
-| Feature | PyTorch/JAX | CUDA/C++ | Arc |
-|:---|:---:|:---:|:---:|
-| **GPU Training** | ✅ | ✅ | ✅ |
-| **TPU Support** | ✅ (JAX only) | ❌ | ✅ |
-| **Zero Python Overhead** | ❌ | ✅ | ✅ |
-| **Write Custom Kernels** | ⚠️ (Need C++) | ✅ | ✅ |
-| **Single Language** | ❌ | ❌ | ✅ |
-| **Systems Programming** | ❌ | ✅ | ✅ |
-| **Quantum Computing** | ❌ | ❌ | ✅ |
-
----
-
-## Learn More
-
-- **[Quickstart Guide](docs/quickstart.md)** - Build your first model in 5 minutes
-- **[ML Primitives](docs/ml_primitives.md)** - Neural networks, autodiff, optimizers
-- **[GPU Programming](docs/gpu_guide.md)** - Write custom CUDA-like kernels
-- **[TPU Deployment](docs/tpu_guide.md)** - Deploy to Google Cloud TPUs
-- **[Systems Programming](docs/systems.md)** - Kernel drivers, memory management
 - **[Language Reference](docs/reference.md)** - Complete syntax and semantics
+- **[Grammar Specification](docs/grammar_1.0.md)** - Language grammar
+- **[Package Management](docs/package_manager.md)** - Dependency resolution
+- **[Foreign Function Interface](docs/extern.md)** - C/C++/Objective-C interop
+- **[Kernel Drivers](docs/kernel_drivers.md)** - Systems programming
+- **[Compiler Intrinsics](docs/intrinsics_1.2.md)** - Built-in functions
+
+---
+
+## Current Status
+
+**Beta Release**
+
+Working:
+- Core language features
+- C/C++/Objective-C FFI
+- Package management
+- CPU compilation (x86-64, ARM64)
+- GPU compilation (CUDA, Metal)
+- Kernel driver support
+
+In Development:
+- Standard library
+- AI model runtime
+- TPU backend
+- Additional GPU targets
+- Tooling (LSP, debugger)
 
 ---
 
@@ -223,17 +542,11 @@ func main() {
 
 Licensed under either of
 
-*   Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-*   MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+* Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+* MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
 
 ## Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
-dual licensed as above, without any additional terms or conditions.
-
----
-
-**Arc: One language. Any chip. Zero compromise.**
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
