@@ -14,7 +14,7 @@
 
 ## What is Arc?
 
-Arc is a systems programming language for building servers, native applications, kernel drivers, and high-performance compute workloads including AI model inference and training.
+Arc is a systems programming language for building native applications, servers, kernel drivers, and high-performance compute workloads including AI model inference and training.
 
 The language compiles to native code for multiple hardware targets. Write code once and compile it for CPUs, GPUs, TPUs, or custom accelerators.
 
