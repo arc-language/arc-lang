@@ -14,7 +14,7 @@
 
 ## What is Arc?
 
-Arc is a modern systems programming language for building native applications, servers, CLI tools, and kernel drivers with C-level performance.
+Arc is a modern systems programming language for building native applications, servers, CLI tools, AI model inference, and kernel drivers with high performance.
 
 Arc provides manual memory management, zero-cost abstractions, and seamless C/C++/Objective-C interoperability. The language compiles to efficient native code for x86-64, ARM64, and other CPU architectures.
 
@@ -23,6 +23,35 @@ Arc provides manual memory management, zero-cost abstractions, and seamless C/C+
 ---
 
 ## Language Overview
+
+### AI Model Integration
+
+```arc
+import "ai"
+import "io"
+
+func main() {
+    // Load model from file
+    let model = ai.load_model("models/model-7b.gguf")
+    defer model.free()
+    
+    // Configure inference
+    let config = ai.InferenceConfig{
+        temperature: 0.7,
+        top_p: 0.9,
+        max_tokens: 512
+    }
+    
+    // Run inference
+    let prompt = "Explain quantum computing in simple terms:"
+    let tokens = model.tokenize(prompt)
+    
+    for token in model.generate(tokens, config) {
+        let text = model.decode(token)
+        io.printf("%s", text)
+    }
+}
+```
 
 ### Type System
 
