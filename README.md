@@ -2,7 +2,7 @@
   <img src="./.github/arc_logo.jpeg" alt="Arc Language" width="200px">
 </h1>
 
-<h4 align="center">Systems Programming Language<br>Multi-target compilation from a single codebase</h4>
+<h4 align="center">Systems Programming Language<br>High Performance, Native Code, Modern Syntax</h4>
 
 <p align="center">
     <img src="https://img.shields.io/badge/Version-2.0-blue" alt="Version">
@@ -14,43 +14,70 @@
 
 ## What is Arc?
 
-Arc is a systems programming language for building native applications, servers, kernel drivers, and high-performance compute workloads including AI model inference and training.
+Arc is a modern systems programming language for building native applications, servers, CLI tools, and kernel drivers with C-level performance.
 
-The language compiles to native code for multiple hardware targets. Write code once and compile it for CPUs, GPUs, TPUs, or custom accelerators.
+Arc provides manual memory management, zero-cost abstractions, and seamless C/C++/Objective-C interoperability. The language compiles to efficient native code for x86-64, ARM64, and other CPU architectures.
 
-Arc provides direct hardware access, manual memory management, and C/C++/Objective-C interoperability.
+**Hardware acceleration built-in:** When you need it, Arc functions can also compile to GPUs and TPUs without leaving your codebase or learning new APIs.
 
 ---
 
 ## Language Overview
 
-### AI Model Integration
+### Type System
 
 ```arc
-import "ai"
-import "io"
+// Fixed-width integers
+let i: int32 = -500
+let u: uint64 = 10000
 
-func main() {
-    // Load model from file
-    let model = ai.load_model("models/model-7b.gguf")
-    defer model.free()
-    
-    // Configure inference
-    let config = ai.InferenceConfig{
-        temperature: 0.7,
-        top_p: 0.9,
-        max_tokens: 512
-    }
-    
-    // Run inference
-    let prompt = "Explain quantum computing in simple terms:"
-    let tokens = model.tokenize(prompt)
-    
-    for token in model.generate(tokens, config) {
-        let text = model.decode(token)
-        io.printf("%s", text)
-    }
+// Pointer-sized integers
+let size: usize = 100      // Unsigned (array indexing, sizes)
+let offset: isize = -4     // Signed (offsets)
+
+// Floating point
+let f: float32 = 3.14
+let d: float64 = 2.71828
+
+// Pointers and references
+let ptr: *int32 = &value
+let ref: &int32 = value
+
+// Structs (value types)
+struct Point {
+    x: int32
+    y: int32
 }
+
+// Classes (reference types)
+class Client {
+    name: string
+    port: int32
+}
+```
+
+### Memory Management
+
+Arc uses manual memory management with explicit allocation and deallocation:
+
+```arc
+// Stack allocation
+let buffer = alloca<byte>(4096)
+memset(buffer, 0, 4096)
+
+// Heap allocation (via FFI)
+extern c {
+    func malloc(usize) *void
+    func free(*void) void
+}
+
+let ptr = malloc(1024)
+defer free(ptr)  // Cleanup on scope exit
+
+// Direct pointer manipulation
+let next = ptr + 1
+let value = *ptr
+*ptr = 42
 ```
 
 ### Foreign Function Interface
@@ -84,38 +111,6 @@ extern objc {
             NSRect, uint64, uint64, bool
         ) *NSWindow
     }
-}
-```
-
-### Type System
-
-```arc
-// Fixed-width integers
-let i: int32 = -500
-let u: uint64 = 10000
-
-// Pointer-sized integers
-let size: usize = 100      // Unsigned (array indexing, sizes)
-let offset: isize = -4     // Signed (offsets)
-
-// Floating point
-let f: float32 = 3.14
-let d: float64 = 2.71828
-
-// Pointers and references
-let ptr: *int32 = &value
-let ref: &int32 = value
-
-// Structs (value types)
-struct Point {
-    x: int32
-    y: int32
-}
-
-// Classes (reference types)
-class Client {
-    name: string
-    port: int32
 }
 ```
 
@@ -153,94 +148,9 @@ struct Box<T> {
 }
 ```
 
-### Memory Management
-
-Arc uses manual memory management with explicit allocation and deallocation:
-
-```arc
-// Stack allocation
-let buffer = alloca<byte>(4096)
-memset(buffer, 0, 4096)
-
-// Heap allocation (via FFI)
-extern c {
-    func malloc(usize) *void
-    func free(*void) void
-}
-
-let ptr = malloc(1024)
-defer free(ptr)  // Cleanup on scope exit
-
-// Direct pointer manipulation
-let next = ptr + 1
-let value = *ptr
-*ptr = 42
-```
-
-### Multi-Target Compilation
-
-Functions can be compiled for different hardware using target annotations:
-
-```arc
-// CPU target (default)
-func process_data(data: *float32, size: usize) {
-    for let i: usize = 0; i < size; i++ {
-        data[i] = data[i] * 2.0
-    }
-}
-
-// GPU target
-async func process_gpu<gpu.cuda>(data: *float32, size: usize) {
-    let idx = gpu.thread_id()
-    if idx < size {
-        data[idx] = data[idx] * 2.0
-    }
-}
-
-// TPU target
-async func process_tpu<tpu>(data: Tensor) Tensor {
-    return data.multiply(2.0)
-}
-```
-
 ---
 
 ## Example Programs
-
-### AI Model Inference
-
-```arc
-namespace main
-
-import "ai"
-import "io"
-
-func main() {
-    // Load model
-    let model = ai.load_model("models/model-7b.gguf")
-    defer model.free()
-    
-    // Configure
-    let config = ai.InferenceConfig{
-        temperature: 0.7,
-        top_p: 0.9,
-        max_tokens: 512
-    }
-    
-    // Generate
-    let prompt = "Explain quantum computing:"
-    let tokens = model.tokenize(prompt)
-    
-    io.printf("Generating...\n")
-    
-    for token in model.generate(tokens, config) {
-        let text = model.decode(token)
-        io.printf("%s", text)
-    }
-    
-    io.printf("\n")
-}
-```
 
 ### HTTP Server
 
@@ -266,35 +176,6 @@ async func main() {
         let (conn, addr) = await listener.accept()
         spawn handle_request(conn)
     }
-}
-```
-
-### Native GUI Application
-
-```arc
-namespace main
-
-import objc "AppKit"
-
-class AppDelegate: NSApplicationDelegate {
-    window: *NSWindow
-    
-    func applicationDidFinishLaunching(self d: *AppDelegate, notif: *NSNotification) {
-        let rect = NSMakeRect(0, 0, 800, 600)
-        let style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
-        
-        d.window = NSWindow.new(rect, style, NSBackingStoreBuffered, false)
-        d.window.title = NSString.from("Arc Application")
-        d.window.center()
-        d.window.makeKeyAndOrderFront(null)
-    }
-}
-
-func main() {
-    let app = NSApplication.sharedApplication()
-    let delegate = AppDelegate{}
-    app.delegate = &delegate
-    app.run()
 }
 ```
 
@@ -337,6 +218,35 @@ func main() {
 }
 ```
 
+### Native GUI Application
+
+```arc
+namespace main
+
+import objc "AppKit"
+
+class AppDelegate: NSApplicationDelegate {
+    window: *NSWindow
+    
+    func applicationDidFinishLaunching(self d: *AppDelegate, notif: *NSNotification) {
+        let rect = NSMakeRect(0, 0, 800, 600)
+        let style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
+        
+        d.window = NSWindow.new(rect, style, NSBackingStoreBuffered, false)
+        d.window.title = NSString.from("Arc Application")
+        d.window.center()
+        d.window.makeKeyAndOrderFront(null)
+    }
+}
+
+func main() {
+    let app = NSApplication.sharedApplication()
+    let delegate = AppDelegate{}
+    app.delegate = &delegate
+    app.run()
+}
+```
+
 ### Kernel Module
 
 ```arc
@@ -361,6 +271,92 @@ func init_module() int32 {
 
 func cleanup_module() {
     log.info("Driver unloading")
+}
+```
+
+### AI Model Inference
+
+```arc
+namespace main
+
+import "ai"
+import "io"
+
+func main() {
+    // Load model
+    let model = ai.load_model("models/model-7b.gguf")
+    defer model.free()
+    
+    // Configure
+    let config = ai.InferenceConfig{
+        temperature: 0.7,
+        top_p: 0.9,
+        max_tokens: 512
+    }
+    
+    // Generate
+    let prompt = "Explain quantum computing:"
+    let tokens = model.tokenize(prompt)
+    
+    io.printf("Generating...\n")
+    
+    for token in model.generate(tokens, config) {
+        let text = model.decode(token)
+        io.printf("%s", text)
+    }
+    
+    io.printf("\n")
+}
+```
+
+---
+
+## Hardware Acceleration
+
+Arc can compile functions to run on specialized hardware when you need maximum performance:
+
+```arc
+namespace compute
+
+import "ai"
+
+// CPU version (default)
+func process_data(data: *float32, size: usize) {
+    for let i: usize = 0; i < size; i++ {
+        data[i] = data[i] * 2.0
+    }
+}
+
+// GPU version
+async func process_gpu<gpu.cuda>(data: *float32, size: usize) {
+    let idx = gpu.thread_id()
+    if idx < size {
+        data[idx] = data[idx] * 2.0
+    }
+}
+
+// TPU version
+async func process_tpu<tpu>(data: Tensor) Tensor {
+    return data.multiply(2.0)
+}
+
+// Train model on GPU
+async func train<gpu.cuda>(model: *ai.Model, data: *Tensor) {
+    for epoch in 0..100 {
+        let loss = model.forward(data)
+        model.backward(loss)
+        model.step()
+    }
+}
+
+func main() {
+    let model = ai.load_model("models/model-13b.gguf")
+    let data = ai.load_tensor("training_data.bin")
+    
+    // Train on NVIDIA GPU
+    await train<gpu.cuda>(&model, &data)
+    
+    io.printf("Training complete\n")
 }
 ```
 
@@ -454,54 +450,6 @@ cd arc-lang/cmd
 ```bash
 ./arc build main.ax -o main
 ./main
-```
-
----
-
-## GPU/TPU Programming
-
-Arc can compile functions to run on specialized hardware:
-
-```arc
-namespace compute
-
-import "ai"
-
-// Train model on GPU
-async func train<gpu.cuda>(model: *ai.Model, data: *Tensor) {
-    for epoch in 0..100 {
-        let loss = model.forward(data)
-        model.backward(loss)
-        model.step()
-    }
-}
-
-// Deploy to TPU for inference
-async func inference<tpu>(model: *ai.Model, input: *Tensor) *Tensor {
-    return model.forward(input)
-}
-
-// Custom GPU kernel
-async func vector_add<gpu.cuda>(a: *float32, b: *float32, c: *float32, n: usize) {
-    let idx = gpu.thread_id()
-    if idx < n {
-        c[idx] = a[idx] + b[idx]
-    }
-}
-
-func main() {
-    let model = ai.load_model("models/model-13b.gguf")
-    let data = ai.load_tensor("training_data.bin")
-    
-    // Train on NVIDIA GPU
-    await train<gpu.cuda>(&model, &data)
-    
-    // Deploy to Google TPU
-    let input = ai.load_tensor("input.bin")
-    let output = await inference<tpu>(&model, &input)
-    
-    io.printf("Result: %f\n", output.data[0])
-}
 ```
 
 ---
