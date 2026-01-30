@@ -16,7 +16,7 @@
 
 Arc is a modern systems programming language for building native applications, servers, CLI tools, AI model inference, and kernel drivers with high performance.
 
-Arc provides manual memory management, zero-cost abstractions, and seamless C/C++/Objective-C interoperability. The language compiles to efficient native code for x86-64, ARM64, and other CPU architectures.
+Arc uses automatic reference counting for memory safety, provides zero-cost abstractions, and seamless C/C++/Objective-C interoperability. The language compiles to efficient native code for x86-64, ARM64, and other CPU architectures.
 
 **Hardware acceleration built-in:** When you need it, Arc functions can also compile to GPUs and TPUs without leaving your codebase or learning new APIs.
 
