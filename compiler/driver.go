@@ -5,11 +5,11 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	//"strings"
 
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/codegen/codegen"
 	"github.com/arc-language/arc-lang/linker/elf"
+	"github.com/arc-language/upkg" // Import upkg to find library paths
 )
 
 // Run is the main entry point for the compiler library.
@@ -68,7 +68,24 @@ func (c *Compiler) emitExecutable(m *ir.Module, cfg Config) error {
 	}
 
 	// Step 3: Resolve External Libraries
-	searchPaths := append(cfg.LibraryPaths,
+
+	// Get upkg configuration to find where packages are installed
+	upkgConfig := upkg.DefaultConfig()
+	installPath := upkgConfig.InstallPath
+
+	// Build search paths: User Flags -> Upkg Paths -> System Paths
+	searchPaths := cfg.LibraryPaths
+	
+	// Add upkg paths (check various common layouts: lib, usr/lib, lib64)
+	searchPaths = append(searchPaths,
+		filepath.Join(installPath, "lib"),
+		filepath.Join(installPath, "usr", "lib"),
+		filepath.Join(installPath, "usr", "lib64"),
+		filepath.Join(installPath, "lib64"),
+	)
+
+	// Add standard system paths (Linux fallback)
+	searchPaths = append(searchPaths,
 		"/usr/lib/x86_64-linux-gnu",
 		"/lib/x86_64-linux-gnu",
 		"/usr/lib64",
@@ -143,7 +160,7 @@ func (c *Compiler) emitExecutable(m *ir.Module, cfg Config) error {
 		}
 
 		if !found {
-			return fmt.Errorf("library -l%s not found in search paths", lib)
+			return fmt.Errorf("library -l%s not found in search paths (checked upkg: %s)", lib, installPath)
 		}
 	}
 

@@ -12,7 +12,7 @@ import (
 	"github.com/arc-language/arc-lang/diagnostic"
 	"github.com/arc-language/arc-lang/irgen"
 	"github.com/arc-language/arc-lang/optimizer"
-	"github.com/arc-language/arc-lang/pkg" // Import the new pkg manager
+	"github.com/arc-language/arc-lang/pkg" // Uses the new manager logic
 	"github.com/arc-language/arc-lang/semantics"
 	"github.com/arc-language/arc-lang/symbol"
 )
@@ -28,7 +28,7 @@ func NewCompiler() *Compiler {
 	return &Compiler{
 		logger:         context.NewLogger("[Driver]"),
 		Importer:       NewImporter(),
-		PackageManager: pkg.NewPackageManager(), // Initialize pointing to ~/.arc/
+		PackageManager: pkg.NewPackageManager(), // Initialize pointing to ~/.upkg/
 	}
 }
 
@@ -82,44 +82,58 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 				importPath = importPath[1 : len(importPath)-1]
 			}
 
-			// 2. Detect Language Prefix (e.g., import c "...", import cpp "...")
+			// 2. Detect Language Prefix (e.g., import c "sqlite", import cpp "...")
 			lang := ""
 			if decl.IDENTIFIER() != nil {
 				lang = decl.IDENTIFIER().GetText()
 			}
 
-			// 3. Ensure Package is Downloaded (Git, Nix, Brew)
-			// If it's a remote package, this returns the path to ~/.arc/dest
-			// If it's local/system, it returns empty string
+			// 3. Ensure Package is Installed
+			// This delegates to pkg.Manager:
+			// - If lang is set ("c", "cpp") -> calls upkg to install system binary/headers
+			// - If lang is empty and path is URL -> calls git clone
+			// - If lang is empty and path is local -> returns empty string (no download needed)
 			downloadedPath, err := c.PackageManager.Ensure(lang, importPath)
 			if err != nil {
 				c.logger.Error("Failed to resolve package '%s': %v", importPath, err)
 				return nil, fmt.Errorf("dependency resolution failed")
 			}
 
-			// 4. Determine Absolute Directory to scan
-			var absDir string
-			if downloadedPath != "" {
-				// Use the path provided by the package manager
-				absDir = downloadedPath
-			} else {
-				// Local path resolution (relative to current source file)
-				absDir, err = c.Importer.ResolveImport(currentPath, importPath)
-			}
+			// 4. Handle Source Files (Only for Arc imports)
+			if lang == "" {
+				var absDir string
 
-			// 5. Scan directory for source files (.ax)
-			if err == nil {
-				sources, _ := c.Importer.GetSourceFiles(absDir)
-				for _, src := range sources {
-					if !processed[src] {
-						fileQueue = append(fileQueue, src)
+				if downloadedPath != "" {
+					// It was a remote module (github, etc) downloaded to ~/.upkg/src/...
+					absDir = downloadedPath
+				} else {
+					// It's likely a local relative import (e.g. import "./utils")
+					absDir, err = c.Importer.ResolveImport(currentPath, importPath)
+					if err != nil {
+						c.logger.Error("Could not resolve local import '%s': %v", importPath, err)
+						continue
+					}
+				}
+
+				// Scan directory for .ax source files and add to queue
+				if absDir != "" {
+					sources, err := c.Importer.GetSourceFiles(absDir)
+					if err != nil {
+						c.logger.Debug("Warning: No sources found in resolved path %s", absDir)
+					}
+					for _, src := range sources {
+						if !processed[src] {
+							fileQueue = append(fileQueue, src)
+						}
 					}
 				}
 			} else {
-				// Only error if it wasn't a system library import (like "c" lib) which might not have source files
-				if downloadedPath == "" && !filepath.IsAbs(importPath) {
-					c.logger.Debug("Could not resolve local import '%s' - assuming system library", importPath)
-				}
+				// 5. Handle Native Imports (C/C++)
+				// We don't scan for source files here.
+				// The PackageManager has ensured the binary/headers exist in ~/.upkg/.
+				// The semantic analyzer (Phase 2) will validate external symbols,
+				// and the Driver will handle linking (Phase 4/Linker).
+				c.logger.Debug("Resolved Native Dependency: %s (Language: %s)", importPath, lang)
 			}
 		}
 	}
