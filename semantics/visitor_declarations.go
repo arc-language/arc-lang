@@ -1,5 +1,3 @@
---- START OF FILE text/plain ---
-
 package semantics
 
 import (
