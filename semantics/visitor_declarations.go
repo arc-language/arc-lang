@@ -375,8 +375,14 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 	}
 
 	if isMethod {
+		nameToUse := parentName
 		if a.currentNamespacePrefix != "" {
-			fullName = a.currentNamespacePrefix + "." + parentName + "_" + rawName
+			// Check if parentName already starts with namespace prefix
+			prefix := a.currentNamespacePrefix + "."
+			if len(parentName) > len(prefix) && parentName[:len(prefix)] == prefix {
+				nameToUse = parentName[len(prefix):]
+			}
+			fullName = a.currentNamespacePrefix + "." + nameToUse + "_" + rawName
 		} else {
 			fullName = parentName + "_" + rawName
 		}
