@@ -12,28 +12,34 @@ import (
 	"github.com/arc-language/arc-lang/diagnostic"
 	"github.com/arc-language/arc-lang/irgen"
 	"github.com/arc-language/arc-lang/optimizer"
-	"github.com/arc-language/arc-lang/pkg" // Uses the new manager logic
+	"github.com/arc-language/arc-lang/pkg"
 	"github.com/arc-language/arc-lang/semantics"
 	"github.com/arc-language/arc-lang/symbol"
+	"github.com/arc-language/upkg" // Import upkg to access the Registry
 )
 
 // Compiler holds the context for the compilation process
 type Compiler struct {
 	logger         *context.Logger
 	Importer       *Importer
-	PackageManager *pkg.PackageManager // Handle package downloads
+	PackageManager *pkg.PackageManager
+	
+	// NativeLibs holds the list of libraries discovered from 'import c "..."'
+	// e.g. ["ssl", "crypto", "sqlite3"]
+	NativeLibs []string
 }
 
 func NewCompiler() *Compiler {
 	return &Compiler{
 		logger:         context.NewLogger("[Driver]"),
 		Importer:       NewImporter(),
-		PackageManager: pkg.NewPackageManager(), // Initialize pointing to ~/.upkg/
+		PackageManager: pkg.NewPackageManager(),
+		NativeLibs:     make([]string, 0),
 	}
 }
 
 // CompileProject handles the frontend pipeline:
-// 1. Discovery (Parsing & Downloading Dependencies)
+// 1. Discovery (Parsing & Downloading Dependencies & Registry Lookup)
 // 2. Semantics
 // 3. IR Gen
 // 4. Optimization
@@ -89,10 +95,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 			}
 
 			// 3. Ensure Package is Installed
-			// This delegates to pkg.Manager:
-			// - If lang is set ("c", "cpp") -> calls upkg to install system binary/headers
-			// - If lang is empty and path is URL -> calls git clone
-			// - If lang is empty and path is local -> returns empty string (no download needed)
 			downloadedPath, err := c.PackageManager.Ensure(lang, importPath)
 			if err != nil {
 				c.logger.Error("Failed to resolve package '%s': %v", importPath, err)
@@ -128,12 +130,29 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 					}
 				}
 			} else {
-				// 5. Handle Native Imports (C/C++)
-				// We don't scan for source files here.
-				// The PackageManager has ensured the binary/headers exist in ~/.upkg/.
-				// The semantic analyzer (Phase 2) will validate external symbols,
-				// and the Driver will handle linking (Phase 4/Linker).
+				// 5. Handle Native Imports (C/C++) - Auto-Linker Logic
 				c.logger.Debug("Resolved Native Dependency: %s (Language: %s)", importPath, lang)
+				
+				// Initialize upkg temporarily to query the registry
+				// We need to know which libraries to link (e.g., "openssl" -> ["ssl", "crypto"])
+				upkgCfg := upkg.DefaultConfig()
+				mgr, err := upkg.NewManager(upkg.BackendAuto, upkgCfg)
+				if err == nil {
+					// Try to get registry info
+					entry, err := mgr.GetRegistryEntry(importPath)
+					if err == nil && len(entry.Libs) > 0 {
+						c.logger.Info("Auto-detected libraries for '%s': %v", importPath, entry.Libs)
+						c.NativeLibs = append(c.NativeLibs, entry.Libs...)
+					} else {
+						// Fallback: If no registry entry (maybe system installed manually), 
+						// assume the package name is the library name.
+						c.logger.Debug("No registry info for '%s', assuming library name match", importPath)
+						c.NativeLibs = append(c.NativeLibs, importPath)
+					}
+					mgr.Close()
+				} else {
+					c.logger.Error("Failed to init upkg for registry lookup: %v", err)
+				}
 			}
 		}
 	}

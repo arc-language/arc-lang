@@ -9,7 +9,7 @@ import (
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/codegen/codegen"
 	"github.com/arc-language/arc-lang/linker/elf"
-	"github.com/arc-language/upkg" // Import upkg to find library paths
+	"github.com/arc-language/upkg"
 )
 
 // Run is the main entry point for the compiler library.
@@ -18,6 +18,7 @@ func (c *Compiler) Run(cfg Config) error {
 	c.logger.Info("Compiling %s -> %s", cfg.InputFile, cfg.OutputFile)
 
 	// 1. Compile to IR
+	// This populates c.NativeLibs with auto-discovered libraries from upkg
 	module, err := c.CompileProject(cfg.InputFile)
 	if err != nil {
 		return fmt.Errorf("compilation failed")
@@ -96,7 +97,32 @@ func (c *Compiler) emitExecutable(m *ir.Module, cfg Config) error {
 
 	ldScriptRegex := regexp.MustCompile(`(?:GROUP|INPUT)\s*\(\s*([^\s)]+)`)
 
+	// Combine Manual Libraries (from flags) and Auto Libraries (from imports)
+	// Deduplicate to avoid linking the same library twice
+	libSet := make(map[string]bool)
+	var libsToLink []string
+
+	// Process manual libs first
 	for _, lib := range cfg.Libraries {
+		if !libSet[lib] {
+			libSet[lib] = true
+			libsToLink = append(libsToLink, lib)
+		}
+	}
+
+	// Process auto-discovered libs (from upkg registry)
+	for _, lib := range c.NativeLibs {
+		if !libSet[lib] {
+			libSet[lib] = true
+			libsToLink = append(libsToLink, lib)
+		}
+	}
+
+	if len(libsToLink) > 0 {
+		c.logger.Info("Linking libraries: %v", libsToLink)
+	}
+
+	for _, lib := range libsToLink {
 		found := false
 
 		for _, dir := range searchPaths {
