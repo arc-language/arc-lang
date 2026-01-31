@@ -19,11 +19,7 @@ type PackageManager struct {
 
 // NewPackageManager creates a manager using upkg's default configuration
 func NewPackageManager() *PackageManager {
-	// This defaults to ~/.upkg (or ~/.cache/upkg depending on implementation)
-	// We want to ensure we use the install path for stability
 	cfg := upkg.DefaultConfig()
-	
-	// Ensure root dir exists
 	os.MkdirAll(cfg.InstallPath, 0755)
 
 	return &PackageManager{
@@ -32,72 +28,85 @@ func NewPackageManager() *PackageManager {
 }
 
 // Ensure checks if a package exists, and downloads it if missing.
-// lang: "c", "cpp" (implies system lib), or "" (implies arc module)
-// importPath: "sqlite", "openssl", "github.com/user/repo"
-// Returns the absolute path to the downloaded package root.
+// lang: "c", "cpp" (system/wrapper), or "" (arc module)
+// importPath: "sqlite", "github.com/user/repo", "github.com/user/repo/folder"
+// Returns the absolute path to the downloaded package root (or subdir).
 func (pm *PackageManager) Ensure(lang string, importPath string) (string, error) {
-	// Clean the path
 	importPath = strings.Trim(importPath, "\"")
 
-	// Strategy 1: Arc Source Modules (Git)
-	// Identified by having a domain structure (dot in the first segment) or specific protocol
-	if lang == "" && (strings.Contains(importPath, ".") || strings.Contains(importPath, "/")) {
+	// Detect if this is a Remote/Git import (contains domain or slash)
+	// Works for both Arc modules and C wrappers (import c "github.com/...")
+	isRemote := strings.Contains(importPath, ".") || strings.Contains(importPath, "/")
+
+	if isRemote {
 		return pm.ensureGitModule(importPath)
 	}
 
 	// Strategy 2: System Libraries (upkg)
-	// Used for 'import c "sqlite"' or 'import cpp "openssl"'
+	// Used for 'import c "sqlite"' or 'import c "libc"'
 	return pm.ensureSystemPackage(importPath)
 }
 
-// ensureGitModule handles "github.com/user/repo"
+// ensureGitModule handles "github.com/user/repo" and "github.com/user/repo/subdir"
 func (pm *PackageManager) ensureGitModule(importPath string) (string, error) {
-	// Store source code in ~/.upkg/src/github.com/user/repo
-	targetDir := filepath.Join(pm.Config.InstallPath, "src", importPath)
-
-	if _, err := os.Stat(targetDir); err == nil {
-		return targetDir, nil
-	}
-
-	fmt.Printf("[Pkg] Cloning %s...\n", importPath)
+	// Heuristic: Assume first 3 components are the repo (host/user/repo)
+	// e.g. github.com/johndoe/wrapper/lib -> repo: github.com/johndoe/wrapper
+	parts := strings.Split(importPath, "/")
 	
-	// Assuming HTTPS. In a real scenario, might handle SSH or other protocols.
-	url := "https://" + importPath
-	if !strings.HasPrefix(importPath, "http") {
-		url = "https://" + importPath
+	var repoPath, subDir string
+
+	if len(parts) >= 3 {
+		repoPath = strings.Join(parts[:3], "/")
+		if len(parts) > 3 {
+			subDir = filepath.Join(parts[3:]...)
+		}
+	} else {
+		// Fallback for things like "localhost/repo"
+		repoPath = importPath
 	}
 
-	_, err := git.PlainClone(targetDir, false, &git.CloneOptions{
-		URL:      url,
-		Depth:    1,
-		Progress: os.Stdout,
-	})
-	if err != nil {
-		os.RemoveAll(targetDir) // Clean up partials
-		return "", fmt.Errorf("git clone failed for %s: %w", importPath, err)
+	// Store source code in ~/.upkg/src/github.com/user/repo
+	targetRepoDir := filepath.Join(pm.Config.InstallPath, "src", repoPath)
+
+	// Check if repo exists
+	if _, err := os.Stat(targetRepoDir); os.IsNotExist(err) {
+		fmt.Printf("[Pkg] Cloning %s...\n", repoPath)
+		
+		url := "https://" + repoPath
+		if !strings.HasPrefix(repoPath, "http") {
+			url = "https://" + repoPath
+		}
+
+		_, err := git.PlainClone(targetRepoDir, false, &git.CloneOptions{
+			URL:      url,
+			Depth:    1,
+			Progress: os.Stdout,
+		})
+		if err != nil {
+			os.RemoveAll(targetRepoDir) // Clean up partials
+			return "", fmt.Errorf("git clone failed for %s: %w", repoPath, err)
+		}
 	}
 
-	return targetDir, nil
+	// Return the specific subdirectory inside the cloned repo
+	// If subDir is empty, this just returns the repo root
+	fullPath := filepath.Join(targetRepoDir, subDir)
+	return fullPath, nil
 }
 
 // ensureSystemPackage handles "sqlite", "curl" via upkg
 func (pm *PackageManager) ensureSystemPackage(name string) (string, error) {
-	// Initialize upkg with Auto backend (detects apt, brew, winget, etc.)
+	// Initialize upkg with Auto backend
 	mgr, err := upkg.NewManager(upkg.BackendAuto, pm.Config)
 	if err != nil {
 		return "", fmt.Errorf("failed to initialize upkg: %w", err)
 	}
 	defer mgr.Close()
 
-	// Check if already installed? 
-	// For now, we rely on upkg.Download's idempotency or just try to download.
-	// In the future, upkg.IsInstalled(name) would be better.
-
 	ctx := context.Background()
 	fmt.Printf("[Pkg] Resolving system dependency: %s\n", name)
 
 	// Download/Install
-	// Auto backend resolves "sqlite" -> "libsqlite3-dev" (apt) or "sqlite" (brew)
 	pkg := &upkg.Package{Name: name}
 	opts := &upkg.DownloadOptions{
 		Extract:    boolPtr(true),
@@ -108,8 +117,6 @@ func (pm *PackageManager) ensureSystemPackage(name string) (string, error) {
 		return "", fmt.Errorf("upkg failed to install %s: %w", name, err)
 	}
 
-	// Return the install path root. 
-	// Compiler/Linker will look for /lib and /include inside here or in system paths.
 	return pm.Config.InstallPath, nil
 }
 

@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/BurntSushi/toml" // Needed to parse index.toml files
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
@@ -15,7 +17,7 @@ import (
 	"github.com/arc-language/arc-lang/pkg"
 	"github.com/arc-language/arc-lang/semantics"
 	"github.com/arc-language/arc-lang/symbol"
-	"github.com/arc-language/upkg" // Import upkg to access the Registry
+	"github.com/arc-language/upkg"
 )
 
 // Compiler holds the context for the compilation process
@@ -25,7 +27,6 @@ type Compiler struct {
 	PackageManager *pkg.PackageManager
 	
 	// NativeLibs holds the list of libraries discovered from 'import c "..."'
-	// e.g. ["ssl", "crypto", "sqlite3"]
 	NativeLibs []string
 }
 
@@ -38,11 +39,7 @@ func NewCompiler() *Compiler {
 	}
 }
 
-// CompileProject handles the frontend pipeline:
-// 1. Discovery (Parsing & Downloading Dependencies & Registry Lookup)
-// 2. Semantics
-// 3. IR Gen
-// 4. Optimization
+// CompileProject handles the frontend pipeline
 func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	absEntry, err := filepath.Abs(entryFile)
 	if err != nil {
@@ -51,7 +48,7 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 
 	c.logger.Info("Compiling project starting at: %s", absEntry)
 
-	// --- PHASE 1: DISCOVERY (Parsing & Downloading) ---
+	// --- PHASE 1: DISCOVERY ---
 	fileQueue := []string{absEntry}
 	processed := make(map[string]bool)
 
@@ -81,35 +78,30 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 				continue
 			}
 
-			// 1. Clean Import Path (remove quotes)
 			rawImport := decl.STRING_LITERAL().GetText()
 			importPath := rawImport
 			if len(importPath) >= 2 {
 				importPath = importPath[1 : len(importPath)-1]
 			}
 
-			// 2. Detect Language Prefix (e.g., import c "sqlite", import cpp "...")
 			lang := ""
 			if decl.IDENTIFIER() != nil {
 				lang = decl.IDENTIFIER().GetText()
 			}
 
-			// 3. Ensure Package is Installed
+			// Ensure Package is Installed (Clone Git Repo or Check Registry)
 			downloadedPath, err := c.PackageManager.Ensure(lang, importPath)
 			if err != nil {
 				c.logger.Error("Failed to resolve package '%s': %v", importPath, err)
 				return nil, fmt.Errorf("dependency resolution failed")
 			}
 
-			// 4. Handle Source Files (Only for Arc imports)
+			// Handle Arc Imports (Source Scan)
 			if lang == "" {
 				var absDir string
-
 				if downloadedPath != "" {
-					// It was a remote module (github, etc) downloaded to ~/.upkg/src/...
 					absDir = downloadedPath
 				} else {
-					// It's likely a local relative import (e.g. import "./utils")
 					absDir, err = c.Importer.ResolveImport(currentPath, importPath)
 					if err != nil {
 						c.logger.Error("Could not resolve local import '%s': %v", importPath, err)
@@ -117,7 +109,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 					}
 				}
 
-				// Scan directory for .ax source files and add to queue
 				if absDir != "" {
 					sources, err := c.Importer.GetSourceFiles(absDir)
 					if err != nil {
@@ -130,28 +121,44 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 					}
 				}
 			} else {
-				// 5. Handle Native Imports (C/C++) - Auto-Linker Logic
+				// Handle Native Imports (C/C++)
 				c.logger.Debug("Resolved Native Dependency: %s (Language: %s)", importPath, lang)
 				
-				// Initialize upkg temporarily to query the registry
-				// We need to know which libraries to link (e.g., "openssl" -> ["ssl", "crypto"])
-				upkgCfg := upkg.DefaultConfig()
-				mgr, err := upkg.NewManager(upkg.BackendAuto, upkgCfg)
-				if err == nil {
-					// Try to get registry info
-					entry, err := mgr.GetRegistryEntry(importPath)
-					if err == nil && len(entry.Libs) > 0 {
-						c.logger.Info("Auto-detected libraries for '%s': %v", importPath, entry.Libs)
-						c.NativeLibs = append(c.NativeLibs, entry.Libs...)
+				// CASE A: Remote/Git Wrapper (contains "/" or ".")
+				if strings.Contains(importPath, "/") || strings.Contains(importPath, ".") {
+					// We look for index.toml in the downloaded directory
+					tomlPath := filepath.Join(downloadedPath, "index.toml")
+					
+					if _, err := os.Stat(tomlPath); err == nil {
+						var entry upkg.RegistryEntry
+						if _, err := toml.DecodeFile(tomlPath, &entry); err != nil {
+							c.logger.Error("Failed to parse index.toml in %s: %v", tomlPath, err)
+						} else {
+							if len(entry.Libs) > 0 {
+								c.logger.Info("Loaded custom libs from %s: %v", importPath, entry.Libs)
+								c.NativeLibs = append(c.NativeLibs, entry.Libs...)
+							}
+						}
 					} else {
-						// Fallback: If no registry entry (maybe system installed manually), 
-						// assume the package name is the library name.
-						c.logger.Debug("No registry info for '%s', assuming library name match", importPath)
-						c.NativeLibs = append(c.NativeLibs, importPath)
+						c.logger.Error("Native import '%s' resolved to %s but no index.toml found", importPath, downloadedPath)
 					}
-					mgr.Close()
+
 				} else {
-					c.logger.Error("Failed to init upkg for registry lookup: %v", err)
+					// CASE B: System Package (e.g. "sqlite3") - Use Registry
+					upkgCfg := upkg.DefaultConfig()
+					mgr, err := upkg.NewManager(upkg.BackendAuto, upkgCfg)
+					if err == nil {
+						entry, err := mgr.GetRegistryEntry(importPath)
+						if err == nil && len(entry.Libs) > 0 {
+							c.logger.Info("Auto-detected libraries for '%s': %v", importPath, entry.Libs)
+							c.NativeLibs = append(c.NativeLibs, entry.Libs...)
+						} else {
+							// Fallback: If no registry entry, assume package name == lib name
+							c.logger.Debug("No registry info for '%s', assuming library name match", importPath)
+							c.NativeLibs = append(c.NativeLibs, importPath)
+						}
+						mgr.Close()
+					}
 				}
 			}
 		}
@@ -169,7 +176,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	}
 	semanticErrors := diagnostic.NewBag()
 
-	// --- PHASE 2.0: TYPE DISCOVERY ---
 	c.logger.Debug("Phase 2.0: Type Discovery")
 	for _, unit := range units {
 		analyzer := semantics.NewAnalyzer(globalScope, unit.Path, semanticErrors)
@@ -177,7 +183,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 		analyzer.Analyze(unit.Tree, analysisRes)
 	}
 
-	// --- PHASE 2.1: DECLARATION SCAN ---
 	c.logger.Debug("Phase 2.1: Semantic Declarations")
 	for _, unit := range units {
 		analyzer := semantics.NewAnalyzer(globalScope, unit.Path, semanticErrors)
@@ -185,7 +190,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 		analyzer.Analyze(unit.Tree, analysisRes)
 	}
 
-	// --- PHASE 2.2: BODY ANALYSIS ---
 	c.logger.Debug("Phase 2.2: Semantic Bodies")
 	for _, unit := range units {
 		analyzer := semantics.NewAnalyzer(globalScope, unit.Path, semanticErrors)
