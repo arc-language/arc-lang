@@ -1,3 +1,5 @@
+--- START OF FILE text/plain ---
+
 package semantics
 
 import (
@@ -69,7 +71,7 @@ func (a *Analyzer) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface{
 	return nil
 }
 
-// --- Struct Declaration (FIXED) ---
+// --- Struct Declaration ---
 
 func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
@@ -77,29 +79,21 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 		name = a.currentNamespacePrefix + "." + name
 	}
 
-	// 1. Definition / Registration
-	// We do this check first regardless of Phase. If the symbol doesn't exist,
-	// we create it. This ensures attributes are captured even if Phase 0 is skipped.
 	if _, ok := a.currentScope.ResolveLocal(name); !ok {
-		// Check for @packed attribute
 		isPacked := false
 		for _, attr := range ctx.AllAttribute() {
 			if attr.IDENTIFIER().GetText() == "packed" {
 				isPacked = true
 			}
 		}
-
-		// Define StructType
 		st := types.NewStruct(name, nil, isPacked)
 		a.currentScope.Define(name, symbol.SymType, st)
 	}
 
-	// 2. Field Resolution (Phase 1)
 	if a.Phase == 1 {
 		sym, _ := a.currentScope.Resolve(name)
 		if sym != nil {
 			st := sym.Type.(*types.StructType)
-			// Only parse fields if we haven't already
 			if len(st.Fields) == 0 {
 				var fields []types.Type
 				indices := make(map[string]int)
@@ -118,7 +112,6 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 		}
 	}
 
-	// 3. Method Analysis (Phase 1 & 2)
 	for _, member := range ctx.AllStructMember() {
 		if m := member.FunctionDecl(); m != nil { a.Visit(m) }
 		if m := member.MutatingDecl(); m != nil { a.Visit(m) }
@@ -126,7 +119,7 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 	return nil
 }
 
-// --- Other Declarations (Unchanged but included for context) ---
+// --- Extern Declarations ---
 
 func (a *Analyzer) VisitExternCDecl(ctx *parser.ExternCDeclContext) interface{} {
     if a.Phase == 1 {
@@ -337,6 +330,8 @@ func (a *Analyzer) visitExternCppMethod(ctx *parser.ExternCppMethodDeclContext, 
 	}
 }
 
+// --- Function Declaration (FIXED) ---
+
 func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	rawName := ctx.IDENTIFIER().GetText()
 	
@@ -344,6 +339,7 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 	var parentName string
 	isMethod := false
 
+	// 1. Check if method via nesting
 	if parent := ctx.GetParent(); parent != nil {
 		if _, ok := parent.(*parser.ClassMemberContext); ok {
 			if cd, ok := parent.GetParent().(*parser.ClassDeclContext); ok {
@@ -358,16 +354,52 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 		}
 	}
 
+	// 2. Check if method via 'self' param
 	if !isMethod && ctx.ParameterList() != nil {
 		params := ctx.ParameterList().AllParameter()
-		if len(params) > 0 {
-			if params[0].SELF() != nil {
-				selfType := a.resolveType(params[0].Type_())
-				if ptr, ok := selfType.(*types.PointerType); ok {
-					selfType = ptr.ElementType
+		if len(params) > 0 && params[0].SELF() != nil {
+			// Try resolving the type
+			selfType := a.resolveType(params[0].Type_())
+			
+			// Unwrap pointer
+			if ptr, ok := selfType.(*types.PointerType); ok {
+				selfType = ptr.ElementType
+			}
+
+			if st, ok := selfType.(*types.StructType); ok {
+				parentName = st.Name
+				isMethod = true
+			} else {
+				// Fallback: If type not yet resolved (e.g. file ordering issue),
+				// manually extract the type identifier from the AST.
+				var getTypeName func(parser.ITypeContext) string
+				getTypeName = func(tCtx parser.ITypeContext) string {
+					tc := tCtx.(*parser.TypeContext)
+					if tc.PointerType() != nil {
+						return getTypeName(tc.PointerType().Type_())
+					}
+					if tc.IDENTIFIER() != nil {
+						return tc.IDENTIFIER().GetText()
+					}
+					if tc.QualifiedType() != nil {
+						return tc.QualifiedType().GetText()
+					}
+					return ""
 				}
-				if st, ok := selfType.(*types.StructType); ok {
-					parentName = st.Name
+
+				rawTypeName := getTypeName(params[0].Type_())
+				if rawTypeName != "" {
+					if a.currentNamespacePrefix != "" {
+						prefix := a.currentNamespacePrefix + "."
+						// Avoid double prefixing
+						if len(rawTypeName) > len(prefix) && rawTypeName[:len(prefix)] == prefix {
+							parentName = rawTypeName
+						} else {
+							parentName = a.currentNamespacePrefix + "." + rawTypeName
+						}
+					} else {
+						parentName = rawTypeName
+					}
 					isMethod = true
 				}
 			}
@@ -377,7 +409,6 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 	if isMethod {
 		nameToUse := parentName
 		if a.currentNamespacePrefix != "" {
-			// Check if parentName already starts with namespace prefix
 			prefix := a.currentNamespacePrefix + "."
 			if len(parentName) > len(prefix) && parentName[:len(prefix)] == prefix {
 				nameToUse = parentName[len(prefix):]
@@ -471,6 +502,8 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 	return nil
 }
 
+// --- Mutating Declaration (FIXED) ---
+
 func (a *Analyzer) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface{} {
 	name := ctx.IDENTIFIER(0).GetText()
 	
@@ -483,19 +516,54 @@ func (a *Analyzer) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface{
 
 	var paramTypes []types.Type
 	selfParamName := ctx.IDENTIFIER(1).GetText()
-	selfType := a.resolveType(ctx.Type_()) 
+	
+	// Self Type Resolution with Fallback
+	selfType := a.resolveType(ctx.Type_())
 	paramTypes = append(paramTypes, selfType)
+	
+	var structName string
+	base := selfType
+	if ptr, ok := base.(*types.PointerType); ok { base = ptr.ElementType }
+	
+	if st, ok := base.(*types.StructType); ok {
+		structName = st.Name
+	} else {
+		// Fallback for unresolved type
+		var getTypeName func(parser.ITypeContext) string
+		getTypeName = func(tCtx parser.ITypeContext) string {
+			tc := tCtx.(*parser.TypeContext)
+			if tc.PointerType() != nil {
+				return getTypeName(tc.PointerType().Type_())
+			}
+			if tc.IDENTIFIER() != nil {
+				return tc.IDENTIFIER().GetText()
+			}
+			if tc.QualifiedType() != nil {
+				return tc.QualifiedType().GetText()
+			}
+			return ""
+		}
+		
+		rawTypeName := getTypeName(ctx.Type_())
+		if rawTypeName != "" {
+			if a.currentNamespacePrefix != "" {
+				prefix := a.currentNamespacePrefix + "."
+				if len(rawTypeName) > len(prefix) && rawTypeName[:len(prefix)] == prefix {
+					structName = rawTypeName
+				} else {
+					structName = a.currentNamespacePrefix + "." + rawTypeName
+				}
+			} else {
+				structName = rawTypeName
+			}
+		}
+	}
 	
 	for _, param := range ctx.AllParameter() {
 		pType := a.resolveType(param.Type_())
 		paramTypes = append(paramTypes, pType)
 	}
 
-	var structName string
-	base := selfType
-	if ptr, ok := base.(*types.PointerType); ok { base = ptr.ElementType }
-	if st, ok := base.(*types.StructType); ok { structName = st.Name }
-	
 	fullName := name
 	if structName != "" { fullName = structName + "_" + name }
 
