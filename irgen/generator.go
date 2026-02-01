@@ -74,7 +74,6 @@ func (g *Generator) exitScope() {
 
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
 	// 1. Hardware Markers
-	// We scan generic parameters for tags like <gpu>, <cuda>, etc.
 	isGPU := false
 	isROCm := false
 	isCUDA := false
@@ -124,7 +123,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		for _, param := range ctx.ParameterList().AllParameter() {
 			if param.SELF() != nil {
 				t := g.resolveType(param.Type_())
-				// Unwrap pointer for class types
 				if ptr, ok := t.(*types.PointerType); ok {
 					t = ptr.ElementType
 				}
@@ -143,7 +141,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 
 	if isMethod {
 		// Clean parent name if it already has the namespace prefix.
-		// st.Name from resolveType is fully qualified (e.g. "main.log").
 		shortParent := parentName
 		if g.currentNamespace != "" {
 			prefix := g.currentNamespace + "."
@@ -152,14 +149,16 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			}
 		}
 
-		// Base method name: "log_printf"
+		// Base method name: "DB_close"
 		methodPart := shortParent + "_" + name
 
 		if g.currentNamespace != "" {
-			// Lookup: "main.log_printf" (Matches Semantic Symbol)
+			// Lookup: "sqlite3.DB_close" (matches semantic symbol)
 			lookupName = g.currentNamespace + "." + methodPart
-			// IR: "main.log_printf"
-			irName = g.currentNamespace + "_" + methodPart
+			// IR name uses dot to avoid collision with extern C symbols.
+			// e.g. "sqlite3.DB_close" can never collide with a C symbol
+			// because C identifiers cannot contain dots.
+			irName = g.currentNamespace + "." + methodPart
 		} else {
 			lookupName = methodPart
 			irName = methodPart
@@ -168,7 +167,9 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		// Standard Function
 		if g.currentNamespace != "" && name != "main" {
 			lookupName = g.currentNamespace + "." + name
-			irName = g.currentNamespace + "_" + name
+			// Same dot-based IR name to prevent collision with extern C.
+			// e.g. Arc's "sqlite3.open" vs extern C's "sqlite3_open"
+			irName = g.currentNamespace + "." + name
 		} else {
 			lookupName = name
 			irName = name
@@ -178,7 +179,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 	// 4. Resolve Symbol
 	sym, ok := g.currentScope.Resolve(lookupName)
 	if !ok {
-		// Fallback: Try raw name
 		sym, ok = g.currentScope.Resolve(name)
 	}
 
@@ -216,7 +216,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			fn.CallConv = ir.CC_PTX
 		}
 
-		// Apply Concurrency Flags (Updated for ExecutionStrategy)
+		// Apply Concurrency Flags
 		if es := ctx.ExecutionStrategy(); es != nil {
 			if es.ASYNC() != nil {
 				fn.FuncType.IsAsync = true

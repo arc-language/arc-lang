@@ -378,12 +378,54 @@ func (g *Generator) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface
 		}
 	}
 
-	irName := name
+	// Construct IR name using dot separator to prevent collision
+	// with extern C symbols, matching the same strategy as VisitFunctionDecl.
+	var irName string
 	if parentName != "" {
-		irName = parentName + "_" + name
+		shortParent := parentName
+		if g.currentNamespace != "" {
+			prefix := g.currentNamespace + "."
+			if len(parentName) > len(prefix) && parentName[:len(prefix)] == prefix {
+				shortParent = parentName[len(prefix):]
+			}
+		}
+		if g.currentNamespace != "" {
+			irName = g.currentNamespace + "." + shortParent + "_" + name
+		} else {
+			irName = parentName + "_" + name
+		}
+	} else {
+		if g.currentNamespace != "" {
+			irName = g.currentNamespace + "." + name
+		} else {
+			irName = name
+		}
 	}
 
-	sym, _ := g.currentScope.Resolve(irName)
+	// Construct lookup name (matches semantic symbol key)
+	var lookupName string
+	if parentName != "" {
+		shortParent := parentName
+		if g.currentNamespace != "" {
+			prefix := g.currentNamespace + "."
+			if len(parentName) > len(prefix) && parentName[:len(prefix)] == prefix {
+				shortParent = parentName[len(prefix):]
+			}
+		}
+		if g.currentNamespace != "" {
+			lookupName = g.currentNamespace + "." + shortParent + "_" + name
+		} else {
+			lookupName = parentName + "_" + name
+		}
+	} else {
+		if g.currentNamespace != "" {
+			lookupName = g.currentNamespace + "." + name
+		} else {
+			lookupName = name
+		}
+	}
+
+	sym, _ := g.currentScope.Resolve(lookupName)
 
 	if g.Phase == 1 {
 		var retType types.Type = types.Void
@@ -391,7 +433,6 @@ func (g *Generator) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface
 			if ctx.ReturnType().Type_() != nil {
 				retType = g.resolveType(ctx.ReturnType().Type_())
 			} else if ctx.ReturnType().TypeList() != nil {
-				// Handle tuple return types
 				var tupleTypes []types.Type
 				for _, t := range ctx.ReturnType().TypeList().AllType_() {
 					tupleTypes = append(tupleTypes, g.resolveType(t))
