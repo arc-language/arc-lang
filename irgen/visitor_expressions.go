@@ -1009,7 +1009,10 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 		// Process escape sequences that strconv.Unquote doesn't handle
 		unquoted = processEscapes(unquoted)
 
-		content := unquoted + "\x00"
+		if len(unquoted) == 0 || unquoted[len(unquoted)-1] != 0 {
+			unquoted += "\x00"
+		}
+		content := unquoted
 		arrType := types.NewArray(types.I8, int64(len(content)))
 		var chars []ir.Constant
 		for _, b := range []byte(content) {
