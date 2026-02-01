@@ -278,16 +278,21 @@ func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) 
 // --- Primary Expressions ---
 
 func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) interface{} {
-	if ctx.Literal() != nil { return a.Visit(ctx.Literal()) }
-	if ctx.StructLiteral() != nil { return a.Visit(ctx.StructLiteral()) }
-	
-    // --- ADD THIS BLOCK ---
-    if ctx.AnonymousFuncExpression() != nil {
-        return a.Visit(ctx.AnonymousFuncExpression())
-    }
-	
-	if ctx.SizeofExpression() != nil { return types.U64 }
-	if ctx.AlignofExpression() != nil { return types.U64 }
+	if ctx.Literal() != nil {
+		return a.Visit(ctx.Literal())
+	}
+	if ctx.StructLiteral() != nil {
+		return a.Visit(ctx.StructLiteral())
+	}
+	if ctx.AnonymousFuncExpression() != nil {
+		return a.Visit(ctx.AnonymousFuncExpression())
+	}
+	if ctx.SizeofExpression() != nil {
+		return types.U64
+	}
+	if ctx.AlignofExpression() != nil {
+		return types.U64
+	}
 
 	var name string
 	var isQualified bool
@@ -297,7 +302,9 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 	if ctx.QualifiedIdentifier() != nil {
 		qCtx := ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
 		for i, id := range qCtx.AllIDENTIFIER() {
-			if i > 0 { name += "." }
+			if i > 0 {
+				name += "."
+			}
 			name += id.GetText()
 		}
 		isQualified = true
@@ -307,24 +314,23 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 
 	if name != "" {
 		if ctx.GenericArgs() != nil && !isQualified {
-			// Handle intrinsics with generic arguments
 			args := ctx.GenericArgs().GenericArgList().AllGenericArg()
-
-			if name == "cast" || name == "bit_cast" { 
+			if name == "cast" || name == "bit_cast" {
 				if len(args) > 0 && args[0].Type_() != nil {
 					return a.resolveType(args[0].Type_())
 				}
-				return types.I64 
-			} 
-			if name == "alloca" { 
+				return types.I64
+			}
+			if name == "alloca" {
 				if len(args) > 0 && args[0].Type_() != nil {
 					elemType := a.resolveType(args[0].Type_())
 					return types.NewPointer(elemType)
 				}
-				return types.NewPointer(types.I8) 
+				return types.NewPointer(types.I8)
 			}
 		}
-		
+
+		// --- Direct symbol resolution (non-qualified or full qualified name match) ---
 		s, ok := a.currentScope.Resolve(name)
 		if !ok && a.currentNamespacePrefix != "" && !isQualified {
 			s, ok = a.currentScope.Resolve(a.currentNamespacePrefix + "." + name)
@@ -334,22 +340,21 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 			typ := s.Type
 			if isCall {
 				if ctx.ArgumentList() != nil {
-					for _, arg := range ctx.ArgumentList().AllArgument() { a.Visit(arg.Expression()) }
+					for _, arg := range ctx.ArgumentList().AllArgument() {
+						a.Visit(arg.Expression())
+					}
 				}
 				if fn, ok := typ.(*types.FunctionType); ok {
-					// Async Fix:
 					if fn.IsAsync {
-						// Store the UNWRAPPED return type on the PrimaryExpression node
-						// This covers cases like: await my_async_func()
 						a.nodeTypes[ctx] = fn.ReturnType
-						return types.NewPointer(types.I8) // Return Handle
+						return types.NewPointer(types.I8)
 					}
 					return fn.ReturnType
 				}
 			}
 			return typ
 		} else if isQualified {
-			// Handle qualified identifiers that resolve to member access (e.g., rect.width)
+			// --- Qualified walk: ins.bind_text, db.handle, etc. ---
 			qCtx := ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
@@ -362,39 +367,60 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 			if ok {
 				curr := s.Type
 				valid := true
-				
+
 				for i := 1; i < len(ids); i++ {
 					fieldName := ids[i].GetText()
-					
+					isLastSegment := (i == len(ids)-1)
+
+					// Auto-dereference pointer
 					if ptr, ok := curr.(*types.PointerType); ok {
 						curr = ptr.ElementType
 					}
 
 					if st, ok := curr.(*types.StructType); ok {
+						// 1. Field lookup
 						if indices, ok := a.structIndices[st.Name]; ok {
 							if idx, ok := indices[fieldName]; ok {
 								curr = st.Fields[idx]
 								continue
 							}
 						}
-						
-						// FIX: Method resolution for QualifiedIdentifier
+
+						// 2. Method lookup
 						methodName := st.Name + "_" + fieldName
 						if sym, ok := a.globalScope.Resolve(methodName); ok {
+							// If this is the last segment AND it's a call,
+							// resolve arguments and return the function's return type
+							if isLastSegment && isCall {
+								if ctx.ArgumentList() != nil {
+									for _, arg := range ctx.ArgumentList().AllArgument() {
+										a.Visit(arg.Expression())
+									}
+								}
+								if fn, ok := sym.Type.(*types.FunctionType); ok {
+									if fn.IsAsync {
+										a.nodeTypes[ctx] = fn.ReturnType
+										return types.NewPointer(types.I8)
+									}
+									return fn.ReturnType
+								}
+							}
+							// Not a call, or not the last segment — carry the type forward
 							curr = sym.Type
 							continue
 						}
 					}
+
 					valid = false
 					break
 				}
-				
+
 				if valid {
 					return curr
 				}
 			}
 		}
-		
+
 		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Undefined identifier '%s'", name)
 		return types.Void
 	}
@@ -402,7 +428,7 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 	if ctx.Expression() != nil && hasParens && name == "" {
 		return a.Visit(ctx.Expression())
 	}
-	
+
 	return types.Void
 }
 
