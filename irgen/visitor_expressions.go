@@ -922,6 +922,53 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	return g.getZeroValue(types.I64)
 }
 
+func processEscapes(s string) string {
+	var buf []byte
+	i := 0
+	for i < len(s) {
+		if s[i] == '\\' && i+1 < len(s) {
+			switch s[i+1] {
+			case '0':
+				buf = append(buf, 0)
+				i += 2
+				continue
+			case 'n':
+				buf = append(buf, '\n')
+				i += 2
+				continue
+			case 't':
+				buf = append(buf, '\t')
+				i += 2
+				continue
+			case 'r':
+				buf = append(buf, '\r')
+				i += 2
+				continue
+			case '\\':
+				buf = append(buf, '\\')
+				i += 2
+				continue
+			case '"':
+				buf = append(buf, '"')
+				i += 2
+				continue
+			case 'x':
+				if i+3 < len(s) {
+					val, err := strconv.ParseUint(s[i+2:i+4], 16, 8)
+					if err == nil {
+						buf = append(buf, byte(val))
+						i += 4
+						continue
+					}
+				}
+			}
+		}
+		buf = append(buf, s[i])
+		i++
+	}
+	return string(buf)
+}
+
 func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	if ctx.InitializerList() != nil {
 		return g.Visit(ctx.InitializerList())
@@ -959,6 +1006,9 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 				unquoted = txt[1 : len(txt)-1]
 			}
 		}
+		// Process escape sequences that strconv.Unquote doesn't handle
+		unquoted = processEscapes(unquoted)
+
 		content := unquoted + "\x00"
 		arrType := types.NewArray(types.I8, int64(len(content)))
 		var chars []ir.Constant
