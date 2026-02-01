@@ -80,10 +80,8 @@ func (g *Generator) resolveType(ctx parser.ITypeContext) types.Type {
 
 func (g *Generator) emitCast(val ir.Value, target types.Type) ir.Value {
 	src := val.Type()
-	if src.Equal(target) {
-		return val
-	}
-
+	if src.Equal(target) { return val }
+	
 	// Constant Folding
 	if cInt, ok := val.(*ir.ConstantInt); ok {
 		if tInt, ok := target.(*types.IntType); ok {
@@ -92,13 +90,18 @@ func (g *Generator) emitCast(val ir.Value, target types.Type) ir.Value {
 		if tFloat, ok := target.(*types.FloatType); ok {
 			return g.ctx.Builder.ConstFloat(tFloat, float64(cInt.Value))
 		}
-		// Any integer constant to pointer: emit inttoptr.
+		// Integer constant to pointer.
+		// Emit as a ConstantInt typed as the pointer directly.
+		// A pointer register is just a 64-bit integer on amd64,
+		// so the backend loads the raw value with no special opcode.
 		// Covers null (0) and sentinel values like SQLITE_TRANSIENT (-1).
 		if types.IsPointer(target) {
-			return g.ctx.Builder.CreateIntToPtr(val, target, "")
+			c := &ir.ConstantInt{Value: cInt.Value}
+			c.SetType(target)
+			return c
 		}
 	}
-
+	
 	if cFloat, ok := val.(*ir.ConstantFloat); ok {
 		if tInt, ok := target.(*types.IntType); ok {
 			return g.ctx.Builder.ConstInt(tInt, int64(cFloat.Value))
@@ -110,31 +113,18 @@ func (g *Generator) emitCast(val ir.Value, target types.Type) ir.Value {
 
 	// Runtime Casting
 	if types.IsInteger(src) && types.IsInteger(target) {
-		if src.BitSize() > target.BitSize() {
-			return g.ctx.Builder.CreateTrunc(val, target, "")
-		}
+		if src.BitSize() > target.BitSize() { return g.ctx.Builder.CreateTrunc(val, target, "") }
 		if src.Equal(types.U8) || src.Equal(types.U16) || src.Equal(types.U32) || src.Equal(types.U64) {
 			return g.ctx.Builder.CreateZExt(val, target, "")
 		}
 		return g.ctx.Builder.CreateSExt(val, target, "")
 	}
 	if types.IsFloat(src) && types.IsFloat(target) {
-		if src.BitSize() > target.BitSize() {
-			return g.ctx.Builder.CreateFPTrunc(val, target, "")
-		}
+		if src.BitSize() > target.BitSize() { return g.ctx.Builder.CreateFPTrunc(val, target, "") }
 		return g.ctx.Builder.CreateFPExt(val, target, "")
 	}
-	if types.IsInteger(src) && types.IsFloat(target) {
-		return g.ctx.Builder.CreateSIToFP(val, target, "")
-	}
-	if types.IsFloat(src) && types.IsInteger(target) {
-		return g.ctx.Builder.CreateFPToSI(val, target, "")
-	}
-
-	// Runtime integer to pointer (non-constant case)
-	if types.IsInteger(src) && types.IsPointer(target) {
-		return g.ctx.Builder.CreateIntToPtr(val, target, "")
-	}
+	if types.IsInteger(src) && types.IsFloat(target) { return g.ctx.Builder.CreateSIToFP(val, target, "") }
+	if types.IsFloat(src) && types.IsInteger(target) { return g.ctx.Builder.CreateFPToSI(val, target, "") }
 
 	// Pointer Casting
 	if types.IsPointer(src) && types.IsPointer(target) {
@@ -147,7 +137,7 @@ func (g *Generator) emitCast(val ir.Value, target types.Type) ir.Value {
 			if srcArr.Length <= targetArr.Length {
 				if cArr, ok := val.(*ir.ConstantArray); ok {
 					var newElems []ir.Constant
-
+					
 					for _, elem := range cArr.Elements {
 						casted := g.emitCast(elem, targetArr.ElementType)
 						if cCasted, ok := casted.(ir.Constant); ok {
@@ -156,7 +146,7 @@ func (g *Generator) emitCast(val ir.Value, target types.Type) ir.Value {
 							panic("Cast of constant array element resulted in non-constant")
 						}
 					}
-
+					
 					if srcArr.Length < targetArr.Length {
 						zero := g.getZeroValue(targetArr.ElementType)
 						if zeroConst, ok := zero.(ir.Constant); ok {
@@ -165,20 +155,20 @@ func (g *Generator) emitCast(val ir.Value, target types.Type) ir.Value {
 							}
 						}
 					}
-
+					
 					return &ir.ConstantArray{
 						BaseValue: ir.BaseValue{ValType: target},
 						Elements:  newElems,
 					}
 				}
-
+				
 				if _, ok := val.(*ir.ConstantZero); ok {
 					return g.ctx.Builder.ConstZero(target)
 				}
 			}
 		}
 	}
-
+	
 	return val
 }
 
