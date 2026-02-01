@@ -141,50 +141,92 @@ func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) 
 	curr := a.Visit(ctx.PrimaryExpression()).(types.Type)
 
 	for _, op := range ctx.AllPostfixOp() {
-		
-		// Function Call via Postfix Op
+
+		// Combined method call: obj.method(args)
+		// Grammar: DOT IDENTIFIER LPAREN argumentList? RPAREN
+		if op.DOT() != nil && op.LPAREN() != nil {
+			name := op.IDENTIFIER().GetText()
+
+			// Visit arguments for side-effect / type checking
+			if op.ArgumentList() != nil {
+				for _, arg := range op.ArgumentList().AllArgument() {
+					a.Visit(arg.Expression())
+				}
+			}
+
+			// Auto-dereference pointer before member lookup
+			base := curr
+			if ptr, ok := base.(*types.PointerType); ok {
+				base = ptr.ElementType
+			}
+
+			if st, ok := base.(*types.StructType); ok {
+				// Resolve method: StructName_methodName
+				methodName := st.Name + "_" + name
+				if sym, ok := a.globalScope.Resolve(methodName); ok {
+					if fn, ok := sym.Type.(*types.FunctionType); ok {
+						if fn.IsAsync {
+							a.nodeTypes[ctx] = fn.ReturnType
+							curr = types.NewPointer(types.I8)
+						} else {
+							curr = fn.ReturnType
+						}
+						continue
+					}
+					curr = sym.Type
+					continue
+				}
+			}
+
+			a.bag.Report(a.file, op.GetStart().GetLine(), 0,
+				"Type '%s' has no method '%s'", curr.String(), name)
+			return types.Void
+		}
+
+		// Standalone function call: obj(args)
+		// Grammar: LPAREN argumentList? RPAREN
 		if op.LPAREN() != nil {
 			if op.ArgumentList() != nil {
 				for _, arg := range op.ArgumentList().AllArgument() {
 					a.Visit(arg.Expression())
 				}
 			}
-			
+
 			if fn, ok := curr.(*types.FunctionType); ok {
 				if fn.IsAsync {
-					// Async Fix:
-					// 1. Semantic type of the CALL is a Handle (ptr<i8>), 
-					//    so variable assignment (let x = async_call()) gets the handle type.
 					curr = types.NewPointer(types.I8)
-
-					// 2. Store the UNWRAPPED return type on this node so 'await' can find it.
 					a.nodeTypes[ctx] = fn.ReturnType
 				} else {
 					curr = fn.ReturnType
 				}
 			} else {
-				a.bag.Report(a.file, op.GetStart().GetLine(), 0, 
+				a.bag.Report(a.file, op.GetStart().GetLine(), 0,
 					"Cannot call non-function type '%s'", curr.String())
 				curr = types.Void
 			}
+			continue
 		}
 
-		// Member Access
+		// Field access (no call): obj.field
+		// Grammar: DOT IDENTIFIER
 		if op.DOT() != nil {
 			name := op.IDENTIFIER().GetText()
-			
+
+			// Auto-dereference pointer
 			if ptr, ok := curr.(*types.PointerType); ok {
 				curr = ptr.ElementType
 			}
 
 			if st, ok := curr.(*types.StructType); ok {
+				// 1. Field lookup
 				if indices, ok := a.structIndices[st.Name]; ok {
 					if idx, ok := indices[name]; ok {
 						curr = st.Fields[idx]
 						continue
 					}
 				}
-				
+
+				// 2. Method reference (no call — e.g. passing as value)
 				methodName := st.Name + "_" + name
 				if sym, ok := a.globalScope.Resolve(methodName); ok {
 					curr = sym.Type
@@ -193,17 +235,17 @@ func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) 
 			}
 
 			if curr != types.Void {
-				a.bag.Report(a.file, op.GetStart().GetLine(), 0, 
+				a.bag.Report(a.file, op.GetStart().GetLine(), 0,
 					"Type '%s' has no field or method '%s'", curr.String(), name)
 			}
 			return types.Void
 		}
 
-		// Indexing
+		// Indexing: obj[expr]
 		if op.LBRACKET() != nil {
 			idxType := a.Visit(op.Expression()).(types.Type)
 			if !types.IsInteger(idxType) {
-				a.bag.Report(a.file, op.GetStart().GetLine(), 0, 
+				a.bag.Report(a.file, op.GetStart().GetLine(), 0,
 					"Index must be an integer, got '%s'", idxType.String())
 			}
 
@@ -215,17 +257,19 @@ func (a *Analyzer) VisitPostfixExpression(ctx *parser.PostfixExpressionContext) 
 			} else if arr, ok := curr.(*types.ArrayType); ok {
 				curr = arr.ElementType
 			} else {
-				a.bag.Report(a.file, op.GetStart().GetLine(), 0, 
+				a.bag.Report(a.file, op.GetStart().GetLine(), 0,
 					"Type '%s' is not indexable", curr.String())
 			}
+			continue
 		}
 
-		// Increment/Decrement
+		// Postfix increment/decrement: obj++ / obj--
 		if op.INCREMENT() != nil || op.DECREMENT() != nil {
 			if !types.IsInteger(curr) && !types.IsPointer(curr) {
 				a.bag.Report(a.file, op.GetStart().GetLine(), 0,
 					"Cannot increment/decrement type '%s'", curr.String())
 			}
+			continue
 		}
 	}
 	return curr
