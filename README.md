@@ -411,33 +411,6 @@ func main() {
 }
 ```
 
-### Configuration
-
-```go
-// ax.mod
-module myapp
-arc 1.0
-
-require (
-    io v1.2
-    ai v2.0
-)
-
-require c (
-    sqlite3 v3.36 (
-        debian   "debian.org/libsqlite3-dev"
-        ubuntu   "ubuntu.org/libsqlite3-dev"
-        macos    "brew.sh/sqlite"
-        windows  "vcpkg.io/sqlite3"
-        default  "vcpkg.io/sqlite3"
-    )
-    
-    curl v7.80 (
-        default  "vcpkg.io/curl"
-    )
-)
-```
-
 The compiler detects your platform and downloads the appropriate packages to `~/.arc/cache/`.
 
 ---
