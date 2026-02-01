@@ -544,6 +544,9 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 				if !ok { continue }
 				
 				fieldVal := g.ctx.Builder.CreateExtractValue(val, []int{i}, "")
+				// Sync the symbol type to match what extractvalue actually produced.
+				// Semantics may have inferred a different type than the tuple field.
+				sym.Type = fieldVal.Type()
 				alloca := g.ctx.Builder.CreateAlloca(sym.Type, name+".addr")
 				g.ctx.Builder.CreateStore(fieldVal, alloca)
 				sym.IRValue = alloca
