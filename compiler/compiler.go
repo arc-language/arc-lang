@@ -6,14 +6,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/BurntSushi/toml" // Needed to parse index.toml files
+	"github.com/BurntSushi/toml" 
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/context"
 	"github.com/arc-language/arc-lang/diagnostic"
 	"github.com/arc-language/arc-lang/irgen"
-	//"github.com/arc-language/arc-lang/optimizer"
+	// "github.com/arc-language/arc-lang/optimizer" // DISABLED FOR NOW
 	"github.com/arc-language/arc-lang/pkg"
 	"github.com/arc-language/arc-lang/semantics"
 	"github.com/arc-language/arc-lang/symbol"
@@ -25,9 +25,7 @@ type Compiler struct {
 	logger         *context.Logger
 	Importer       *Importer
 	PackageManager *pkg.PackageManager
-	
-	// NativeLibs holds the list of libraries discovered from 'import c "..."'
-	NativeLibs []string
+	NativeLibs     []string
 }
 
 func NewCompiler() *Compiler {
@@ -39,7 +37,6 @@ func NewCompiler() *Compiler {
 	}
 }
 
-// CompileProject handles the frontend pipeline
 func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	absEntry, err := filepath.Abs(entryFile)
 	if err != nil {
@@ -51,7 +48,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	// --- PHASE 1: DISCOVERY ---
 	fileQueue := []string{absEntry}
 	processed := make(map[string]bool)
-
 	var units []*irgen.SourceUnit
 
 	for i := 0; i < len(fileQueue); i++ {
@@ -60,43 +56,32 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 			continue
 		}
 		processed[currentPath] = true
-
 		c.logger.Debug("Parsing: %s", currentPath)
-
 		tree, errs := Parse(currentPath)
-
 		if errs.HasErrors() {
 			c.printDiagnostics(errs)
 			return nil, fmt.Errorf("parsing failed in %s", currentPath)
 		}
-
 		units = append(units, &irgen.SourceUnit{Path: currentPath, Tree: tree})
 
-		// Process Imports
 		for _, decl := range tree.AllImportDecl() {
 			if decl.STRING_LITERAL() == nil {
 				continue
 			}
-
 			rawImport := decl.STRING_LITERAL().GetText()
 			importPath := rawImport
 			if len(importPath) >= 2 {
 				importPath = importPath[1 : len(importPath)-1]
 			}
-
 			lang := ""
 			if decl.IDENTIFIER() != nil {
 				lang = decl.IDENTIFIER().GetText()
 			}
-
-			// Ensure Package is Installed (Clone Git Repo or Check Registry)
 			downloadedPath, err := c.PackageManager.Ensure(lang, importPath)
 			if err != nil {
 				c.logger.Error("Failed to resolve package '%s': %v", importPath, err)
 				return nil, fmt.Errorf("dependency resolution failed")
 			}
-
-			// Handle Arc Imports (Source Scan)
 			if lang == "" {
 				var absDir string
 				if downloadedPath != "" {
@@ -108,7 +93,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 						continue
 					}
 				}
-
 				if absDir != "" {
 					sources, err := c.Importer.GetSourceFiles(absDir)
 					if err != nil {
@@ -121,14 +105,9 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 					}
 				}
 			} else {
-				// Handle Native Imports (C/C++)
 				c.logger.Debug("Resolved Native Dependency: %s (Language: %s)", importPath, lang)
-				
-				// CASE A: Remote/Git Wrapper (contains "/" or ".")
 				if strings.Contains(importPath, "/") || strings.Contains(importPath, ".") {
-					// We look for index.toml in the downloaded directory
 					tomlPath := filepath.Join(downloadedPath, "index.toml")
-					
 					if _, err := os.Stat(tomlPath); err == nil {
 						var entry upkg.RegistryEntry
 						if _, err := toml.DecodeFile(tomlPath, &entry); err != nil {
@@ -139,12 +118,8 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 								c.NativeLibs = append(c.NativeLibs, entry.Libs...)
 							}
 						}
-					} else {
-						c.logger.Error("Native import '%s' resolved to %s but no index.toml found", importPath, downloadedPath)
 					}
-
 				} else {
-					// CASE B: System Package (e.g. "sqlite3") - Use Registry
 					upkgCfg := upkg.DefaultConfig()
 					mgr, err := upkg.NewManager(upkg.BackendAuto, upkgCfg)
 					if err == nil {
@@ -153,7 +128,6 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 							c.logger.Info("Auto-detected libraries for '%s': %v", importPath, entry.Libs)
 							c.NativeLibs = append(c.NativeLibs, entry.Libs...)
 						} else {
-							// Fallback: If no registry entry, assume package name == lib name
 							c.logger.Debug("No registry info for '%s', assuming library name match", importPath)
 							c.NativeLibs = append(c.NativeLibs, importPath)
 						}
@@ -209,9 +183,9 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	module := irgen.GenerateProject(units, moduleName, analysisRes)
 
 	// --- PHASE 4: OPTIMIZATION ---
-	//c.logger.Debug("Phase 4: Optimization")
-	//dce := optimizer.NewDCE()
-	//dce.Run(module)
+	// c.logger.Debug("Phase 4: Optimization")
+	// dce := optimizer.NewDCE()
+	// dce.Run(module)
 
 	return module, nil
 }

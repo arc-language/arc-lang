@@ -55,19 +55,24 @@ func (b *Builder) CurrentBlock() *ir.BasicBlock {
 // SetInsertPoint sets where instructions will be inserted
 func (b *Builder) SetInsertPoint(block *ir.BasicBlock) {
 	b.currentBlock = block
-	b.currentFunc = block.Parent
+	if block != nil {
+		b.currentFunc = block.Parent
+	}
 	b.insertPoint = -1
 }
 
 // SetInsertPointBefore sets insertion point before an instruction
 func (b *Builder) SetInsertPointBefore(inst ir.Instruction) {
 	b.currentBlock = inst.Parent()
-	for i, in := range b.currentBlock.Instructions {
-		if in == inst {
-			b.insertPoint = i
-			return
+	if b.currentBlock != nil {
+		for i, in := range b.currentBlock.Instructions {
+			if in == inst {
+				b.insertPoint = i
+				return
+			}
 		}
 	}
+	b.insertPoint = -1 // Fallback
 }
 
 // GetInsertBlock returns the current insertion block
@@ -85,16 +90,22 @@ func (b *Builder) generateName() string {
 // insert adds an instruction at the current insertion point
 func (b *Builder) insert(inst ir.Instruction) {
 	if b.currentBlock == nil {
-		panic("no insertion block set")
+		// Silently fail or panic? Panic helps debug.
+		panic("IR Builder: Attempted to insert instruction with no active BasicBlock set.")
 	}
-	if b.insertPoint < 0 {
+	
+	if b.insertPoint < 0 || b.insertPoint >= len(b.currentBlock.Instructions) {
+		// Append mode
 		b.currentBlock.AddInstruction(inst)
 	} else {
+		// Insert mode
 		insts := b.currentBlock.Instructions
 		newInsts := make([]ir.Instruction, len(insts)+1)
+		
 		copy(newInsts, insts[:b.insertPoint])
 		newInsts[b.insertPoint] = inst
 		copy(newInsts[b.insertPoint+1:], insts[b.insertPoint:])
+		
 		b.currentBlock.Instructions = newInsts
 		inst.SetParent(b.currentBlock)
 		b.insertPoint++
@@ -167,7 +178,6 @@ func (b *Builder) CreateGlobalConstant(name string, initializer ir.Constant) *ir
 // ============================================================================
 
 func (b *Builder) CreateBlock(baseName string) *ir.BasicBlock {
-	// Generate unique name using the counter
 	uniqueName := fmt.Sprintf("%s.%d", baseName, b.nameCounter)
 	b.nameCounter++
 	
@@ -179,7 +189,6 @@ func (b *Builder) CreateBlock(baseName string) *ir.BasicBlock {
 }
 
 func (b *Builder) CreateBlockInFunction(baseName string, fn *ir.Function) *ir.BasicBlock {
-	// Generate unique name using the counter
 	uniqueName := fmt.Sprintf("%s.%d", baseName, b.nameCounter)
 	b.nameCounter++
 	
@@ -230,7 +239,7 @@ func (b *Builder) CreateCondBr(cond ir.Value, trueBlock, falseBlock *ir.BasicBlo
 	inst.Self = inst
 	inst.Op = ir.OpCondBr
 	
-	// FIX: Register the instruction as a user of 'cond'
+	// FIX: Register user to prevent DCE deletion
 	if cond != nil {
 		if tracker, ok := cond.(ir.TrackableValue); ok {
 			tracker.AddUser(inst)
@@ -253,7 +262,7 @@ func (b *Builder) CreateSwitch(cond ir.Value, defaultBlock *ir.BasicBlock, numCa
 	inst.Self = inst
 	inst.Op = ir.OpSwitch
 	
-	// FIX: Register the instruction as a user of 'cond'
+	// FIX: Register user
 	if cond != nil {
 		if tracker, ok := cond.(ir.TrackableValue); ok {
 			tracker.AddUser(inst)
@@ -515,7 +524,6 @@ func (b *Builder) CreateGEP(pointeeType types.Type, ptr ir.Value, indices []ir.V
 	resultType := pointeeType
 
 	if len(indices) > 1 {
-		// Iterate from 2nd index
 		for _, idxVal := range indices[1:] {
 			if st, ok := resultType.(*types.StructType); ok {
 				if cIdx, ok := idxVal.(*ir.ConstantInt); ok {
@@ -751,9 +759,6 @@ func (b *Builder) CreateCall(fn *ir.Function, args []ir.Value, name string) *ir.
 
 func (b *Builder) CreateIndirectCall(callee ir.Value, args []ir.Value, name string) *ir.CallInst {
 	var retType types.Type = types.Void
-
-	// Determine return type from pointer element type
-	// callee type should be ptr<func(...) -> ret>
 	if ptr, ok := callee.Type().(*types.PointerType); ok {
 		if fn, ok := ptr.ElementType.(*types.FunctionType); ok {
 			retType = fn.ReturnType
@@ -766,7 +771,7 @@ func (b *Builder) CreateIndirectCall(callee ir.Value, args []ir.Value, name stri
 
 	inst := &ir.CallInst{
 		CalleeVal: callee,
-		CallConv:  ir.CC_C, // Default, effectively dynamic
+		CallConv:  ir.CC_C,
 	}
 	inst.Self = inst
 	inst.Op = ir.OpCall
@@ -1069,11 +1074,9 @@ func (b *Builder) CreateRaise(message ir.Value) *ir.RaiseInst {
 }
 
 // ============================================================================
-// Async Task operations (Smart Threads)
+// Async Task operations
 // ============================================================================
 
-// CreateAsyncTask creates a new smart thread executing the given function.
-// It returns a handle (pointer) to the task's state.
 func (b *Builder) CreateAsyncTask(fn *ir.Function, args []ir.Value, name string) *ir.AsyncTaskCreateInst {
 	if name == "" {
 		name = b.generateName()
@@ -1084,10 +1087,7 @@ func (b *Builder) CreateAsyncTask(fn *ir.Function, args []ir.Value, name string)
 	inst.Self = inst
 	inst.Op = ir.OpAsyncTaskCreate
 	inst.SetName(name)
-
-	// Return type is a pointer to the task state (AsyncResult struct)
 	inst.SetType(types.NewPointer(types.I8))
-
 	for i, arg := range args {
 		inst.SetOperand(i, arg)
 	}
@@ -1095,8 +1095,6 @@ func (b *Builder) CreateAsyncTask(fn *ir.Function, args []ir.Value, name string)
 	return inst
 }
 
-// CreateAwaitTask blocks until the task referenced by the handle completes.
-// It returns the value produced by the task.
 func (b *Builder) CreateAwaitTask(handle ir.Value, resultType types.Type, name string) *ir.AsyncTaskAwaitInst {
 	if name == "" {
 		name = b.generateName()
@@ -1105,11 +1103,8 @@ func (b *Builder) CreateAwaitTask(handle ir.Value, resultType types.Type, name s
 	inst.Self = inst
 	inst.Op = ir.OpAsyncTaskAwait
 	inst.SetName(name)
-
-	// The instruction returns the value from the task
 	inst.SetType(resultType)
 	inst.SetOperand(0, handle)
-
 	b.insert(inst)
 	return inst
 }
@@ -1124,9 +1119,7 @@ func (b *Builder) CreateProcess(fn *ir.Function, args []ir.Value, name string) *
 	inst.Self = inst
 	inst.Op = ir.OpProcessCreate
 	inst.SetName(name)
-	// Process returns an int32 PID
 	inst.SetType(types.I32)
-
 	for i, arg := range args {
 		inst.SetOperand(i, arg)
 	}

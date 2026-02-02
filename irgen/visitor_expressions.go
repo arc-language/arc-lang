@@ -141,7 +141,7 @@ func (g *Generator) VisitEqualityExpression(ctx *parser.EqualityExpressionContex
 			lhs = g.ctx.Builder.CreateICmpNE(lhs, rhs, "")
 		}
 
-		// Fix: lhs is ir.Value (interface)
+		// SAFETY FIX
 		if inst, ok := lhs.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
@@ -164,8 +164,8 @@ func (g *Generator) VisitRelationalExpression(ctx *parser.RelationalExpressionCo
 		case parser.ArcParserGE:
 			lhs = g.ctx.Builder.CreateICmpSGE(lhs, rhs, "")
 		}
-
-		// Fix: lhs is ir.Value (interface)
+		
+		// SAFETY FIX
 		if inst, ok := lhs.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
@@ -768,23 +768,17 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 					if !isCall {
-						// NOTE: loaded is *ir.LoadInst (concrete type)
 						loaded := g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 						
-						// Fix: Check Parent directly
+						// SAFETY FIX: Concrete pointer check
 						if loaded.Parent() == nil {
 							g.ctx.Builder.GetInsertBlock().AddInstruction(loaded)
 						}
-						
-						fmt.Printf("[DEBUG] PrimaryExpr: Loaded '%s' -> %v (type: %s)\n", name, loaded, loaded.Type())
 						return loaded
 					}
 					
-					// NOTE: entity (assigned from CreateLoad) is treated as ir.Value later,
-					// but here we deal with the concrete *ir.LoadInst directly first
 					loadInst := g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
-					
-					// Fix: Check Parent directly
+					// SAFETY FIX
 					if loadInst.Parent() == nil {
 						g.ctx.Builder.GetInsertBlock().AddInstruction(loadInst)
 					}
@@ -888,11 +882,9 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 				if valid && entity == nil {
 					ptrType := currPtr.Type().(*types.PointerType)
-					
-					// NOTE: loadInst is *ir.LoadInst (concrete)
 					loadInst := g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 					
-					// Fix: Check Parent directly
+					// SAFETY FIX
 					if loadInst.Parent() == nil {
 						g.ctx.Builder.GetInsertBlock().AddInstruction(loadInst)
 					}
