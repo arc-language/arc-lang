@@ -154,18 +154,19 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 		
 		cond := g.Visit(ctx.Expression(i)).(ir.Value)
 		
-		// DEBUG: Print what we got
-		fmt.Printf("[DEBUG] If condition %d: type=%s, value=%v\n", i, cond.Type(), cond)
-		
-		// FIX: Ensure the condition evaluation instruction is attached to the block
+		// Fix: cond is an interface (ir.Value), so we cast to ir.Instruction
 		if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
-
+		
+		// DEBUG: Print what we got
+		fmt.Printf("[DEBUG] If condition %d: type=%s, value=%v\n", i, cond.Type(), cond)
+		
 		if cond.Type().BitSize() > 1 {
+			// CreateICmpNE returns *ir.ICmpInst, but we assign it to 'cond' (ir.Value)
 			cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
 			
-			// FIX: Ensure the implicit boolean check is attached to the block
+			// Fix: Check parent on the new comparison instruction
 			if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 			}
@@ -259,9 +260,11 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 		// Condition Check
 		g.ctx.Builder.SetInsertPoint(condBlock)
+		
+		// NOTE: currVal is *ir.LoadInst (concrete type)
 		currVal := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
 		
-		// FIX: currVal is *ir.LoadInst (concrete), check Parent directly
+		// Fix: Check Parent directly on concrete type (no casting)
 		if currVal.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(currVal)
 		}
@@ -272,8 +275,8 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		} else {
 			cmp = g.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
 		}
-
-		// FIX: cmp is ir.Value (interface), type assertion required
+		
+		// Fix: cmp is ir.Value (interface), so cast needed
 		if inst, ok := cmp.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
@@ -292,8 +295,9 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 		// Post Step
 		g.ctx.Builder.SetInsertPoint(postBlock)
+		
+		// NOTE: currVal is *ir.LoadInst (concrete type)
 		currVal = g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
-		// Note: We should probably check this load too, though usually Post blocks are simple
 		if currVal.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(currVal)
 		}
@@ -342,14 +346,15 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		cond = g.Visit(ctx.Expression(0)).(ir.Value)
 	}
 
-	// FIX: Ensure loop condition expression is attached
+	// Fix: cond is ir.Value (interface)
 	if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 		g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 	}
 
 	if cond.Type().BitSize() > 1 {
 		cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
-		// FIX: Ensure implicit boolean check is attached
+		
+		// Fix: cond is interface
 		if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
@@ -381,32 +386,6 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 	// 5. End
 	g.ctx.Builder.SetInsertPoint(endBlock)
-	return nil
-}
-
-func (g *Generator) VisitBreakStmt(ctx *parser.BreakStmtContext) interface{} {
-	if len(g.loopStack) > 0 {
-		g.ctx.Builder.CreateBr(g.loopStack[len(g.loopStack)-1].breakBlock)
-	}
-	return nil
-}
-
-func (g *Generator) VisitContinueStmt(ctx *parser.ContinueStmtContext) interface{} {
-	if len(g.loopStack) > 0 {
-		g.ctx.Builder.CreateBr(g.loopStack[len(g.loopStack)-1].continueBlock)
-	}
-	return nil
-}
-
-func (g *Generator) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
-	g.deferStack.Add(func(gen *Generator) {
-		if ctx.Expression() != nil {
-			gen.Visit(ctx.Expression())
-		}
-		if ctx.AssignmentStmt() != nil {
-			gen.Visit(ctx.AssignmentStmt())
-		}
-	})
 	return nil
 }
 

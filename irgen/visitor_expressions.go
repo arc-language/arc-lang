@@ -116,7 +116,7 @@ func (g *Generator) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) i
 	return lhs
 }
 
-func (g *Generator) VisitEqualityExpression(ctx *parser.EqualityExpressionContext) interface{} {
+(ctx *parser.EqualityExpressionContext) interface{} {
 	lhs := g.Visit(ctx.RelationalExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllRelationalExpression()); i++ {
 		rhs := g.Visit(ctx.RelationalExpression(i)).(ir.Value)
@@ -165,7 +165,7 @@ func (g *Generator) VisitRelationalExpression(ctx *parser.RelationalExpressionCo
 			lhs = g.ctx.Builder.CreateICmpSGE(lhs, rhs, "")
 		}
 
-		// FIX: Ensure ICmp instruction is attached to the block
+		// Fix: lhs is ir.Value (interface)
 		if inst, ok := lhs.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
@@ -768,9 +768,10 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 					if !isCall {
+						// NOTE: loaded is *ir.LoadInst (concrete type)
 						loaded := g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 						
-						// FIX: loaded is *ir.LoadInst (concrete). Check Parent directly.
+						// Fix: Check Parent directly
 						if loaded.Parent() == nil {
 							g.ctx.Builder.GetInsertBlock().AddInstruction(loaded)
 						}
@@ -779,10 +780,11 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 						return loaded
 					}
 					
-					// Use temporary variable to handle concrete type return
+					// NOTE: entity (assigned from CreateLoad) is treated as ir.Value later,
+					// but here we deal with the concrete *ir.LoadInst directly first
 					loadInst := g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 					
-					// FIX: Check Parent directly
+					// Fix: Check Parent directly
 					if loadInst.Parent() == nil {
 						g.ctx.Builder.GetInsertBlock().AddInstruction(loadInst)
 					}
@@ -886,9 +888,11 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 				if valid && entity == nil {
 					ptrType := currPtr.Type().(*types.PointerType)
+					
+					// NOTE: loadInst is *ir.LoadInst (concrete)
 					loadInst := g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 					
-					// FIX: Check Parent directly for concrete LoadInst
+					// Fix: Check Parent directly
 					if loadInst.Parent() == nil {
 						g.ctx.Builder.GetInsertBlock().AddInstruction(loadInst)
 					}
