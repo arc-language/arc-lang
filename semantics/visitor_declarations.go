@@ -54,12 +54,10 @@ func (a *Analyzer) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface{
 		if ctx.ExternCppDecl() != nil { return a.Visit(ctx.ExternCppDecl()) }
 		if ctx.ConstDecl() != nil { return a.Visit(ctx.ConstDecl()) }
 		if ctx.VariableDecl() != nil { return a.Visit(ctx.VariableDecl()) }
-		if ctx.MutatingDecl() != nil { return a.Visit(ctx.MutatingDecl()) }
 		return nil
 	}
 	if a.Phase == 2 {
 		if ctx.FunctionDecl() != nil { return a.Visit(ctx.FunctionDecl()) }
-		if ctx.MutatingDecl() != nil { return a.Visit(ctx.MutatingDecl()) }
 		if ctx.StructDecl() != nil { return a.Visit(ctx.StructDecl()) }
 		if ctx.ClassDecl() != nil { return a.Visit(ctx.ClassDecl()) }
 		if ctx.VariableDecl() != nil { return a.Visit(ctx.VariableDecl()) }
@@ -112,7 +110,6 @@ func (a *Analyzer) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 
 	for _, member := range ctx.AllStructMember() {
 		if m := member.FunctionDecl(); m != nil { a.Visit(m) }
-		if m := member.MutatingDecl(); m != nil { a.Visit(m) }
 	}
 	return nil
 }
@@ -495,98 +492,6 @@ func (a *Analyzer) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{
 			for _, stmt := range ctx.Block().AllStatement() {
 				a.Visit(stmt)
 			}
-		}
-	}
-	return nil
-}
-
-// --- Mutating Declaration (FIXED) ---
-
-func (a *Analyzer) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface{} {
-	name := ctx.IDENTIFIER(0).GetText()
-	
-	var retType types.Type = types.Void
-	if ctx.ReturnType() != nil {
-		if ctx.ReturnType().Type_() != nil {
-			retType = a.resolveType(ctx.ReturnType().Type_())
-		}
-	}
-
-	var paramTypes []types.Type
-	selfParamName := ctx.IDENTIFIER(1).GetText()
-	
-	// Self Type Resolution with Fallback
-	selfType := a.resolveType(ctx.Type_())
-	paramTypes = append(paramTypes, selfType)
-	
-	var structName string
-	base := selfType
-	if ptr, ok := base.(*types.PointerType); ok { base = ptr.ElementType }
-	
-	if st, ok := base.(*types.StructType); ok {
-		structName = st.Name
-	} else {
-		// Fallback for unresolved type
-		var getTypeName func(parser.ITypeContext) string
-		getTypeName = func(tCtx parser.ITypeContext) string {
-			tc := tCtx.(*parser.TypeContext)
-			if tc.PointerType() != nil {
-				return getTypeName(tc.PointerType().Type_())
-			}
-			if tc.IDENTIFIER() != nil {
-				return tc.IDENTIFIER().GetText()
-			}
-			if tc.QualifiedType() != nil {
-				return tc.QualifiedType().GetText()
-			}
-			return ""
-		}
-		
-		rawTypeName := getTypeName(ctx.Type_())
-		if rawTypeName != "" {
-			if a.currentNamespacePrefix != "" {
-				prefix := a.currentNamespacePrefix + "."
-				if len(rawTypeName) > len(prefix) && rawTypeName[:len(prefix)] == prefix {
-					structName = rawTypeName
-				} else {
-					structName = a.currentNamespacePrefix + "." + rawTypeName
-				}
-			} else {
-				structName = rawTypeName
-			}
-		}
-	}
-	
-	for _, param := range ctx.AllParameter() {
-		pType := a.resolveType(param.Type_())
-		paramTypes = append(paramTypes, pType)
-	}
-
-	fullName := name
-	if structName != "" { fullName = structName + "_" + name }
-
-	if a.Phase == 1 || a.Phase == 0 {
-		fnType := types.NewFunction(retType, paramTypes, false)
-		if _, ok := a.currentScope.ResolveLocal(fullName); !ok {
-			a.currentScope.Define(fullName, symbol.SymFunc, fnType)
-		}
-	}
-
-	if a.Phase == 2 || a.Phase == 0 {
-		a.currentFuncRetType = retType
-		a.pushScope(ctx)
-		defer func() { a.popScope(); a.currentFuncRetType = nil }()
-
-		a.currentScope.Define(selfParamName, symbol.SymVar, selfType)
-		for _, param := range ctx.AllParameter() {
-			pName := param.IDENTIFIER().GetText()
-			pType := a.resolveType(param.Type_())
-			a.currentScope.Define(pName, symbol.SymVar, pType)
-		}
-
-		if ctx.Block() != nil {
-			a.scopes[ctx.Block()] = a.currentScope
-			for _, stmt := range ctx.Block().AllStatement() { a.Visit(stmt) }
 		}
 	}
 	return nil
