@@ -103,14 +103,22 @@ func (pm *PackageManager) ensureSystemPackage(name string) (string, error) {
 	}
 	defer mgr.Close()
 
+	// CHECK IF ALREADY INSTALLED
+	if mgr.IsInstalled(name) {
+		fmt.Printf("[Pkg] ✓ Package '%s' already installed\n", name)
+		return pm.Config.InstallPath, nil
+	}
+
 	ctx := context.Background()
 	fmt.Printf("[Pkg] Resolving system dependency: %s\n", name)
 
-	// Download/Install
+	// Download/Install with SkipIfInstalled=true (double safety)
 	pkg := &upkg.Package{Name: name}
 	opts := &upkg.DownloadOptions{
-		Extract:    boolPtr(true),
-		VerifyHash: boolPtr(true),
+		Extract:         boolPtr(true),
+		VerifyHash:      boolPtr(true),
+		SkipIfInstalled: true,
+		Force:           false, // Never force reinstall during compilation
 	}
 
 	if err := mgr.Download(ctx, pkg, opts); err != nil {
