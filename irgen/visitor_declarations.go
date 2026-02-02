@@ -25,9 +25,6 @@ func (g *Generator) VisitTopLevelDecl(ctx *parser.TopLevelDeclContext) interface
 	if ctx.FunctionDecl() != nil {
 		return g.Visit(ctx.FunctionDecl())
 	}
-	if ctx.MutatingDecl() != nil {
-		return g.Visit(ctx.MutatingDecl())
-	}
 
 	if g.Phase == 1 {
 		if ctx.VariableDecl() != nil {
@@ -289,9 +286,6 @@ func (g *Generator) VisitStructDecl(ctx *parser.StructDeclContext) interface{} {
 		if member.FunctionDecl() != nil {
 			g.Visit(member.FunctionDecl())
 		}
-		if member.MutatingDecl() != nil {
-			g.Visit(member.MutatingDecl())
-		}
 	}
 	return nil
 }
@@ -355,158 +349,6 @@ func (g *Generator) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 	return nil
 }
 
-func (g *Generator) VisitMutatingDecl(ctx *parser.MutatingDeclContext) interface{} {
-	name := ctx.IDENTIFIER(0).GetText()
-
-	var parentName string
-	if parent := ctx.GetParent(); parent != nil {
-		if _, ok := parent.(*parser.StructMemberContext); ok {
-			if sd, ok := parent.GetParent().(*parser.StructDeclContext); ok {
-				parentName = sd.IDENTIFIER().GetText()
-			}
-		}
-	}
-
-	// Fix: Handle Flat Mutating Methods (mutating func foo(self x: T))
-	if parentName == "" && ctx.Type_() != nil {
-		t := g.resolveType(ctx.Type_())
-		if ptr, ok := t.(*types.PointerType); ok {
-			t = ptr.ElementType
-		}
-		if st, ok := t.(*types.StructType); ok {
-			parentName = st.Name
-		}
-	}
-
-	// Construct IR name using dot separator to prevent collision
-	// with extern C symbols, matching the same strategy as VisitFunctionDecl.
-	var irName string
-	if parentName != "" {
-		shortParent := parentName
-		if g.currentNamespace != "" {
-			prefix := g.currentNamespace + "."
-			if len(parentName) > len(prefix) && parentName[:len(prefix)] == prefix {
-				shortParent = parentName[len(prefix):]
-			}
-		}
-		if g.currentNamespace != "" {
-			irName = g.currentNamespace + "." + shortParent + "_" + name
-		} else {
-			irName = parentName + "_" + name
-		}
-	} else {
-		if g.currentNamespace != "" {
-			irName = g.currentNamespace + "." + name
-		} else {
-			irName = name
-		}
-	}
-
-	// Construct lookup name (matches semantic symbol key)
-	var lookupName string
-	if parentName != "" {
-		shortParent := parentName
-		if g.currentNamespace != "" {
-			prefix := g.currentNamespace + "."
-			if len(parentName) > len(prefix) && parentName[:len(prefix)] == prefix {
-				shortParent = parentName[len(prefix):]
-			}
-		}
-		if g.currentNamespace != "" {
-			lookupName = g.currentNamespace + "." + shortParent + "_" + name
-		} else {
-			lookupName = parentName + "_" + name
-		}
-	} else {
-		if g.currentNamespace != "" {
-			lookupName = g.currentNamespace + "." + name
-		} else {
-			lookupName = name
-		}
-	}
-
-	sym, _ := g.currentScope.Resolve(lookupName)
-
-	if g.Phase == 1 {
-		var retType types.Type = types.Void
-		if ctx.ReturnType() != nil {
-			if ctx.ReturnType().Type_() != nil {
-				retType = g.resolveType(ctx.ReturnType().Type_())
-			} else if ctx.ReturnType().TypeList() != nil {
-				var tupleTypes []types.Type
-				for _, t := range ctx.ReturnType().TypeList().AllType_() {
-					tupleTypes = append(tupleTypes, g.resolveType(t))
-				}
-				retType = types.NewStruct("", tupleTypes, false)
-			}
-		}
-		var paramTypes []types.Type
-		if ctx.Type_() != nil {
-			paramTypes = append(paramTypes, g.resolveType(ctx.Type_()))
-		}
-		for _, param := range ctx.AllParameter() {
-			paramTypes = append(paramTypes, g.resolveType(param.Type_()))
-		}
-		fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
-		if sym != nil {
-			sym.IRValue = fn
-		}
-		return nil
-	}
-
-	if g.Phase == 2 {
-		if sym == nil || sym.IRValue == nil {
-			return nil
-		}
-		fn := sym.IRValue.(*ir.Function)
-		g.ctx.EnterFunction(fn)
-		g.enterScope(ctx)
-		defer g.exitScope()
-
-		argIdx := 0
-		selfName := ctx.IDENTIFIER(1).GetText()
-		if argIdx < len(fn.Arguments) {
-			arg := fn.Arguments[argIdx]
-			arg.SetName(selfName)
-			alloca := g.ctx.Builder.CreateAlloca(arg.Type(), selfName+".addr")
-			g.ctx.Builder.CreateStore(arg, alloca)
-			if s, ok := g.currentScope.Resolve(selfName); ok {
-				s.IRValue = alloca
-			}
-			argIdx++
-		}
-
-		for _, param := range ctx.AllParameter() {
-			if argIdx < len(fn.Arguments) {
-				pName := param.IDENTIFIER().GetText()
-				arg := fn.Arguments[argIdx]
-				arg.SetName(pName)
-				alloca := g.ctx.Builder.CreateAlloca(arg.Type(), pName+".addr")
-				g.ctx.Builder.CreateStore(arg, alloca)
-				if s, ok := g.currentScope.Resolve(pName); ok {
-					s.IRValue = alloca
-				}
-				argIdx++
-			}
-		}
-
-		if ctx.Block() != nil {
-			g.deferStack = NewDeferStack()
-			g.Visit(ctx.Block())
-		}
-
-		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
-			g.deferStack.Emit(g)
-			if fn.FuncType.ReturnType == types.Void {
-				g.ctx.Builder.CreateRetVoid()
-			} else {
-				g.ctx.Builder.CreateRet(g.getZeroValue(fn.FuncType.ReturnType))
-			}
-		}
-		g.ctx.ExitFunction()
-	}
-	return nil
-}
 
 func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
 	// --- Phase 1: Global Variable Declarations ---
