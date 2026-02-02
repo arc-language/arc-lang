@@ -209,9 +209,9 @@ func (c *Compiler) CompileProject(entryFile string) (*ir.Module, error) {
 	module := irgen.GenerateProject(units, moduleName, analysisRes)
 
 	// --- PHASE 4: OPTIMIZATION ---
-	c.logger.Debug("Phase 4: Optimization")
-	dce := optimizer.NewDCE()
-	dce.Run(module)
+	//c.logger.Debug("Phase 4: Optimization")
+	//dce := optimizer.NewDCE()
+	//dce.Run(module)
 
 	return module, nil
 }
