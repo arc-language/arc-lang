@@ -157,12 +157,19 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 		// DEBUG: Print what we got
 		fmt.Printf("[DEBUG] If condition %d: type=%s, value=%v\n", i, cond.Type(), cond)
 		
+		// FIX: Ensure the condition evaluation instruction is attached to the block
+		if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
+			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+		}
+
 		if cond.Type().BitSize() > 1 {
 			cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
-			// Fix: Ensure the implicit boolean check instruction is inserted
+			
+			// FIX: Ensure the implicit boolean check is attached to the block
 			if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 			}
+			
 			fmt.Printf("[DEBUG] After CreateICmpNE: type=%s, value=%v\n", cond.Type(), cond)
 		}
 		
@@ -254,13 +261,19 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		g.ctx.Builder.SetInsertPoint(condBlock)
 		currVal := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
 		
+		// FIX: Ensure load is attached
+		if inst, ok := currVal.(ir.Instruction); ok && inst.Parent() == nil {
+			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+		}
+		
 		var cmp ir.Value
 		if types.IsFloat(startVal.Type()) {
 			cmp = g.ctx.Builder.CreateFCmp(ir.FCmpOLT, currVal, endVal, "")
 		} else {
 			cmp = g.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
 		}
-		// Fix: Ensure insertion of range comparison
+
+		// FIX: Ensure comparison is attached
 		if inst, ok := cmp.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
@@ -325,9 +338,14 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		cond = g.Visit(ctx.Expression(0)).(ir.Value)
 	}
 
+	// FIX: Ensure loop condition expression is attached
+	if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
+		g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+	}
+
 	if cond.Type().BitSize() > 1 {
 		cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
-		// Fix: Ensure insertion of implicit boolean check in loops
+		// FIX: Ensure implicit boolean check is attached
 		if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}

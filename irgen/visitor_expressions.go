@@ -141,7 +141,7 @@ func (g *Generator) VisitEqualityExpression(ctx *parser.EqualityExpressionContex
 			lhs = g.ctx.Builder.CreateICmpNE(lhs, rhs, "")
 		}
 
-		// Fix: Explicitly check and insert the comparison instruction
+		// FIX: Ensure ICmp instruction is attached to the block
 		if inst, ok := lhs.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
@@ -163,6 +163,11 @@ func (g *Generator) VisitRelationalExpression(ctx *parser.RelationalExpressionCo
 			lhs = g.ctx.Builder.CreateICmpSLE(lhs, rhs, "")
 		case parser.ArcParserGE:
 			lhs = g.ctx.Builder.CreateICmpSGE(lhs, rhs, "")
+		}
+
+		// FIX: Ensure ICmp instruction is attached to the block
+		if inst, ok := lhs.(ir.Instruction); ok && inst.Parent() == nil {
+			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
 	}
 	return lhs
@@ -764,15 +769,18 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 					if !isCall {
 						loaded := g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
-						// Fix: Ensure the load instruction is inserted
-						if loaded.Parent() == nil {
-							g.ctx.Builder.GetInsertBlock().AddInstruction(loaded)
+						
+						// FIX: Ensure the Load instruction is attached to the block
+						if inst, ok := loaded.(ir.Instruction); ok && inst.Parent() == nil {
+							g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 						}
+						
 						fmt.Printf("[DEBUG] PrimaryExpr: Loaded '%s' -> %v (type: %s)\n", name, loaded, loaded.Type())
 						return loaded
 					}
 					entity = g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
-					// Fix: Ensure the load instruction (for call target) is inserted
+					
+					// FIX: Ensure the entity Load instruction is attached to the block
 					if inst, ok := entity.(ir.Instruction); ok && inst.Parent() == nil {
 						g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 					}
@@ -876,6 +884,11 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				if valid && entity == nil {
 					ptrType := currPtr.Type().(*types.PointerType)
 					entity = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
+					
+					// FIX: Ensure the qualified Load instruction is attached to the block
+					if inst, ok := entity.(ir.Instruction); ok && inst.Parent() == nil {
+						g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+					}
 				}
 			}
 		}
