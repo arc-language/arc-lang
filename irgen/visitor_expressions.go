@@ -116,7 +116,7 @@ func (g *Generator) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) i
 	return lhs
 }
 
-(ctx *parser.EqualityExpressionContext) interface{} {
+func RelationalExpression(ctx *parser.EqualityExpressionContext) interface{} {
 	lhs := g.Visit(ctx.RelationalExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllRelationalExpression()); i++ {
 		rhs := g.Visit(ctx.RelationalExpression(i)).(ir.Value)
