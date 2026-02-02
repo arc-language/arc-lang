@@ -116,7 +116,7 @@ func (g *Generator) VisitBitAndExpression(ctx *parser.BitAndExpressionContext) i
 	return lhs
 }
 
-func RelationalExpression(ctx *parser.EqualityExpressionContext) interface{} {
+func (g *Generator) VisitEqualityExpression(ctx *parser.EqualityExpressionContext) interface{} {
 	lhs := g.Visit(ctx.RelationalExpression(0)).(ir.Value)
 	for i := 1; i < len(ctx.AllRelationalExpression()); i++ {
 		rhs := g.Visit(ctx.RelationalExpression(i)).(ir.Value)
@@ -141,7 +141,7 @@ func RelationalExpression(ctx *parser.EqualityExpressionContext) interface{} {
 			lhs = g.ctx.Builder.CreateICmpNE(lhs, rhs, "")
 		}
 
-		// FIX: Ensure ICmp instruction is attached to the block
+		// Fix: lhs is ir.Value (interface)
 		if inst, ok := lhs.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
