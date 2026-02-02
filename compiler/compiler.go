@@ -13,7 +13,7 @@ import (
 	"github.com/arc-language/arc-lang/context"
 	"github.com/arc-language/arc-lang/diagnostic"
 	"github.com/arc-language/arc-lang/irgen"
-	"github.com/arc-language/arc-lang/optimizer"
+	//"github.com/arc-language/arc-lang/optimizer"
 	"github.com/arc-language/arc-lang/pkg"
 	"github.com/arc-language/arc-lang/semantics"
 	"github.com/arc-language/arc-lang/symbol"
