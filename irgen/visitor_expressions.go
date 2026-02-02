@@ -758,7 +758,9 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 					if !isCall {
-						return g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
+						loaded := g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
+						fmt.Printf("[DEBUG] PrimaryExpr: Loaded '%s' -> %v (type: %s)\n", name, loaded, loaded.Type())
+						return loaded
 					}
 					entity = g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 				} else {
