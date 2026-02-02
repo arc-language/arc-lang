@@ -229,6 +229,14 @@ func (b *Builder) CreateCondBr(cond ir.Value, trueBlock, falseBlock *ir.BasicBlo
 	}
 	inst.Self = inst
 	inst.Op = ir.OpCondBr
+	
+	// FIX: Register the instruction as a user of 'cond'
+	if cond != nil {
+		if tracker, ok := cond.(ir.TrackableValue); ok {
+			tracker.AddUser(inst)
+		}
+	}
+
 	b.insert(inst)
 	b.currentBlock.Successors = append(b.currentBlock.Successors, trueBlock, falseBlock)
 	trueBlock.Predecessors = append(trueBlock.Predecessors, b.currentBlock)
@@ -244,6 +252,14 @@ func (b *Builder) CreateSwitch(cond ir.Value, defaultBlock *ir.BasicBlock, numCa
 	}
 	inst.Self = inst
 	inst.Op = ir.OpSwitch
+	
+	// FIX: Register the instruction as a user of 'cond'
+	if cond != nil {
+		if tracker, ok := cond.(ir.TrackableValue); ok {
+			tracker.AddUser(inst)
+		}
+	}
+
 	b.insert(inst)
 	b.currentBlock.Successors = append(b.currentBlock.Successors, defaultBlock)
 	defaultBlock.Predecessors = append(defaultBlock.Predecessors, b.currentBlock)
