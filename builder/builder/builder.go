@@ -178,8 +178,12 @@ func (b *Builder) CreateBlock(baseName string) *ir.BasicBlock {
 	return block
 }
 
-func (b *Builder) CreateBlockInFunction(name string, fn *ir.Function) *ir.BasicBlock {
-	block := ir.NewBasicBlock(name)
+func (b *Builder) CreateBlockInFunction(baseName string, fn *ir.Function) *ir.BasicBlock {
+	// Generate unique name using the counter
+	uniqueName := fmt.Sprintf("%s.%d", baseName, b.nameCounter)
+	b.nameCounter++
+	
+	block := ir.NewBasicBlock(uniqueName)
 	fn.AddBlock(block)
 	return block
 }

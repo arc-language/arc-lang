@@ -157,10 +157,10 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 			cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
 		}
 		
-		thenBlock := g.ctx.Builder.CreateBlock(fmt.Sprintf("if.then.%d", i))
+		thenBlock := g.ctx.Builder.CreateBlock("if.then")
 		
 		if i < conditionCount - 1 {
-			nextCheckBlock = g.ctx.Builder.CreateBlock(fmt.Sprintf("if.check.%d", i+1))
+			nextCheckBlock = g.ctx.Builder.CreateBlock("if.check")
 		} else {
 			if len(ctx.AllBlock()) > conditionCount {
 				nextCheckBlock = g.ctx.Builder.CreateBlock("if.else")
