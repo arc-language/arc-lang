@@ -153,8 +153,13 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 		}
 		
 		cond := g.Visit(ctx.Expression(i)).(ir.Value)
+		
+		// DEBUG: Print what we got
+		fmt.Printf("[DEBUG] If condition %d: type=%s, value=%v\n", i, cond.Type(), cond)
+		
 		if cond.Type().BitSize() > 1 {
 			cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
+			fmt.Printf("[DEBUG] After CreateICmpNE: type=%s, value=%v\n", cond.Type(), cond)
 		}
 		
 		thenBlock := g.ctx.Builder.CreateBlock("if.then")
