@@ -159,6 +159,10 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 		
 		if cond.Type().BitSize() > 1 {
 			cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
+			// Fix: Ensure the implicit boolean check instruction is inserted
+			if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
+				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+			}
 			fmt.Printf("[DEBUG] After CreateICmpNE: type=%s, value=%v\n", cond.Type(), cond)
 		}
 		
@@ -256,6 +260,11 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		} else {
 			cmp = g.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
 		}
+		// Fix: Ensure insertion of range comparison
+		if inst, ok := cmp.(ir.Instruction); ok && inst.Parent() == nil {
+			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+		}
+
 		g.ctx.Builder.CreateCondBr(cmp, bodyBlock, endBlock)
 
 		// Loop Body
@@ -318,6 +327,10 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 	if cond.Type().BitSize() > 1 {
 		cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
+		// Fix: Ensure insertion of implicit boolean check in loops
+		if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
+			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+		}
 	}
 	g.ctx.Builder.CreateCondBr(cond, bodyBlock, endBlock)
 
