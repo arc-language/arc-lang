@@ -166,8 +166,12 @@ func (b *Builder) CreateGlobalConstant(name string, initializer ir.Constant) *ir
 // Basic Block operations
 // ============================================================================
 
-func (b *Builder) CreateBlock(name string) *ir.BasicBlock {
-	block := ir.NewBasicBlock(name)
+func (b *Builder) CreateBlock(baseName string) *ir.BasicBlock {
+	// Generate unique name using the counter
+	uniqueName := fmt.Sprintf("%s.%d", baseName, b.nameCounter)
+	b.nameCounter++
+	
+	block := ir.NewBasicBlock(uniqueName)
 	if b.currentFunc != nil {
 		b.currentFunc.AddBlock(block)
 	}
