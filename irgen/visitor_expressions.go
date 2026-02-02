@@ -770,20 +770,23 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					if !isCall {
 						loaded := g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 						
-						// FIX: Ensure the Load instruction is attached to the block
-						if inst, ok := loaded.(ir.Instruction); ok && inst.Parent() == nil {
-							g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+						// FIX: loaded is *ir.LoadInst (concrete). Check Parent directly.
+						if loaded.Parent() == nil {
+							g.ctx.Builder.GetInsertBlock().AddInstruction(loaded)
 						}
 						
 						fmt.Printf("[DEBUG] PrimaryExpr: Loaded '%s' -> %v (type: %s)\n", name, loaded, loaded.Type())
 						return loaded
 					}
-					entity = g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 					
-					// FIX: Ensure the entity Load instruction is attached to the block
-					if inst, ok := entity.(ir.Instruction); ok && inst.Parent() == nil {
-						g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+					// Use temporary variable to handle concrete type return
+					loadInst := g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
+					
+					// FIX: Check Parent directly
+					if loadInst.Parent() == nil {
+						g.ctx.Builder.GetInsertBlock().AddInstruction(loadInst)
 					}
+					entity = loadInst
 				} else {
 					entity = sym.IRValue
 				}
@@ -883,12 +886,13 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 				if valid && entity == nil {
 					ptrType := currPtr.Type().(*types.PointerType)
-					entity = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
+					loadInst := g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
 					
-					// FIX: Ensure the qualified Load instruction is attached to the block
-					if inst, ok := entity.(ir.Instruction); ok && inst.Parent() == nil {
-						g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+					// FIX: Check Parent directly for concrete LoadInst
+					if loadInst.Parent() == nil {
+						g.ctx.Builder.GetInsertBlock().AddInstruction(loadInst)
 					}
+					entity = loadInst
 				}
 			}
 		}

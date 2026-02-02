@@ -261,9 +261,9 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		g.ctx.Builder.SetInsertPoint(condBlock)
 		currVal := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
 		
-		// FIX: Ensure load is attached
-		if inst, ok := currVal.(ir.Instruction); ok && inst.Parent() == nil {
-			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+		// FIX: currVal is *ir.LoadInst (concrete), check Parent directly
+		if currVal.Parent() == nil {
+			g.ctx.Builder.GetInsertBlock().AddInstruction(currVal)
 		}
 		
 		var cmp ir.Value
@@ -273,7 +273,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 			cmp = g.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
 		}
 
-		// FIX: Ensure comparison is attached
+		// FIX: cmp is ir.Value (interface), type assertion required
 		if inst, ok := cmp.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
@@ -293,6 +293,10 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		// Post Step
 		g.ctx.Builder.SetInsertPoint(postBlock)
 		currVal = g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
+		// Note: We should probably check this load too, though usually Post blocks are simple
+		if currVal.Parent() == nil {
+			g.ctx.Builder.GetInsertBlock().AddInstruction(currVal)
+		}
 		
 		var nextVal ir.Value
 		if types.IsFloat(startVal.Type()) {
