@@ -601,15 +601,14 @@ func (g *Generator) VisitDeinitDecl(ctx *parser.DeinitDeclContext) interface{} {
 	g.enterScope(ctx)
 	defer g.exitScope()
 
-	// 5. Setup 'self' argument
+	// 5. FIX: Setup 'self' argument - don't create alloca
 	selfName := ctx.IDENTIFIER().GetText()
 	arg := fn.Arguments[0]
 	arg.SetName(selfName)
-	alloca := g.ctx.Builder.CreateAlloca(arg.Type(), selfName+".addr")
-	g.ctx.Builder.CreateStore(arg, alloca)
 	
+	// Symbol points directly to the argument
 	if s, ok := g.currentScope.Resolve(selfName); ok {
-		s.IRValue = alloca
+		s.IRValue = arg
 	}
 
 	// 6. Generate Statements

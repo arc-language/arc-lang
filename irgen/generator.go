@@ -249,14 +249,14 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			}
 		}
 
-		// Create Argument Allocas
+		// FIX: Don't create allocas for parameters
+		// Let codegen handle the stack allocation directly
 		for i, arg := range fn.Arguments {
 			if i < len(paramNames) {
 				arg.SetName(paramNames[i])
-				alloca := g.ctx.Builder.CreateAlloca(arg.Type(), paramNames[i]+".addr")
-				g.ctx.Builder.CreateStore(arg, alloca)
+				// Symbol points directly to the argument
 				if s, ok := g.currentScope.Resolve(paramNames[i]); ok {
-					s.IRValue = alloca
+					s.IRValue = arg
 				}
 			}
 		}
