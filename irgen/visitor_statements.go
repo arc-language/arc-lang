@@ -78,18 +78,19 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 
 
 func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) interface{} {
-	// Updated: Use UnaryExpression instead of LeftHandSide
 	lhsCtx := ctx.UnaryExpression()
-	
-	// Resolve L-Value
 	destPtr := g.getLValue(lhsCtx)
 
 	if destPtr == nil {
 		fmt.Printf("[IRGen] Error: Invalid assignment target at line %d\n", ctx.GetStart().GetLine())
 		return nil
 	}
+	
+	// FIX: Ensure l-value computation instructions are inserted (e.g. GEPs)
+	if inst, ok := destPtr.(ir.Instruction); ok && inst.Parent() == nil {
+		g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+	}
 
-	// SAFETY CHECK: Ensure assignment target is actually a pointer
 	ptrType, isPtr := destPtr.Type().(*types.PointerType)
 	if !isPtr {
 		fmt.Printf("[IRGen] Error: Assignment target is not a pointer (type: %s) at line %d\n", destPtr.Type().String(), ctx.GetStart().GetLine())
@@ -97,11 +98,23 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 	}
 
 	rhs := g.Visit(ctx.Expression()).(ir.Value)
+	
+	// FIX: Ensure RHS evaluation is inserted
+	if inst, ok := rhs.(ir.Instruction); ok && inst.Parent() == nil {
+		g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+	}
+
 	finalVal := rhs
 
 	if ctx.AssignmentOp().ASSIGN() == nil {
-		// Compound assignment: need to load current value
+		// Compound assignment
 		currVal := g.ctx.Builder.CreateLoad(ptrType.ElementType, destPtr, "")
+		
+		// FIX: Insert load
+		if currVal.Parent() == nil {
+			g.ctx.Builder.GetInsertBlock().AddInstruction(currVal)
+		}
+		
 		op := ctx.AssignmentOp()
 		
 		if types.IsFloat(currVal.Type()) {
@@ -133,10 +146,20 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 				finalVal = g.ctx.Builder.CreateXor(currVal, rhs, "")
 			}
 		}
+		
+		// FIX: Insert binary op result
+		if inst, ok := finalVal.(ir.Instruction); ok && inst.Parent() == nil {
+			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+		}
 	}
 
-	// Ensure RHS type matches the element type of the pointer
 	finalVal = g.emitCast(finalVal, ptrType.ElementType)
+	
+	// FIX: Insert cast
+	if inst, ok := finalVal.(ir.Instruction); ok && inst.Parent() == nil {
+		g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+	}
+
 	g.ctx.Builder.CreateStore(finalVal, destPtr)
 
 	return nil
@@ -151,6 +174,7 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 		if nextCheckBlock != nil {
 			g.ctx.SetInsertBlock(nextCheckBlock)
 		} else {
+			// FIX: Reset insert point to end of current block
 			if curr := g.ctx.Builder.GetInsertBlock(); curr != nil {
 				g.ctx.Builder.SetInsertPoint(curr)
 			}
@@ -158,13 +182,14 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 		
 		cond := g.Visit(ctx.Expression(i)).(ir.Value)
 		
-		// SAFETY FIX: If condition instruction was created but not inserted, force insert it
+		// FIX: Ensure condition instruction is inserted
 		if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
 		
 		if cond.Type().BitSize() > 1 {
 			cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
+			// FIX: Ensure implicit boolean check is inserted
 			if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 			}

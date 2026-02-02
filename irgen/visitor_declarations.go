@@ -365,8 +365,6 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		}
 		
 		var init ir.Constant = g.ctx.Builder.ConstZero(sym.Type)
-		// (Optional: constant expression evaluation here)
-		
 		glob := g.ctx.Builder.CreateGlobalVariable(name, sym.Type, init)
 		sym.IRValue = glob
 		return nil
@@ -379,6 +377,12 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		if ctx.TuplePattern() != nil {
 			if ctx.Expression() == nil { return nil }
 			val := g.Visit(ctx.Expression()).(ir.Value)
+			
+			// FIX: Ensure val instruction is inserted
+			if inst, ok := val.(ir.Instruction); ok && inst.Parent() == nil {
+				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+			}
+
 			names := ctx.TuplePattern().AllIDENTIFIER()
 			for i, idNode := range names {
 				name := idNode.GetText()
@@ -386,8 +390,13 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 				if !ok { continue }
 				
 				fieldVal := g.ctx.Builder.CreateExtractValue(val, []int{i}, "")
-				// Sync the symbol type to match what extractvalue actually produced.
-				// Semantics may have inferred a different type than the tuple field.
+				
+				// FIX: Ensure extractvalue is inserted
+				if fieldVal.Parent() == nil {
+					g.ctx.Builder.GetInsertBlock().AddInstruction(fieldVal)
+				}
+
+				// Sync type and allocate
 				sym.Type = fieldVal.Type()
 				alloca := g.ctx.Builder.CreateAlloca(sym.Type, name+".addr")
 				g.ctx.Builder.CreateStore(fieldVal, alloca)
@@ -405,7 +414,11 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		if ctx.Expression() != nil {
 			initVal = g.Visit(ctx.Expression()).(ir.Value)
 			
-			// Type Inference
+			// FIX: Ensure initVal instruction is inserted
+			if inst, ok := initVal.(ir.Instruction); ok && inst.Parent() == nil {
+				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+			}
+
 			if ctx.Type_() == nil && initVal != nil {
 				sym.Type = initVal.Type()
 			}
@@ -420,37 +433,29 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		isClass := false
 		var structType *types.StructType
 
-		// Check A: Type is directly a StructType
 		if st, ok := sym.Type.(*types.StructType); ok {
-			// Primary Check: Is it flagged as a class in Semantics?
 			if st.IsClass {
 				isClass = true
 				structType = st
 				storageType = types.NewPointer(sym.Type)
 			} else {
-				// Secondary Check: Consult the IR Module definitions
-				// If Semantics missed the flag but IRGen Declarations registered it as a Class, we sync up.
-				// This handles cases where scopes might have disjoint type definitions.
 				if modSt, found := g.ctx.Module.Types[st.Name]; found && modSt.IsClass {
 					fmt.Printf("[IRGen] Info: Syncing Class status for %s from Module\n", st.Name)
 					isClass = true
 					structType = modSt
 					storageType = types.NewPointer(modSt)
-					sym.Type = modSt // Update symbol to prevent future mismatches
+					sym.Type = modSt 
 				}
 			}
 		} else if ptr, ok := sym.Type.(*types.PointerType); ok {
-			// Check B: Type is a Pointer to a Class (e.g. from 'new' or struct literal)
 			if st, ok := ptr.ElementType.(*types.StructType); ok && st.IsClass {
 				isClass = true
 				structType = st
-				storageType = sym.Type // Already a pointer
+				storageType = sym.Type 
 			}
 		}
 
 		// 4. Allocate Stack Slot
-		// For structs, we allocate the size of the struct.
-		// For classes, we allocate the size of a pointer.
 		alloca := g.ctx.Builder.CreateAlloca(storageType, name+".addr")
 		sym.IRValue = alloca
 
@@ -460,6 +465,12 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 				initVal = g.getZeroValue(storageType)
 			}
 			initVal = g.emitCast(initVal, storageType)
+			
+			// FIX: Ensure cast is inserted
+			if inst, ok := initVal.(ir.Instruction); ok && inst.Parent() == nil {
+				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+			}
+			
 			g.ctx.Builder.CreateStore(initVal, alloca)
 		} else {
 			g.ctx.Builder.CreateStore(g.getZeroValue(storageType), alloca)
@@ -468,35 +479,33 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		// 6. Automatic Reference Counting (ARC) Injection
 		if isClass {
 			g.deferStack.Add(func(gen *Generator) {
-				// A. Load Object Pointer
-				// %obj = load %MyClass*, %MyClass** %alloca
 				objPtr := gen.ctx.Builder.CreateLoad(storageType, alloca, name+".arc_load")
+				if objPtr.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(objPtr) }
 
-				// B. Get RefCount Pointer (Index 0)
-				// Note: Index 0 is the hidden i64 header
 				rcPtr := gen.ctx.Builder.CreateStructGEP(structType, objPtr, 0, "rc_ptr")
+				if rcPtr.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(rcPtr) }
 
-				// C. Decrement RefCount
 				rc := gen.ctx.Builder.CreateLoad(types.I64, rcPtr, "rc_val")
+				if rc.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(rc) }
+
 				one := gen.ctx.Builder.ConstInt(types.I64, 1)
 				newRc := gen.ctx.Builder.CreateSub(rc, one, "rc_dec")
+				if newRc.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(newRc) }
+
 				gen.ctx.Builder.CreateStore(newRc, rcPtr)
 
-				// D. Check if Zero
 				zero := gen.ctx.Builder.ConstInt(types.I64, 0)
 				isZero := gen.ctx.Builder.CreateICmpEQ(newRc, zero, "is_zero")
+				if isZero.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(isZero) }
 
-				// E. Conditional Branch (Free vs Continue)
 				funcObj := gen.ctx.CurrentFunction
 				freeBlock := gen.ctx.Builder.CreateBlockInFunction("arc_free", funcObj)
 				contBlock := gen.ctx.Builder.CreateBlockInFunction("arc_cont", funcObj)
 
 				gen.ctx.Builder.CreateCondBr(isZero, freeBlock, contBlock)
 
-				// --- FREE BLOCK ---
 				gen.ctx.Builder.SetInsertPoint(freeBlock)
 
-				// 1. Call User Deinit (e.g. main.log_deinit)
 				deinitName := structType.Name + "_deinit"
 				if deinitSym, ok := gen.currentScope.Resolve(deinitName); ok {
 					if fn, ok := deinitSym.IRValue.(*ir.Function); ok {
@@ -504,9 +513,8 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 					}
 				}
 
-				// 2. Call Free
-				// Bitcast to i8* for free()
 				voidPtr := gen.ctx.Builder.CreateBitCast(objPtr, types.NewPointer(types.I8), "")
+				if voidPtr.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(voidPtr) }
 				
 				freeFn := gen.ctx.Module.GetFunction("free")
 				if freeFn == nil {
@@ -516,7 +524,6 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 
 				gen.ctx.Builder.CreateBr(contBlock)
 
-				// --- CONTINUE BLOCK ---
 				gen.ctx.Builder.SetInsertPoint(contBlock)
 			})
 		}
