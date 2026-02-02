@@ -1,3 +1,4 @@
+```markdown
 # arc Language Grammar (Version 1.2 - Core Syntax)
 
 Grammar rules:
@@ -324,37 +325,6 @@ struct Point {
 }
 ```
 
-## Structs, mutating methods
-```arc
-struct Counter {
-    count: int32
-    
-    // Mutating method - modifies the struct in-place
-    // Only callable on mutable instances (let, not const)
-    mutating increment(self c: *Counter) {
-        c.count++
-    }
-    
-    mutating add(self c: *Counter, value: int32) {
-        c.count += value
-    }
-    
-    // Non-mutating method - read-only access
-    func get_count(self c: Counter) int32 {
-        return c.count
-    }
-}
-
-// Usage
-let counter = Counter{count: 0}  // Mutable
-counter.increment()               // OK - counter is mutable
-counter.add(5)                    // OK
-
-const frozen = Counter{count: 10} // Immutable
-// frozen.increment()              // ERROR - cannot call mutating method on const
-let value = frozen.get_count()    // OK - non-mutating method
-```
-
 ## Structs, flat methods (alternative style)
 ```arc
 struct Point {
@@ -370,12 +340,6 @@ func distance(self p: Point) float64 {
 func move(self p: *Point, dx: int32, dy: int32) {
     p.x += dx
     p.y += dy
-}
-
-// Mutating method declared outside
-mutating reset(self p: *Point) {
-    p.x = 0
-    p.y = 0
 }
 ```
 
@@ -463,8 +427,6 @@ async func example() {
 - `struct` = Value type (stack allocated, copied on assignment, no ref counting)
 - Both support methods (inline or flat declaration style)
 - Only `class` supports `deinit` (called when ref count reaches 0)
-- `struct` methods can be marked `mutating` to modify the struct in-place
-- `mutating` keyword only applies to structs (classes already use pointers)
 
 ## Control Flow, if-else
 ```arc
@@ -1006,4 +968,5 @@ button.onClick = (x: int32, y: int32) => {
 }
 
 button.press(100, 200)  // Triggers the callback
+```
 ```

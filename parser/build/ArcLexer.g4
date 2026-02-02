@@ -13,7 +13,6 @@ AWAIT: 'await';
 PROCESS: 'process';
 STRUCT: 'struct';
 CLASS: 'class';
-MUTATING: 'mutating';
 INIT: 'init';
 DEINIT: 'deinit';
 RETURN: 'return';

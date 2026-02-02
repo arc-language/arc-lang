@@ -224,9 +224,6 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#methodDecl.
 	VisitMethodDecl(ctx *MethodDeclContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#mutatingDecl.
-	VisitMutatingDecl(ctx *MutatingDeclContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#deinitDecl.
 	VisitDeinitDecl(ctx *DeinitDeclContext) interface{}
 

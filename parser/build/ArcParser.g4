@@ -25,7 +25,6 @@ topLevelDecl
     | enumDecl
     | computeDecl
     | methodDecl
-    | mutatingDecl
     | deinitDecl
     | variableDecl
     | constDecl
@@ -287,7 +286,7 @@ parameter: SELF? IDENTIFIER COLON type;
 // =============================================================================
 
 structDecl: attribute* STRUCT IDENTIFIER genericParams? LBRACE structMember* RBRACE;
-structMember: structField | functionDecl | mutatingDecl | initDecl;
+structMember: structField | functionDecl | initDecl;
 structField: IDENTIFIER COLON type;
 
 initDecl: INIT LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* (COMMA ELLIPSIS)? RPAREN block;
@@ -318,7 +317,6 @@ enumMember: IDENTIFIER (ASSIGN expression)?;
 // =============================================================================
 
 methodDecl: executionStrategy? FUNC IDENTIFIER genericParams? LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN returnType? block;
-mutatingDecl: MUTATING IDENTIFIER LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN returnType? block;
 deinitDecl: DEINIT LPAREN SELF IDENTIFIER COLON type RPAREN block;
 
 // =============================================================================
