@@ -782,6 +782,31 @@ func (c *compiler) load(dst Register, src ir.Value) {
 		c.asm.LeaRel(dst, v.Name())
 	case *ir.Function:
 		c.asm.LeaRel(dst, v.Name())
+	case *ir.Argument:
+		// FIX: Arguments are already in their stack slots (saved by prologue)
+		// Just load them directly from the stack
+		slot := c.getStackSlot(v)
+		typ := v.Type()
+		size := SizeOf(typ)
+		if size == 8 {
+			c.asm.Mov(RegOp(dst), slot, 64)
+		} else if size == 4 {
+			c.asm.Mov(RegOp(dst), slot, 32)
+		} else if size == 2 {
+			c.asm.Mov(RegOp(dst), slot, 16)
+		} else if size == 1 {
+			isSigned := false
+			if intTy, ok := typ.(*types.IntType); ok && intTy.Signed {
+				isSigned = true
+			}
+			if isSigned {
+				c.asm.Movsx(dst, slot, 8)
+			} else {
+				c.asm.MovZX(dst, slot, 8)
+			}
+		} else {
+			c.asm.Mov(RegOp(dst), slot, 64)
+		}
 	case *ir.AllocaInst:
 		off := c.stackMap[v]
 		c.asm.Lea(dst, NewMem(RBP, off))
