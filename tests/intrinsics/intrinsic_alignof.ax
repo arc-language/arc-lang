@@ -5,7 +5,7 @@ extern c {
     func printf(*byte, ...) int32
 }
 
-func main int32 () {
+func main() int32 {
 
     let align = alignof(int64)
     printf("align=%zu\n", align)

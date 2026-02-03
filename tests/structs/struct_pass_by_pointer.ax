@@ -15,7 +15,7 @@ func move_point(p: *Point, dx: int32, dy: int32) {
     p.y += dy
 }
 
-func main int32 () {
+func main() int32 {
 
     let pt = Point{x: 0, y: 0}
     move_point(&pt, 5, 10)

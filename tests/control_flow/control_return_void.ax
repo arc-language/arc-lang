@@ -10,7 +10,7 @@ func test_return() {
     return
 }
 
-func main int32 () {
+func main() int32 {
 
     test_return()
     printf("done\n")

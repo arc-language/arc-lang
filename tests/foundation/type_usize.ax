@@ -5,7 +5,7 @@ extern c {
     func printf(*byte, ...) int32
 }
 
-func main int32 () {
+func main() int32 {
 
     let size: usize = 1024
     printf("usize=%zu\n", size)

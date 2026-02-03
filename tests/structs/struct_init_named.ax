@@ -10,7 +10,7 @@ struct Point {
     y: int32
 }
 
-func main int32 () {
+func main() int32 {
 
     printf("struct_defined\n")
 

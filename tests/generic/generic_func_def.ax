@@ -9,7 +9,7 @@ func identity<T>(x: T) T {
     return x
 }
 
-func main int32 () {
+func main() int32 {
 
     let result = identity<int32>(99)
     printf("result=%d\n", result)

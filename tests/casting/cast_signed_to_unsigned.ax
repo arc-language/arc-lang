@@ -5,7 +5,7 @@ extern c {
     func printf(*byte, ...) int32
 }
 
-func main int32 () {
+func main() int32 {
 
     let neg: int32 = -1
     let pos: uint32 = cast<uint32>(neg)

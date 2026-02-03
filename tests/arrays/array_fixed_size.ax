@@ -5,7 +5,7 @@ extern c {
     func printf(*byte, ...) int32
 }
 
-func main int32 () {
+func main() int32 {
 
     let arr: [3]int32 = {10, 20, 30}
     printf("arr[1]=%d\n", arr[1])

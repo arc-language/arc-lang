@@ -14,7 +14,7 @@ func fib(n: int32) int32 {
 }
 
 
-func main int32 () {
+func main() int32 {
 
     let result = fib(7)
     printf("fib=%d\n", result)

@@ -10,7 +10,7 @@ struct Point {
     y: int32
 }
 
-func main int32 () {
+func main() int32 {
 
     let p: Point = Point{x: 10, y: 20}
     printf("x=%d y=%d\n", p.x, p.y)

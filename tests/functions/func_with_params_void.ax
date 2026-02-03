@@ -9,7 +9,7 @@ func print_sum(a: int32, b: int32) {
     printf("sum=%d\n", a + b)
 }
 
-func main int32 () {
+func main() int32 {
 
     print_sum(10, 20)
 

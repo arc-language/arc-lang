@@ -10,7 +10,7 @@ struct Pair {
     b: int32
 }
 
-func main int32 () {
+func main() int32 {
 
     let size = sizeof(Pair)
     printf("size=%zu\n", size)

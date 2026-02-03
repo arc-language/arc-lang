@@ -13,7 +13,7 @@ func get(self c: Counter) int32 {
     return c.value
 }
 
-func main int32 () {
+func main() int32 {
 
     let counter = Counter{value: 77}
     let val = counter.get()

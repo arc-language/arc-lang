@@ -11,7 +11,7 @@ async func async_function() int32 {
 	return results
 }
 
-func main int32 () {
+func main() int32 {
 
 	let results = await async_function()
     printf("%d\n", results)

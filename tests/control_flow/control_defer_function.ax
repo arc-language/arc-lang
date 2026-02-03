@@ -9,7 +9,7 @@ func cleanup() {
     printf("cleanup_called\n")
 }
 
-func main int32 () {
+func main() int32 {
 
     printf("start\n")
     defer cleanup()

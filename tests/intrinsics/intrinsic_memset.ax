@@ -5,7 +5,7 @@ extern c {
     func printf(*byte, ...) int32
 }
 
-func main int32 () {
+func main() int32 {
 
     let buffer = alloca<byte>(10)
     memset(buffer, 0x42, 10)

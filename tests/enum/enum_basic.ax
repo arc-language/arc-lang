@@ -11,7 +11,7 @@ enum Status {
     PENDING
 }
 
-func main int32 () {
+func main() int32 {
 
     let s: Status = Status.OK
     printf("status=%d\n", s)

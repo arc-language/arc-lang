@@ -9,7 +9,7 @@ struct Box<T> {
     value: T
 }
 
-func main int32 () {
+func main() int32 {
 
     let b: Box<int32> = Box<int32>{value: 42}
     printf("value=%d\n", b.value)

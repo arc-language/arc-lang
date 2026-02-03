@@ -12,7 +12,7 @@ func check_positive(x: int32) int32 {
     return x
 }
 
-func main int32 () {
+func main() int32 {
 
     let result = check_positive(-5)
     printf("result=%d\n", result)

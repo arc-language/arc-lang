@@ -9,7 +9,7 @@ func greet() {
     printf("hello\n")
 }
 
-func main int32 () {
+func main() int32 {
 
     greet()
 

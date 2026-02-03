@@ -14,7 +14,7 @@ func print_point(p: Point) {
     printf("x=%d y=%d\n", p.x, p.y)
 }
 
-func main int32 () {
+func main() int32 {
 
     let pt = Point{x: 5, y: 10}
     print_point(pt)

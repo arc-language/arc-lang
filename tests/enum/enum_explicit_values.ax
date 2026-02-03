@@ -11,7 +11,7 @@ enum HttpCode {
     SERVER_ERROR = 500
 }
 
-func main int32 () {
+func main() int32 {
 
     let code: HttpCode = HttpCode.NOT_FOUND
     printf("code=%d\n", code)

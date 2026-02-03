@@ -5,7 +5,7 @@ extern c {
     func printf(*byte, ...) int32
 }
 
-func main int32 () {
+func main() int32 {
 
     const LIMIT = 1024
     printf("limit=%d\n", LIMIT)

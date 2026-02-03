@@ -13,7 +13,7 @@ struct Counter {
     }
 }
 
-func main int32 () {
+func main() int32 {
 
     let counter = Counter{value: 42}
     let val = counter.get()

@@ -9,7 +9,7 @@ func modify_value(ptr: *int32) {
     *ptr = 888
 }
 
-func main int32 () {
+func main() int32 {
 
     let x = 10
     modify_value(&x)

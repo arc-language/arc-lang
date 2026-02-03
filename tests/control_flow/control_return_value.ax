@@ -9,7 +9,7 @@ func get_value() int32 {
     return 42
 }
 
-func main int32 () {
+func main() int32 {
 
     let x = get_value()
     printf("value=%d\n", x)

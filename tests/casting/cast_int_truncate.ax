@@ -5,7 +5,7 @@ extern c {
     func printf(*byte, ...) int32
 }
 
-func main int32 () {
+func main() int32 {
 
     let large: int32 = 1000
     let small: int8 = cast<int8>(large)

@@ -1,0 +1,1772 @@
+
+--- Test: array_2d (../tests/arrays/array_2d.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/arrays/array_2d.ax -> /tmp/arc_test_env/array_2d
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_2d.ax
+/home/marss6414/arc-lang/tests/arrays/array_2d.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_2d.ax:14:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/arrays/array_2d.ax -> /tmp/arc_test_env/array_2d
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_2d.ax
+/home/marss6414/arc-lang/tests/arrays/array_2d.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_2d.ax:14:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: array_element_assign (../tests/arrays/array_element_assign.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/arrays/array_element_assign.ax -> /tmp/arc_test_env/array_element_assign
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_element_assign.ax
+/home/marss6414/arc-lang/tests/arrays/array_element_assign.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_element_assign.ax:11:7: Syntax Error: no viable alternative at input 'arr['
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/arrays/array_element_assign.ax -> /tmp/arc_test_env/array_element_assign
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_element_assign.ax
+/home/marss6414/arc-lang/tests/arrays/array_element_assign.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_element_assign.ax:11:7: Syntax Error: no viable alternative at input 'arr['
+Error: compilation failed
+
+--- Test: array_fixed_size (../tests/arrays/array_fixed_size.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/arrays/array_fixed_size.ax -> /tmp/arc_test_env/array_fixed_size
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_fixed_size.ax
+/home/marss6414/arc-lang/tests/arrays/array_fixed_size.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_fixed_size.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/arrays/array_fixed_size.ax -> /tmp/arc_test_env/array_fixed_size
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_fixed_size.ax
+/home/marss6414/arc-lang/tests/arrays/array_fixed_size.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_fixed_size.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: array_iteration_cstyle (../tests/arrays/array_iteration_cstyle.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/arrays/array_iteration_cstyle.ax -> /tmp/arc_test_env/array_iteration_cstyle
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_iteration_cstyle.ax
+/home/marss6414/arc-lang/tests/arrays/array_iteration_cstyle.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_iteration_cstyle.ax:12:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+/home/marss6414/arc-lang/tests/arrays/array_iteration_cstyle.ax:12:24: Syntax Error: extraneous input ';' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/arrays/array_iteration_cstyle.ax -> /tmp/arc_test_env/array_iteration_cstyle
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_iteration_cstyle.ax
+/home/marss6414/arc-lang/tests/arrays/array_iteration_cstyle.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_iteration_cstyle.ax:12:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+/home/marss6414/arc-lang/tests/arrays/array_iteration_cstyle.ax:12:24: Syntax Error: extraneous input ';' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: array_ptr_first (../tests/arrays/array_ptr_first.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/arrays/array_ptr_first.ax -> /tmp/arc_test_env/array_ptr_first
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_ptr_first.ax
+/home/marss6414/arc-lang/tests/arrays/array_ptr_first.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_ptr_first.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/arrays/array_ptr_first.ax -> /tmp/arc_test_env/array_ptr_first
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_ptr_first.ax
+/home/marss6414/arc-lang/tests/arrays/array_ptr_first.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_ptr_first.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: array_zero_init (../tests/arrays/array_zero_init.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/arrays/array_zero_init.ax -> /tmp/arc_test_env/array_zero_init
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_zero_init.ax
+/home/marss6414/arc-lang/tests/arrays/array_zero_init.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_zero_init.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/arrays/array_zero_init.ax -> /tmp/arc_test_env/array_zero_init
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/arrays/array_zero_init.ax
+/home/marss6414/arc-lang/tests/arrays/array_zero_init.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/arrays/array_zero_init.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: async_basic (../tests/async/async_basic.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/async/async_basic.ax -> /tmp/arc_test_env/async_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/async/async_basic.ax
+/home/marss6414/arc-lang/tests/async/async_basic.ax:14:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/async/async_basic.ax:17:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/async/async_basic.ax -> /tmp/arc_test_env/async_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/async/async_basic.ax
+/home/marss6414/arc-lang/tests/async/async_basic.ax:14:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/async/async_basic.ax:17:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: cast_float_to_int (../tests/casting/cast_float_to_int.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/casting/cast_float_to_int.ax -> /tmp/arc_test_env/cast_float_to_int
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_float_to_int.ax
+/home/marss6414/arc-lang/tests/casting/cast_float_to_int.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_float_to_int.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/casting/cast_float_to_int.ax -> /tmp/arc_test_env/cast_float_to_int
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_float_to_int.ax
+/home/marss6414/arc-lang/tests/casting/cast_float_to_int.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_float_to_int.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: cast_int_to_float (../tests/casting/cast_int_to_float.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/casting/cast_int_to_float.ax -> /tmp/arc_test_env/cast_int_to_float
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_int_to_float.ax
+/home/marss6414/arc-lang/tests/casting/cast_int_to_float.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_int_to_float.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/casting/cast_int_to_float.ax -> /tmp/arc_test_env/cast_int_to_float
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_int_to_float.ax
+/home/marss6414/arc-lang/tests/casting/cast_int_to_float.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_int_to_float.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: cast_int_to_ptr (../tests/casting/cast_int_to_ptr.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/casting/cast_int_to_ptr.ax -> /tmp/arc_test_env/cast_int_to_ptr
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_int_to_ptr.ax
+/home/marss6414/arc-lang/tests/casting/cast_int_to_ptr.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_int_to_ptr.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/casting/cast_int_to_ptr.ax -> /tmp/arc_test_env/cast_int_to_ptr
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_int_to_ptr.ax
+/home/marss6414/arc-lang/tests/casting/cast_int_to_ptr.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_int_to_ptr.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: cast_int_truncate (../tests/casting/cast_int_truncate.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/casting/cast_int_truncate.ax -> /tmp/arc_test_env/cast_int_truncate
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_int_truncate.ax
+/home/marss6414/arc-lang/tests/casting/cast_int_truncate.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_int_truncate.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/casting/cast_int_truncate.ax -> /tmp/arc_test_env/cast_int_truncate
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_int_truncate.ax
+/home/marss6414/arc-lang/tests/casting/cast_int_truncate.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_int_truncate.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: cast_int_widen (../tests/casting/cast_int_widen.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/casting/cast_int_widen.ax -> /tmp/arc_test_env/cast_int_widen
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_int_widen.ax
+/home/marss6414/arc-lang/tests/casting/cast_int_widen.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_int_widen.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/casting/cast_int_widen.ax -> /tmp/arc_test_env/cast_int_widen
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_int_widen.ax
+/home/marss6414/arc-lang/tests/casting/cast_int_widen.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_int_widen.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: cast_ptr_to_int (../tests/casting/cast_ptr_to_int.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/casting/cast_ptr_to_int.ax -> /tmp/arc_test_env/cast_ptr_to_int
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_ptr_to_int.ax
+/home/marss6414/arc-lang/tests/casting/cast_ptr_to_int.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_ptr_to_int.ax:13:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/casting/cast_ptr_to_int.ax -> /tmp/arc_test_env/cast_ptr_to_int
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_ptr_to_int.ax
+/home/marss6414/arc-lang/tests/casting/cast_ptr_to_int.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_ptr_to_int.ax:13:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: cast_ptr_to_ptr (../tests/casting/cast_ptr_to_ptr.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/casting/cast_ptr_to_ptr.ax -> /tmp/arc_test_env/cast_ptr_to_ptr
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_ptr_to_ptr.ax
+/home/marss6414/arc-lang/tests/casting/cast_ptr_to_ptr.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_ptr_to_ptr.ax:14:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/casting/cast_ptr_to_ptr.ax -> /tmp/arc_test_env/cast_ptr_to_ptr
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_ptr_to_ptr.ax
+/home/marss6414/arc-lang/tests/casting/cast_ptr_to_ptr.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_ptr_to_ptr.ax:14:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: cast_signed_to_unsigned (../tests/casting/cast_signed_to_unsigned.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/casting/cast_signed_to_unsigned.ax -> /tmp/arc_test_env/cast_signed_to_unsigned
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_signed_to_unsigned.ax
+/home/marss6414/arc-lang/tests/casting/cast_signed_to_unsigned.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_signed_to_unsigned.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/casting/cast_signed_to_unsigned.ax -> /tmp/arc_test_env/cast_signed_to_unsigned
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_signed_to_unsigned.ax
+/home/marss6414/arc-lang/tests/casting/cast_signed_to_unsigned.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_signed_to_unsigned.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: cast_unsigned_to_signed (../tests/casting/cast_unsigned_to_signed.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/casting/cast_unsigned_to_signed.ax -> /tmp/arc_test_env/cast_unsigned_to_signed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_unsigned_to_signed.ax
+/home/marss6414/arc-lang/tests/casting/cast_unsigned_to_signed.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_unsigned_to_signed.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/casting/cast_unsigned_to_signed.ax -> /tmp/arc_test_env/cast_unsigned_to_signed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/casting/cast_unsigned_to_signed.ax
+/home/marss6414/arc-lang/tests/casting/cast_unsigned_to_signed.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/casting/cast_unsigned_to_signed.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: control_defer_function (../tests/control_flow/control_defer_function.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_defer_function.ax -> /tmp/arc_test_env/control_defer_function
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_defer_function.ax
+/home/marss6414/arc-lang/tests/control_flow/control_defer_function.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_defer_function.ax -> /tmp/arc_test_env/control_defer_function
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_defer_function.ax
+/home/marss6414/arc-lang/tests/control_flow/control_defer_function.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+--- Test: control_defer_multiple (../tests/control_flow/control_defer_multiple.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_defer_multiple.ax -> /tmp/arc_test_env/control_defer_multiple
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_defer_multiple.ax
+/home/marss6414/arc-lang/tests/control_flow/control_defer_multiple.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_defer_multiple.ax -> /tmp/arc_test_env/control_defer_multiple
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_defer_multiple.ax
+/home/marss6414/arc-lang/tests/control_flow/control_defer_multiple.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+--- Test: control_defer_single (../tests/control_flow/control_defer_single.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_defer_single.ax -> /tmp/arc_test_env/control_defer_single
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_defer_single.ax
+/home/marss6414/arc-lang/tests/control_flow/control_defer_single.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_defer_single.ax -> /tmp/arc_test_env/control_defer_single
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_defer_single.ax
+/home/marss6414/arc-lang/tests/control_flow/control_defer_single.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+--- Test: control_for_continue (../tests/control_flow/control_for_continue.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_for_continue.ax -> /tmp/arc_test_env/control_for_continue
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_continue.ax
+/home/marss6414/arc-lang/tests/control_flow/control_for_continue.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_for_continue.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+/home/marss6414/arc-lang/tests/control_flow/control_for_continue.ax:11:17: Syntax Error: extraneous input ';' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_for_continue.ax -> /tmp/arc_test_env/control_for_continue
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_continue.ax
+/home/marss6414/arc-lang/tests/control_flow/control_for_continue.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_for_continue.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+/home/marss6414/arc-lang/tests/control_flow/control_for_continue.ax:11:17: Syntax Error: extraneous input ';' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: control_for_cstyle (../tests/control_flow/control_for_cstyle.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_for_cstyle.ax -> /tmp/arc_test_env/control_for_cstyle
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_cstyle.ax
+/home/marss6414/arc-lang/tests/control_flow/control_for_cstyle.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_for_cstyle.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+/home/marss6414/arc-lang/tests/control_flow/control_for_cstyle.ax:11:17: Syntax Error: extraneous input ';' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_for_cstyle.ax -> /tmp/arc_test_env/control_for_cstyle
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_cstyle.ax
+/home/marss6414/arc-lang/tests/control_flow/control_for_cstyle.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_for_cstyle.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+/home/marss6414/arc-lang/tests/control_flow/control_for_cstyle.ax:11:17: Syntax Error: extraneous input ';' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: control_for_infinite_break (../tests/control_flow/control_for_infinite_break.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_for_infinite_break.ax -> /tmp/arc_test_env/control_for_infinite_break
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_infinite_break.ax
+/home/marss6414/arc-lang/tests/control_flow/control_for_infinite_break.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_for_infinite_break.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_for_infinite_break.ax -> /tmp/arc_test_env/control_for_infinite_break
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_infinite_break.ax
+/home/marss6414/arc-lang/tests/control_flow/control_for_infinite_break.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_for_infinite_break.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: control_for_nested (../tests/control_flow/control_for_nested.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_for_nested.ax -> /tmp/arc_test_env/control_for_nested
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_nested.ax
+/home/marss6414/arc-lang/tests/control_flow/control_for_nested.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_for_nested.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+/home/marss6414/arc-lang/tests/control_flow/control_for_nested.ax:11:17: Syntax Error: extraneous input ';' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+/home/marss6414/arc-lang/tests/control_flow/control_for_nested.ax:12:21: Syntax Error: extraneous input ';' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_for_nested.ax -> /tmp/arc_test_env/control_for_nested
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_nested.ax
+/home/marss6414/arc-lang/tests/control_flow/control_for_nested.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_for_nested.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+/home/marss6414/arc-lang/tests/control_flow/control_for_nested.ax:11:17: Syntax Error: extraneous input ';' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+/home/marss6414/arc-lang/tests/control_flow/control_for_nested.ax:12:21: Syntax Error: extraneous input ';' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: control_for_while (../tests/control_flow/control_for_while.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_for_while.ax -> /tmp/arc_test_env/control_for_while
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_while.ax
+/home/marss6414/arc-lang/tests/control_flow/control_for_while.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_for_while.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_for_while.ax -> /tmp/arc_test_env/control_for_while
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_while.ax
+/home/marss6414/arc-lang/tests/control_flow/control_for_while.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_for_while.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: control_if_basic (../tests/control_flow/control_if_basic.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_if_basic.ax -> /tmp/arc_test_env/control_if_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_basic.ax
+/home/marss6414/arc-lang/tests/control_flow/control_if_basic.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_if_basic.ax:11:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_if_basic.ax -> /tmp/arc_test_env/control_if_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_basic.ax
+/home/marss6414/arc-lang/tests/control_flow/control_if_basic.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_if_basic.ax:11:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: control_if_else (../tests/control_flow/control_if_else.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_if_else.ax -> /tmp/arc_test_env/control_if_else
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_else.ax
+/home/marss6414/arc-lang/tests/control_flow/control_if_else.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_if_else.ax:11:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_if_else.ax -> /tmp/arc_test_env/control_if_else
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_else.ax
+/home/marss6414/arc-lang/tests/control_flow/control_if_else.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_if_else.ax:11:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: control_if_elseif (../tests/control_flow/control_if_elseif.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_if_elseif.ax -> /tmp/arc_test_env/control_if_elseif
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_elseif.ax
+/home/marss6414/arc-lang/tests/control_flow/control_if_elseif.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_if_elseif.ax:11:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_if_elseif.ax -> /tmp/arc_test_env/control_if_elseif
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_elseif.ax
+/home/marss6414/arc-lang/tests/control_flow/control_if_elseif.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_if_elseif.ax:11:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: control_if_nested (../tests/control_flow/control_if_nested.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_if_nested.ax -> /tmp/arc_test_env/control_if_nested
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_nested.ax
+/home/marss6414/arc-lang/tests/control_flow/control_if_nested.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_if_nested.ax:12:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_if_nested.ax -> /tmp/arc_test_env/control_if_nested
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_nested.ax
+/home/marss6414/arc-lang/tests/control_flow/control_if_nested.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_if_nested.ax:12:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: control_return_value (../tests/control_flow/control_return_value.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_return_value.ax -> /tmp/arc_test_env/control_return_value
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_return_value.ax
+/home/marss6414/arc-lang/tests/control_flow/control_return_value.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_return_value.ax:15:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_return_value.ax -> /tmp/arc_test_env/control_return_value
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_return_value.ax
+/home/marss6414/arc-lang/tests/control_flow/control_return_value.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_return_value.ax:15:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: control_return_void (../tests/control_flow/control_return_void.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_return_void.ax -> /tmp/arc_test_env/control_return_void
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_return_void.ax
+/home/marss6414/arc-lang/tests/control_flow/control_return_void.ax:13:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_return_void.ax -> /tmp/arc_test_env/control_return_void
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_return_void.ax
+/home/marss6414/arc-lang/tests/control_flow/control_return_void.ax:13:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+--- Test: control_switch_default (../tests/control_flow/control_switch_default.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_switch_default.ax -> /tmp/arc_test_env/control_switch_default
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_switch_default.ax
+/home/marss6414/arc-lang/tests/control_flow/control_switch_default.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_switch_default.ax:11:4: Syntax Error: extraneous input 'switch' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_switch_default.ax -> /tmp/arc_test_env/control_switch_default
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_switch_default.ax
+/home/marss6414/arc-lang/tests/control_flow/control_switch_default.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_switch_default.ax:11:4: Syntax Error: extraneous input 'switch' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: control_switch_multi (../tests/control_flow/control_switch_multi.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_switch_multi.ax -> /tmp/arc_test_env/control_switch_multi
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_switch_multi.ax
+/home/marss6414/arc-lang/tests/control_flow/control_switch_multi.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_switch_multi.ax:11:4: Syntax Error: extraneous input 'switch' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_switch_multi.ax -> /tmp/arc_test_env/control_switch_multi
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_switch_multi.ax
+/home/marss6414/arc-lang/tests/control_flow/control_switch_multi.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_switch_multi.ax:11:4: Syntax Error: extraneous input 'switch' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: control_switch_simple (../tests/control_flow/control_switch_simple.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_switch_simple.ax -> /tmp/arc_test_env/control_switch_simple
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_switch_simple.ax
+/home/marss6414/arc-lang/tests/control_flow/control_switch_simple.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_switch_simple.ax:11:4: Syntax Error: extraneous input 'switch' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/control_flow/control_switch_simple.ax -> /tmp/arc_test_env/control_switch_simple
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_switch_simple.ax
+/home/marss6414/arc-lang/tests/control_flow/control_switch_simple.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/control_flow/control_switch_simple.ax:11:4: Syntax Error: extraneous input 'switch' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: enum_basic (../tests/enum/enum_basic.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/enum/enum_basic.ax -> /tmp/arc_test_env/enum_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/enum/enum_basic.ax
+/home/marss6414/arc-lang/tests/enum/enum_basic.ax:14:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/enum/enum_basic.ax:17:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/enum/enum_basic.ax -> /tmp/arc_test_env/enum_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/enum/enum_basic.ax
+/home/marss6414/arc-lang/tests/enum/enum_basic.ax:14:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/enum/enum_basic.ax:17:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: enum_explicit_values (../tests/enum/enum_explicit_values.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/enum/enum_explicit_values.ax -> /tmp/arc_test_env/enum_explicit_values
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/enum/enum_explicit_values.ax
+/home/marss6414/arc-lang/tests/enum/enum_explicit_values.ax:14:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/enum/enum_explicit_values.ax:17:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/enum/enum_explicit_values.ax -> /tmp/arc_test_env/enum_explicit_values
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/enum/enum_explicit_values.ax
+/home/marss6414/arc-lang/tests/enum/enum_explicit_values.ax:14:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/enum/enum_explicit_values.ax:17:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: extern_malloc (../tests/extern_c/extern_malloc.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/extern_c/extern_malloc.ax -> /tmp/arc_test_env/extern_malloc
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/extern_c/extern_malloc.ax
+/home/marss6414/arc-lang/tests/extern_c/extern_malloc.ax:9:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/extern_c/extern_malloc.ax:13:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/extern_c/extern_malloc.ax -> /tmp/arc_test_env/extern_malloc
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/extern_c/extern_malloc.ax
+/home/marss6414/arc-lang/tests/extern_c/extern_malloc.ax:9:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/extern_c/extern_malloc.ax:13:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: extern_printf (../tests/extern_c/extern_printf.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/extern_c/extern_printf.ax -> /tmp/arc_test_env/extern_printf
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/extern_c/extern_printf.ax
+/home/marss6414/arc-lang/tests/extern_c/extern_printf.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/extern_c/extern_printf.ax -> /tmp/arc_test_env/extern_printf
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/extern_c/extern_printf.ax
+/home/marss6414/arc-lang/tests/extern_c/extern_printf.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+--- Test: for_in_range (../tests/for_loops/for_in_range.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/for_loops/for_in_range.ax -> /tmp/arc_test_env/for_in_range
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/for_loops/for_in_range.ax
+/home/marss6414/arc-lang/tests/for_loops/for_in_range.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/for_loops/for_in_range.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/for_loops/for_in_range.ax -> /tmp/arc_test_env/for_in_range
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/for_loops/for_in_range.ax
+/home/marss6414/arc-lang/tests/for_loops/for_in_range.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/for_loops/for_in_range.ax:11:4: Syntax Error: extraneous input 'for' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: constant_inferred (../tests/foundation/constant_inferred.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/constant_inferred.ax -> /tmp/arc_test_env/constant_inferred
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/constant_inferred.ax
+/home/marss6414/arc-lang/tests/foundation/constant_inferred.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/constant_inferred.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/constant_inferred.ax -> /tmp/arc_test_env/constant_inferred
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/constant_inferred.ax
+/home/marss6414/arc-lang/tests/foundation/constant_inferred.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/constant_inferred.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: constant_typed (../tests/foundation/constant_typed.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/constant_typed.ax -> /tmp/arc_test_env/constant_typed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/constant_typed.ax
+/home/marss6414/arc-lang/tests/foundation/constant_typed.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/constant_typed.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/constant_typed.ax -> /tmp/arc_test_env/constant_typed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/constant_typed.ax
+/home/marss6414/arc-lang/tests/foundation/constant_typed.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/constant_typed.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: literal_bool (../tests/foundation/literal_bool.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_bool.ax -> /tmp/arc_test_env/literal_bool
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_bool.ax
+/home/marss6414/arc-lang/tests/foundation/literal_bool.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_bool.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/literal_bool.ax -> /tmp/arc_test_env/literal_bool
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_bool.ax
+/home/marss6414/arc-lang/tests/foundation/literal_bool.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_bool.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: literal_char (../tests/foundation/literal_char.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_char.ax -> /tmp/arc_test_env/literal_char
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_char.ax
+/home/marss6414/arc-lang/tests/foundation/literal_char.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_char.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/literal_char.ax -> /tmp/arc_test_env/literal_char
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_char.ax
+/home/marss6414/arc-lang/tests/foundation/literal_char.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_char.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: literal_char_escape (../tests/foundation/literal_char_escape.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_char_escape.ax -> /tmp/arc_test_env/literal_char_escape
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_char_escape.ax
+/home/marss6414/arc-lang/tests/foundation/literal_char_escape.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_char_escape.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/literal_char_escape.ax -> /tmp/arc_test_env/literal_char_escape
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_char_escape.ax
+/home/marss6414/arc-lang/tests/foundation/literal_char_escape.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_char_escape.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: literal_float_scientific (../tests/foundation/literal_float_scientific.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_float_scientific.ax -> /tmp/arc_test_env/literal_float_scientific
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_float_scientific.ax
+/home/marss6414/arc-lang/tests/foundation/literal_float_scientific.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_float_scientific.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/literal_float_scientific.ax -> /tmp/arc_test_env/literal_float_scientific
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_float_scientific.ax
+/home/marss6414/arc-lang/tests/foundation/literal_float_scientific.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_float_scientific.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: literal_float_standard (../tests/foundation/literal_float_standard.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_float_standard.ax -> /tmp/arc_test_env/literal_float_standard
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_float_standard.ax
+/home/marss6414/arc-lang/tests/foundation/literal_float_standard.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_float_standard.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/literal_float_standard.ax -> /tmp/arc_test_env/literal_float_standard
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_float_standard.ax
+/home/marss6414/arc-lang/tests/foundation/literal_float_standard.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_float_standard.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: literal_int_decimal (../tests/foundation/literal_int_decimal.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_int_decimal.ax -> /tmp/arc_test_env/literal_int_decimal
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_int_decimal.ax
+/home/marss6414/arc-lang/tests/foundation/literal_int_decimal.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_int_decimal.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/literal_int_decimal.ax -> /tmp/arc_test_env/literal_int_decimal
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_int_decimal.ax
+/home/marss6414/arc-lang/tests/foundation/literal_int_decimal.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_int_decimal.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: literal_int_hex (../tests/foundation/literal_int_hex.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_int_hex.ax -> /tmp/arc_test_env/literal_int_hex
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_int_hex.ax
+/home/marss6414/arc-lang/tests/foundation/literal_int_hex.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_int_hex.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/literal_int_hex.ax -> /tmp/arc_test_env/literal_int_hex
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_int_hex.ax
+/home/marss6414/arc-lang/tests/foundation/literal_int_hex.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_int_hex.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: literal_int_negative (../tests/foundation/literal_int_negative.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_int_negative.ax -> /tmp/arc_test_env/literal_int_negative
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_int_negative.ax
+/home/marss6414/arc-lang/tests/foundation/literal_int_negative.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_int_negative.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/literal_int_negative.ax -> /tmp/arc_test_env/literal_int_negative
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_int_negative.ax
+/home/marss6414/arc-lang/tests/foundation/literal_int_negative.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_int_negative.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: literal_null (../tests/foundation/literal_null.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_null.ax -> /tmp/arc_test_env/literal_null
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_null.ax
+/home/marss6414/arc-lang/tests/foundation/literal_null.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_null.ax:11:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/literal_null.ax -> /tmp/arc_test_env/literal_null
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_null.ax
+/home/marss6414/arc-lang/tests/foundation/literal_null.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_null.ax:11:4: Syntax Error: extraneous input 'if' expecting {<EOF>, 'import', 'namespace', 'let', 'const', 'func', 'async', 'process', 'struct', 'class', 'deinit', 'enum', 'compute', 'extern', '@', IDENTIFIER}
+Error: compilation failed
+
+--- Test: literal_string_basic (../tests/foundation/literal_string_basic.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_string_basic.ax -> /tmp/arc_test_env/literal_string_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_string_basic.ax
+/home/marss6414/arc-lang/tests/foundation/literal_string_basic.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_string_basic.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/literal_string_basic.ax -> /tmp/arc_test_env/literal_string_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_string_basic.ax
+/home/marss6414/arc-lang/tests/foundation/literal_string_basic.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_string_basic.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: literal_string_escape (../tests/foundation/literal_string_escape.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_string_escape.ax -> /tmp/arc_test_env/literal_string_escape
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_string_escape.ax
+/home/marss6414/arc-lang/tests/foundation/literal_string_escape.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_string_escape.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/literal_string_escape.ax -> /tmp/arc_test_env/literal_string_escape
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_string_escape.ax
+/home/marss6414/arc-lang/tests/foundation/literal_string_escape.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/literal_string_escape.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_alias_bool (../tests/foundation/type_alias_bool.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_alias_bool.ax -> /tmp/arc_test_env/type_alias_bool
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_alias_bool.ax
+/home/marss6414/arc-lang/tests/foundation/type_alias_bool.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_alias_bool.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_alias_bool.ax -> /tmp/arc_test_env/type_alias_bool
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_alias_bool.ax
+/home/marss6414/arc-lang/tests/foundation/type_alias_bool.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_alias_bool.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_alias_byte (../tests/foundation/type_alias_byte.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_alias_byte.ax -> /tmp/arc_test_env/type_alias_byte
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_alias_byte.ax
+/home/marss6414/arc-lang/tests/foundation/type_alias_byte.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_alias_byte.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_alias_byte.ax -> /tmp/arc_test_env/type_alias_byte
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_alias_byte.ax
+/home/marss6414/arc-lang/tests/foundation/type_alias_byte.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_alias_byte.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_alias_char (../tests/foundation/type_alias_char.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_alias_char.ax -> /tmp/arc_test_env/type_alias_char
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_alias_char.ax
+/home/marss6414/arc-lang/tests/foundation/type_alias_char.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_alias_char.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_alias_char.ax -> /tmp/arc_test_env/type_alias_char
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_alias_char.ax
+/home/marss6414/arc-lang/tests/foundation/type_alias_char.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_alias_char.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_float32 (../tests/foundation/type_float32.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_float32.ax -> /tmp/arc_test_env/type_float32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_float32.ax
+/home/marss6414/arc-lang/tests/foundation/type_float32.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_float32.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_float32.ax -> /tmp/arc_test_env/type_float32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_float32.ax
+/home/marss6414/arc-lang/tests/foundation/type_float32.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_float32.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_float64 (../tests/foundation/type_float64.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_float64.ax -> /tmp/arc_test_env/type_float64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_float64.ax
+/home/marss6414/arc-lang/tests/foundation/type_float64.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_float64.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_float64.ax -> /tmp/arc_test_env/type_float64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_float64.ax
+/home/marss6414/arc-lang/tests/foundation/type_float64.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_float64.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_int16 (../tests/foundation/type_int16.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_int16.ax -> /tmp/arc_test_env/type_int16
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int16.ax
+/home/marss6414/arc-lang/tests/foundation/type_int16.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_int16.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_int16.ax -> /tmp/arc_test_env/type_int16
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int16.ax
+/home/marss6414/arc-lang/tests/foundation/type_int16.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_int16.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_int32 (../tests/foundation/type_int32.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_int32.ax -> /tmp/arc_test_env/type_int32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int32.ax
+/home/marss6414/arc-lang/tests/foundation/type_int32.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_int32.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_int32.ax -> /tmp/arc_test_env/type_int32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int32.ax
+/home/marss6414/arc-lang/tests/foundation/type_int32.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_int32.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_int64 (../tests/foundation/type_int64.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_int64.ax -> /tmp/arc_test_env/type_int64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int64.ax
+/home/marss6414/arc-lang/tests/foundation/type_int64.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_int64.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_int64.ax -> /tmp/arc_test_env/type_int64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int64.ax
+/home/marss6414/arc-lang/tests/foundation/type_int64.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_int64.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_int8 (../tests/foundation/type_int8.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_int8.ax -> /tmp/arc_test_env/type_int8
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int8.ax
+/home/marss6414/arc-lang/tests/foundation/type_int8.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_int8.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_int8.ax -> /tmp/arc_test_env/type_int8
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int8.ax
+/home/marss6414/arc-lang/tests/foundation/type_int8.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_int8.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_isize (../tests/foundation/type_isize.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_isize.ax -> /tmp/arc_test_env/type_isize
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_isize.ax
+/home/marss6414/arc-lang/tests/foundation/type_isize.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_isize.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_isize.ax -> /tmp/arc_test_env/type_isize
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_isize.ax
+/home/marss6414/arc-lang/tests/foundation/type_isize.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_isize.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_uint16 (../tests/foundation/type_uint16.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_uint16.ax -> /tmp/arc_test_env/type_uint16
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint16.ax
+/home/marss6414/arc-lang/tests/foundation/type_uint16.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_uint16.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_uint16.ax -> /tmp/arc_test_env/type_uint16
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint16.ax
+/home/marss6414/arc-lang/tests/foundation/type_uint16.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_uint16.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_uint32 (../tests/foundation/type_uint32.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_uint32.ax -> /tmp/arc_test_env/type_uint32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint32.ax
+/home/marss6414/arc-lang/tests/foundation/type_uint32.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_uint32.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_uint32.ax -> /tmp/arc_test_env/type_uint32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint32.ax
+/home/marss6414/arc-lang/tests/foundation/type_uint32.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_uint32.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_uint64 (../tests/foundation/type_uint64.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_uint64.ax -> /tmp/arc_test_env/type_uint64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint64.ax
+/home/marss6414/arc-lang/tests/foundation/type_uint64.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_uint64.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_uint64.ax -> /tmp/arc_test_env/type_uint64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint64.ax
+/home/marss6414/arc-lang/tests/foundation/type_uint64.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_uint64.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_uint8 (../tests/foundation/type_uint8.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_uint8.ax -> /tmp/arc_test_env/type_uint8
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint8.ax
+/home/marss6414/arc-lang/tests/foundation/type_uint8.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_uint8.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_uint8.ax -> /tmp/arc_test_env/type_uint8
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint8.ax
+/home/marss6414/arc-lang/tests/foundation/type_uint8.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_uint8.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: type_usize (../tests/foundation/type_usize.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_usize.ax -> /tmp/arc_test_env/type_usize
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_usize.ax
+/home/marss6414/arc-lang/tests/foundation/type_usize.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_usize.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/type_usize.ax -> /tmp/arc_test_env/type_usize
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_usize.ax
+/home/marss6414/arc-lang/tests/foundation/type_usize.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/type_usize.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: variable_mutable_inferred (../tests/foundation/variable_mutable_inferred.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/variable_mutable_inferred.ax -> /tmp/arc_test_env/variable_mutable_inferred
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/variable_mutable_inferred.ax
+/home/marss6414/arc-lang/tests/foundation/variable_mutable_inferred.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/variable_mutable_inferred.ax:11:6: Syntax Error: no viable alternative at input 'x='
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/variable_mutable_inferred.ax -> /tmp/arc_test_env/variable_mutable_inferred
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/variable_mutable_inferred.ax
+/home/marss6414/arc-lang/tests/foundation/variable_mutable_inferred.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/variable_mutable_inferred.ax:11:6: Syntax Error: no viable alternative at input 'x='
+Error: compilation failed
+
+--- Test: variable_mutable_typed (../tests/foundation/variable_mutable_typed.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/variable_mutable_typed.ax -> /tmp/arc_test_env/variable_mutable_typed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/variable_mutable_typed.ax
+/home/marss6414/arc-lang/tests/foundation/variable_mutable_typed.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/variable_mutable_typed.ax:11:6: Syntax Error: no viable alternative at input 'x='
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/variable_mutable_typed.ax -> /tmp/arc_test_env/variable_mutable_typed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/variable_mutable_typed.ax
+/home/marss6414/arc-lang/tests/foundation/variable_mutable_typed.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/foundation/variable_mutable_typed.ax:11:6: Syntax Error: no viable alternative at input 'x='
+Error: compilation failed
+
+--- Test: func_early_return (../tests/functions/func_early_return.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_early_return.ax -> /tmp/arc_test_env/func_early_return
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_early_return.ax
+/home/marss6414/arc-lang/tests/functions/func_early_return.ax:15:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_early_return.ax:18:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/functions/func_early_return.ax -> /tmp/arc_test_env/func_early_return
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_early_return.ax
+/home/marss6414/arc-lang/tests/functions/func_early_return.ax:15:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_early_return.ax:18:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: func_multiple_return (../tests/functions/func_multiple_return.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_multiple_return.ax -> /tmp/arc_test_env/func_multiple_return
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_multiple_return.ax
+/home/marss6414/arc-lang/tests/functions/func_multiple_return.ax:17:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_multiple_return.ax:20:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/functions/func_multiple_return.ax -> /tmp/arc_test_env/func_multiple_return
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_multiple_return.ax
+/home/marss6414/arc-lang/tests/functions/func_multiple_return.ax:17:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_multiple_return.ax:20:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: func_nested_calls (../tests/functions/func_nested_calls.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_nested_calls.ax -> /tmp/arc_test_env/func_nested_calls
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_nested_calls.ax
+/home/marss6414/arc-lang/tests/functions/func_nested_calls.ax:16:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_nested_calls.ax:19:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/functions/func_nested_calls.ax -> /tmp/arc_test_env/func_nested_calls
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_nested_calls.ax
+/home/marss6414/arc-lang/tests/functions/func_nested_calls.ax:16:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_nested_calls.ax:19:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: func_no_params_void (../tests/functions/func_no_params_void.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_no_params_void.ax -> /tmp/arc_test_env/func_no_params_void
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_no_params_void.ax
+/home/marss6414/arc-lang/tests/functions/func_no_params_void.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/functions/func_no_params_void.ax -> /tmp/arc_test_env/func_no_params_void
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_no_params_void.ax
+/home/marss6414/arc-lang/tests/functions/func_no_params_void.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+--- Test: func_pass_by_value (../tests/functions/func_pass_by_value.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_pass_by_value.ax -> /tmp/arc_test_env/func_pass_by_value
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_pass_by_value.ax
+/home/marss6414/arc-lang/tests/functions/func_pass_by_value.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_pass_by_value.ax:15:10: Syntax Error: no viable alternative at input 'modify('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/functions/func_pass_by_value.ax -> /tmp/arc_test_env/func_pass_by_value
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_pass_by_value.ax
+/home/marss6414/arc-lang/tests/functions/func_pass_by_value.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_pass_by_value.ax:15:10: Syntax Error: no viable alternative at input 'modify('
+Error: compilation failed
+
+--- Test: func_recursive_factorial (../tests/functions/func_recursive_factorial.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_recursive_factorial.ax -> /tmp/arc_test_env/func_recursive_factorial
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_recursive_factorial.ax
+/home/marss6414/arc-lang/tests/functions/func_recursive_factorial.ax:17:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_recursive_factorial.ax:20:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/functions/func_recursive_factorial.ax -> /tmp/arc_test_env/func_recursive_factorial
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_recursive_factorial.ax
+/home/marss6414/arc-lang/tests/functions/func_recursive_factorial.ax:17:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_recursive_factorial.ax:20:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: func_recursive_fibonacci (../tests/functions/func_recursive_fibonacci.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_recursive_fibonacci.ax -> /tmp/arc_test_env/func_recursive_fibonacci
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_recursive_fibonacci.ax
+/home/marss6414/arc-lang/tests/functions/func_recursive_fibonacci.ax:17:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_recursive_fibonacci.ax:20:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/functions/func_recursive_fibonacci.ax -> /tmp/arc_test_env/func_recursive_fibonacci
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_recursive_fibonacci.ax
+/home/marss6414/arc-lang/tests/functions/func_recursive_fibonacci.ax:17:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_recursive_fibonacci.ax:20:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: func_with_params_void (../tests/functions/func_with_params_void.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_with_params_void.ax -> /tmp/arc_test_env/func_with_params_void
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_with_params_void.ax
+/home/marss6414/arc-lang/tests/functions/func_with_params_void.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/functions/func_with_params_void.ax -> /tmp/arc_test_env/func_with_params_void
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_with_params_void.ax
+/home/marss6414/arc-lang/tests/functions/func_with_params_void.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+Error: compilation failed
+
+--- Test: func_with_return (../tests/functions/func_with_return.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_with_return.ax -> /tmp/arc_test_env/func_with_return
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_with_return.ax
+/home/marss6414/arc-lang/tests/functions/func_with_return.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_with_return.ax:15:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/functions/func_with_return.ax -> /tmp/arc_test_env/func_with_return
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_with_return.ax
+/home/marss6414/arc-lang/tests/functions/func_with_return.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/functions/func_with_return.ax:15:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: generic_func_def (../tests/generic/generic_func_def.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/generic/generic_func_def.ax -> /tmp/arc_test_env/generic_func_def
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_func_def.ax
+/home/marss6414/arc-lang/tests/generic/generic_func_def.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/generic/generic_func_def.ax:15:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/generic/generic_func_def.ax -> /tmp/arc_test_env/generic_func_def
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_func_def.ax
+/home/marss6414/arc-lang/tests/generic/generic_func_def.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/generic/generic_func_def.ax:15:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: generic_struct_def (../tests/generic/generic_struct_def.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/generic/generic_struct_def.ax -> /tmp/arc_test_env/generic_struct_def
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_struct_def.ax
+/home/marss6414/arc-lang/tests/generic/generic_struct_def.ax:4:0: Syntax Error: missing IDENTIFIER at 'extern'
+/home/marss6414/arc-lang/tests/generic/generic_struct_def.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/generic/generic_struct_def.ax:15:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/generic/generic_struct_def.ax -> /tmp/arc_test_env/generic_struct_def
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_struct_def.ax
+/home/marss6414/arc-lang/tests/generic/generic_struct_def.ax:4:0: Syntax Error: missing IDENTIFIER at 'extern'
+/home/marss6414/arc-lang/tests/generic/generic_struct_def.ax:12:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/generic/generic_struct_def.ax:15:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: generic_swap (../tests/generic/generic_swap.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/generic/generic_swap.ax -> /tmp/arc_test_env/generic_swap
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_swap.ax
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:14:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:18:8: Syntax Error: no viable alternative at input 'swap<'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/generic/generic_swap.ax -> /tmp/arc_test_env/generic_swap
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_swap.ax
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:14:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:18:8: Syntax Error: no viable alternative at input 'swap<'
+Error: compilation failed
+
+--- Test: intrinsic_alignof (../tests/intrinsics/intrinsic_alignof.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_alignof.ax -> /tmp/arc_test_env/intrinsic_alignof
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_alignof.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alignof.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alignof.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_alignof.ax -> /tmp/arc_test_env/intrinsic_alignof
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_alignof.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alignof.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alignof.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: intrinsic_alloca_array (../tests/intrinsics/intrinsic_alloca_array.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_alloca_array.ax -> /tmp/arc_test_env/intrinsic_alloca_array
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_array.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_array.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_array.ax:11:10: Syntax Error: no viable alternative at input 'buffer['
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_alloca_array.ax -> /tmp/arc_test_env/intrinsic_alloca_array
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_array.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_array.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_array.ax:11:10: Syntax Error: no viable alternative at input 'buffer['
+Error: compilation failed
+
+--- Test: intrinsic_alloca_single (../tests/intrinsics/intrinsic_alloca_single.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_alloca_single.ax -> /tmp/arc_test_env/intrinsic_alloca_single
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_single.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_single.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_single.ax:11:5: Syntax Error: no viable alternative at input 'ptr'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_alloca_single.ax -> /tmp/arc_test_env/intrinsic_alloca_single
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_single.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_single.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_single.ax:11:5: Syntax Error: no viable alternative at input 'ptr'
+Error: compilation failed
+
+--- Test: intrinsic_bitcast (../tests/intrinsics/intrinsic_bitcast.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_bitcast.ax -> /tmp/arc_test_env/intrinsic_bitcast
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_bitcast.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_bitcast.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_bitcast.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_bitcast.ax -> /tmp/arc_test_env/intrinsic_bitcast
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_bitcast.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_bitcast.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_bitcast.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: intrinsic_memcpy (../tests/intrinsics/intrinsic_memcpy.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_memcpy.ax -> /tmp/arc_test_env/intrinsic_memcpy
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_memcpy.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_memcpy.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_memcpy.ax:11:7: Syntax Error: no viable alternative at input 'src['
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_memcpy.ax:16:10: Syntax Error: no viable alternative at input 'memcpy('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_memcpy.ax -> /tmp/arc_test_env/intrinsic_memcpy
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_memcpy.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_memcpy.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_memcpy.ax:11:7: Syntax Error: no viable alternative at input 'src['
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_memcpy.ax:16:10: Syntax Error: no viable alternative at input 'memcpy('
+Error: compilation failed
+
+--- Test: intrinsic_memset (../tests/intrinsics/intrinsic_memset.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_memset.ax -> /tmp/arc_test_env/intrinsic_memset
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_memset.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_memset.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_memset.ax:11:10: Syntax Error: no viable alternative at input 'memset('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_memset.ax -> /tmp/arc_test_env/intrinsic_memset
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_memset.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_memset.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_memset.ax:11:10: Syntax Error: no viable alternative at input 'memset('
+Error: compilation failed
+
+--- Test: intrinsic_sizeof_int32 (../tests/intrinsics/intrinsic_sizeof_int32.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_sizeof_int32.ax -> /tmp/arc_test_env/intrinsic_sizeof_int32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int32.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int32.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int32.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_sizeof_int32.ax -> /tmp/arc_test_env/intrinsic_sizeof_int32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int32.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int32.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int32.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: intrinsic_sizeof_int64 (../tests/intrinsics/intrinsic_sizeof_int64.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_sizeof_int64.ax -> /tmp/arc_test_env/intrinsic_sizeof_int64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int64.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int64.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int64.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_sizeof_int64.ax -> /tmp/arc_test_env/intrinsic_sizeof_int64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int64.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int64.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int64.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: intrinsic_sizeof_struct (../tests/intrinsics/intrinsic_sizeof_struct.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_sizeof_struct.ax -> /tmp/arc_test_env/intrinsic_sizeof_struct
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_struct.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_struct.ax:13:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_struct.ax:16:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_sizeof_struct.ax -> /tmp/arc_test_env/intrinsic_sizeof_struct
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_struct.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_struct.ax:13:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_struct.ax:16:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: intrinsic_strlen (../tests/intrinsics/intrinsic_strlen.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_strlen.ax -> /tmp/arc_test_env/intrinsic_strlen
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_strlen.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_strlen.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_strlen.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_strlen.ax -> /tmp/arc_test_env/intrinsic_strlen
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_strlen.ax
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_strlen.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/intrinsics/intrinsic_strlen.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_addition (../tests/operators/op_addition.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_addition.ax -> /tmp/arc_test_env/op_addition
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_addition.ax
+/home/marss6414/arc-lang/tests/operators/op_addition.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_addition.ax:13:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_addition.ax -> /tmp/arc_test_env/op_addition
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_addition.ax
+/home/marss6414/arc-lang/tests/operators/op_addition.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_addition.ax:13:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_bitwise_and (../tests/operators/op_bitwise_and.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_bitwise_and.ax -> /tmp/arc_test_env/op_bitwise_and
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_and.ax
+/home/marss6414/arc-lang/tests/operators/op_bitwise_and.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_bitwise_and.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_bitwise_and.ax -> /tmp/arc_test_env/op_bitwise_and
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_and.ax
+/home/marss6414/arc-lang/tests/operators/op_bitwise_and.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_bitwise_and.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_bitwise_not (../tests/operators/op_bitwise_not.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_bitwise_not.ax -> /tmp/arc_test_env/op_bitwise_not
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_not.ax
+/home/marss6414/arc-lang/tests/operators/op_bitwise_not.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_bitwise_not.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_bitwise_not.ax -> /tmp/arc_test_env/op_bitwise_not
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_not.ax
+/home/marss6414/arc-lang/tests/operators/op_bitwise_not.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_bitwise_not.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_bitwise_or (../tests/operators/op_bitwise_or.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_bitwise_or.ax -> /tmp/arc_test_env/op_bitwise_or
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_or.ax
+/home/marss6414/arc-lang/tests/operators/op_bitwise_or.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_bitwise_or.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_bitwise_or.ax -> /tmp/arc_test_env/op_bitwise_or
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_or.ax
+/home/marss6414/arc-lang/tests/operators/op_bitwise_or.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_bitwise_or.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_bitwise_xor (../tests/operators/op_bitwise_xor.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_bitwise_xor.ax -> /tmp/arc_test_env/op_bitwise_xor
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_xor.ax
+/home/marss6414/arc-lang/tests/operators/op_bitwise_xor.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_bitwise_xor.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_bitwise_xor.ax -> /tmp/arc_test_env/op_bitwise_xor
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_xor.ax
+/home/marss6414/arc-lang/tests/operators/op_bitwise_xor.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_bitwise_xor.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_compound_add (../tests/operators/op_compound_add.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_compound_add.ax -> /tmp/arc_test_env/op_compound_add
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_add.ax
+/home/marss6414/arc-lang/tests/operators/op_compound_add.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_compound_add.ax:11:6: Syntax Error: no viable alternative at input 'x+='
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_compound_add.ax -> /tmp/arc_test_env/op_compound_add
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_add.ax
+/home/marss6414/arc-lang/tests/operators/op_compound_add.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_compound_add.ax:11:6: Syntax Error: no viable alternative at input 'x+='
+Error: compilation failed
+
+--- Test: op_compound_div (../tests/operators/op_compound_div.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_compound_div.ax -> /tmp/arc_test_env/op_compound_div
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_div.ax
+/home/marss6414/arc-lang/tests/operators/op_compound_div.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_compound_div.ax:11:6: Syntax Error: no viable alternative at input 'x/='
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_compound_div.ax -> /tmp/arc_test_env/op_compound_div
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_div.ax
+/home/marss6414/arc-lang/tests/operators/op_compound_div.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_compound_div.ax:11:6: Syntax Error: no viable alternative at input 'x/='
+Error: compilation failed
+
+--- Test: op_compound_mod (../tests/operators/op_compound_mod.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_compound_mod.ax -> /tmp/arc_test_env/op_compound_mod
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_mod.ax
+/home/marss6414/arc-lang/tests/operators/op_compound_mod.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_compound_mod.ax:11:6: Syntax Error: no viable alternative at input 'x%='
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_compound_mod.ax -> /tmp/arc_test_env/op_compound_mod
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_mod.ax
+/home/marss6414/arc-lang/tests/operators/op_compound_mod.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_compound_mod.ax:11:6: Syntax Error: no viable alternative at input 'x%='
+Error: compilation failed
+
+--- Test: op_compound_mul (../tests/operators/op_compound_mul.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_compound_mul.ax -> /tmp/arc_test_env/op_compound_mul
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_mul.ax
+/home/marss6414/arc-lang/tests/operators/op_compound_mul.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_compound_mul.ax:11:6: Syntax Error: no viable alternative at input 'x*='
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_compound_mul.ax -> /tmp/arc_test_env/op_compound_mul
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_mul.ax
+/home/marss6414/arc-lang/tests/operators/op_compound_mul.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_compound_mul.ax:11:6: Syntax Error: no viable alternative at input 'x*='
+Error: compilation failed
+
+--- Test: op_compound_sub (../tests/operators/op_compound_sub.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_compound_sub.ax -> /tmp/arc_test_env/op_compound_sub
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_sub.ax
+/home/marss6414/arc-lang/tests/operators/op_compound_sub.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_compound_sub.ax:11:6: Syntax Error: no viable alternative at input 'x-='
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_compound_sub.ax -> /tmp/arc_test_env/op_compound_sub
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_sub.ax
+/home/marss6414/arc-lang/tests/operators/op_compound_sub.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_compound_sub.ax:11:6: Syntax Error: no viable alternative at input 'x-='
+Error: compilation failed
+
+--- Test: op_decrement_postfix (../tests/operators/op_decrement_postfix.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_decrement_postfix.ax -> /tmp/arc_test_env/op_decrement_postfix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_decrement_postfix.ax
+/home/marss6414/arc-lang/tests/operators/op_decrement_postfix.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_decrement_postfix.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_decrement_postfix.ax -> /tmp/arc_test_env/op_decrement_postfix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_decrement_postfix.ax
+/home/marss6414/arc-lang/tests/operators/op_decrement_postfix.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_decrement_postfix.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_decrement_prefix (../tests/operators/op_decrement_prefix.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_decrement_prefix.ax -> /tmp/arc_test_env/op_decrement_prefix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_decrement_prefix.ax
+/home/marss6414/arc-lang/tests/operators/op_decrement_prefix.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_decrement_prefix.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_decrement_prefix.ax -> /tmp/arc_test_env/op_decrement_prefix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_decrement_prefix.ax
+/home/marss6414/arc-lang/tests/operators/op_decrement_prefix.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_decrement_prefix.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_division_signed (../tests/operators/op_division_signed.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_division_signed.ax -> /tmp/arc_test_env/op_division_signed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_division_signed.ax
+/home/marss6414/arc-lang/tests/operators/op_division_signed.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_division_signed.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_division_signed.ax -> /tmp/arc_test_env/op_division_signed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_division_signed.ax
+/home/marss6414/arc-lang/tests/operators/op_division_signed.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_division_signed.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_division_unsigned (../tests/operators/op_division_unsigned.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_division_unsigned.ax -> /tmp/arc_test_env/op_division_unsigned
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_division_unsigned.ax
+/home/marss6414/arc-lang/tests/operators/op_division_unsigned.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_division_unsigned.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_division_unsigned.ax -> /tmp/arc_test_env/op_division_unsigned
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_division_unsigned.ax
+/home/marss6414/arc-lang/tests/operators/op_division_unsigned.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_division_unsigned.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_equality (../tests/operators/op_equality.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_equality.ax -> /tmp/arc_test_env/op_equality
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_equality.ax
+/home/marss6414/arc-lang/tests/operators/op_equality.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_equality.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_equality.ax -> /tmp/arc_test_env/op_equality
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_equality.ax
+/home/marss6414/arc-lang/tests/operators/op_equality.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_equality.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_greater_equal (../tests/operators/op_greater_equal.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_greater_equal.ax -> /tmp/arc_test_env/op_greater_equal
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_greater_equal.ax
+/home/marss6414/arc-lang/tests/operators/op_greater_equal.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_greater_equal.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_greater_equal.ax -> /tmp/arc_test_env/op_greater_equal
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_greater_equal.ax
+/home/marss6414/arc-lang/tests/operators/op_greater_equal.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_greater_equal.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_greater_than (../tests/operators/op_greater_than.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_greater_than.ax -> /tmp/arc_test_env/op_greater_than
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_greater_than.ax
+/home/marss6414/arc-lang/tests/operators/op_greater_than.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_greater_than.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_greater_than.ax -> /tmp/arc_test_env/op_greater_than
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_greater_than.ax
+/home/marss6414/arc-lang/tests/operators/op_greater_than.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_greater_than.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_increment_postfix (../tests/operators/op_increment_postfix.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_increment_postfix.ax -> /tmp/arc_test_env/op_increment_postfix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_increment_postfix.ax
+/home/marss6414/arc-lang/tests/operators/op_increment_postfix.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_increment_postfix.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_increment_postfix.ax -> /tmp/arc_test_env/op_increment_postfix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_increment_postfix.ax
+/home/marss6414/arc-lang/tests/operators/op_increment_postfix.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_increment_postfix.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_increment_prefix (../tests/operators/op_increment_prefix.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_increment_prefix.ax -> /tmp/arc_test_env/op_increment_prefix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_increment_prefix.ax
+/home/marss6414/arc-lang/tests/operators/op_increment_prefix.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_increment_prefix.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_increment_prefix.ax -> /tmp/arc_test_env/op_increment_prefix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_increment_prefix.ax
+/home/marss6414/arc-lang/tests/operators/op_increment_prefix.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_increment_prefix.ax:12:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_inequality (../tests/operators/op_inequality.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_inequality.ax -> /tmp/arc_test_env/op_inequality
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_inequality.ax
+/home/marss6414/arc-lang/tests/operators/op_inequality.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_inequality.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_inequality.ax -> /tmp/arc_test_env/op_inequality
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_inequality.ax
+/home/marss6414/arc-lang/tests/operators/op_inequality.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_inequality.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_less_equal (../tests/operators/op_less_equal.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_less_equal.ax -> /tmp/arc_test_env/op_less_equal
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_less_equal.ax
+/home/marss6414/arc-lang/tests/operators/op_less_equal.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_less_equal.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_less_equal.ax -> /tmp/arc_test_env/op_less_equal
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_less_equal.ax
+/home/marss6414/arc-lang/tests/operators/op_less_equal.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_less_equal.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_less_than (../tests/operators/op_less_than.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_less_than.ax -> /tmp/arc_test_env/op_less_than
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_less_than.ax
+/home/marss6414/arc-lang/tests/operators/op_less_than.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_less_than.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_less_than.ax -> /tmp/arc_test_env/op_less_than
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_less_than.ax
+/home/marss6414/arc-lang/tests/operators/op_less_than.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_less_than.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_logical_and (../tests/operators/op_logical_and.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_logical_and.ax -> /tmp/arc_test_env/op_logical_and
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_logical_and.ax
+/home/marss6414/arc-lang/tests/operators/op_logical_and.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_logical_and.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_logical_and.ax -> /tmp/arc_test_env/op_logical_and
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_logical_and.ax
+/home/marss6414/arc-lang/tests/operators/op_logical_and.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_logical_and.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_logical_not (../tests/operators/op_logical_not.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_logical_not.ax -> /tmp/arc_test_env/op_logical_not
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_logical_not.ax
+/home/marss6414/arc-lang/tests/operators/op_logical_not.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_logical_not.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_logical_not.ax -> /tmp/arc_test_env/op_logical_not
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_logical_not.ax
+/home/marss6414/arc-lang/tests/operators/op_logical_not.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_logical_not.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_logical_or (../tests/operators/op_logical_or.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_logical_or.ax -> /tmp/arc_test_env/op_logical_or
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_logical_or.ax
+/home/marss6414/arc-lang/tests/operators/op_logical_or.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_logical_or.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_logical_or.ax -> /tmp/arc_test_env/op_logical_or
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_logical_or.ax
+/home/marss6414/arc-lang/tests/operators/op_logical_or.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_logical_or.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_modulo (../tests/operators/op_modulo.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_modulo.ax -> /tmp/arc_test_env/op_modulo
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_modulo.ax
+/home/marss6414/arc-lang/tests/operators/op_modulo.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_modulo.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_modulo.ax -> /tmp/arc_test_env/op_modulo
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_modulo.ax
+/home/marss6414/arc-lang/tests/operators/op_modulo.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_modulo.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_multiplication (../tests/operators/op_multiplication.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_multiplication.ax -> /tmp/arc_test_env/op_multiplication
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_multiplication.ax
+/home/marss6414/arc-lang/tests/operators/op_multiplication.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_multiplication.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_multiplication.ax -> /tmp/arc_test_env/op_multiplication
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_multiplication.ax
+/home/marss6414/arc-lang/tests/operators/op_multiplication.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_multiplication.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_parentheses (../tests/operators/op_parentheses.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_parentheses.ax -> /tmp/arc_test_env/op_parentheses
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_parentheses.ax
+/home/marss6414/arc-lang/tests/operators/op_parentheses.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_parentheses.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/operators/op_parentheses.ax -> /tmp/arc_test_env/op_parentheses
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_parentheses.ax
+/home/marss6414/arc-lang/tests/operators/op_parentheses.ax:8:10: Syntax Error: no viable alternative at input 'funcmainint32'
+/home/marss6414/arc-lang/tests/operators/op_parentheses.ax:11:10: Syntax Error: no viable alternative at input 'printf('
+Error: compilation failed
+
+--- Test: op_precedence (../tests/operators/op_precedence.ax) ---

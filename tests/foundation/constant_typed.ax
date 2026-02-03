@@ -5,7 +5,7 @@ extern c {
     func printf(*byte, ...) int32
 }
 
-func main int32 () {
+func main() int32 {
 
     const MAX: int32 = 255
     printf("max=%d\n", MAX)

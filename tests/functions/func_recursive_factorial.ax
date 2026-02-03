@@ -14,7 +14,7 @@ func factorial(n: int32) int32 {
 }
 
 
-func main int32 () {
+func main() int32 {
 
     let result = factorial(5)
     printf("factorial=%d\n", result)

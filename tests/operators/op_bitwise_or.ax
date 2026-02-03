@@ -5,7 +5,7 @@ extern c {
     func printf(*byte, ...) int32
 }
 
-func main int32 () {
+func main() int32 {
 
     let result = 0xF0 | 0x0F
     printf("or=%d\n", result)

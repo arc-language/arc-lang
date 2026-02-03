@@ -6,7 +6,7 @@ extern c {
     func malloc(usize) *void
 }
 
-func main int32 () {
+func main() int32 {
 
     printf("extern_test\n")
     let ptr = malloc(64)

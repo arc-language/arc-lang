@@ -10,7 +10,7 @@ struct Point {
     y: int32
 }
 
-func main int32 () {
+func main() int32 {
 
     let p = Point{x: 5, y: 10}
     p.x = 99

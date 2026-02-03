@@ -11,7 +11,7 @@ struct Person {
     weight: int32
 }
 
-func main int32 () {
+func main() int32 {
 
     let person = Person{age: 30, height: 180, weight: 75}
     printf("age=%d height=%d weight=%d\n", person.age, person.height)

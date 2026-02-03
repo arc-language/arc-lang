@@ -9,7 +9,7 @@ func modify(x: int32) {
     x = 99
 }
 
-func main int32 () {
+func main() int32 {
 
     let original = 10
     modify(original)
