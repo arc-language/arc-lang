@@ -1,2 +1,5 @@
 
 *.jar
+
+cmd/test_runner
+cmd/arc

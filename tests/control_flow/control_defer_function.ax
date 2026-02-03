@@ -1,0 +1,19 @@
+//@test(expect = "start\nend\ncleanup_called")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func cleanup() {
+    printf("cleanup_called\n")
+}
+
+func main int32 () {
+
+    printf("start\n")
+    defer cleanup()
+    printf("end\n")
+
+    return 0
+}
