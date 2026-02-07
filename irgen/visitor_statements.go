@@ -37,6 +37,11 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 	// We do this first so the value is calculated before any deferred cleanup runs.
 	if ctx.Expression() != nil {
 		val = g.Visit(ctx.Expression()).(ir.Value)
+
+		// FIX: Ensure the return value instruction is inserted into the block
+		if inst, ok := val.(ir.Instruction); ok && inst.Parent() == nil {
+			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+		}
 	}
 
 	if ctx.TupleExpression() != nil {
@@ -44,6 +49,10 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 		var fieldVals []ir.Value
 		for _, expr := range tupleCtx.AllExpression() {
 			v := g.Visit(expr).(ir.Value)
+			// FIX: Ensure tuple element instruction is inserted
+			if inst, ok := v.(ir.Instruction); ok && inst.Parent() == nil {
+				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+			}
 			fieldVals = append(fieldVals, v)
 		}
 
@@ -54,6 +63,10 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 				for i, v := range fieldVals {
 					if i < len(st.Fields) {
 						v = g.emitCast(v, st.Fields[i])
+						// FIX: Ensure cast instruction is inserted
+						if inst, ok := v.(ir.Instruction); ok && inst.Parent() == nil {
+							g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+						}
 						agg = g.ctx.Builder.CreateInsertValue(agg, v, []int{i}, "")
 					}
 				}
@@ -73,6 +86,11 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 		if g.ctx.CurrentFunction != nil && ctx.TupleExpression() == nil {
 			targetType := g.ctx.CurrentFunction.FuncType.ReturnType
 			val = g.emitCast(val, targetType)
+
+			// FIX: Ensure final cast instruction is inserted
+			if inst, ok := val.(ir.Instruction); ok && inst.Parent() == nil {
+				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+			}
 		}
 		g.ctx.Builder.CreateRet(val)
 	} else {
@@ -116,7 +134,7 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 		fmt.Printf("[IRGen] Error: Invalid assignment target at line %d\n", ctx.GetStart().GetLine())
 		return nil
 	}
-	
+
 	// FIX: Ensure l-value computation instructions are inserted (e.g. GEPs)
 	if inst, ok := destPtr.(ir.Instruction); ok && inst.Parent() == nil {
 		g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
@@ -129,7 +147,7 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 	}
 
 	rhs := g.Visit(ctx.Expression()).(ir.Value)
-	
+
 	// FIX: Ensure RHS evaluation is inserted
 	if inst, ok := rhs.(ir.Instruction); ok && inst.Parent() == nil {
 		g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
@@ -140,14 +158,14 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 	if ctx.AssignmentOp().ASSIGN() == nil {
 		// Compound assignment
 		currVal := g.ctx.Builder.CreateLoad(ptrType.ElementType, destPtr, "")
-		
+
 		// FIX: Insert load
 		if currVal.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(currVal)
 		}
-		
+
 		op := ctx.AssignmentOp()
-		
+
 		if types.IsFloat(currVal.Type()) {
 			if op.PLUS_ASSIGN() != nil {
 				finalVal = g.ctx.Builder.CreateFAdd(currVal, rhs, "")
@@ -177,7 +195,7 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 				finalVal = g.ctx.Builder.CreateXor(currVal, rhs, "")
 			}
 		}
-		
+
 		// FIX: Insert binary op result
 		if inst, ok := finalVal.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
@@ -185,7 +203,7 @@ func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) inter
 	}
 
 	finalVal = g.emitCast(finalVal, ptrType.ElementType)
-	
+
 	// FIX: Insert cast
 	if inst, ok := finalVal.(ir.Instruction); ok && inst.Parent() == nil {
 		g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
@@ -200,24 +218,24 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 	mergeBlock := g.ctx.Builder.CreateBlock("if.end")
 	conditionCount := len(ctx.AllExpression())
 	var nextCheckBlock *ir.BasicBlock
-	
+
 	for i := 0; i < conditionCount; i++ {
 		if nextCheckBlock != nil {
 			g.ctx.SetInsertBlock(nextCheckBlock)
 		} else {
-			// FIX: Reset insert point to end of current block
+			// FIX: Reset insert point to end of current block if needed
 			if curr := g.ctx.Builder.GetInsertBlock(); curr != nil {
 				g.ctx.Builder.SetInsertPoint(curr)
 			}
 		}
-		
+
 		cond := g.Visit(ctx.Expression(i)).(ir.Value)
-		
+
 		// FIX: Ensure condition instruction is inserted
 		if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
-		
+
 		if cond.Type().BitSize() > 1 {
 			cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
 			// FIX: Ensure implicit boolean check is inserted
@@ -225,10 +243,10 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 			}
 		}
-		
+
 		thenBlock := g.ctx.Builder.CreateBlock("if.then")
-		
-		if i < conditionCount - 1 {
+
+		if i < conditionCount-1 {
 			nextCheckBlock = g.ctx.Builder.CreateBlock("if.check")
 		} else {
 			if len(ctx.AllBlock()) > conditionCount {
@@ -237,16 +255,16 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 				nextCheckBlock = mergeBlock
 			}
 		}
-		
+
 		g.ctx.Builder.CreateCondBr(cond, thenBlock, nextCheckBlock)
-		
+
 		g.ctx.SetInsertBlock(thenBlock)
 		g.Visit(ctx.Block(i))
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			g.ctx.Builder.CreateBr(mergeBlock)
 		}
 	}
-	
+
 	if len(ctx.AllBlock()) > conditionCount {
 		g.ctx.SetInsertBlock(nextCheckBlock)
 		g.Visit(ctx.Block(conditionCount))
@@ -254,7 +272,7 @@ func (g *Generator) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 			g.ctx.Builder.CreateBr(mergeBlock)
 		}
 	}
-	
+
 	g.ctx.SetInsertBlock(mergeBlock)
 	return nil
 }
@@ -269,20 +287,28 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	endBlock := g.ctx.Builder.CreateBlock("loop.end")
 
 	if ctx.IN() != nil {
-		if len(ctx.AllExpression()) == 0 { return nil }
-		
+		if len(ctx.AllExpression()) == 0 {
+			return nil
+		}
+
 		var findRange func(antlr.ParseTree) parser.IRangeExpressionContext
 		findRange = func(node antlr.ParseTree) parser.IRangeExpressionContext {
-			if r, ok := node.(parser.IRangeExpressionContext); ok { return r }
+			if r, ok := node.(parser.IRangeExpressionContext); ok {
+				return r
+			}
 			if node.GetChildCount() == 1 {
 				child := node.GetChild(0)
-				if pt, ok := child.(antlr.ParseTree); ok { return findRange(pt) }
+				if pt, ok := child.(antlr.ParseTree); ok {
+					return findRange(pt)
+				}
 			}
 			return nil
 		}
-		
+
 		rangeCtx := findRange(ctx.Expression(0))
-		if rangeCtx == nil || rangeCtx.RANGE() == nil { return nil }
+		if rangeCtx == nil || rangeCtx.RANGE() == nil {
+			return nil
+		}
 
 		startVal := g.Visit(rangeCtx.AdditiveExpression(0)).(ir.Value)
 		endVal := g.Visit(rangeCtx.AdditiveExpression(1)).(ir.Value)
@@ -290,30 +316,33 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 		varName := ctx.IDENTIFIER(0).GetText()
 		sym, ok := g.currentScope.Resolve(varName)
-		if !ok { return nil }
-		
+		if !ok {
+			return nil
+		}
+
 		if sym.IRValue == nil {
 			alloca := g.ctx.Builder.CreateAlloca(startVal.Type(), varName+".addr")
 			sym.IRValue = alloca
 		}
-		
+
 		g.ctx.Builder.CreateStore(startVal, sym.IRValue)
 		g.ctx.Builder.CreateBr(condBlock)
 
 		g.ctx.Builder.SetInsertPoint(condBlock)
 		currVal := g.ctx.Builder.CreateLoad(startVal.Type(), sym.IRValue, "")
-		
-		// SAFETY FIX
+
+		// FIX: Ensure loop variable load is inserted
 		if currVal.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(currVal)
 		}
-		
+
 		var cmp ir.Value
 		if types.IsFloat(startVal.Type()) {
 			cmp = g.ctx.Builder.CreateFCmp(ir.FCmpOLT, currVal, endVal, "")
 		} else {
 			cmp = g.ctx.Builder.CreateICmpSLT(currVal, endVal, "")
 		}
+		// FIX: Ensure comparison is inserted
 		if inst, ok := cmp.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
@@ -324,7 +353,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		g.loopStack = append(g.loopStack, loopInfo{breakBlock: endBlock, continueBlock: postBlock})
 		g.Visit(ctx.Block())
 		g.loopStack = g.loopStack[:len(g.loopStack)-1]
-		
+
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			g.ctx.Builder.CreateBr(postBlock)
 		}
@@ -334,7 +363,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		if currVal.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(currVal)
 		}
-		
+
 		var nextVal ir.Value
 		if types.IsFloat(startVal.Type()) {
 			one := g.ctx.Builder.ConstFloat(startVal.Type().(*types.FloatType), 1.0)
@@ -343,7 +372,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 			one := g.ctx.Builder.ConstInt(startVal.Type().(*types.IntType), 1)
 			nextVal = g.ctx.Builder.CreateAdd(currVal, one, "")
 		}
-		
+
 		g.ctx.Builder.CreateStore(nextVal, sym.IRValue)
 		g.ctx.Builder.CreateBr(condBlock)
 
@@ -352,7 +381,9 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	}
 
 	if len(ctx.AllSEMICOLON()) >= 2 {
-		if ctx.VariableDecl() != nil { g.Visit(ctx.VariableDecl()) }
+		if ctx.VariableDecl() != nil {
+			g.Visit(ctx.VariableDecl())
+		}
 		if len(ctx.AllAssignmentStmt()) > 0 && ctx.AssignmentStmt(0).GetStart().GetTokenIndex() < ctx.SEMICOLON(0).GetSymbol().GetTokenIndex() {
 			g.Visit(ctx.AssignmentStmt(0))
 		}
@@ -362,7 +393,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 	g.ctx.Builder.SetInsertPoint(condBlock)
 	var cond ir.Value = g.ctx.Builder.True()
-	
+
 	if len(ctx.AllSEMICOLON()) >= 2 {
 		semi1 := ctx.SEMICOLON(0).GetSymbol().GetTokenIndex()
 		semi2 := ctx.SEMICOLON(1).GetSymbol().GetTokenIndex()
@@ -376,13 +407,14 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 		cond = g.Visit(ctx.Expression(0)).(ir.Value)
 	}
 
-	// SAFETY FIX
+	// FIX: Ensure loop condition is inserted
 	if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 		g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 	}
 
 	if cond.Type().BitSize() > 1 {
 		cond = g.ctx.Builder.CreateICmpNE(cond, g.ctx.Builder.ConstZero(cond.Type()), "")
+		// FIX: Ensure implicit boolean check is inserted
 		if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 		}
@@ -393,7 +425,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	g.loopStack = append(g.loopStack, loopInfo{breakBlock: endBlock, continueBlock: postBlock})
 	g.Visit(ctx.Block())
 	g.loopStack = g.loopStack[:len(g.loopStack)-1]
-	
+
 	if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 		g.ctx.Builder.CreateBr(postBlock)
 	}
@@ -402,10 +434,14 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	if len(ctx.AllSEMICOLON()) >= 2 {
 		semi2 := ctx.SEMICOLON(1).GetSymbol().GetTokenIndex()
 		for _, assign := range ctx.AllAssignmentStmt() {
-			if assign.GetStart().GetTokenIndex() > semi2 { g.Visit(assign) }
+			if assign.GetStart().GetTokenIndex() > semi2 {
+				g.Visit(assign)
+			}
 		}
 		for _, expr := range ctx.AllExpression() {
-			if expr.GetStart().GetTokenIndex() > semi2 { g.Visit(expr) }
+			if expr.GetStart().GetTokenIndex() > semi2 {
+				g.Visit(expr)
+			}
 		}
 	}
 	g.ctx.Builder.CreateBr(condBlock)
