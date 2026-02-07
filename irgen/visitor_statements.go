@@ -34,6 +34,7 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 	var val ir.Value
 
 	// 1. Evaluate the return expression (if any)
+	// We do this first so the value is calculated before any deferred cleanup runs.
 	if ctx.Expression() != nil {
 		val = g.Visit(ctx.Expression()).(ir.Value)
 	}
@@ -62,8 +63,7 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 	}
 
 	// 2. Emit Deferred Actions (LIFO order)
-	// We do this after evaluation so that any side effects in the return expr happen first,
-	// but before the actual jump/ret instruction.
+	// These instructions are inserted into the current block before the 'ret' instruction.
 	if g.deferStack != nil {
 		g.deferStack.Emit(g)
 	}
@@ -91,7 +91,7 @@ func (g *Generator) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
 	} else {
 		return nil
 	}
-	
+
 	// Capture the current scope so symbols (variables) are resolved correctly 
 	// when the deferred statement is executed at the end of the function.
 	capturedScope := g.currentScope
@@ -102,6 +102,7 @@ func (g *Generator) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
 		gen.currentScope = capturedScope
 		defer func() { gen.currentScope = prevScope }()
 
+		// Generate the IR for the deferred statement
 		gen.Visit(node)
 	})
 	return nil
