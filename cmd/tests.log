@@ -277,17 +277,17 @@ Build Output:
 [Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_defer_function.ax
 [Driver] [INFO] Linking libraries: [c]
 DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
-DEBUG: Stub at 0x40107c, main at 0x40129c, lea PC at 0x401090
+DEBUG: Stub at 0x40107c, main at 0x4012ac, lea PC at 0x401090
 DEBUG: call PC at 0x40109b, __libc_start_main at 0x40103c
 DEBUG: Reloc .str.0: Type=2 Off=2a Addend=-4 SymVal=402268 P=4010c6 Val=4510
-DEBUG: Reloc .str.1: Type=2 Off=a0 Addend=-4 SymVal=402278 P=40113c Val=4408
-DEBUG: Reloc .str.2: Type=2 Off=b2 Addend=-4 SymVal=402288 P=40114e Val=4406
-DEBUG: Reloc .str.3: Type=2 Off=1b7 Addend=-4 SymVal=402290 P=401253 Val=4153
-DEBUG: Reloc printf: Type=4 Off=1ed Addend=-4 SymVal=40106c P=401289 Val=-545
-DEBUG: Reloc .str.4: Type=2 Off=359 Addend=-4 SymVal=402298 P=4013f5 Val=3743
-DEBUG: Reloc .str.5: Type=2 Off=36b Addend=-4 SymVal=4022a8 P=401407 Val=3741
-DEBUG: Reloc .str.6: Type=2 Off=3e7 Addend=-4 SymVal=4022b0 P=401483 Val=3625
-DEBUG: Reloc .str.7: Type=2 Off=43f Addend=-4 SymVal=4022b8 P=4014db Val=3545
+DEBUG: Reloc .str.1: Type=2 Off=ac Addend=-4 SymVal=402278 P=401148 Val=4396
+DEBUG: Reloc .str.2: Type=2 Off=be Addend=-4 SymVal=402288 P=40115a Val=4394
+DEBUG: Reloc .str.3: Type=2 Off=1c3 Addend=-4 SymVal=402290 P=40125f Val=4141
+DEBUG: Reloc printf: Type=4 Off=1f9 Addend=-4 SymVal=40106c P=401295 Val=-557
+DEBUG: Reloc .str.4: Type=2 Off=369 Addend=-4 SymVal=402298 P=401405 Val=3727
+DEBUG: Reloc .str.5: Type=2 Off=37b Addend=-4 SymVal=4022a8 P=401417 Val=3725
+DEBUG: Reloc .str.6: Type=2 Off=3f7 Addend=-4 SymVal=4022b0 P=401493 Val=3609
+DEBUG: Reloc .str.7: Type=2 Off=44f Addend=-4 SymVal=4022b8 P=4014eb Val=3529
 [Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_defer_function
 
 Run Output:

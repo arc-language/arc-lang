@@ -2,20 +2,24 @@
 namespace main
 
 extern c {
-    func fopen(*byte, *byte) *byte
-    func fprintf(*byte, *byte, ...) int32
-    func fclose(*byte) int32
-    func fread(*byte, uint64, uint64, *byte) uint64
+    func fopen(*byte, *byte) *FILE
+    func fprintf(*FILE, *byte, ...) int32
+    func fclose(*FILE) int32
+    func fread(*byte, uint64, uint64, *FILE) uint64
     func printf(*byte, ...) int32
-    func memset(*byte, int32, uint64) *byte
 }
 
-func cleanup(file: *byte) {
+struct FILE {
+    // Opaque - we don't need to know the internal structure
+    // C's FILE* is treated as a pointer to this struct
+}
+
+func cleanup(file: *FILE) {
     fprintf(file, "cleanup_called\n")
     fclose(file)
     
     // Reopen and read back the file to stdout
-    let read_file: *byte = fopen("/tmp/myfile.txt", "r")
+    let read_file: *FILE = fopen("/tmp/myfile.txt", "r")
     let buffer: [100]byte = {}
     fread(&buffer, 1, 100, read_file)
     fclose(read_file)
@@ -25,7 +29,7 @@ func cleanup(file: *byte) {
 }
 
 func main() int32 {
-    let file: *byte = fopen("/tmp/myfile.txt", "w")
+    let file: *FILE = fopen("/tmp/myfile.txt", "w")
     
     fprintf(file, "start\n")
     defer cleanup(file)
