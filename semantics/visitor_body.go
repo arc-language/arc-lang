@@ -90,7 +90,13 @@ func (a *Analyzer) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 }
 
 func (a *Analyzer) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
-	return a.Visit(ctx.Statement())
+	if ctx.AssignmentStmt() != nil {
+		return a.Visit(ctx.AssignmentStmt())
+	}
+	if ctx.Expression() != nil {
+		return a.Visit(ctx.Expression())
+	}
+	return nil
 }
 
 // Stubs for remaining statements to ensure interface satisfaction

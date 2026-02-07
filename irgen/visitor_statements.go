@@ -82,7 +82,15 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 }
 
 func (g *Generator) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
-	stmt := ctx.Statement()
+	// Determine which child node to visit (Expression or AssignmentStmt)
+	var node antlr.ParseTree
+	if ctx.AssignmentStmt() != nil {
+		node = ctx.AssignmentStmt()
+	} else if ctx.Expression() != nil {
+		node = ctx.Expression()
+	} else {
+		return nil
+	}
 	
 	// Capture the current scope so symbols (variables) are resolved correctly 
 	// when the deferred statement is executed at the end of the function.
@@ -94,7 +102,7 @@ func (g *Generator) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
 		gen.currentScope = capturedScope
 		defer func() { gen.currentScope = prevScope }()
 
-		gen.Visit(stmt)
+		gen.Visit(node)
 	})
 	return nil
 }

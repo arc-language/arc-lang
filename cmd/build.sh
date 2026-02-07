@@ -28,7 +28,7 @@ print_info() {
 # Build Arc compiler
 build_compiler() {
     print_info "Building Arc compiler..."
-    GOPROXY=direct go get github.com/arc-language/arc-lang@latest
+    GOPROXY=direct go install github.com/arc-language/arc-lang/cmd/arc@latest
     if go build -o "$ARC_BINARY" main.go; then
         print_success "Arc compiler built successfully"
         return 0
