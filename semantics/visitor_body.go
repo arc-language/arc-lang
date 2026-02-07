@@ -89,9 +89,12 @@ func (a *Analyzer) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	return nil
 }
 
+func (a *Analyzer) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
+	return a.Visit(ctx.Statement())
+}
+
 // Stubs for remaining statements to ensure interface satisfaction
 func (a *Analyzer) VisitBreakStmt(ctx *parser.BreakStmtContext) interface{} { return nil }
 func (a *Analyzer) VisitContinueStmt(ctx *parser.ContinueStmtContext) interface{} { return nil }
-func (a *Analyzer) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} { return nil }
 func (a *Analyzer) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} { return nil }
 func (a *Analyzer) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) interface{} { return nil }

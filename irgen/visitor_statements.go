@@ -31,16 +31,13 @@ func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
 }
 
 func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
-	// Emit Deferred Actions BEFORE return
-	if g.deferStack != nil {
-		g.deferStack.Emit(g)
-	}
-
 	var val ir.Value
+
+	// 1. Evaluate the return expression (if any)
 	if ctx.Expression() != nil {
 		val = g.Visit(ctx.Expression()).(ir.Value)
-	} 
-	
+	}
+
 	if ctx.TupleExpression() != nil {
 		tupleCtx := ctx.TupleExpression()
 		var fieldVals []ir.Value
@@ -48,7 +45,7 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 			v := g.Visit(expr).(ir.Value)
 			fieldVals = append(fieldVals, v)
 		}
-		
+
 		if g.ctx.CurrentFunction != nil {
 			retType := g.ctx.CurrentFunction.FuncType.ReturnType
 			if st, ok := retType.(*types.StructType); ok {
@@ -64,6 +61,14 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 		}
 	}
 
+	// 2. Emit Deferred Actions (LIFO order)
+	// We do this after evaluation so that any side effects in the return expr happen first,
+	// but before the actual jump/ret instruction.
+	if g.deferStack != nil {
+		g.deferStack.Emit(g)
+	}
+
+	// 3. Generate Return Instruction
 	if val != nil {
 		if g.ctx.CurrentFunction != nil && ctx.TupleExpression() == nil {
 			targetType := g.ctx.CurrentFunction.FuncType.ReturnType
@@ -76,6 +81,23 @@ func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
 	return nil
 }
 
+func (g *Generator) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
+	stmt := ctx.Statement()
+	
+	// Capture the current scope so symbols (variables) are resolved correctly 
+	// when the deferred statement is executed at the end of the function.
+	capturedScope := g.currentScope
+
+	g.deferStack.Add(func(gen *Generator) {
+		// Temporarily restore the scope where defer was defined
+		prevScope := gen.currentScope
+		gen.currentScope = capturedScope
+		defer func() { gen.currentScope = prevScope }()
+
+		gen.Visit(stmt)
+	})
+	return nil
+}
 
 func (g *Generator) VisitAssignmentStmt(ctx *parser.AssignmentStmtContext) interface{} {
 	lhsCtx := ctx.UnaryExpression()

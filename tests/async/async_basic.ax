@@ -3,6 +3,7 @@ namespace main
 
 extern c {
     func printf(*byte, ...) int32
+    func sleep(uint32) uint32
 }
 
 async func async_function() int32 {

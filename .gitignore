@@ -3,3 +3,4 @@
 
 cmd/test_runner
 cmd/arc
+cmd/tests.log
