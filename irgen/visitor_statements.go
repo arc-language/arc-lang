@@ -436,7 +436,7 @@ func (g *Generator) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 	cond := g.Visit(ctx.Expression()).(ir.Value)
-	
+
 	// FIX: Ensure switch condition is inserted
 	if inst, ok := cond.(ir.Instruction); ok && inst.Parent() == nil {
 		g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
@@ -447,10 +447,10 @@ func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 
 	for i, c := range ctx.AllSwitchCase() {
 		g.ctx.SetInsertBlock(prevBlock)
-		
+
 		caseBlock := g.ctx.Builder.CreateBlock(fmt.Sprintf("case.%d", i))
 		nextCheckBlock := g.ctx.Builder.CreateBlock(fmt.Sprintf("check.%d", i))
-		
+
 		if i == len(ctx.AllSwitchCase())-1 && ctx.DefaultCase() == nil {
 			nextCheckBlock = endBlock
 		}
@@ -459,28 +459,30 @@ func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 		currentCheck := prevBlock
 		for j, expr := range c.AllExpression() {
 			g.ctx.SetInsertBlock(currentCheck)
-			
+
 			val := g.Visit(expr).(ir.Value)
 			// FIX: Ensure case value instruction is inserted
 			if inst, ok := val.(ir.Instruction); ok && inst.Parent() == nil {
 				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 			}
-			
+
 			cmp := g.ctx.Builder.CreateICmpEQ(cond, val, "")
-			// FIX: Ensure comparison is inserted
-			if inst, ok := cmp.(ir.Instruction); ok && inst.Parent() == nil {
-				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
-			}
 			
+			// FIX: Ensure comparison is inserted. 
+			// cmp is *ir.ICmpInst (concrete type), so we check Parent directly without type assertion.
+			if cmp.Parent() == nil {
+				g.ctx.Builder.GetInsertBlock().AddInstruction(cmp)
+			}
+
 			nextExprBlock := nextCheckBlock
 			if j < len(c.AllExpression())-1 {
 				nextExprBlock = g.ctx.Builder.CreateBlock(fmt.Sprintf("check.%d.%d", i, j))
 			}
-			
+
 			g.ctx.Builder.CreateCondBr(cmp, caseBlock, nextExprBlock)
 			currentCheck = nextExprBlock
 		}
-		
+
 		// Generate Case Body
 		g.ctx.SetInsertBlock(caseBlock)
 		for _, s := range c.AllStatement() {
@@ -499,7 +501,7 @@ func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 	// Handle Default
 	if prevBlock != endBlock {
 		g.ctx.SetInsertBlock(prevBlock)
-		
+
 		if ctx.DefaultCase() != nil {
 			for _, s := range ctx.DefaultCase().AllStatement() {
 				g.Visit(s)
@@ -508,7 +510,7 @@ func (g *Generator) VisitSwitchStmt(ctx *parser.SwitchStmtContext) interface{} {
 				}
 			}
 		}
-		
+
 		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
 			g.ctx.Builder.CreateBr(endBlock)
 		}
