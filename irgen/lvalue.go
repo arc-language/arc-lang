@@ -162,6 +162,14 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 				if fn, ok := sym.IRValue.(*ir.Function); ok {
 					return fn
 				}
+				
+				// FIX: Arguments are R-Values, not L-Values.
+				// Returning them here would cause VisitPostfixExpression to treat them 
+				// as addresses and load from them, causing a double-dereference for pointers.
+				if _, ok := sym.IRValue.(*ir.Argument); ok {
+					return nil
+				}
+
 				return sym.IRValue
 			}
 		}
