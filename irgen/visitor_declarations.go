@@ -561,9 +561,9 @@ func (g *Generator) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 		if val != nil {
 			if constant, ok := val.(ir.Constant); ok {
 				sym.IRValue = constant
-			} else {
+			} else if v, ok := val.(ir.Value); ok {
 				// Fallback if the expression isn't strictly constant (though it should be for const)
-				sym.IRValue = val
+				sym.IRValue = v
 			}
 		}
 	}
