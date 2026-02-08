@@ -277,24 +277,28 @@ Build Output:
 [Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_defer_function.ax
 [Driver] [INFO] Linking libraries: [c]
 DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
-DEBUG: Stub at 0x40107c, main at 0x4012ac, lea PC at 0x401090
+DEBUG: Stub at 0x40107c, main at 0x40126c, lea PC at 0x401090
 DEBUG: call PC at 0x40109b, __libc_start_main at 0x40103c
-DEBUG: Reloc .str.0: Type=2 Off=2a Addend=-4 SymVal=402268 P=4010c6 Val=4510
-DEBUG: Reloc .str.1: Type=2 Off=ac Addend=-4 SymVal=402278 P=401148 Val=4396
-DEBUG: Reloc .str.2: Type=2 Off=be Addend=-4 SymVal=402288 P=40115a Val=4394
-DEBUG: Reloc .str.3: Type=2 Off=1c3 Addend=-4 SymVal=402290 P=40125f Val=4141
-DEBUG: Reloc printf: Type=4 Off=1f9 Addend=-4 SymVal=40106c P=401295 Val=-557
-DEBUG: Reloc .str.4: Type=2 Off=369 Addend=-4 SymVal=402298 P=401405 Val=3727
-DEBUG: Reloc .str.5: Type=2 Off=37b Addend=-4 SymVal=4022a8 P=401417 Val=3725
-DEBUG: Reloc .str.6: Type=2 Off=3f7 Addend=-4 SymVal=4022b0 P=401493 Val=3609
-DEBUG: Reloc .str.7: Type=2 Off=44f Addend=-4 SymVal=4022b8 P=4014eb Val=3529
+DEBUG: Reloc .str.0: Type=2 Off=15 Addend=-4 SymVal=402268 P=4010b1 Val=4531
+DEBUG: Reloc .str.1: Type=2 Off=74 Addend=-4 SymVal=402278 P=401110 Val=4452
+DEBUG: Reloc .str.2: Type=2 Off=86 Addend=-4 SymVal=402288 P=401122 Val=4450
+DEBUG: Reloc .str.3: Type=2 Off=18b Addend=-4 SymVal=402290 P=401227 Val=4197
+DEBUG: Reloc printf: Type=4 Off=1c1 Addend=-4 SymVal=40106c P=40125d Val=-501
+DEBUG: Reloc .str.4: Type=2 Off=329 Addend=-4 SymVal=402298 P=4013c5 Val=3791
+DEBUG: Reloc .str.5: Type=2 Off=33b Addend=-4 SymVal=4022a8 P=4013d7 Val=3789
+DEBUG: Reloc .str.6: Type=2 Off=3b7 Addend=-4 SymVal=4022b0 P=401453 Val=3673
+DEBUG: Reloc .str.7: Type=2 Off=40f Addend=-4 SymVal=4022b8 P=4014ab Val=3593
 [Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_defer_function
 
 Run Output:
-
+start
+end
+cleanup_called
+
 Result: FAIL
-Error: runtime error (exit code 139)
-Output: 
+Error: assertion failed.
+      Expected: "start\\nend\\ncleanup_called\\n"
+      Got:      "start\nend\ncleanup_called\n\x7f"
 
 --- Test: control_defer_multiple (../tests/control_flow/control_defer_multiple.ax) ---
 Build Output:
@@ -400,3 +404,2213 @@ DEBUG: Reloc .str.0: Type=2 Off=21e Addend=-4 SymVal=402170 P=40127a Val=3826
 DEBUG: Reloc printf: Type=4 Off=269 Addend=-4 SymVal=40102c P=4012c5 Val=-669
 [Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_for_infinite_break
 
+Run Output:
+
+Result: FAIL
+Error: execution timeout (exceeded 10s) - possible infinite loop
+
+--- Test: control_for_nested (../tests/control_flow/control_for_nested.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_for_nested.ax -> /tmp/arc_test_env/control_for_nested
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_nested.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=232 Addend=-4 SymVal=402170 P=40128e Val=3806
+DEBUG: Reloc printf: Type=4 Off=27d Addend=-4 SymVal=40102c P=4012d9 Val=-689
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_for_nested
+
+Run Output:
+product=6
+
+Result: PASS
+
+--- Test: control_for_while (../tests/control_flow/control_for_while.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_for_while.ax -> /tmp/arc_test_env/control_for_while
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_for_while.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=20b Addend=-4 SymVal=402170 P=401267 Val=3845
+DEBUG: Reloc printf: Type=4 Off=256 Addend=-4 SymVal=40102c P=4012b2 Val=-650
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_for_while
+
+Run Output:
+count=3
+
+Result: PASS
+
+--- Test: control_if_basic (../tests/control_flow/control_if_basic.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_if_basic.ax -> /tmp/arc_test_env/control_if_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_basic.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1bf Addend=-4 SymVal=402170 P=40121b Val=3921
+DEBUG: Reloc printf: Type=4 Off=1ee Addend=-4 SymVal=40102c P=40124a Val=-546
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_if_basic
+
+Run Output:
+condition_true
+
+Result: PASS
+
+--- Test: control_if_else (../tests/control_flow/control_if_else.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_if_else.ax -> /tmp/arc_test_env/control_if_else
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_else.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1bf Addend=-4 SymVal=402170 P=40121b Val=3921
+DEBUG: Reloc printf: Type=4 Off=1ee Addend=-4 SymVal=40102c P=40124a Val=-546
+DEBUG: Reloc .str.1: Type=2 Off=200 Addend=-4 SymVal=402180 P=40125c Val=3872
+DEBUG: Reloc printf: Type=4 Off=22f Addend=-4 SymVal=40102c P=40128b Val=-611
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_if_else
+
+Run Output:
+not_greater
+
+Result: PASS
+
+--- Test: control_if_elseif (../tests/control_flow/control_if_elseif.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_if_elseif.ax -> /tmp/arc_test_env/control_if_elseif
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_elseif.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1c2 Addend=-4 SymVal=402170 P=40121e Val=3918
+DEBUG: Reloc printf: Type=4 Off=1f1 Addend=-4 SymVal=40102c P=40124d Val=-549
+DEBUG: Reloc .str.1: Type=2 Off=252 Addend=-4 SymVal=402178 P=4012ae Val=3782
+DEBUG: Reloc printf: Type=4 Off=281 Addend=-4 SymVal=40102c P=4012dd Val=-693
+DEBUG: Reloc .str.2: Type=2 Off=2e2 Addend=-4 SymVal=402180 P=40133e Val=3646
+DEBUG: Reloc printf: Type=4 Off=311 Addend=-4 SymVal=40102c P=40136d Val=-837
+DEBUG: Reloc .str.3: Type=2 Off=323 Addend=-4 SymVal=402188 P=40137f Val=3589
+DEBUG: Reloc printf: Type=4 Off=352 Addend=-4 SymVal=40102c P=4013ae Val=-902
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_if_elseif
+
+Run Output:
+C
+
+Result: PASS
+
+--- Test: control_if_nested (../tests/control_flow/control_if_nested.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_if_nested.ax -> /tmp/arc_test_env/control_if_nested
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_if_nested.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=225 Addend=-4 SymVal=402170 P=401281 Val=3819
+DEBUG: Reloc printf: Type=4 Off=254 Addend=-4 SymVal=40102c P=4012b0 Val=-648
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_if_nested
+
+Run Output:
+both_true
+
+Result: PASS
+
+--- Test: control_return_value (../tests/control_flow/control_return_value.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_return_value.ax -> /tmp/arc_test_env/control_return_value
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_return_value.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40107c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=19e Addend=-4 SymVal=402170 P=4011fa Val=3954
+DEBUG: Reloc printf: Type=4 Off=1e6 Addend=-4 SymVal=40102c P=401242 Val=-538
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_return_value
+
+Run Output:
+value=42
+
+Result: PASS
+
+--- Test: control_return_void (../tests/control_flow/control_return_void.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_return_void.ax -> /tmp/arc_test_env/control_return_void
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_return_void.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x4010ac, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=b Addend=-4 SymVal=402170 P=401067 Val=4357
+DEBUG: Reloc printf: Type=4 Off=3a Addend=-4 SymVal=40102c P=401096 Val=-110
+DEBUG: Reloc .str.1: Type=2 Off=1b5 Addend=-4 SymVal=402180 P=401211 Val=3947
+DEBUG: Reloc printf: Type=4 Off=1e4 Addend=-4 SymVal=40102c P=401240 Val=-536
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_return_void
+
+Run Output:
+before_return
+done
+
+Result: FAIL
+Error: assertion failed.
+      Expected: "before_return\\ndone"
+      Got:      "before_return\ndone"
+
+--- Test: control_switch_default (../tests/control_flow/control_switch_default.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_switch_default.ax -> /tmp/arc_test_env/control_switch_default
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_switch_default.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1bf Addend=-4 SymVal=402170 P=40121b Val=3921
+DEBUG: Reloc printf: Type=4 Off=1ee Addend=-4 SymVal=40102c P=40124a Val=-546
+DEBUG: Reloc .str.1: Type=2 Off=23a Addend=-4 SymVal=402178 P=401296 Val=3806
+DEBUG: Reloc printf: Type=4 Off=269 Addend=-4 SymVal=40102c P=4012c5 Val=-669
+DEBUG: Reloc .str.2: Type=2 Off=27b Addend=-4 SymVal=402180 P=4012d7 Val=3749
+DEBUG: Reloc printf: Type=4 Off=2aa Addend=-4 SymVal=40102c P=401306 Val=-734
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_switch_default
+
+Run Output:
+other
+
+Result: PASS
+
+--- Test: control_switch_multi (../tests/control_flow/control_switch_multi.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_switch_multi.ax -> /tmp/arc_test_env/control_switch_multi
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_switch_multi.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1c2 Addend=-4 SymVal=402170 P=40121e Val=3918
+DEBUG: Reloc printf: Type=4 Off=1f1 Addend=-4 SymVal=40102c P=40124d Val=-549
+DEBUG: Reloc .str.1: Type=2 Off=2b1 Addend=-4 SymVal=402178 P=40130d Val=3687
+DEBUG: Reloc printf: Type=4 Off=2e0 Addend=-4 SymVal=40102c P=40133c Val=-788
+DEBUG: Reloc .str.2: Type=2 Off=2f2 Addend=-4 SymVal=402180 P=40134e Val=3630
+DEBUG: Reloc printf: Type=4 Off=321 Addend=-4 SymVal=40102c P=40137d Val=-853
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_switch_multi
+
+Run Output:
+low
+
+Result: PASS
+
+--- Test: control_switch_simple (../tests/control_flow/control_switch_simple.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/control_flow/control_switch_simple.ax -> /tmp/arc_test_env/control_switch_simple
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_switch_simple.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1bf Addend=-4 SymVal=402170 P=40121b Val=3921
+DEBUG: Reloc printf: Type=4 Off=1ee Addend=-4 SymVal=40102c P=40124a Val=-546
+DEBUG: Reloc .str.1: Type=2 Off=23a Addend=-4 SymVal=402178 P=401296 Val=3806
+DEBUG: Reloc printf: Type=4 Off=269 Addend=-4 SymVal=40102c P=4012c5 Val=-669
+DEBUG: Reloc .str.2: Type=2 Off=2b5 Addend=-4 SymVal=402180 P=401311 Val=3691
+DEBUG: Reloc printf: Type=4 Off=2e4 Addend=-4 SymVal=40102c P=401340 Val=-792
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_switch_simple
+
+Run Output:
+two
+
+Result: PASS
+
+--- Test: enum_basic (../tests/enum/enum_basic.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/enum/enum_basic.ax -> /tmp/arc_test_env/enum_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/enum/enum_basic.ax
+/home/marss6414/arc-lang/tests/enum/enum_basic.ax:16:0: Undefined identifier 'Status.OK'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/enum/enum_basic.ax -> /tmp/arc_test_env/enum_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/enum/enum_basic.ax
+/home/marss6414/arc-lang/tests/enum/enum_basic.ax:16:0: Undefined identifier 'Status.OK'
+Error: compilation failed
+
+--- Test: enum_explicit_values (../tests/enum/enum_explicit_values.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/enum/enum_explicit_values.ax -> /tmp/arc_test_env/enum_explicit_values
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/enum/enum_explicit_values.ax
+/home/marss6414/arc-lang/tests/enum/enum_explicit_values.ax:16:0: Undefined identifier 'HttpCode.NOT_FOUND'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/enum/enum_explicit_values.ax -> /tmp/arc_test_env/enum_explicit_values
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/enum/enum_explicit_values.ax
+/home/marss6414/arc-lang/tests/enum/enum_explicit_values.ax:16:0: Undefined identifier 'HttpCode.NOT_FOUND'
+Error: compilation failed
+
+--- Test: extern_malloc (../tests/extern_c/extern_malloc.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/extern_c/extern_malloc.ax -> /tmp/arc_test_env/extern_malloc
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/extern_c/extern_malloc.ax
+/home/marss6414/arc-lang/tests/extern_c/extern_malloc.ax:16:0: Undefined identifier 'free'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/extern_c/extern_malloc.ax -> /tmp/arc_test_env/extern_malloc
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/extern_c/extern_malloc.ax
+/home/marss6414/arc-lang/tests/extern_c/extern_malloc.ax:16:0: Undefined identifier 'free'
+Error: compilation failed
+
+--- Test: extern_printf (../tests/extern_c/extern_printf.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/extern_c/extern_printf.ax -> /tmp/arc_test_env/extern_printf
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/extern_c/extern_printf.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=156 Addend=-4 SymVal=402170 P=4011b2 Val=4026
+DEBUG: Reloc printf: Type=4 Off=185 Addend=-4 SymVal=40102c P=4011e1 Val=-441
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/extern_printf
+
+Run Output:
+extern_test
+
+Result: PASS
+
+--- Test: for_in_range (../tests/for_loops/for_in_range.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/for_loops/for_in_range.ax -> /tmp/arc_test_env/for_in_range
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/for_loops/for_in_range.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=274 Addend=-4 SymVal=402170 P=4012d0 Val=3740
+DEBUG: Reloc printf: Type=4 Off=2bf Addend=-4 SymVal=40102c P=40131b Val=-755
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/for_in_range
+
+Run Output:
+sum=10
+
+Result: PASS
+
+--- Test: constant_inferred (../tests/foundation/constant_inferred.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/constant_inferred.ax -> /tmp/arc_test_env/constant_inferred
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/constant_inferred.ax
+/home/marss6414/arc-lang/tests/foundation/constant_inferred.ax:11:0: Undefined identifier 'LIMIT'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/constant_inferred.ax -> /tmp/arc_test_env/constant_inferred
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/constant_inferred.ax
+/home/marss6414/arc-lang/tests/foundation/constant_inferred.ax:11:0: Undefined identifier 'LIMIT'
+Error: compilation failed
+
+--- Test: constant_typed (../tests/foundation/constant_typed.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/constant_typed.ax -> /tmp/arc_test_env/constant_typed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/constant_typed.ax
+/home/marss6414/arc-lang/tests/foundation/constant_typed.ax:11:0: Undefined identifier 'MAX'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/foundation/constant_typed.ax -> /tmp/arc_test_env/constant_typed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/constant_typed.ax
+/home/marss6414/arc-lang/tests/foundation/constant_typed.ax:11:0: Undefined identifier 'MAX'
+Error: compilation failed
+
+--- Test: literal_bool (../tests/foundation/literal_bool.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_bool.ax -> /tmp/arc_test_env/literal_bool
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_bool.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=172 Addend=-4 SymVal=402170 P=4011ce Val=3998
+DEBUG: Reloc printf: Type=4 Off=1db Addend=-4 SymVal=40102c P=401237 Val=-527
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/literal_bool
+
+Run Output:
+true=1 false=0
+
+Result: PASS
+
+--- Test: literal_char (../tests/foundation/literal_char.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_char.ax -> /tmp/arc_test_env/literal_char
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_char.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=167 Addend=-4 SymVal=402170 P=4011c3 Val=4009
+DEBUG: Reloc printf: Type=4 Off=1c8 Addend=-4 SymVal=40102c P=401224 Val=-508
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/literal_char
+
+Run Output:
+char=A code=65
+
+Result: PASS
+
+--- Test: literal_char_escape (../tests/foundation/literal_char_escape.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_char_escape.ax -> /tmp/arc_test_env/literal_char_escape
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_char_escape.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=178 Addend=-4 SymVal=402170 P=4011d4 Val=3992
+DEBUG: Reloc printf: Type=4 Off=1c0 Addend=-4 SymVal=40102c P=40121c Val=-500
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/literal_char_escape
+
+Run Output:
+escape_test\ok
+
+Result: FAIL
+Error: assertion failed.
+      Expected: "escape_test\\nok"
+      Got:      "escape_test\\ok"
+
+--- Test: literal_float_scientific (../tests/foundation/literal_float_scientific.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_float_scientific.ax -> /tmp/arc_test_env/literal_float_scientific
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_float_scientific.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=16e Addend=-4 SymVal=402170 P=4011ca Val=4002
+DEBUG: Reloc printf: Type=4 Off=1be Addend=-4 SymVal=40102c P=40121a Val=-498
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/literal_float_scientific
+
+Run Output:
+sci=0.0015
+
+Result: PASS
+
+--- Test: literal_float_standard (../tests/foundation/literal_float_standard.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_float_standard.ax -> /tmp/arc_test_env/literal_float_standard
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_float_standard.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=167 Addend=-4 SymVal=402170 P=4011c3 Val=4009
+DEBUG: Reloc printf: Type=4 Off=1b7 Addend=-4 SymVal=40102c P=401213 Val=-491
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/literal_float_standard
+
+Run Output:
+pi=3.14
+
+Result: PASS
+
+--- Test: literal_int_decimal (../tests/foundation/literal_int_decimal.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_int_decimal.ax -> /tmp/arc_test_env/literal_int_decimal
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_int_decimal.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/literal_int_decimal
+
+Run Output:
+value=42
+
+Result: PASS
+
+--- Test: literal_int_hex (../tests/foundation/literal_int_hex.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_int_hex.ax -> /tmp/arc_test_env/literal_int_hex
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_int_hex.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/literal_int_hex
+
+Run Output:
+hex=255
+
+Result: PASS
+
+--- Test: literal_int_negative (../tests/foundation/literal_int_negative.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_int_negative.ax -> /tmp/arc_test_env/literal_int_negative
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_int_negative.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/literal_int_negative
+
+Run Output:
+neg=-100
+
+Result: PASS
+
+--- Test: literal_null (../tests/foundation/literal_null.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_null.ax -> /tmp/arc_test_env/literal_null
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_null.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1c5 Addend=-4 SymVal=402170 P=401221 Val=3915
+DEBUG: Reloc printf: Type=4 Off=1f4 Addend=-4 SymVal=40102c P=401250 Val=-552
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/literal_null
+
+Run Output:
+ptr_is_null
+
+Result: PASS
+
+--- Test: literal_string_basic (../tests/foundation/literal_string_basic.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_string_basic.ax -> /tmp/arc_test_env/literal_string_basic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_string_basic.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=156 Addend=-4 SymVal=402170 P=4011b2 Val=4026
+DEBUG: Reloc .str.1: Type=2 Off=17d Addend=-4 SymVal=402178 P=4011d9 Val=3995
+DEBUG: Reloc printf: Type=4 Off=1c8 Addend=-4 SymVal=40102c P=401224 Val=-508
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/literal_string_basic
+
+Run Output:
+hello
+
+Result: PASS
+
+--- Test: literal_string_escape (../tests/foundation/literal_string_escape.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/literal_string_escape.ax -> /tmp/arc_test_env/literal_string_escape
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/literal_string_escape.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=156 Addend=-4 SymVal=402170 P=4011b2 Val=4026
+DEBUG: Reloc .str.1: Type=2 Off=17d Addend=-4 SymVal=402180 P=4011d9 Val=4003
+DEBUG: Reloc printf: Type=4 Off=1c8 Addend=-4 SymVal=40102c P=401224 Val=-508
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/literal_string_escape
+
+Run Output:
+line1
+line2
+
+Result: FAIL
+Error: assertion failed.
+      Expected: "line1\\nline2"
+      Got:      "line1\nline2"
+
+--- Test: type_alias_bool (../tests/foundation/type_alias_bool.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_alias_bool.ax -> /tmp/arc_test_env/type_alias_bool
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_alias_bool.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=164 Addend=-4 SymVal=402170 P=4011c0 Val=4012
+DEBUG: Reloc printf: Type=4 Off=1b0 Addend=-4 SymVal=40102c P=40120c Val=-484
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_alias_bool
+
+Run Output:
+bool=1
+
+Result: PASS
+
+--- Test: type_alias_byte (../tests/foundation/type_alias_byte.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_alias_byte.ax -> /tmp/arc_test_env/type_alias_byte
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_alias_byte.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=164 Addend=-4 SymVal=402170 P=4011c0 Val=4012
+DEBUG: Reloc printf: Type=4 Off=1b0 Addend=-4 SymVal=40102c P=40120c Val=-484
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_alias_byte
+
+Run Output:
+byte=66
+
+Result: PASS
+
+--- Test: type_alias_char (../tests/foundation/type_alias_char.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_alias_char.ax -> /tmp/arc_test_env/type_alias_char
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_alias_char.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=167 Addend=-4 SymVal=402170 P=4011c3 Val=4009
+DEBUG: Reloc printf: Type=4 Off=1af Addend=-4 SymVal=40102c P=40120b Val=-483
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_alias_char
+
+Run Output:
+char=Z
+
+Result: PASS
+
+--- Test: type_float32 (../tests/foundation/type_float32.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_float32.ax -> /tmp/arc_test_env/type_float32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_float32.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=167 Addend=-4 SymVal=402170 P=4011c3 Val=4009
+DEBUG: Reloc printf: Type=4 Off=1b7 Addend=-4 SymVal=40102c P=401213 Val=-491
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_float32
+
+Run Output:
+float32=3.14159
+
+Result: PASS
+
+--- Test: type_float64 (../tests/foundation/type_float64.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_float64.ax -> /tmp/arc_test_env/type_float64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_float64.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=16e Addend=-4 SymVal=402170 P=4011ca Val=4002
+DEBUG: Reloc printf: Type=4 Off=1be Addend=-4 SymVal=40102c P=40121a Val=-498
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_float64
+
+Run Output:
+float64=2.718281828459045
+
+Result: PASS
+
+--- Test: type_int16 (../tests/foundation/type_int16.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_int16.ax -> /tmp/arc_test_env/type_int16
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int16.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=166 Addend=-4 SymVal=402170 P=4011c2 Val=4010
+DEBUG: Reloc printf: Type=4 Off=1bf Addend=-4 SymVal=40102c P=40121b Val=-499
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_int16
+
+Run Output:
+int16=32000
+
+Result: PASS
+
+--- Test: type_int32 (../tests/foundation/type_int32.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_int32.ax -> /tmp/arc_test_env/type_int32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int32.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=167 Addend=-4 SymVal=402170 P=4011c3 Val=4009
+DEBUG: Reloc printf: Type=4 Off=1af Addend=-4 SymVal=40102c P=40120b Val=-483
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_int32
+
+Run Output:
+int32=2147483647
+
+Result: PASS
+
+--- Test: type_int64 (../tests/foundation/type_int64.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_int64.ax -> /tmp/arc_test_env/type_int64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int64.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=16e Addend=-4 SymVal=402170 P=4011ca Val=4002
+DEBUG: Reloc printf: Type=4 Off=1b9 Addend=-4 SymVal=40102c P=401215 Val=-493
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_int64
+
+Run Output:
+int64=9223372036854775807
+
+Result: PASS
+
+--- Test: type_int8 (../tests/foundation/type_int8.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_int8.ax -> /tmp/arc_test_env/type_int8
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_int8.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=164 Addend=-4 SymVal=402170 P=4011c0 Val=4012
+DEBUG: Reloc printf: Type=4 Off=1b0 Addend=-4 SymVal=40102c P=40120c Val=-484
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_int8
+
+Run Output:
+int8=-128
+
+Result: PASS
+
+--- Test: type_isize (../tests/foundation/type_isize.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_isize.ax -> /tmp/arc_test_env/type_isize
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_isize.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_isize
+
+Run Output:
+isize=-256
+
+Result: PASS
+
+--- Test: type_uint16 (../tests/foundation/type_uint16.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_uint16.ax -> /tmp/arc_test_env/type_uint16
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint16.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=166 Addend=-4 SymVal=402170 P=4011c2 Val=4010
+DEBUG: Reloc printf: Type=4 Off=1bf Addend=-4 SymVal=40102c P=40121b Val=-499
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_uint16
+
+Run Output:
+uint16=65535
+
+Result: PASS
+
+--- Test: type_uint32 (../tests/foundation/type_uint32.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_uint32.ax -> /tmp/arc_test_env/type_uint32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint32.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=167 Addend=-4 SymVal=402170 P=4011c3 Val=4009
+DEBUG: Reloc printf: Type=4 Off=1af Addend=-4 SymVal=40102c P=40120b Val=-483
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_uint32
+
+Run Output:
+uint32=4294967295
+
+Result: PASS
+
+--- Test: type_uint64 (../tests/foundation/type_uint64.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_uint64.ax -> /tmp/arc_test_env/type_uint64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint64.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=16e Addend=-4 SymVal=402170 P=4011ca Val=4002
+DEBUG: Reloc printf: Type=4 Off=1b9 Addend=-4 SymVal=40102c P=401215 Val=-493
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_uint64
+
+Run Output:
+uint64=9223372036854775807
+
+Result: FAIL
+Error: assertion failed.
+      Expected: "uint64=18446744073709551615"
+      Got:      "uint64=9223372036854775807"
+
+--- Test: type_uint8 (../tests/foundation/type_uint8.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_uint8.ax -> /tmp/arc_test_env/type_uint8
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_uint8.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=164 Addend=-4 SymVal=402170 P=4011c0 Val=4012
+DEBUG: Reloc printf: Type=4 Off=1b0 Addend=-4 SymVal=40102c P=40120c Val=-484
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_uint8
+
+Run Output:
+uint8=255
+
+Result: PASS
+
+--- Test: type_usize (../tests/foundation/type_usize.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/type_usize.ax -> /tmp/arc_test_env/type_usize
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/type_usize.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/type_usize
+
+Run Output:
+usize=1024
+
+Result: PASS
+
+--- Test: variable_mutable_inferred (../tests/foundation/variable_mutable_inferred.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/variable_mutable_inferred.ax -> /tmp/arc_test_env/variable_mutable_inferred
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/variable_mutable_inferred.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=17a Addend=-4 SymVal=402170 P=4011d6 Val=3990
+DEBUG: Reloc printf: Type=4 Off=1c5 Addend=-4 SymVal=40102c P=401221 Val=-505
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/variable_mutable_inferred
+
+Run Output:
+inferred=100
+
+Result: PASS
+
+--- Test: variable_mutable_typed (../tests/foundation/variable_mutable_typed.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/foundation/variable_mutable_typed.ax -> /tmp/arc_test_env/variable_mutable_typed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/foundation/variable_mutable_typed.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=178 Addend=-4 SymVal=402170 P=4011d4 Val=3992
+DEBUG: Reloc printf: Type=4 Off=1c0 Addend=-4 SymVal=40102c P=40121c Val=-500
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/variable_mutable_typed
+
+Run Output:
+x=20
+
+Result: PASS
+
+--- Test: func_early_return (../tests/functions/func_early_return.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_early_return.ax -> /tmp/arc_test_env/func_early_return
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_early_return.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x4010bc, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1e8 Addend=-4 SymVal=402170 P=401244 Val=3880
+DEBUG: Reloc printf: Type=4 Off=230 Addend=-4 SymVal=40102c P=40128c Val=-612
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/func_early_return
+
+Run Output:
+result=0
+
+Result: PASS
+
+--- Test: func_multiple_return (../tests/functions/func_multiple_return.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_multiple_return.ax -> /tmp/arc_test_env/func_multiple_return
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_multiple_return.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40113c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=2a2 Addend=-4 SymVal=402170 P=4012fe Val=3694
+DEBUG: Reloc printf: Type=4 Off=307 Addend=-4 SymVal=40102c P=401363 Val=-827
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/func_multiple_return
+
+Run Output:
+result=5 ok=1
+
+Result: PASS
+
+--- Test: func_nested_calls (../tests/functions/func_nested_calls.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_nested_calls.ax -> /tmp/arc_test_env/func_nested_calls
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_nested_calls.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x4010dc, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=223 Addend=-4 SymVal=402170 P=40127f Val=3821
+DEBUG: Reloc printf: Type=4 Off=26b Addend=-4 SymVal=40102c P=4012c7 Val=-671
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/func_nested_calls
+
+Run Output:
+result=30
+
+Result: PASS
+
+--- Test: func_no_params_void (../tests/functions/func_no_params_void.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_no_params_void.ax -> /tmp/arc_test_env/func_no_params_void
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_no_params_void.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x4010ac, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=b Addend=-4 SymVal=402170 P=401067 Val=4357
+DEBUG: Reloc printf: Type=4 Off=3a Addend=-4 SymVal=40102c P=401096 Val=-110
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/func_no_params_void
+
+Run Output:
+hello
+
+Result: PASS
+
+--- Test: func_pass_by_value (../tests/functions/func_pass_by_value.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_pass_by_value.ax -> /tmp/arc_test_env/func_pass_by_value
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_pass_by_value.ax
+[IRGen] Error: Invalid assignment target at line 9
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40107c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1bf Addend=-4 SymVal=402170 P=40121b Val=3921
+DEBUG: Reloc printf: Type=4 Off=20a Addend=-4 SymVal=40102c P=401266 Val=-574
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/func_pass_by_value
+
+Run Output:
+original=10
+
+Result: PASS
+
+--- Test: func_recursive_factorial (../tests/functions/func_recursive_factorial.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_recursive_factorial.ax -> /tmp/arc_test_env/func_recursive_factorial
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_recursive_factorial.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40111c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=248 Addend=-4 SymVal=402170 P=4012a4 Val=3784
+DEBUG: Reloc printf: Type=4 Off=290 Addend=-4 SymVal=40102c P=4012ec Val=-708
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/func_recursive_factorial
+
+Run Output:
+factorial=120
+
+Result: PASS
+
+--- Test: func_recursive_fibonacci (../tests/functions/func_recursive_fibonacci.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_recursive_fibonacci.ax -> /tmp/arc_test_env/func_recursive_fibonacci
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_recursive_fibonacci.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40114c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=278 Addend=-4 SymVal=402170 P=4012d4 Val=3736
+DEBUG: Reloc printf: Type=4 Off=2c0 Addend=-4 SymVal=40102c P=40131c Val=-756
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/func_recursive_fibonacci
+
+Run Output:
+fib=13
+
+Result: PASS
+
+--- Test: func_with_params_void (../tests/functions/func_with_params_void.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_with_params_void.ax -> /tmp/arc_test_env/func_with_params_void
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_with_params_void.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x4010dc, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=19 Addend=-4 SymVal=402170 P=401075 Val=4343
+DEBUG: Reloc printf: Type=4 Off=64 Addend=-4 SymVal=40102c P=4010c0 Val=-152
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/func_with_params_void
+
+Run Output:
+sum=30
+
+Result: PASS
+
+--- Test: func_with_return (../tests/functions/func_with_return.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/functions/func_with_return.ax -> /tmp/arc_test_env/func_with_return
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/functions/func_with_return.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40109c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1d2 Addend=-4 SymVal=402170 P=40122e Val=3902
+DEBUG: Reloc printf: Type=4 Off=21a Addend=-4 SymVal=40102c P=401276 Val=-590
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/func_with_return
+
+Run Output:
+result=40
+
+Result: PASS
+
+--- Test: generic_func_def (../tests/generic/generic_func_def.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/generic/generic_func_def.ax -> /tmp/arc_test_env/generic_func_def
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_func_def.ax
+/home/marss6414/arc-lang/tests/generic/generic_func_def.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_func_def.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_func_def.ax:8:0: Unknown type 'T'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/generic/generic_func_def.ax -> /tmp/arc_test_env/generic_func_def
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_func_def.ax
+/home/marss6414/arc-lang/tests/generic/generic_func_def.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_func_def.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_func_def.ax:8:0: Unknown type 'T'
+Error: compilation failed
+
+--- Test: generic_struct_def (../tests/generic/generic_struct_def.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/generic/generic_struct_def.ax -> /tmp/arc_test_env/generic_struct_def
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_struct_def.ax
+/home/marss6414/arc-lang/tests/generic/generic_struct_def.ax:4:0: Syntax Error: missing IDENTIFIER at 'extern'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/generic/generic_struct_def.ax -> /tmp/arc_test_env/generic_struct_def
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_struct_def.ax
+/home/marss6414/arc-lang/tests/generic/generic_struct_def.ax:4:0: Syntax Error: missing IDENTIFIER at 'extern'
+Error: compilation failed
+
+--- Test: generic_swap (../tests/generic/generic_swap.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/generic/generic_swap.ax -> /tmp/arc_test_env/generic_swap
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_swap.ax
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:9:0: Unknown type 'T'
+Error: compilation failed
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/generic/generic_swap.ax -> /tmp/arc_test_env/generic_swap
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/generic/generic_swap.ax
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:8:0: Unknown type 'T'
+/home/marss6414/arc-lang/tests/generic/generic_swap.ax:9:0: Unknown type 'T'
+Error: compilation failed
+
+--- Test: intrinsic_alignof (../tests/intrinsics/intrinsic_alignof.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_alignof.ax -> /tmp/arc_test_env/intrinsic_alignof
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_alignof.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=17c Addend=-4 SymVal=402170 P=4011d8 Val=3988
+DEBUG: Reloc printf: Type=4 Off=1c7 Addend=-4 SymVal=40102c P=401223 Val=-507
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/intrinsic_alignof
+
+Run Output:
+align=8
+
+Result: PASS
+
+--- Test: intrinsic_alloca_array (../tests/intrinsics/intrinsic_alloca_array.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_alloca_array.ax -> /tmp/arc_test_env/intrinsic_alloca_array
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_array.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=212 Addend=-4 SymVal=402170 P=40126e Val=3838
+DEBUG: Reloc printf: Type=4 Off=281 Addend=-4 SymVal=40102c P=4012dd Val=-693
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/intrinsic_alloca_array
+
+Run Output:
+buffer[1]=20
+
+Result: PASS
+
+--- Test: intrinsic_alloca_single (../tests/intrinsics/intrinsic_alloca_single.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_alloca_single.ax -> /tmp/arc_test_env/intrinsic_alloca_single
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_alloca_single.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=191 Addend=-4 SymVal=402170 P=4011ed Val=3967
+DEBUG: Reloc printf: Type=4 Off=1ee Addend=-4 SymVal=40102c P=40124a Val=-546
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/intrinsic_alloca_single
+
+Run Output:
+value=777
+
+Result: PASS
+
+--- Test: intrinsic_bitcast (../tests/intrinsics/intrinsic_bitcast.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_bitcast.ax -> /tmp/arc_test_env/intrinsic_bitcast
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_bitcast.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=199 Addend=-4 SymVal=402170 P=4011f5 Val=3959
+DEBUG: Reloc printf: Type=4 Off=1e1 Addend=-4 SymVal=40102c P=40123d Val=-533
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/intrinsic_bitcast
+
+Run Output:
+bits=1065353216
+
+Result: PASS
+
+--- Test: intrinsic_memcpy (../tests/intrinsics/intrinsic_memcpy.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_memcpy.ax -> /tmp/arc_test_env/intrinsic_memcpy
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_memcpy.ax
+Error: codegen failed: in function main: unknown opcode: memcpy
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_memcpy.ax -> /tmp/arc_test_env/intrinsic_memcpy
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_memcpy.ax
+Error: codegen failed: in function main: unknown opcode: memcpy
+
+--- Test: intrinsic_memset (../tests/intrinsics/intrinsic_memset.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_memset.ax -> /tmp/arc_test_env/intrinsic_memset
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_memset.ax
+Error: codegen failed: in function main: unknown opcode: memset
+
+Result: FAIL
+Error: build failed: [Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_memset.ax -> /tmp/arc_test_env/intrinsic_memset
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_memset.ax
+Error: codegen failed: in function main: unknown opcode: memset
+
+--- Test: intrinsic_sizeof_int32 (../tests/intrinsics/intrinsic_sizeof_int32.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_sizeof_int32.ax -> /tmp/arc_test_env/intrinsic_sizeof_int32
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int32.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=17c Addend=-4 SymVal=402170 P=4011d8 Val=3988
+DEBUG: Reloc printf: Type=4 Off=1c7 Addend=-4 SymVal=40102c P=401223 Val=-507
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/intrinsic_sizeof_int32
+
+Run Output:
+size=4
+
+Result: PASS
+
+--- Test: intrinsic_sizeof_int64 (../tests/intrinsics/intrinsic_sizeof_int64.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_sizeof_int64.ax -> /tmp/arc_test_env/intrinsic_sizeof_int64
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_int64.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=17c Addend=-4 SymVal=402170 P=4011d8 Val=3988
+DEBUG: Reloc printf: Type=4 Off=1c7 Addend=-4 SymVal=40102c P=401223 Val=-507
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/intrinsic_sizeof_int64
+
+Run Output:
+size=8
+
+Result: PASS
+
+--- Test: intrinsic_sizeof_struct (../tests/intrinsics/intrinsic_sizeof_struct.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_sizeof_struct.ax -> /tmp/arc_test_env/intrinsic_sizeof_struct
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_sizeof_struct.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=17c Addend=-4 SymVal=402170 P=4011d8 Val=3988
+DEBUG: Reloc printf: Type=4 Off=1c7 Addend=-4 SymVal=40102c P=401223 Val=-507
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/intrinsic_sizeof_struct
+
+Run Output:
+size=8
+
+Result: PASS
+
+--- Test: intrinsic_strlen (../tests/intrinsics/intrinsic_strlen.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/intrinsics/intrinsic_strlen.ax -> /tmp/arc_test_env/intrinsic_strlen
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/intrinsics/intrinsic_strlen.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40104c, main at 0x40106c, lea PC at 0x401060
+DEBUG: call PC at 0x40106b, __libc_start_main at 0x40102c
+DEBUG: Reloc .str.0: Type=2 Off=156 Addend=-4 SymVal=4021b0 P=4011c2 Val=4074
+DEBUG: Reloc .str.1: Type=2 Off=1c8 Addend=-4 SymVal=4021b8 P=401234 Val=3968
+DEBUG: Reloc printf: Type=4 Off=213 Addend=-4 SymVal=40103c P=40127f Val=-583
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/intrinsic_strlen
+
+Run Output:
+len=5
+
+Result: PASS
+
+--- Test: io_pointer (../tests/io/io_pointer.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/io/io_pointer.ax -> /tmp/arc_test_env/io_pointer
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/io/io_pointer.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40106c, main at 0x40113c, lea PC at 0x401080
+DEBUG: call PC at 0x40108b, __libc_start_main at 0x40102c
+DEBUG: Reloc .str.0: Type=2 Off=12 Addend=-4 SymVal=402230 P=40109e Val=4494
+DEBUG: Reloc .str.1: Type=2 Off=71 Addend=-4 SymVal=402240 P=4010fd Val=4415
+DEBUG: Reloc printf: Type=4 Off=a0 Addend=-4 SymVal=40105c P=40112c Val=-212
+DEBUG: Reloc .str.2: Type=2 Off=206 Addend=-4 SymVal=402260 P=401292 Val=4042
+DEBUG: Reloc printf: Type=4 Off=235 Addend=-4 SymVal=40105c P=4012c1 Val=-617
+DEBUG: Reloc .str.3: Type=2 Off=242 Addend=-4 SymVal=402278 P=4012ce Val=4006
+DEBUG: Reloc .str.4: Type=2 Off=254 Addend=-4 SymVal=402288 P=4012e0 Val=4004
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/io_pointer
+
+Run Output:
+Hello from Arc!
+File written successfully
+
+Result: FAIL
+Error: assertion failed.
+      Expected: "Hello from Arc!\\nFile written successfully\\n"
+      Got:      "Hello from Arc!\nFile written successfully"
+
+--- Test: io_read (../tests/io/io_read.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/io/io_read.ax -> /tmp/arc_test_env/io_read
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/io/io_read.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40107c, main at 0x40116c, lea PC at 0x401090
+DEBUG: call PC at 0x40109b, __libc_start_main at 0x40103c
+DEBUG: Reloc .str.0: Type=2 Off=7f Addend=-4 SymVal=402268 P=40111b Val=4425
+DEBUG: Reloc printf: Type=4 Off=b5 Addend=-4 SymVal=40106c P=401151 Val=-233
+DEBUG: Reloc .str.1: Type=2 Off=229 Addend=-4 SymVal=402270 P=4012c5 Val=4007
+DEBUG: Reloc printf: Type=4 Off=258 Addend=-4 SymVal=40106c P=4012f4 Val=-652
+DEBUG: Reloc .str.2: Type=2 Off=265 Addend=-4 SymVal=402288 P=401301 Val=3971
+DEBUG: Reloc .str.3: Type=2 Off=277 Addend=-4 SymVal=4022a0 P=401313 Val=3977
+DEBUG: Reloc .str.4: Type=2 Off=2f3 Addend=-4 SymVal=4022a8 P=40138f Val=3861
+DEBUG: Reloc .str.5: Type=2 Off=367 Addend=-4 SymVal=4022c8 P=401403 Val=3777
+DEBUG: Reloc printf: Type=4 Off=396 Addend=-4 SymVal=40106c P=401432 Val=-970
+DEBUG: Reloc .str.6: Type=2 Off=3a3 Addend=-4 SymVal=4022e0 P=40143f Val=3741
+DEBUG: Reloc .str.7: Type=2 Off=3b5 Addend=-4 SymVal=4022f8 P=401451 Val=3747
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/io_read
+
+Run Output:
+Writing to file...
+Reading from file:
+Hello from Arc file I/O!
+
+Result: FAIL
+Error: assertion failed.
+      Expected: "Writing to file...\\nReading from file:\\nHello from Arc file I/O!\\n"
+      Got:      "Writing to file...\nReading from file:\nHello from Arc file I/O!"
+
+--- Test: op_addition (../tests/operators/op_addition.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_addition.ax -> /tmp/arc_test_env/op_addition
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_addition.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1d1 Addend=-4 SymVal=402170 P=40122d Val=3903
+DEBUG: Reloc printf: Type=4 Off=21c Addend=-4 SymVal=40102c P=401278 Val=-592
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_addition
+
+Run Output:
+sum=30
+
+Result: PASS
+
+--- Test: op_bitwise_and (../tests/operators/op_bitwise_and.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_bitwise_and.ax -> /tmp/arc_test_env/op_bitwise_and
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_and.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_bitwise_and
+
+Run Output:
+and=0
+
+Result: PASS
+
+--- Test: op_bitwise_not (../tests/operators/op_bitwise_not.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_bitwise_not.ax -> /tmp/arc_test_env/op_bitwise_not
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_not.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1a9 Addend=-4 SymVal=402170 P=401205 Val=3943
+DEBUG: Reloc printf: Type=4 Off=1f5 Addend=-4 SymVal=40102c P=401251 Val=-553
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_bitwise_not
+
+Run Output:
+not=240
+
+Result: PASS
+
+--- Test: op_bitwise_or (../tests/operators/op_bitwise_or.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_bitwise_or.ax -> /tmp/arc_test_env/op_bitwise_or
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_or.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_bitwise_or
+
+Run Output:
+or=255
+
+Result: PASS
+
+--- Test: op_bitwise_xor (../tests/operators/op_bitwise_xor.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_bitwise_xor.ax -> /tmp/arc_test_env/op_bitwise_xor
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_bitwise_xor.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_bitwise_xor
+
+Run Output:
+xor=240
+
+Result: PASS
+
+--- Test: op_compound_add (../tests/operators/op_compound_add.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_compound_add.ax -> /tmp/arc_test_env/op_compound_add
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_add.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1ad Addend=-4 SymVal=402170 P=401209 Val=3939
+DEBUG: Reloc printf: Type=4 Off=1f8 Addend=-4 SymVal=40102c P=401254 Val=-556
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_compound_add
+
+Run Output:
+x=15
+
+Result: PASS
+
+--- Test: op_compound_div (../tests/operators/op_compound_div.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_compound_div.ax -> /tmp/arc_test_env/op_compound_div
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_div.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1af Addend=-4 SymVal=402170 P=40120b Val=3937
+DEBUG: Reloc printf: Type=4 Off=1fa Addend=-4 SymVal=40102c P=401256 Val=-558
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_compound_div
+
+Run Output:
+x=25
+
+Result: PASS
+
+--- Test: op_compound_mod (../tests/operators/op_compound_mod.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_compound_mod.ax -> /tmp/arc_test_env/op_compound_mod
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_mod.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1af Addend=-4 SymVal=402170 P=40120b Val=3937
+DEBUG: Reloc printf: Type=4 Off=1fa Addend=-4 SymVal=40102c P=401256 Val=-558
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_compound_mod
+
+Run Output:
+x=2
+
+Result: PASS
+
+--- Test: op_compound_mul (../tests/operators/op_compound_mul.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_compound_mul.ax -> /tmp/arc_test_env/op_compound_mul
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_mul.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1ae Addend=-4 SymVal=402170 P=40120a Val=3938
+DEBUG: Reloc printf: Type=4 Off=1f9 Addend=-4 SymVal=40102c P=401255 Val=-557
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_compound_mul
+
+Run Output:
+x=15
+
+Result: PASS
+
+--- Test: op_compound_sub (../tests/operators/op_compound_sub.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_compound_sub.ax -> /tmp/arc_test_env/op_compound_sub
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_compound_sub.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1ad Addend=-4 SymVal=402170 P=401209 Val=3939
+DEBUG: Reloc printf: Type=4 Off=1f8 Addend=-4 SymVal=40102c P=401254 Val=-556
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_compound_sub
+
+Run Output:
+x=13
+
+Result: PASS
+
+--- Test: op_decrement_postfix (../tests/operators/op_decrement_postfix.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_decrement_postfix.ax -> /tmp/arc_test_env/op_decrement_postfix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_decrement_postfix.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1c2 Addend=-4 SymVal=402170 P=40121e Val=3918
+DEBUG: Reloc printf: Type=4 Off=229 Addend=-4 SymVal=40102c P=401285 Val=-605
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_decrement_postfix
+
+Run Output:
+old=10 new=9
+
+Result: PASS
+
+--- Test: op_decrement_prefix (../tests/operators/op_decrement_prefix.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_decrement_prefix.ax -> /tmp/arc_test_env/op_decrement_prefix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_decrement_prefix.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1c2 Addend=-4 SymVal=402170 P=40121e Val=3918
+DEBUG: Reloc printf: Type=4 Off=20d Addend=-4 SymVal=40102c P=401269 Val=-577
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_decrement_prefix
+
+Run Output:
+new=9
+
+Result: PASS
+
+--- Test: op_division_signed (../tests/operators/op_division_signed.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_division_signed.ax -> /tmp/arc_test_env/op_division_signed
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_division_signed.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=167 Addend=-4 SymVal=402170 P=4011c3 Val=4009
+DEBUG: Reloc printf: Type=4 Off=1af Addend=-4 SymVal=40102c P=40120b Val=-483
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_division_signed
+
+Run Output:
+quot=-5
+
+Result: PASS
+
+--- Test: op_division_unsigned (../tests/operators/op_division_unsigned.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_division_unsigned.ax -> /tmp/arc_test_env/op_division_unsigned
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_division_unsigned.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=167 Addend=-4 SymVal=402170 P=4011c3 Val=4009
+DEBUG: Reloc printf: Type=4 Off=1af Addend=-4 SymVal=40102c P=40120b Val=-483
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_division_unsigned
+
+Run Output:
+quot=5
+
+Result: PASS
+
+--- Test: op_equality (../tests/operators/op_equality.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_equality.ax -> /tmp/arc_test_env/op_equality
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_equality.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=164 Addend=-4 SymVal=402170 P=4011c0 Val=4012
+DEBUG: Reloc printf: Type=4 Off=1b0 Addend=-4 SymVal=40102c P=40120c Val=-484
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_equality
+
+Run Output:
+eq=1
+
+Result: PASS
+
+--- Test: op_greater_equal (../tests/operators/op_greater_equal.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_greater_equal.ax -> /tmp/arc_test_env/op_greater_equal
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_greater_equal.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=18f Addend=-4 SymVal=402170 P=4011eb Val=3969
+DEBUG: Reloc printf: Type=4 Off=1db Addend=-4 SymVal=40102c P=401237 Val=-527
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_greater_equal
+
+Run Output:
+ge=1
+
+Result: PASS
+
+--- Test: op_greater_than (../tests/operators/op_greater_than.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_greater_than.ax -> /tmp/arc_test_env/op_greater_than
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_greater_than.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=18f Addend=-4 SymVal=402170 P=4011eb Val=3969
+DEBUG: Reloc printf: Type=4 Off=1db Addend=-4 SymVal=40102c P=401237 Val=-527
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_greater_than
+
+Run Output:
+gt=1
+
+Result: PASS
+
+--- Test: op_increment_postfix (../tests/operators/op_increment_postfix.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_increment_postfix.ax -> /tmp/arc_test_env/op_increment_postfix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_increment_postfix.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1c2 Addend=-4 SymVal=402170 P=40121e Val=3918
+DEBUG: Reloc printf: Type=4 Off=229 Addend=-4 SymVal=40102c P=401285 Val=-605
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_increment_postfix
+
+Run Output:
+old=10 new=11
+
+Result: PASS
+
+--- Test: op_increment_prefix (../tests/operators/op_increment_prefix.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_increment_prefix.ax -> /tmp/arc_test_env/op_increment_prefix
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_increment_prefix.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1c2 Addend=-4 SymVal=402170 P=40121e Val=3918
+DEBUG: Reloc printf: Type=4 Off=20d Addend=-4 SymVal=40102c P=401269 Val=-577
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_increment_prefix
+
+Run Output:
+new=11
+
+Result: PASS
+
+--- Test: op_inequality (../tests/operators/op_inequality.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_inequality.ax -> /tmp/arc_test_env/op_inequality
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_inequality.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=164 Addend=-4 SymVal=402170 P=4011c0 Val=4012
+DEBUG: Reloc printf: Type=4 Off=1b0 Addend=-4 SymVal=40102c P=40120c Val=-484
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_inequality
+
+Run Output:
+ne=1
+
+Result: PASS
+
+--- Test: op_less_equal (../tests/operators/op_less_equal.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_less_equal.ax -> /tmp/arc_test_env/op_less_equal
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_less_equal.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=18f Addend=-4 SymVal=402170 P=4011eb Val=3969
+DEBUG: Reloc printf: Type=4 Off=1db Addend=-4 SymVal=40102c P=401237 Val=-527
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_less_equal
+
+Run Output:
+le=1
+
+Result: PASS
+
+--- Test: op_less_than (../tests/operators/op_less_than.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_less_than.ax -> /tmp/arc_test_env/op_less_than
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_less_than.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=18f Addend=-4 SymVal=402170 P=4011eb Val=3969
+DEBUG: Reloc printf: Type=4 Off=1db Addend=-4 SymVal=40102c P=401237 Val=-527
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_less_than
+
+Run Output:
+lt=1
+
+Result: PASS
+
+--- Test: op_logical_and (../tests/operators/op_logical_and.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_logical_and.ax -> /tmp/arc_test_env/op_logical_and
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_logical_and.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=164 Addend=-4 SymVal=402170 P=4011c0 Val=4012
+DEBUG: Reloc printf: Type=4 Off=1b0 Addend=-4 SymVal=40102c P=40120c Val=-484
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_logical_and
+
+Run Output:
+and=1
+
+Result: PASS
+
+--- Test: op_logical_not (../tests/operators/op_logical_not.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_logical_not.ax -> /tmp/arc_test_env/op_logical_not
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_logical_not.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=181 Addend=-4 SymVal=402170 P=4011dd Val=3983
+DEBUG: Reloc printf: Type=4 Off=1cd Addend=-4 SymVal=40102c P=401229 Val=-513
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_logical_not
+
+Run Output:
+not=1
+
+Result: PASS
+
+--- Test: op_logical_or (../tests/operators/op_logical_or.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_logical_or.ax -> /tmp/arc_test_env/op_logical_or
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_logical_or.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=164 Addend=-4 SymVal=402170 P=4011c0 Val=4012
+DEBUG: Reloc printf: Type=4 Off=1b0 Addend=-4 SymVal=40102c P=40120c Val=-484
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_logical_or
+
+Run Output:
+or=1
+
+Result: PASS
+
+--- Test: op_modulo (../tests/operators/op_modulo.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_modulo.ax -> /tmp/arc_test_env/op_modulo
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_modulo.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_modulo
+
+Run Output:
+rem=2
+
+Result: PASS
+
+--- Test: op_multiplication (../tests/operators/op_multiplication.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_multiplication.ax -> /tmp/arc_test_env/op_multiplication
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_multiplication.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_multiplication
+
+Run Output:
+prod=56
+
+Result: PASS
+
+--- Test: op_parentheses (../tests/operators/op_parentheses.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_parentheses.ax -> /tmp/arc_test_env/op_parentheses
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_parentheses.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_parentheses
+
+Run Output:
+result=20
+
+Result: PASS
+
+--- Test: op_precedence (../tests/operators/op_precedence.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_precedence.ax -> /tmp/arc_test_env/op_precedence
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_precedence.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_precedence
+
+Run Output:
+result=14
+
+Result: PASS
+
+--- Test: op_shift_left (../tests/operators/op_shift_left.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_shift_left.ax -> /tmp/arc_test_env/op_shift_left
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_shift_left.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_shift_left
+
+Run Output:
+shl=16
+
+Result: PASS
+
+--- Test: op_shift_right_arithmetic (../tests/operators/op_shift_right_arithmetic.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_shift_right_arithmetic.ax -> /tmp/arc_test_env/op_shift_right_arithmetic
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_shift_right_arithmetic.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1a9 Addend=-4 SymVal=402170 P=401205 Val=3943
+DEBUG: Reloc printf: Type=4 Off=1f1 Addend=-4 SymVal=40102c P=40124d Val=-549
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_shift_right_arithmetic
+
+Run Output:
+shr=-16
+
+Result: PASS
+
+--- Test: op_shift_right_logical (../tests/operators/op_shift_right_logical.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_shift_right_logical.ax -> /tmp/arc_test_env/op_shift_right_logical
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_shift_right_logical.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1a9 Addend=-4 SymVal=402170 P=401205 Val=3943
+DEBUG: Reloc printf: Type=4 Off=1f1 Addend=-4 SymVal=40102c P=40124d Val=-549
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_shift_right_logical
+
+Run Output:
+shr=16
+
+Result: PASS
+
+--- Test: op_subtraction (../tests/operators/op_subtraction.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_subtraction.ax -> /tmp/arc_test_env/op_subtraction
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_subtraction.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1b3 Addend=-4 SymVal=40102c P=40120f Val=-487
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_subtraction
+
+Run Output:
+diff=35
+
+Result: PASS
+
+--- Test: op_unary_negation (../tests/operators/op_unary_negation.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/operators/op_unary_negation.ax -> /tmp/arc_test_env/op_unary_negation
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/operators/op_unary_negation.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1a6 Addend=-4 SymVal=402170 P=401202 Val=3946
+DEBUG: Reloc printf: Type=4 Off=1f1 Addend=-4 SymVal=40102c P=40124d Val=-549
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/op_unary_negation
+
+Run Output:
+neg=-100
+
+Result: PASS
+
+--- Test: pointer_address_of (../tests/pointers/pointer_address_of.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/pointers/pointer_address_of.ax -> /tmp/arc_test_env/pointer_address_of
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/pointers/pointer_address_of.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=17c Addend=-4 SymVal=402170 P=4011d8 Val=3988
+DEBUG: Reloc printf: Type=4 Off=1d9 Addend=-4 SymVal=40102c P=401235 Val=-525
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/pointer_address_of
+
+Run Output:
+value=100
+
+Result: PASS
+
+--- Test: pointer_arithmetic_add (../tests/pointers/pointer_arithmetic_add.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/pointers/pointer_arithmetic_add.ax -> /tmp/arc_test_env/pointer_arithmetic_add
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/pointers/pointer_arithmetic_add.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=240 Addend=-4 SymVal=402170 P=40129c Val=3792
+DEBUG: Reloc printf: Type=4 Off=29d Addend=-4 SymVal=40102c P=4012f9 Val=-721
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/pointer_arithmetic_add
+
+Run Output:
+value=20
+
+Result: PASS
+
+--- Test: pointer_arithmetic_sub (../tests/pointers/pointer_arithmetic_sub.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/pointers/pointer_arithmetic_sub.ax -> /tmp/arc_test_env/pointer_arithmetic_sub
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/pointers/pointer_arithmetic_sub.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=276 Addend=-4 SymVal=402170 P=4012d2 Val=3738
+DEBUG: Reloc printf: Type=4 Off=2d3 Addend=-4 SymVal=40102c P=40132f Val=-775
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/pointer_arithmetic_sub
+
+Run Output:
+value=10
+
+Result: PASS
+
+--- Test: pointer_array_indexing (../tests/pointers/pointer_array_indexing.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/pointers/pointer_array_indexing.ax -> /tmp/arc_test_env/pointer_array_indexing
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/pointers/pointer_array_indexing.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=212 Addend=-4 SymVal=402170 P=40126e Val=3838
+DEBUG: Reloc printf: Type=4 Off=281 Addend=-4 SymVal=40102c P=4012dd Val=-693
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/pointer_array_indexing
+
+Run Output:
+arr[1]=200
+
+Result: PASS
+
+--- Test: pointer_basic_type (../tests/pointers/pointer_basic_type.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/pointers/pointer_basic_type.ax -> /tmp/arc_test_env/pointer_basic_type
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/pointers/pointer_basic_type.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=17c Addend=-4 SymVal=402170 P=4011d8 Val=3988
+DEBUG: Reloc printf: Type=4 Off=1d9 Addend=-4 SymVal=40102c P=401235 Val=-525
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/pointer_basic_type
+
+Run Output:
+value=42
+
+Result: PASS
+
+--- Test: pointer_deref_read (../tests/pointers/pointer_deref_read.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/pointers/pointer_deref_read.ax -> /tmp/arc_test_env/pointer_deref_read
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/pointers/pointer_deref_read.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1b7 Addend=-4 SymVal=402170 P=401213 Val=3929
+DEBUG: Reloc printf: Type=4 Off=1ff Addend=-4 SymVal=40102c P=40125b Val=-563
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/pointer_deref_read
+
+Run Output:
+value=50
+
+Result: PASS
+
+--- Test: pointer_deref_write (../tests/pointers/pointer_deref_write.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/pointers/pointer_deref_write.ax -> /tmp/arc_test_env/pointer_deref_write
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/pointers/pointer_deref_write.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1a2 Addend=-4 SymVal=402170 P=4011fe Val=3950
+DEBUG: Reloc printf: Type=4 Off=1ea Addend=-4 SymVal=40102c P=401246 Val=-542
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/pointer_deref_write
+
+Run Output:
+value=99
+
+Result: PASS
+
+--- Test: pointer_double_pointer (../tests/pointers/pointer_double_pointer.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/pointers/pointer_double_pointer.ax -> /tmp/arc_test_env/pointer_double_pointer
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/pointers/pointer_double_pointer.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=191 Addend=-4 SymVal=402170 P=4011ed Val=3967
+DEBUG: Reloc printf: Type=4 Off=203 Addend=-4 SymVal=40102c P=40125f Val=-567
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/pointer_double_pointer
+
+Run Output:
+value=77
+
+Result: PASS
+
+--- Test: pointer_null_check (../tests/pointers/pointer_null_check.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/pointers/pointer_null_check.ax -> /tmp/arc_test_env/pointer_null_check
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/pointers/pointer_null_check.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1c5 Addend=-4 SymVal=402170 P=401221 Val=3915
+DEBUG: Reloc printf: Type=4 Off=1f4 Addend=-4 SymVal=40102c P=401250 Val=-552
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/pointer_null_check
+
+Run Output:
+is_null
+
+Result: PASS
+
+--- Test: pointer_pass_to_function (../tests/pointers/pointer_pass_to_function.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/pointers/pointer_pass_to_function.ax -> /tmp/arc_test_env/pointer_pass_to_function
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/pointers/pointer_pass_to_function.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40108c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1bc Addend=-4 SymVal=402170 P=401218 Val=3924
+DEBUG: Reloc printf: Type=4 Off=207 Addend=-4 SymVal=40102c P=401263 Val=-571
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/pointer_pass_to_function
+
+Run Output:
+x=888
+
+Result: PASS
+
+--- Test: pointer_void_type (../tests/pointers/pointer_void_type.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/pointers/pointer_void_type.ax -> /tmp/arc_test_env/pointer_void_type
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/pointers/pointer_void_type.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1c2 Addend=-4 SymVal=402170 P=40121e Val=3918
+DEBUG: Reloc printf: Type=4 Off=21f Addend=-4 SymVal=40102c P=40127b Val=-595
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/pointer_void_type
+
+Run Output:
+value=42
+
+Result: PASS
+
+--- Test: struct_definition (../tests/structs/struct_definition.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_definition.ax -> /tmp/arc_test_env/struct_definition
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_definition.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=198 Addend=-4 SymVal=402170 P=4011f4 Val=3960
+DEBUG: Reloc printf: Type=4 Off=219 Addend=-4 SymVal=40102c P=401275 Val=-589
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_definition
+
+Run Output:
+x=10 y=20
+
+Result: PASS
+
+--- Test: struct_field_read (../tests/structs/struct_field_read.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_field_read.ax -> /tmp/arc_test_env/struct_field_read
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_field_read.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=198 Addend=-4 SymVal=402170 P=4011f4 Val=3960
+DEBUG: Reloc printf: Type=4 Off=1ee Addend=-4 SymVal=40102c P=40124a Val=-546
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_field_read
+
+Run Output:
+width=100
+
+Result: PASS
+
+--- Test: struct_field_write (../tests/structs/struct_field_write.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_field_write.ax -> /tmp/arc_test_env/struct_field_write
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_field_write.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1b7 Addend=-4 SymVal=402170 P=401213 Val=3929
+DEBUG: Reloc printf: Type=4 Off=20d Addend=-4 SymVal=40102c P=401269 Val=-577
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_field_write
+
+Run Output:
+x=99
+
+Result: PASS
+
+--- Test: struct_init_default (../tests/structs/struct_init_default.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_init_default.ax -> /tmp/arc_test_env/struct_init_default
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_init_default.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
+DEBUG: Reloc printf: Type=4 Off=1e9 Addend=-4 SymVal=40102c P=401245 Val=-541
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_init_default
+
+Run Output:
+x=0 y=0
+
+Result: PASS
+
+--- Test: struct_init_named (../tests/structs/struct_init_named.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_init_named.ax -> /tmp/arc_test_env/struct_init_named
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_init_named.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=156 Addend=-4 SymVal=402170 P=4011b2 Val=4026
+DEBUG: Reloc printf: Type=4 Off=185 Addend=-4 SymVal=40102c P=4011e1 Val=-441
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_init_named
+
+Run Output:
+struct_defined
+
+Result: PASS
+
+--- Test: struct_method_flat (../tests/structs/struct_method_flat.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_method_flat.ax -> /tmp/arc_test_env/struct_method_flat
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_method_flat.ax
+[IRGen] Error: Undefined identifier 'c.value'
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40107c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1f0 Addend=-4 SymVal=402170 P=40124c Val=3872
+DEBUG: Reloc printf: Type=4 Off=238 Addend=-4 SymVal=40102c P=401294 Val=-620
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_method_flat
+
+Run Output:
+value=0
+
+Result: FAIL
+Error: assertion failed.
+      Expected: "value=77"
+      Got:      "value=0"
+
+--- Test: struct_method_inline (../tests/structs/struct_method_inline.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_method_inline.ax -> /tmp/arc_test_env/struct_method_inline
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_method_inline.ax
+[IRGen] Error: Undefined identifier 'c.value'
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40107c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1f0 Addend=-4 SymVal=402170 P=40124c Val=3872
+DEBUG: Reloc printf: Type=4 Off=238 Addend=-4 SymVal=40102c P=401294 Val=-620
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_method_inline
+
+Run Output:
+value=0
+
+Result: FAIL
+Error: assertion failed.
+      Expected: "value=42"
+      Got:      "value=0"
+
+--- Test: struct_multiple_fields (../tests/structs/struct_multiple_fields.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_multiple_fields.ax -> /tmp/arc_test_env/struct_multiple_fields
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_multiple_fields.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1f3 Addend=-4 SymVal=402170 P=40124f Val=3869
+DEBUG: Reloc printf: Type=4 Off=274 Addend=-4 SymVal=40102c P=4012d0 Val=-680
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_multiple_fields
+
+Run Output:
+age=30 height=180 weight=439740488
+
+Result: FAIL
+Error: assertion failed.
+      Expected: "age=30 height=180 weight=75"
+      Got:      "age=30 height=180 weight=439740488"
+
+--- Test: struct_nested (../tests/structs/struct_nested.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_nested.ax -> /tmp/arc_test_env/struct_nested
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_nested.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=224 Addend=-4 SymVal=402170 P=401280 Val=3820
+DEBUG: Reloc printf: Type=4 Off=28c Addend=-4 SymVal=40102c P=4012e8 Val=-704
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_nested
+
+Run Output:
+end_x=10
+
+Result: PASS
+
+--- Test: struct_pass_by_pointer (../tests/structs/struct_pass_by_pointer.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_pass_by_pointer.ax -> /tmp/arc_test_env/struct_pass_by_pointer
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_pass_by_pointer.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40111c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=282 Addend=-4 SymVal=402170 P=4012de Val=3726
+DEBUG: Reloc printf: Type=4 Off=303 Addend=-4 SymVal=40102c P=40135f Val=-823
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_pass_by_pointer
+
+Run Output:
+x=5 y=10
+
+Result: PASS
+
+--- Test: struct_pass_by_value (../tests/structs/struct_pass_by_value.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_pass_by_value.ax -> /tmp/arc_test_env/struct_pass_by_value
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_pass_by_value.ax
+[IRGen] Error: Undefined identifier 'p.x'
+[IRGen] Error: Undefined identifier 'p.y'
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x4010bc, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=12 Addend=-4 SymVal=402170 P=40106e Val=4350
+DEBUG: Reloc printf: Type=4 Off=47 Addend=-4 SymVal=40102c P=4010a3 Val=-123
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_pass_by_value
+
+Run Output:
+x=0 y=0
+
+Result: FAIL
+Error: assertion failed.
+      Expected: "x=5 y=10"
+      Got:      "x=0 y=0"
+
+--- Test: struct_pointer_field (../tests/structs/struct_pointer_field.ax) ---
+Build Output:
+[Driver] [INFO] Compiling ../tests/structs/struct_pointer_field.ax -> /tmp/arc_test_env/struct_pointer_field
+[Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/structs/struct_pointer_field.ax
+[Driver] [INFO] Linking libraries: [c]
+DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
+DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
+DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
+DEBUG: Reloc .str.0: Type=2 Off=1ad Addend=-4 SymVal=402170 P=401209 Val=3939
+DEBUG: Reloc printf: Type=4 Off=218 Addend=-4 SymVal=40102c P=401274 Val=-588
+[Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_pointer_field
+
+Run Output:
+x=15
+
+Result: PASS

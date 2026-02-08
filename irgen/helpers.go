@@ -91,14 +91,15 @@ func (g *Generator) emitCast(val ir.Value, target types.Type) ir.Value {
 			return g.ctx.Builder.ConstFloat(tFloat, float64(cInt.Value))
 		}
 		// Integer constant to pointer.
-		// Emit as a ConstantInt typed as the pointer directly.
-		// A pointer register is just a 64-bit integer on amd64,
-		// so the backend loads the raw value with no special opcode.
-		// Covers null (0) and sentinel values like SQLITE_TRANSIENT (-1).
 		if types.IsPointer(target) {
 			c := &ir.ConstantInt{Value: cInt.Value}
 			c.SetType(target)
 			return c
+		}
+		// FIX: Handle 0 initialization for Aggregates (Arrays/Structs)
+		// This converts the 'i64 0' from '{}' into a '[100 x u8] zeroinitializer'
+		if types.IsAggregate(target) && cInt.Value == 0 {
+			return g.ctx.Builder.ConstZero(target)
 		}
 	}
 	
