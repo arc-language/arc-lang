@@ -79,20 +79,12 @@ func (c *Compiler) emitExecutable(m *ir.Module, cfg Config) error {
 	
 	// Add upkg paths (check various common layouts: lib, usr/lib, lib64)
 	searchPaths = append(searchPaths,
-		filepath.Join(installPath, "lib"),                // /home/marss6414/.upkg/lib
-		filepath.Join(installPath, "usr", "lib"),         // /home/marss6414/.upkg/usr/lib
-		filepath.Join(installPath, "usr", "lib64"),       // /home/marss6414/.upkg/usr/lib64
-		filepath.Join(installPath, "lib64"),              // /home/marss6414/.upkg/lib64
-	)
-
-	// Add standard system paths (Linux fallback)
-	searchPaths = append(searchPaths,
-		"/usr/lib/x86_64-linux-gnu",
-		"/lib/x86_64-linux-gnu",
-		"/usr/lib64",
-		"/lib64",
-		"/usr/lib",
-		"/lib",
+		filepath.Join(installPath, "usr", "lib", "x86_64-linux-gnu"),  // ADD THIS LINE
+		filepath.Join(installPath, "lib", "x86_64-linux-gnu"),          // ADD THIS LINE
+		filepath.Join(installPath, "lib"),
+		filepath.Join(installPath, "usr", "lib"),
+		filepath.Join(installPath, "usr", "lib64"),
+		filepath.Join(installPath, "lib64"),
 	)
 
 	ldScriptRegex := regexp.MustCompile(`(?:GROUP|INPUT)\s*\(\s*([^\s)]+)`)
