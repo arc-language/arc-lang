@@ -229,7 +229,9 @@ func runTest(tc TestCase, arcBinary, tempDir string, log *os.File) (string, erro
 
 	// Assert
 	if !strings.Contains(output, tc.Expected) {
-		return output, fmt.Errorf("assertion failed.\n      Expected: %q\n      Got:      %q", tc.Expected, strings.TrimSpace(output))
+		return output, fmt.Errorf("assertion failed.\n      Expected (quoted): %q\n      Expected (raw): %s\n      Got (quoted): %q\n      Got (raw): %s", 
+			tc.Expected, tc.Expected, 
+			strings.TrimSpace(output), strings.TrimSpace(output))
 	}
 
 	return output, nil

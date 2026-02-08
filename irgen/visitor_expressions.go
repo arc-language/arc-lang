@@ -1007,9 +1007,27 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 		return g.ctx.Builder.ConstNull(types.NewPointer(types.Void))
 	}
 	if ctx.CHAR_LITERAL() != nil {
-		if len(txt) >= 2 {
-			r := []rune(txt)[1]
+		// Fix: Use strconv.Unquote to parse escape sequences (e.g. '\n' -> 10, not 92)
+		val, err := strconv.Unquote(txt)
+		if err == nil && len(val) > 0 {
+			r := []rune(val)[0]
 			return g.ctx.Builder.ConstInt(types.I32, int64(r))
+		}
+		
+		// Fallback for simple escapes if Unquote fails (redundancy for safety)
+		if len(txt) >= 3 && txt[0] == '\'' && txt[len(txt)-1] == '\'' {
+			inner := txt[1 : len(txt)-1]
+			if len(inner) == 2 && inner[0] == '\\' {
+				switch inner[1] {
+				case 'n': return g.ctx.Builder.ConstInt(types.I32, 10)
+				case 't': return g.ctx.Builder.ConstInt(types.I32, 9)
+				case 'r': return g.ctx.Builder.ConstInt(types.I32, 13)
+				case '0': return g.ctx.Builder.ConstInt(types.I32, 0)
+				case '\\': return g.ctx.Builder.ConstInt(types.I32, 92)
+				case '\'': return g.ctx.Builder.ConstInt(types.I32, 39)
+				case '"': return g.ctx.Builder.ConstInt(types.I32, 34)
+				}
+			}
 		}
 		return g.getZeroValue(types.I32)
 	}
