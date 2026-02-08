@@ -23,7 +23,7 @@ type TestCase struct {
 }
 
 func main() {
-	logFile, err := os.Create("tests.log")
+	logFile, err := os.Create("/tmp/tests.log")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating log file: %v\n", err)
 		os.Exit(1)
