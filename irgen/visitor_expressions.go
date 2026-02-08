@@ -754,7 +754,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		var pendingFnType *types.FunctionType
 
 		sym, ok := g.currentScope.Resolve(name)
-		// Fix: Removed !isQualified check
 		if !ok && g.currentNamespace != "" {
 			sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + name)
 		}
@@ -770,8 +769,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
 					if !isCall {
 						loaded := g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
-						
-						// SAFETY FIX: Concrete pointer check
 						if loaded.Parent() == nil {
 							g.ctx.Builder.GetInsertBlock().AddInstruction(loaded)
 						}
@@ -779,7 +776,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 					}
 					
 					loadInst := g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
-					// SAFETY FIX
 					if loadInst.Parent() == nil {
 						g.ctx.Builder.GetInsertBlock().AddInstruction(loadInst)
 					}
@@ -799,97 +795,143 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		} else if isQualified {
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
-			var basePtr ir.Value
+			
+			// Resolve the base symbol
+			var curr ir.Value
 			sym, ok := g.currentScope.Resolve(baseName)
 			if !ok && g.currentNamespace != "" {
 				sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + baseName)
 			}
 			if ok {
-				if constant, ok := sym.IRValue.(ir.Constant); ok {
-					return constant
-				}
-				if alloca, ok := sym.IRValue.(*ir.AllocaInst); ok {
-					basePtr = alloca
-				} else {
-					basePtr = sym.IRValue
-				}
+				curr = sym.IRValue
 			}
 
-			if basePtr != nil {
-				currPtr := basePtr
-				if ptrType, ok := currPtr.Type().(*types.PointerType); ok {
-					if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
-						currPtr = g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
-					}
+			if curr != nil {
+				// We track if the current value is an address (pointer to memory) or a direct value
+				// This determines if we use GEP or ExtractValue
+				isLValue := false
+				
+				// Identify initial state
+				if _, ok := curr.(*ir.AllocaInst); ok {
+					isLValue = true
+				} else if types.IsPointer(curr.Type()) {
+					// Pointers are effectively L-values for field access
+					isLValue = true
 				}
+
 				valid := true
+				
 				for i := 1; i < len(ids); i++ {
 					fieldName := ids[i].GetText()
-					ptrType, isPtr := currPtr.Type().(*types.PointerType)
-					if !isPtr {
-						valid = false
-						break
-					}
-					if st, ok := ptrType.ElementType.(*types.StructType); ok {
-						indices, hasIndices := g.analysis.StructIndices[st.Name]
-						if !hasIndices && g.currentNamespace != "" {
-							indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
-						}
-						if !hasIndices && g.currentNamespace != "" {
-							prefix := g.currentNamespace + "."
-							if len(st.Name) > len(prefix) && strings.HasPrefix(st.Name, prefix) {
-								indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
-							}
-						}
-						if hasIndices {
-							if idx, ok := indices[fieldName]; ok {
-								physicalIndex := idx
-								if st.IsClass {
-									physicalIndex = idx + 1
-								}
-								currPtr = g.ctx.Builder.CreateStructGEP(st, currPtr, physicalIndex, "")
-								continue
+					
+					// Case 1: Handle Pointers (GEP)
+					if isLValue {
+						// Auto-dereference pointer-to-pointer
+						if ptrType, ok := curr.Type().(*types.PointerType); ok {
+							if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
+								curr = g.ctx.Builder.CreateLoad(ptrType.ElementType, curr, "")
 							}
 						}
 						
-						methodName := st.Name + "_" + fieldName
-						methodSym, ok := g.currentScope.Resolve(methodName)
-						if !ok && g.currentNamespace != "" {
-							methodSym, ok = g.currentScope.Resolve(g.currentNamespace + "." + methodName)
-						}
-						if ok {
-							if fn, ok := methodSym.IRValue.(*ir.Function); ok {
-								thisArg := currPtr
-								ft := fn.FuncType
-								if len(ft.ParamTypes) > 0 && !ft.ParamTypes[0].Equal(thisArg.Type()) {
-									if pt, isPtr := thisArg.Type().(*types.PointerType); isPtr && pt.ElementType.Equal(ft.ParamTypes[0]) {
-										thisArg = g.ctx.Builder.CreateLoad(pt.ElementType, thisArg, "")
-									}
+						ptrType := curr.Type().(*types.PointerType)
+						if st, ok := ptrType.ElementType.(*types.StructType); ok {
+							// Resolve Struct Field
+							indices, hasIndices := g.analysis.StructIndices[st.Name]
+							// ... (namespace resolution for struct indices) ...
+							if !hasIndices && g.currentNamespace != "" {
+								indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+							}
+							if !hasIndices && g.currentNamespace != "" {
+								prefix := g.currentNamespace + "."
+								if len(st.Name) > len(prefix) && strings.HasPrefix(st.Name, prefix) {
+									indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
 								}
-								if isCall && i == len(ids)-1 {
-									pendingFnType = ft
-									argsToPass = append([]ir.Value{thisArg}, argsToPass...)
-									entity = methodSym.IRValue
-									valid = true
-									break
-								} else if i == len(ids)-1 {
-									return &BoundMethod{Fn: fn, This: thisArg}
+							}
+
+							if hasIndices {
+								if idx, ok := indices[fieldName]; ok {
+									physicalIndex := idx
+									if st.IsClass { physicalIndex = idx + 1 }
+									curr = g.ctx.Builder.CreateStructGEP(st, curr, physicalIndex, "")
+									continue
+								}
+							}
+							
+							// Resolve Method on Pointer
+							methodName := st.Name + "_" + fieldName
+							methodSym, ok := g.currentScope.Resolve(methodName)
+							if !ok && g.currentNamespace != "" {
+								methodSym, ok = g.currentScope.Resolve(g.currentNamespace + "." + methodName)
+							}
+							if ok {
+								if fn, ok := methodSym.IRValue.(*ir.Function); ok {
+									// ... (arg preparation similar to Postfix) ...
+									thisArg := curr
+									ft := fn.FuncType
+									if len(ft.ParamTypes) > 0 && !ft.ParamTypes[0].Equal(thisArg.Type()) {
+										if pt, isPtr := thisArg.Type().(*types.PointerType); isPtr && pt.ElementType.Equal(ft.ParamTypes[0]) {
+											thisArg = g.ctx.Builder.CreateLoad(pt.ElementType, thisArg, "")
+										}
+									}
+									if isCall && i == len(ids)-1 {
+										pendingFnType = ft
+										argsToPass = append([]ir.Value{thisArg}, argsToPass...)
+										entity = methodSym.IRValue
+										valid = true
+										break
+									} else if i == len(ids)-1 {
+										return &BoundMethod{Fn: fn, This: thisArg}
+									}
 								}
 							}
 						}
 					}
+					
+					// Case 2: Handle Values (ExtractValue)
+					// This handles struct arguments passed by value (e.g. `func foo(c: Counter)`)
+					if !isLValue {
+						if st, ok := curr.Type().(*types.StructType); ok {
+							indices, hasIndices := g.analysis.StructIndices[st.Name]
+							// ... (namespace resolution) ...
+							if !hasIndices && g.currentNamespace != "" {
+								indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+							}
+							if !hasIndices && g.currentNamespace != "" {
+								prefix := g.currentNamespace + "."
+								if len(st.Name) > len(prefix) && strings.HasPrefix(st.Name, prefix) {
+									indices, hasIndices = g.analysis.StructIndices[st.Name[len(prefix):]]
+								}
+							}
+
+							if hasIndices {
+								if idx, ok := indices[fieldName]; ok {
+									physicalIndex := idx
+									if st.IsClass { physicalIndex = idx + 1 }
+									curr = g.ctx.Builder.CreateExtractValue(curr, []int{physicalIndex}, "")
+									continue
+								}
+							}
+						}
+					}
+					
 					valid = false
 					break
 				}
+				
 				if valid && entity == nil {
-					ptrType := currPtr.Type().(*types.PointerType)
-					loadInst := g.ctx.Builder.CreateLoad(ptrType.ElementType, currPtr, "")
-					
-					// SAFETY FIX
-					if loadInst.Parent() == nil {
-						g.ctx.Builder.GetInsertBlock().AddInstruction(loadInst)
+					// Finalize result
+					if isLValue {
+						// If we ended up with a pointer (via GEPs), load the value
+						ptrType := curr.Type().(*types.PointerType)
+						loadInst := g.ctx.Builder.CreateLoad(ptrType.ElementType, curr, "")
+						if loadInst.Parent() == nil {
+							g.ctx.Builder.GetInsertBlock().AddInstruction(loadInst)
+						}
+						entity = loadInst
+					} else {
+						// If we ended up with a value (via ExtractValue), use it directly
+						entity = curr
 					}
-					entity = loadInst
 				}
 			}
 		}
