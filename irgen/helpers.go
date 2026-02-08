@@ -7,6 +7,7 @@ import (
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
+    "github.com/arc-language/arc-lang/codegen/cpu/amd64"
 )
 
 func (g *Generator) resolveType(ctx parser.ITypeContext) types.Type {
@@ -186,4 +187,27 @@ func (g *Generator) getZeroValue(t types.Type) ir.Value {
 	if types.IsFloat(t) { return g.ctx.Builder.ConstFloat(t.(*types.FloatType), 0.0) }
 	if types.IsPointer(t) { return g.ctx.Builder.ConstNull(t.(*types.PointerType)) }
 	return g.ctx.Builder.ConstZero(t)
+}
+
+func needsSret(t types.Type) bool {
+    if t == nil || t.Kind() == types.VoidKind {
+        return false
+    }
+    return amd64.SizeOf(t) > 16
+}
+
+func (g *Generator) emitCallWithSret(fn *ir.Function, args []ir.Value, name string) ir.Value {
+    isSret := fn.FuncType.OriginalReturnType != nil && needsSret(fn.FuncType.OriginalReturnType)
+
+    if isSret {
+        retType := fn.FuncType.OriginalReturnType
+        alloca := g.ctx.Builder.CreateAlloca(retType, name+".sret")
+
+        sretArgs := append([]ir.Value{alloca}, args...)
+        g.ctx.Builder.CreateCall(fn, sretArgs, "")
+
+        return g.ctx.Builder.CreateLoad(retType, alloca, name+".result")
+    }
+
+    return g.ctx.Builder.CreateCall(fn, args, name)
 }

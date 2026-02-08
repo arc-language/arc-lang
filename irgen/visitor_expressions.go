@@ -386,7 +386,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 	var pendingFnType *types.FunctionType
 
 	for _, op := range ctx.AllPostfixOp() {
-		
+
 		if op.LPAREN() != nil {
 			var args []ir.Value
 			if bm, ok := curr.(*BoundMethod); ok {
@@ -407,12 +407,20 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				}
 			}
 			if currPtr != nil && targetType != nil && len(targetType.ParamTypes) > 0 {
-				if g.checkTypeMatch(currPtr, targetType.ParamTypes[0]) {
-					args = append(args, currPtr)
-				} else {
-					if pt, ok := currPtr.Type().(*types.PointerType); ok && pt.ElementType.Equal(targetType.ParamTypes[0]) {
-						loaded := g.ctx.Builder.CreateLoad(pt.ElementType, currPtr, "")
-						args = append(args, loaded)
+				// For sret-lowered functions, the first param is the hidden sret pointer.
+				// Skip it when checking if we need to pass 'self'.
+				firstUserParam := 0
+				if targetType.OriginalReturnType != nil && needsSret(targetType.OriginalReturnType) {
+					firstUserParam = 1
+				}
+				if firstUserParam < len(targetType.ParamTypes) {
+					if g.checkTypeMatch(currPtr, targetType.ParamTypes[firstUserParam]) {
+						args = append(args, currPtr)
+					} else {
+						if pt, ok := currPtr.Type().(*types.PointerType); ok && pt.ElementType.Equal(targetType.ParamTypes[firstUserParam]) {
+							loaded := g.ctx.Builder.CreateLoad(pt.ElementType, currPtr, "")
+							args = append(args, loaded)
+						}
 					}
 				}
 			}
@@ -421,7 +429,11 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					if v := g.Visit(arg.Expression()); v != nil {
 						val := v.(ir.Value)
 						if targetType != nil {
+							// Account for sret offset when matching arg to param type
 							targetIdx := len(args)
+							if targetType.OriginalReturnType != nil && needsSret(targetType.OriginalReturnType) {
+								targetIdx += 1
+							}
 							if targetIdx < len(targetType.ParamTypes) {
 								expected := targetType.ParamTypes[targetIdx]
 								val = g.emitCast(val, expected)
@@ -446,11 +458,15 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 					}
 				} else {
 					if fn, ok := curr.(*ir.Function); ok {
-						curr = g.ctx.Builder.CreateCall(fn, args, "")
+						curr = g.emitCallWithSret(fn, args, "")
 					} else {
 						call := g.ctx.Builder.CreateIndirectCall(curr, args, "")
 						if targetType != nil {
-							call.SetType(targetType.ReturnType)
+							retType := targetType.ReturnType
+							if targetType.OriginalReturnType != nil {
+								retType = targetType.OriginalReturnType
+							}
+							call.SetType(retType)
 						}
 						curr = call
 					}
@@ -479,7 +495,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				if st, ok := ptrType.ElementType.(*types.StructType); ok {
 					indices, hasIndices := g.analysis.StructIndices[st.Name]
 					if !hasIndices && g.currentNamespace != "" {
-						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace+"."+st.Name]
 					}
 					if !hasIndices && g.currentNamespace != "" {
 						prefix := g.currentNamespace + "."
@@ -521,7 +537,7 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 				if st, ok := curr.Type().(*types.StructType); ok {
 					indices, hasIndices := g.analysis.StructIndices[st.Name]
 					if !hasIndices && g.currentNamespace != "" {
-						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+						indices, hasIndices = g.analysis.StructIndices[g.currentNamespace+"."+st.Name]
 					}
 					if !hasIndices && g.currentNamespace != "" {
 						prefix := g.currentNamespace + "."
@@ -558,20 +574,22 @@ func (g *Generator) VisitPostfixExpression(ctx *parser.PostfixExpressionContext)
 			if basePtr == nil && curr != nil && types.IsPointer(curr.Type()) {
 				basePtr = curr
 			}
-			if basePtr == nil { basePtr = currPtr }
+			if basePtr == nil {
+				basePtr = currPtr
+			}
 
 			if basePtr != nil {
 				ptrType := basePtr.Type().(*types.PointerType)
 				var elemPtr ir.Value
-                var loadType types.Type
+				var loadType types.Type
 
 				if arrType, isArray := ptrType.ElementType.(*types.ArrayType); isArray {
 					zero := g.ctx.Builder.ConstInt(types.I32, 0)
 					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{zero, idx}, "")
-                    loadType = arrType.ElementType
+					loadType = arrType.ElementType
 				} else {
 					elemPtr = g.ctx.Builder.CreateInBoundsGEP(ptrType.ElementType, basePtr, []ir.Value{idx}, "")
-                    loadType = ptrType.ElementType
+					loadType = ptrType.ElementType
 				}
 				currPtr = elemPtr
 				curr = g.ctx.Builder.CreateLoad(loadType, currPtr, "")
@@ -728,7 +746,9 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	if ctx.QualifiedIdentifier() != nil {
 		qCtx = ctx.QualifiedIdentifier().(*parser.QualifiedIdentifierContext)
 		for i, id := range qCtx.AllIDENTIFIER() {
-			if i > 0 { name += "." }
+			if i > 0 {
+				name += "."
+			}
 			name += id.GetText()
 		}
 		isQualified = true
@@ -774,7 +794,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 						}
 						return loaded
 					}
-					
+
 					loadInst := g.ctx.Builder.CreateLoad(sym.Type, alloca, "")
 					if loadInst.Parent() == nil {
 						g.ctx.Builder.GetInsertBlock().AddInstruction(loadInst)
@@ -795,8 +815,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		} else if isQualified {
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
-			
-			// Resolve the base symbol
+
 			var curr ir.Value
 			sym, ok := g.currentScope.Resolve(baseName)
 			if !ok && g.currentNamespace != "" {
@@ -807,39 +826,31 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			}
 
 			if curr != nil {
-				// We track if the current value is an address (pointer to memory) or a direct value
-				// This determines if we use GEP or ExtractValue
 				isLValue := false
-				
-				// Identify initial state
+
 				if _, ok := curr.(*ir.AllocaInst); ok {
 					isLValue = true
 				} else if types.IsPointer(curr.Type()) {
-					// Pointers are effectively L-values for field access
 					isLValue = true
 				}
 
 				valid := true
-				
+
 				for i := 1; i < len(ids); i++ {
 					fieldName := ids[i].GetText()
-					
-					// Case 1: Handle Pointers (GEP)
+
 					if isLValue {
-						// Auto-dereference pointer-to-pointer
 						if ptrType, ok := curr.Type().(*types.PointerType); ok {
 							if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 								curr = g.ctx.Builder.CreateLoad(ptrType.ElementType, curr, "")
 							}
 						}
-						
+
 						ptrType := curr.Type().(*types.PointerType)
 						if st, ok := ptrType.ElementType.(*types.StructType); ok {
-							// Resolve Struct Field
 							indices, hasIndices := g.analysis.StructIndices[st.Name]
-							// ... (namespace resolution for struct indices) ...
 							if !hasIndices && g.currentNamespace != "" {
-								indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+								indices, hasIndices = g.analysis.StructIndices[g.currentNamespace+"."+st.Name]
 							}
 							if !hasIndices && g.currentNamespace != "" {
 								prefix := g.currentNamespace + "."
@@ -851,13 +862,14 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 							if hasIndices {
 								if idx, ok := indices[fieldName]; ok {
 									physicalIndex := idx
-									if st.IsClass { physicalIndex = idx + 1 }
+									if st.IsClass {
+										physicalIndex = idx + 1
+									}
 									curr = g.ctx.Builder.CreateStructGEP(st, curr, physicalIndex, "")
 									continue
 								}
 							}
-							
-							// Resolve Method on Pointer
+
 							methodName := st.Name + "_" + fieldName
 							methodSym, ok := g.currentScope.Resolve(methodName)
 							if !ok && g.currentNamespace != "" {
@@ -865,11 +877,15 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 							}
 							if ok {
 								if fn, ok := methodSym.IRValue.(*ir.Function); ok {
-									// ... (arg preparation similar to Postfix) ...
 									thisArg := curr
 									ft := fn.FuncType
-									if len(ft.ParamTypes) > 0 && !ft.ParamTypes[0].Equal(thisArg.Type()) {
-										if pt, isPtr := thisArg.Type().(*types.PointerType); isPtr && pt.ElementType.Equal(ft.ParamTypes[0]) {
+									// Account for sret: first user param may be at index 1
+									firstUserParam := 0
+									if ft.OriginalReturnType != nil && needsSret(ft.OriginalReturnType) {
+										firstUserParam = 1
+									}
+									if firstUserParam < len(ft.ParamTypes) && !ft.ParamTypes[firstUserParam].Equal(thisArg.Type()) {
+										if pt, isPtr := thisArg.Type().(*types.PointerType); isPtr && pt.ElementType.Equal(ft.ParamTypes[firstUserParam]) {
 											thisArg = g.ctx.Builder.CreateLoad(pt.ElementType, thisArg, "")
 										}
 									}
@@ -886,15 +902,12 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 							}
 						}
 					}
-					
-					// Case 2: Handle Values (ExtractValue)
-					// This handles struct arguments passed by value (e.g. `func foo(c: Counter)`)
+
 					if !isLValue {
 						if st, ok := curr.Type().(*types.StructType); ok {
 							indices, hasIndices := g.analysis.StructIndices[st.Name]
-							// ... (namespace resolution) ...
 							if !hasIndices && g.currentNamespace != "" {
-								indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
+								indices, hasIndices = g.analysis.StructIndices[g.currentNamespace+"."+st.Name]
 							}
 							if !hasIndices && g.currentNamespace != "" {
 								prefix := g.currentNamespace + "."
@@ -906,22 +919,22 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 							if hasIndices {
 								if idx, ok := indices[fieldName]; ok {
 									physicalIndex := idx
-									if st.IsClass { physicalIndex = idx + 1 }
+									if st.IsClass {
+										physicalIndex = idx + 1
+									}
 									curr = g.ctx.Builder.CreateExtractValue(curr, []int{physicalIndex}, "")
 									continue
 								}
 							}
 						}
 					}
-					
+
 					valid = false
 					break
 				}
-				
+
 				if valid && entity == nil {
-					// Finalize result
 					if isLValue {
-						// If we ended up with a pointer (via GEPs), load the value
 						ptrType := curr.Type().(*types.PointerType)
 						loadInst := g.ctx.Builder.CreateLoad(ptrType.ElementType, curr, "")
 						if loadInst.Parent() == nil {
@@ -929,7 +942,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 						}
 						entity = loadInst
 					} else {
-						// If we ended up with a value (via ExtractValue), use it directly
 						entity = curr
 					}
 				}
@@ -963,9 +975,15 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 
 		if isCall {
 			if pendingFnType != nil {
+				// When casting args to expected param types, account for sret offset
+				sretOffset := 0
+				if pendingFnType.OriginalReturnType != nil && needsSret(pendingFnType.OriginalReturnType) {
+					sretOffset = 1
+				}
 				for i, argVal := range argsToPass {
-					if i < len(pendingFnType.ParamTypes) {
-						expected := pendingFnType.ParamTypes[i]
+					paramIdx := i + sretOffset
+					if paramIdx < len(pendingFnType.ParamTypes) {
+						expected := pendingFnType.ParamTypes[paramIdx]
 						argsToPass[i] = g.emitCast(argVal, expected)
 					}
 				}
@@ -979,11 +997,15 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				return call
 			}
 			if fn, ok := entity.(*ir.Function); ok {
-				return g.ctx.Builder.CreateCall(fn, argsToPass, "")
+				return g.emitCallWithSret(fn, argsToPass, "")
 			} else {
 				call := g.ctx.Builder.CreateIndirectCall(entity, argsToPass, "")
 				if pendingFnType != nil {
-					call.SetType(pendingFnType.ReturnType)
+					retType := pendingFnType.ReturnType
+					if pendingFnType.OriginalReturnType != nil {
+						retType = pendingFnType.OriginalReturnType
+					}
+					call.SetType(retType)
 				}
 				return call
 			}

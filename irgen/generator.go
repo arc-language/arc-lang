@@ -73,209 +73,220 @@ func (g *Generator) exitScope() {
 }
 
 func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface{} {
-	// 1. Hardware Markers
-	isGPU := false
-	isROCm := false
-	isCUDA := false
-	isTPU := false
+    // 1. Hardware Markers
+    isGPU := false
+    isROCm := false
+    isCUDA := false
+    isTPU := false
 
-	if gp := ctx.GenericParams(); gp != nil {
-		if gpl := gp.GenericParamList(); gpl != nil {
-			for _, param := range gpl.AllGenericParam() {
-				for _, id := range param.AllIDENTIFIER() {
-					tag := id.GetText()
-					if tag == "gpu" {
-						isGPU = true
-					} else if tag == "rocm" {
-						isROCm = true
-					} else if tag == "cuda" {
-						isCUDA = true
-					} else if tag == "tpu" {
-						isTPU = true
-					}
-				}
-			}
-		}
-	}
+    if gp := ctx.GenericParams(); gp != nil {
+        if gpl := gp.GenericParamList(); gpl != nil {
+            for _, param := range gpl.AllGenericParam() {
+                for _, id := range param.AllIDENTIFIER() {
+                    tag := id.GetText()
+                    if tag == "gpu" {
+                        isGPU = true
+                    } else if tag == "rocm" {
+                        isROCm = true
+                    } else if tag == "cuda" {
+                        isCUDA = true
+                    } else if tag == "tpu" {
+                        isTPU = true
+                    }
+                }
+            }
+        }
+    }
 
-	// 2. Resolve Name & Parent
-	name := ctx.IDENTIFIER().GetText()
-	var parentName string
-	isMethod := false
+    // 2. Resolve Name & Parent
+    name := ctx.IDENTIFIER().GetText()
+    var parentName string
+    isMethod := false
 
-	// Case A: Nested inside Class/Struct block
-	if parent := ctx.GetParent(); parent != nil {
-		if _, ok := parent.(*parser.ClassMemberContext); ok {
-			if classDecl, ok := parent.GetParent().(*parser.ClassDeclContext); ok {
-				parentName = classDecl.IDENTIFIER().GetText()
-				isMethod = true
-			}
-		} else if _, ok := parent.(*parser.StructMemberContext); ok {
-			if structDecl, ok := parent.GetParent().(*parser.StructDeclContext); ok {
-				parentName = structDecl.IDENTIFIER().GetText()
-				isMethod = true
-			}
-		}
-	}
+    if parent := ctx.GetParent(); parent != nil {
+        if _, ok := parent.(*parser.ClassMemberContext); ok {
+            if classDecl, ok := parent.GetParent().(*parser.ClassDeclContext); ok {
+                parentName = classDecl.IDENTIFIER().GetText()
+                isMethod = true
+            }
+        } else if _, ok := parent.(*parser.StructMemberContext); ok {
+            if structDecl, ok := parent.GetParent().(*parser.StructDeclContext); ok {
+                parentName = structDecl.IDENTIFIER().GetText()
+                isMethod = true
+            }
+        }
+    }
 
-	// Case B: Flat Methods (func foo(self ...))
-	if !isMethod && ctx.ParameterList() != nil {
-		for _, param := range ctx.ParameterList().AllParameter() {
-			if param.SELF() != nil {
-				t := g.resolveType(param.Type_())
-				if ptr, ok := t.(*types.PointerType); ok {
-					t = ptr.ElementType
-				}
-				if st, ok := t.(*types.StructType); ok {
-					parentName = st.Name
-					isMethod = true
-				}
-				break
-			}
-		}
-	}
+    if !isMethod && ctx.ParameterList() != nil {
+        for _, param := range ctx.ParameterList().AllParameter() {
+            if param.SELF() != nil {
+                t := g.resolveType(param.Type_())
+                if ptr, ok := t.(*types.PointerType); ok {
+                    t = ptr.ElementType
+                }
+                if st, ok := t.(*types.StructType); ok {
+                    parentName = st.Name
+                    isMethod = true
+                }
+                break
+            }
+        }
+    }
 
-	// 3. Construct Names (IR Name & Lookup Name)
-	var lookupName string
-	var irName string
+    // 3. Construct Names
+    var lookupName string
+    var irName string
 
-	if isMethod {
-		// Clean parent name if it already has the namespace prefix.
-		shortParent := parentName
-		if g.currentNamespace != "" {
-			prefix := g.currentNamespace + "."
-			if len(parentName) > len(prefix) && parentName[:len(prefix)] == prefix {
-				shortParent = parentName[len(prefix):]
-			}
-		}
+    if isMethod {
+        shortParent := parentName
+        if g.currentNamespace != "" {
+            prefix := g.currentNamespace + "."
+            if len(parentName) > len(prefix) && parentName[:len(prefix)] == prefix {
+                shortParent = parentName[len(prefix):]
+            }
+        }
+        methodPart := shortParent + "_" + name
+        if g.currentNamespace != "" {
+            lookupName = g.currentNamespace + "." + methodPart
+            irName = g.currentNamespace + "." + methodPart
+        } else {
+            lookupName = methodPart
+            irName = methodPart
+        }
+    } else {
+        if g.currentNamespace != "" && name != "main" {
+            lookupName = g.currentNamespace + "." + name
+            irName = g.currentNamespace + "." + name
+        } else {
+            lookupName = name
+            irName = name
+        }
+    }
 
-		// Base method name: "DB_close"
-		methodPart := shortParent + "_" + name
+    // 4. Resolve Symbol
+    sym, ok := g.currentScope.Resolve(lookupName)
+    if !ok {
+        sym, ok = g.currentScope.Resolve(name)
+    }
 
-		if g.currentNamespace != "" {
-			// Lookup: "sqlite3.DB_close" (matches semantic symbol)
-			lookupName = g.currentNamespace + "." + methodPart
-			// IR name uses dot to avoid collision with extern C symbols.
-			irName = g.currentNamespace + "." + methodPart
-		} else {
-			lookupName = methodPart
-			irName = methodPart
-		}
-	} else {
-		// Standard Function
-		if g.currentNamespace != "" && name != "main" {
-			lookupName = g.currentNamespace + "." + name
-			irName = g.currentNamespace + "." + name
-		} else {
-			lookupName = name
-			irName = name
-		}
-	}
+    // --- Phase 1: Prototype ---
+    if g.Phase == 1 {
+        var retType types.Type = types.Void
+        if ctx.ReturnType() != nil {
+            if ctx.ReturnType().Type_() != nil {
+                retType = g.resolveType(ctx.ReturnType().Type_())
+            } else if ctx.ReturnType().TypeList() != nil {
+                var tupleTypes []types.Type
+                for _, t := range ctx.ReturnType().TypeList().AllType_() {
+                    tupleTypes = append(tupleTypes, g.resolveType(t))
+                }
+                retType = types.NewStruct("", tupleTypes, false)
+            }
+        }
+        var paramTypes []types.Type
+        if ctx.ParameterList() != nil {
+            for _, param := range ctx.ParameterList().AllParameter() {
+                paramTypes = append(paramTypes, g.resolveType(param.Type_()))
+            }
+        }
 
-	// 4. Resolve Symbol
-	sym, ok := g.currentScope.Resolve(lookupName)
-	if !ok {
-		sym, ok = g.currentScope.Resolve(name)
-	}
+        // SRET lowering: if return type is too large for registers,
+        // rewrite signature to pass a hidden pointer as the first param.
+        var originalRetType types.Type
+        if needsSret(retType) {
+            originalRetType = retType
+            paramTypes = append([]types.Type{types.NewPointer(retType)}, paramTypes...)
+            retType = types.Void
+        }
 
-	// --- Phase 1: Prototype ---
-	if g.Phase == 1 {
-		var retType types.Type = types.Void
-		if ctx.ReturnType() != nil {
-			if ctx.ReturnType().Type_() != nil {
-				retType = g.resolveType(ctx.ReturnType().Type_())
-			} else if ctx.ReturnType().TypeList() != nil {
-				var tupleTypes []types.Type
-				for _, t := range ctx.ReturnType().TypeList().AllType_() {
-					tupleTypes = append(tupleTypes, g.resolveType(t))
-				}
-				retType = types.NewStruct("", tupleTypes, false)
-			}
-		}
-		var paramTypes []types.Type
-		if ctx.ParameterList() != nil {
-			for _, param := range ctx.ParameterList().AllParameter() {
-				paramTypes = append(paramTypes, g.resolveType(param.Type_()))
-			}
-		}
+        fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
 
-		fn := g.ctx.Builder.CreateFunction(irName, retType, paramTypes, false)
+        if originalRetType != nil {
+            fn.FuncType.OriginalReturnType = originalRetType
+        }
 
-		// Apply Hardware Markers
-		if isTPU {
-			fn.CallConv = ir.CC_TPU
-		} else if isROCm {
-			fn.CallConv = ir.CC_ROCM
-		} else if isCUDA {
-			fn.CallConv = ir.CC_PTX
-		} else if isGPU {
-			fn.CallConv = ir.CC_PTX
-		}
+        if isTPU {
+            fn.CallConv = ir.CC_TPU
+        } else if isROCm {
+            fn.CallConv = ir.CC_ROCM
+        } else if isCUDA {
+            fn.CallConv = ir.CC_PTX
+        } else if isGPU {
+            fn.CallConv = ir.CC_PTX
+        }
 
-		// Apply Concurrency Flags
-		if es := ctx.ExecutionStrategy(); es != nil {
-			if es.ASYNC() != nil {
-				fn.FuncType.IsAsync = true
-			} else if es.PROCESS() != nil {
-				fn.FuncType.IsProcess = true
-			}
-		}
+        if es := ctx.ExecutionStrategy(); es != nil {
+            if es.ASYNC() != nil {
+                fn.FuncType.IsAsync = true
+            } else if es.PROCESS() != nil {
+                fn.FuncType.IsProcess = true
+            }
+        }
 
-		if sym != nil {
-			sym.IRValue = fn
-		}
-		return nil
-	}
+        if sym != nil {
+            sym.IRValue = fn
+        }
+        return nil
+    }
 
-	// --- Phase 2: Body ---
-	if g.Phase == 2 {
-		if sym == nil || sym.IRValue == nil {
-			return nil
-		}
+    // --- Phase 2: Body ---
+    if g.Phase == 2 {
+        if sym == nil || sym.IRValue == nil {
+            return nil
+        }
 
-		fn := sym.IRValue.(*ir.Function)
-		g.ctx.EnterFunction(fn)
-		g.enterScope(ctx)
-		defer g.exitScope()
+        fn := sym.IRValue.(*ir.Function)
+        g.ctx.EnterFunction(fn)
+        g.enterScope(ctx)
+        defer g.exitScope()
 
-		// Fix: Create entry block and set insert point
-		entryBlock := g.ctx.Builder.CreateBlock("entry")
-		g.ctx.Builder.SetInsertPoint(entryBlock)
+        entryBlock := g.ctx.Builder.CreateBlock("entry")
+        g.ctx.Builder.SetInsertPoint(entryBlock)
 
-		var paramNames []string
-		if ctx.ParameterList() != nil {
-			for _, param := range ctx.ParameterList().AllParameter() {
-				paramNames = append(paramNames, param.IDENTIFIER().GetText())
-			}
-		}
+        var paramNames []string
+        if ctx.ParameterList() != nil {
+            for _, param := range ctx.ParameterList().AllParameter() {
+                paramNames = append(paramNames, param.IDENTIFIER().GetText())
+            }
+        }
 
-		// Don't create allocas for parameters, map them directly
-		for i, arg := range fn.Arguments {
-			if i < len(paramNames) {
-				arg.SetName(paramNames[i])
-				// Symbol points directly to the argument
-				if s, ok := g.currentScope.Resolve(paramNames[i]); ok {
-					s.IRValue = arg
-				}
-			}
-		}
+        // If sret-lowered, the first IR argument is the hidden sret pointer.
+        // Skip it when mapping user-visible parameters.
+        isSret := fn.FuncType.OriginalReturnType != nil && needsSret(fn.FuncType.OriginalReturnType)
+        argOffset := 0
+        if isSret {
+            fn.Arguments[0].SetName("sret.ptr")
+            argOffset = 1
+        }
 
-		if ctx.Block() != nil {
-			g.deferStack = NewDeferStack()
-			g.Visit(ctx.Block())
-		}
+        for i, arg := range fn.Arguments[argOffset:] {
+            if i < len(paramNames) {
+                arg.SetName(paramNames[i])
+                if s, ok := g.currentScope.Resolve(paramNames[i]); ok {
+                    s.IRValue = arg
+                }
+            }
+        }
 
-		if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
-			g.deferStack.Emit(g)
-			if fn.FuncType.ReturnType == types.Void {
-				g.ctx.Builder.CreateRetVoid()
-			} else {
-				g.ctx.Builder.CreateRet(g.getZeroValue(fn.FuncType.ReturnType))
-			}
-		}
-		g.ctx.ExitFunction()
-	}
-	return nil
+        if ctx.Block() != nil {
+            g.deferStack = NewDeferStack()
+            g.Visit(ctx.Block())
+        }
+
+        if g.ctx.Builder.GetInsertBlock().Terminator() == nil {
+            g.deferStack.Emit(g)
+            if fn.FuncType.ReturnType == types.Void && !isSret {
+                g.ctx.Builder.CreateRetVoid()
+            } else if isSret {
+                // Implicit return of sret function with no explicit return — return void
+                g.ctx.Builder.CreateRetVoid()
+            } else {
+                g.ctx.Builder.CreateRet(g.getZeroValue(fn.FuncType.ReturnType))
+            }
+        }
+        g.ctx.ExitFunction()
+    }
+    return nil
 }
 
 // Visit acts as the main dispatcher for the AST nodes.

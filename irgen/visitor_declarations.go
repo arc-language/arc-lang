@@ -358,6 +358,9 @@ func (g *Generator) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 	return nil
 }
 
+
+
+
 func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
 	// --- Phase 1: Global Variable Declarations ---
 	if g.ctx.CurrentFunction == nil && g.Phase == 1 {
@@ -371,7 +374,7 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		if !ok {
 			return nil
 		}
-		
+
 		var init ir.Constant = g.ctx.Builder.ConstZero(sym.Type)
 		glob := g.ctx.Builder.CreateGlobalVariable(name, sym.Type, init)
 		sym.IRValue = glob
@@ -380,13 +383,14 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 
 	// --- Phase 2: Local Variable Declarations ---
 	if g.ctx.CurrentFunction != nil && g.Phase == 2 {
-		
+
 		// 1. Handle Tuple Destructuring: let (a, b) = ...
 		if ctx.TuplePattern() != nil {
-			if ctx.Expression() == nil { return nil }
+			if ctx.Expression() == nil {
+				return nil
+			}
 			val := g.Visit(ctx.Expression()).(ir.Value)
-			
-			// FIX: Ensure val instruction is inserted
+
 			if inst, ok := val.(ir.Instruction); ok && inst.Parent() == nil {
 				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 			}
@@ -395,16 +399,16 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 			for i, idNode := range names {
 				name := idNode.GetText()
 				sym, ok := g.currentScope.Resolve(name)
-				if !ok { continue }
-				
+				if !ok {
+					continue
+				}
+
 				fieldVal := g.ctx.Builder.CreateExtractValue(val, []int{i}, "")
-				
-				// FIX: Ensure extractvalue is inserted
+
 				if fieldVal.Parent() == nil {
 					g.ctx.Builder.GetInsertBlock().AddInstruction(fieldVal)
 				}
 
-				// Sync type and allocate
 				sym.Type = fieldVal.Type()
 				alloca := g.ctx.Builder.CreateAlloca(sym.Type, name+".addr")
 				g.ctx.Builder.CreateStore(fieldVal, alloca)
@@ -416,13 +420,14 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		// 2. Handle Standard Declaration: let x = val
 		name := ctx.IDENTIFIER().GetText()
 		sym, ok := g.currentScope.Resolve(name)
-		if !ok { return nil }
+		if !ok {
+			return nil
+		}
 
 		var initVal ir.Value
 		if ctx.Expression() != nil {
 			initVal = g.Visit(ctx.Expression()).(ir.Value)
-			
-			// FIX: Ensure initVal instruction is inserted
+
 			if inst, ok := initVal.(ir.Instruction); ok && inst.Parent() == nil {
 				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 			}
@@ -452,14 +457,14 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 					isClass = true
 					structType = modSt
 					storageType = types.NewPointer(modSt)
-					sym.Type = modSt 
+					sym.Type = modSt
 				}
 			}
 		} else if ptr, ok := sym.Type.(*types.PointerType); ok {
 			if st, ok := ptr.ElementType.(*types.StructType); ok && st.IsClass {
 				isClass = true
 				structType = st
-				storageType = sym.Type 
+				storageType = sym.Type
 			}
 		}
 
@@ -473,12 +478,11 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 				initVal = g.getZeroValue(storageType)
 			}
 			initVal = g.emitCast(initVal, storageType)
-			
-			// FIX: Ensure cast is inserted
+
 			if inst, ok := initVal.(ir.Instruction); ok && inst.Parent() == nil {
 				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
 			}
-			
+
 			g.ctx.Builder.CreateStore(initVal, alloca)
 		} else {
 			g.ctx.Builder.CreateStore(g.getZeroValue(storageType), alloca)
@@ -488,23 +492,33 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 		if isClass {
 			g.deferStack.Add(func(gen *Generator) {
 				objPtr := gen.ctx.Builder.CreateLoad(storageType, alloca, name+".arc_load")
-				if objPtr.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(objPtr) }
+				if objPtr.Parent() == nil {
+					gen.ctx.Builder.GetInsertBlock().AddInstruction(objPtr)
+				}
 
 				rcPtr := gen.ctx.Builder.CreateStructGEP(structType, objPtr, 0, "rc_ptr")
-				if rcPtr.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(rcPtr) }
+				if rcPtr.Parent() == nil {
+					gen.ctx.Builder.GetInsertBlock().AddInstruction(rcPtr)
+				}
 
 				rc := gen.ctx.Builder.CreateLoad(types.I64, rcPtr, "rc_val")
-				if rc.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(rc) }
+				if rc.Parent() == nil {
+					gen.ctx.Builder.GetInsertBlock().AddInstruction(rc)
+				}
 
 				one := gen.ctx.Builder.ConstInt(types.I64, 1)
 				newRc := gen.ctx.Builder.CreateSub(rc, one, "rc_dec")
-				if newRc.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(newRc) }
+				if newRc.Parent() == nil {
+					gen.ctx.Builder.GetInsertBlock().AddInstruction(newRc)
+				}
 
 				gen.ctx.Builder.CreateStore(newRc, rcPtr)
 
 				zero := gen.ctx.Builder.ConstInt(types.I64, 0)
 				isZero := gen.ctx.Builder.CreateICmpEQ(newRc, zero, "is_zero")
-				if isZero.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(isZero) }
+				if isZero.Parent() == nil {
+					gen.ctx.Builder.GetInsertBlock().AddInstruction(isZero)
+				}
 
 				funcObj := gen.ctx.CurrentFunction
 				freeBlock := gen.ctx.Builder.CreateBlockInFunction("arc_free", funcObj)
@@ -522,8 +536,10 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 				}
 
 				voidPtr := gen.ctx.Builder.CreateBitCast(objPtr, types.NewPointer(types.I8), "")
-				if voidPtr.Parent() == nil { gen.ctx.Builder.GetInsertBlock().AddInstruction(voidPtr) }
-				
+				if voidPtr.Parent() == nil {
+					gen.ctx.Builder.GetInsertBlock().AddInstruction(voidPtr)
+				}
+
 				freeFn := gen.ctx.Module.GetFunction("free")
 				if freeFn == nil {
 					freeFn = gen.ctx.Builder.DeclareFunction("free", types.Void, []types.Type{types.NewPointer(types.I8)}, false)
@@ -538,6 +554,12 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 	}
 	return nil
 }
+
+
+
+
+
+
 
 func (g *Generator) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()

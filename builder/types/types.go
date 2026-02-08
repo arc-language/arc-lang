@@ -207,6 +207,7 @@ type FunctionType struct {
 	Variadic   bool
 	IsAsync    bool // True if declared with 'async' modifier
 	IsProcess  bool // True if declared with 'process' modifier
+	OriginalReturnType Type // non-nil if sret-lowered; holds the real return type
 }
 
 func (t *FunctionType) Kind() TypeKind { return FunctionKind }

@@ -31,72 +31,82 @@ func (g *Generator) VisitBlock(ctx *parser.BlockContext) interface{} {
 }
 
 func (g *Generator) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
-	var val ir.Value
+    var val ir.Value
 
-	// 1. Evaluate the return expression (if any)
-	// We do this first so the value is calculated before any deferred cleanup runs.
-	if ctx.Expression() != nil {
-		val = g.Visit(ctx.Expression()).(ir.Value)
-		
-		// FIX: Ensure val instruction is inserted into the block
-		if inst, ok := val.(ir.Instruction); ok && inst.Parent() == nil {
-			g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
-		}
-	}
+    // 1. Evaluate the return expression (if any)
+    if ctx.Expression() != nil {
+        val = g.Visit(ctx.Expression()).(ir.Value)
 
-	if ctx.TupleExpression() != nil {
-		tupleCtx := ctx.TupleExpression()
-		var fieldVals []ir.Value
-		for _, expr := range tupleCtx.AllExpression() {
-			v := g.Visit(expr).(ir.Value)
-			// FIX: Ensure tuple element instruction is inserted
-			if inst, ok := v.(ir.Instruction); ok && inst.Parent() == nil {
-				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
-			}
-			fieldVals = append(fieldVals, v)
-		}
+        if inst, ok := val.(ir.Instruction); ok && inst.Parent() == nil {
+            g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+        }
+    }
 
-		if g.ctx.CurrentFunction != nil {
-			retType := g.ctx.CurrentFunction.FuncType.ReturnType
-			if st, ok := retType.(*types.StructType); ok {
-				var agg ir.Value = g.ctx.Builder.ConstZero(st)
-				for i, v := range fieldVals {
-					if i < len(st.Fields) {
-						v = g.emitCast(v, st.Fields[i])
-						// FIX: Ensure cast instruction is inserted
-						if inst, ok := v.(ir.Instruction); ok && inst.Parent() == nil {
-							g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
-						}
-						agg = g.ctx.Builder.CreateInsertValue(agg, v, []int{i}, "")
-					}
-				}
-				val = agg
-			}
-		}
-	}
+    if ctx.TupleExpression() != nil {
+        tupleCtx := ctx.TupleExpression()
+        var fieldVals []ir.Value
+        for _, expr := range tupleCtx.AllExpression() {
+            v := g.Visit(expr).(ir.Value)
+            if inst, ok := v.(ir.Instruction); ok && inst.Parent() == nil {
+                g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+            }
+            fieldVals = append(fieldVals, v)
+        }
 
-	// 2. Emit Deferred Actions (LIFO order)
-	// These instructions are inserted into the current block before the 'ret' instruction.
-	if g.deferStack != nil {
-		g.deferStack.Emit(g)
-	}
+        if g.ctx.CurrentFunction != nil {
+            // Use OriginalReturnType if sret-lowered, otherwise use ReturnType
+            fn := g.ctx.CurrentFunction
+            retType := fn.FuncType.ReturnType
+            if fn.FuncType.OriginalReturnType != nil {
+                retType = fn.FuncType.OriginalReturnType
+            }
 
-	// 3. Generate Return Instruction
-	if val != nil {
-		if g.ctx.CurrentFunction != nil && ctx.TupleExpression() == nil {
-			targetType := g.ctx.CurrentFunction.FuncType.ReturnType
-			val = g.emitCast(val, targetType)
-			
-			// FIX: Ensure cast instruction is inserted
-			if inst, ok := val.(ir.Instruction); ok && inst.Parent() == nil {
-				g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
-			}
-		}
-		g.ctx.Builder.CreateRet(val)
-	} else {
-		g.ctx.Builder.CreateRetVoid()
-	}
-	return nil
+            if st, ok := retType.(*types.StructType); ok {
+                var agg ir.Value = g.ctx.Builder.ConstZero(st)
+                for i, v := range fieldVals {
+                    if i < len(st.Fields) {
+                        v = g.emitCast(v, st.Fields[i])
+                        if inst, ok := v.(ir.Instruction); ok && inst.Parent() == nil {
+                            g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+                        }
+                        agg = g.ctx.Builder.CreateInsertValue(agg, v, []int{i}, "")
+                    }
+                }
+                val = agg
+            }
+        }
+    }
+
+    // 2. Emit Deferred Actions (LIFO order)
+    if g.deferStack != nil {
+        g.deferStack.Emit(g)
+    }
+
+    // 3. Generate Return Instruction
+    if val != nil {
+        fn := g.ctx.CurrentFunction
+        isSret := fn.FuncType.OriginalReturnType != nil && needsSret(fn.FuncType.OriginalReturnType)
+
+        if isSret {
+            // Store the return value through the hidden sret pointer (argument 0)
+            sretPtr := fn.Arguments[0]
+            g.ctx.Builder.CreateStore(val, sretPtr)
+            g.ctx.Builder.CreateRetVoid()
+        } else {
+            if g.ctx.CurrentFunction != nil && ctx.TupleExpression() == nil {
+                targetType := g.ctx.CurrentFunction.FuncType.ReturnType
+                val = g.emitCast(val, targetType)
+
+                if inst, ok := val.(ir.Instruction); ok && inst.Parent() == nil {
+                    g.ctx.Builder.GetInsertBlock().AddInstruction(inst)
+                }
+            }
+            g.ctx.Builder.CreateRet(val)
+        }
+    } else {
+        g.ctx.Builder.CreateRetVoid()
+    }
+    return nil
 }
 
 func (g *Generator) VisitDeferStmt(ctx *parser.DeferStmtContext) interface{} {
