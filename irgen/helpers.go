@@ -63,12 +63,20 @@ func (g *Generator) resolveType(ctx parser.ITypeContext) types.Type {
 
 		// 1. Try resolving symbol directly
 		if s, ok := g.currentScope.Resolve(name); ok { 
+			// FIX: Classes are reference types, so they are inherently pointers in IR.
+			if st, ok := s.Type.(*types.StructType); ok && st.IsClass {
+				return types.NewPointer(s.Type)
+			}
 			return s.Type 
 		} 
 		
 		// 2. Fallback: Check current namespace
 		if g.currentNamespace != "" {
 			if s, ok := g.currentScope.Resolve(g.currentNamespace + "." + name); ok {
+				// FIX: Classes are reference types here too.
+				if st, ok := s.Type.(*types.StructType); ok && st.IsClass {
+					return types.NewPointer(s.Type)
+				}
 				return s.Type
 			}
 		}

@@ -5,7 +5,7 @@ extern c {
     func printf(*byte, ...) int32
 }
 
-struct Person {
+class Person {
     age: int32
     height: int32
     weight: int32
