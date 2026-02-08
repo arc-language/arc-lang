@@ -796,6 +796,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			ids := qCtx.AllIDENTIFIER()
 			baseName := ids[0].GetText()
 			
+			// Resolve the base symbol
 			var curr ir.Value
 			sym, ok := g.currentScope.Resolve(baseName)
 			if !ok && g.currentNamespace != "" {
@@ -806,11 +807,15 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 			}
 
 			if curr != nil {
-				// isLValue tracks if 'curr' is a pointer that we should GEP into.
+				// We track if the current value is an address (pointer to memory) or a direct value
+				// This determines if we use GEP or ExtractValue
 				isLValue := false
+				
+				// Identify initial state
 				if _, ok := curr.(*ir.AllocaInst); ok {
 					isLValue = true
 				} else if types.IsPointer(curr.Type()) {
+					// Pointers are effectively L-values for field access
 					isLValue = true
 				}
 
@@ -819,19 +824,20 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				for i := 1; i < len(ids); i++ {
 					fieldName := ids[i].GetText()
 					
+					// Case 1: Handle Pointers (GEP)
 					if isLValue {
-						// Auto-dereference pointer-to-pointer (e.g. Class*)
+						// Auto-dereference pointer-to-pointer
 						if ptrType, ok := curr.Type().(*types.PointerType); ok {
 							if _, isPtrToPtr := ptrType.ElementType.(*types.PointerType); isPtrToPtr {
 								curr = g.ctx.Builder.CreateLoad(ptrType.ElementType, curr, "")
-								if curr.Parent() == nil { g.ctx.Builder.GetInsertBlock().AddInstruction(curr.(ir.Instruction)) }
 							}
 						}
 						
 						ptrType := curr.Type().(*types.PointerType)
 						if st, ok := ptrType.ElementType.(*types.StructType); ok {
-							// Struct Field Access
+							// Resolve Struct Field
 							indices, hasIndices := g.analysis.StructIndices[st.Name]
+							// ... (namespace resolution for struct indices) ...
 							if !hasIndices && g.currentNamespace != "" {
 								indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
 							}
@@ -846,36 +852,12 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 								if idx, ok := indices[fieldName]; ok {
 									physicalIndex := idx
 									if st.IsClass { physicalIndex = idx + 1 }
-									
-									// GEP to get pointer to field
-									fieldPtr := g.ctx.Builder.CreateStructGEP(st, curr, physicalIndex, "")
-									if fieldPtr.Parent() == nil { g.ctx.Builder.GetInsertBlock().AddInstruction(fieldPtr) }
-									
-									// If this is NOT the last element, we must load it to continue traversing
-									// UNLESS the field itself is a value struct we want to GEP into next.
-									// But for Classes (refs), the field is a pointer, so we load it to get the object address.
-									if i < len(ids)-1 {
-										nextType := st.Fields[idx]
-										// If next field is a Class (pointer), load it so we can dereference it next loop
-										if types.IsPointer(nextType) {
-											curr = g.ctx.Builder.CreateLoad(nextType, fieldPtr, "")
-											if curr.Parent() == nil { g.ctx.Builder.GetInsertBlock().AddInstruction(curr.(ir.Instruction)) }
-											// It remains an LValue (pointer) for the next iteration
-											isLValue = true 
-										} else {
-											// It's a value struct/primitive. Keep the pointer (fieldPtr) for GEP.
-											curr = fieldPtr
-											isLValue = true
-										}
-									} else {
-										// Last element. Keep as pointer.
-										curr = fieldPtr
-									}
+									curr = g.ctx.Builder.CreateStructGEP(st, curr, physicalIndex, "")
 									continue
 								}
 							}
 							
-							// Method Call on Pointer
+							// Resolve Method on Pointer
 							methodName := st.Name + "_" + fieldName
 							methodSym, ok := g.currentScope.Resolve(methodName)
 							if !ok && g.currentNamespace != "" {
@@ -883,12 +865,12 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 							}
 							if ok {
 								if fn, ok := methodSym.IRValue.(*ir.Function); ok {
+									// ... (arg preparation similar to Postfix) ...
 									thisArg := curr
 									ft := fn.FuncType
 									if len(ft.ParamTypes) > 0 && !ft.ParamTypes[0].Equal(thisArg.Type()) {
 										if pt, isPtr := thisArg.Type().(*types.PointerType); isPtr && pt.ElementType.Equal(ft.ParamTypes[0]) {
 											thisArg = g.ctx.Builder.CreateLoad(pt.ElementType, thisArg, "")
-											if thisArg.Parent() == nil { g.ctx.Builder.GetInsertBlock().AddInstruction(thisArg.(ir.Instruction)) }
 										}
 									}
 									if isCall && i == len(ids)-1 {
@@ -903,12 +885,14 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 								}
 							}
 						}
-					} 
+					}
 					
-					// Handle Value (R-Value) Access
+					// Case 2: Handle Values (ExtractValue)
+					// This handles struct arguments passed by value (e.g. `func foo(c: Counter)`)
 					if !isLValue {
 						if st, ok := curr.Type().(*types.StructType); ok {
 							indices, hasIndices := g.analysis.StructIndices[st.Name]
+							// ... (namespace resolution) ...
 							if !hasIndices && g.currentNamespace != "" {
 								indices, hasIndices = g.analysis.StructIndices[g.currentNamespace + "." + st.Name]
 							}
@@ -924,12 +908,6 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 									physicalIndex := idx
 									if st.IsClass { physicalIndex = idx + 1 }
 									curr = g.ctx.Builder.CreateExtractValue(curr, []int{physicalIndex}, "")
-									if curr.Parent() == nil { g.ctx.Builder.GetInsertBlock().AddInstruction(curr.(ir.Instruction)) }
-									
-									// If extracted value is a pointer (Class ref), it becomes an LValue for next iter
-									if types.IsPointer(curr.Type()) {
-										isLValue = true
-									}
 									continue
 								}
 							}
@@ -941,8 +919,9 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 				}
 				
 				if valid && entity == nil {
+					// Finalize result
 					if isLValue {
-						// Final load if we ended up with a pointer
+						// If we ended up with a pointer (via GEPs), load the value
 						ptrType := curr.Type().(*types.PointerType)
 						loadInst := g.ctx.Builder.CreateLoad(ptrType.ElementType, curr, "")
 						if loadInst.Parent() == nil {
@@ -950,6 +929,7 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 						}
 						entity = loadInst
 					} else {
+						// If we ended up with a value (via ExtractValue), use it directly
 						entity = curr
 					}
 				}
