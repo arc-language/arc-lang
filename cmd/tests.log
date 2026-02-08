@@ -92,8 +92,8 @@ Build Output:
 DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
 DEBUG: Stub at 0x40103c, main at 0x40105c, lea PC at 0x401050
 DEBUG: call PC at 0x40105b, __libc_start_main at 0x40101c
-DEBUG: Reloc .str.0: Type=2 Off=168 Addend=-4 SymVal=402170 P=4011c4 Val=4008
-DEBUG: Reloc printf: Type=4 Off=1f1 Addend=-4 SymVal=40102c P=40124d Val=-549
+DEBUG: Reloc .str.0: Type=2 Off=18f Addend=-4 SymVal=402170 P=4011eb Val=3969
+DEBUG: Reloc printf: Type=4 Off=218 Addend=-4 SymVal=40102c P=401274 Val=-588
 [Driver] [INFO] Success! Executable created: /tmp/arc_test_env/array_zero_init
 
 Run Output:
@@ -277,28 +277,25 @@ Build Output:
 [Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/control_flow/control_defer_function.ax
 [Driver] [INFO] Linking libraries: [c]
 DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
-DEBUG: Stub at 0x40107c, main at 0x40126c, lea PC at 0x401090
+DEBUG: Stub at 0x40107c, main at 0x40130c, lea PC at 0x401090
 DEBUG: call PC at 0x40109b, __libc_start_main at 0x40103c
 DEBUG: Reloc .str.0: Type=2 Off=15 Addend=-4 SymVal=402268 P=4010b1 Val=4531
 DEBUG: Reloc .str.1: Type=2 Off=74 Addend=-4 SymVal=402278 P=401110 Val=4452
 DEBUG: Reloc .str.2: Type=2 Off=86 Addend=-4 SymVal=402288 P=401122 Val=4450
-DEBUG: Reloc .str.3: Type=2 Off=18b Addend=-4 SymVal=402290 P=401227 Val=4197
-DEBUG: Reloc printf: Type=4 Off=1c1 Addend=-4 SymVal=40106c P=40125d Val=-501
-DEBUG: Reloc .str.4: Type=2 Off=329 Addend=-4 SymVal=402298 P=4013c5 Val=3791
-DEBUG: Reloc .str.5: Type=2 Off=33b Addend=-4 SymVal=4022a8 P=4013d7 Val=3789
-DEBUG: Reloc .str.6: Type=2 Off=3b7 Addend=-4 SymVal=4022b0 P=401453 Val=3673
-DEBUG: Reloc .str.7: Type=2 Off=40f Addend=-4 SymVal=4022b8 P=4014ab Val=3593
+DEBUG: Reloc .str.3: Type=2 Off=220 Addend=-4 SymVal=402290 P=4012bc Val=4048
+DEBUG: Reloc printf: Type=4 Off=256 Addend=-4 SymVal=40106c P=4012f2 Val=-650
+DEBUG: Reloc .str.4: Type=2 Off=3c9 Addend=-4 SymVal=402298 P=401465 Val=3631
+DEBUG: Reloc .str.5: Type=2 Off=3db Addend=-4 SymVal=4022a8 P=401477 Val=3629
+DEBUG: Reloc .str.6: Type=2 Off=457 Addend=-4 SymVal=4022b0 P=4014f3 Val=3513
+DEBUG: Reloc .str.7: Type=2 Off=4af Addend=-4 SymVal=4022b8 P=40154b Val=3433
 [Driver] [INFO] Success! Executable created: /tmp/arc_test_env/control_defer_function
 
 Run Output:
 start
 end
 cleanup_called
-
-Result: FAIL
-Error: assertion failed.
-      Expected: "start\\nend\\ncleanup_called\\n"
-      Got:      "start\nend\ncleanup_called\n\x7f"
+
+Result: PASS
 
 --- Test: control_defer_multiple (../tests/control_flow/control_defer_multiple.ax) ---
 Build Output:
@@ -324,10 +321,7 @@ third
 second
 first
 
-Result: FAIL
-Error: assertion failed.
-      Expected: "main\\nthird\\nsecond\\nfirst"
-      Got:      "main\nthird\nsecond\nfirst"
+Result: PASS
 
 --- Test: control_defer_single (../tests/control_flow/control_defer_single.ax) ---
 Build Output:
@@ -350,10 +344,7 @@ before
 after
 deferred
 
-Result: FAIL
-Error: assertion failed.
-      Expected: "before\\nafter\\ndeferred"
-      Got:      "before\nafter\ndeferred"
+Result: PASS
 
 --- Test: control_for_continue (../tests/control_flow/control_for_continue.ax) ---
 Build Output:
@@ -554,10 +545,7 @@ Run Output:
 before_return
 done
 
-Result: FAIL
-Error: assertion failed.
-      Expected: "before_return\\ndone"
-      Got:      "before_return\ndone"
+Result: PASS
 
 --- Test: control_switch_default (../tests/control_flow/control_switch_default.ax) ---
 Build Output:
@@ -772,7 +760,7 @@ escape_test\ok
 
 Result: FAIL
 Error: assertion failed.
-      Expected: "escape_test\\nok"
+      Expected: "escape_test\nok"
       Got:      "escape_test\\ok"
 
 --- Test: literal_float_scientific (../tests/foundation/literal_float_scientific.ax) ---
@@ -912,10 +900,7 @@ Run Output:
 line1
 line2
 
-Result: FAIL
-Error: assertion failed.
-      Expected: "line1\\nline2"
-      Got:      "line1\nline2"
+Result: PASS
 
 --- Test: type_alias_bool (../tests/foundation/type_alias_bool.ax) ---
 Build Output:
@@ -1594,10 +1579,7 @@ Run Output:
 Hello from Arc!
 File written successfully
 
-Result: FAIL
-Error: assertion failed.
-      Expected: "Hello from Arc!\\nFile written successfully\\n"
-      Got:      "Hello from Arc!\nFile written successfully"
+Result: PASS
 
 --- Test: io_read (../tests/io/io_read.ax) ---
 Build Output:
@@ -1605,19 +1587,19 @@ Build Output:
 [Driver] [INFO] Compiling project starting at: /home/marss6414/arc-lang/tests/io/io_read.ax
 [Driver] [INFO] Linking libraries: [c]
 DEBUG: Loaded shared object '/lib/x86_64-linux-gnu/libc.so.6' with 3136 exported symbols
-DEBUG: Stub at 0x40107c, main at 0x40116c, lea PC at 0x401090
+DEBUG: Stub at 0x40107c, main at 0x4011fc, lea PC at 0x401090
 DEBUG: call PC at 0x40109b, __libc_start_main at 0x40103c
-DEBUG: Reloc .str.0: Type=2 Off=7f Addend=-4 SymVal=402268 P=40111b Val=4425
-DEBUG: Reloc printf: Type=4 Off=b5 Addend=-4 SymVal=40106c P=401151 Val=-233
-DEBUG: Reloc .str.1: Type=2 Off=229 Addend=-4 SymVal=402270 P=4012c5 Val=4007
-DEBUG: Reloc printf: Type=4 Off=258 Addend=-4 SymVal=40106c P=4012f4 Val=-652
-DEBUG: Reloc .str.2: Type=2 Off=265 Addend=-4 SymVal=402288 P=401301 Val=3971
-DEBUG: Reloc .str.3: Type=2 Off=277 Addend=-4 SymVal=4022a0 P=401313 Val=3977
-DEBUG: Reloc .str.4: Type=2 Off=2f3 Addend=-4 SymVal=4022a8 P=40138f Val=3861
-DEBUG: Reloc .str.5: Type=2 Off=367 Addend=-4 SymVal=4022c8 P=401403 Val=3777
-DEBUG: Reloc printf: Type=4 Off=396 Addend=-4 SymVal=40106c P=401432 Val=-970
-DEBUG: Reloc .str.6: Type=2 Off=3a3 Addend=-4 SymVal=4022e0 P=40143f Val=3741
-DEBUG: Reloc .str.7: Type=2 Off=3b5 Addend=-4 SymVal=4022f8 P=401451 Val=3747
+DEBUG: Reloc .str.0: Type=2 Off=114 Addend=-4 SymVal=402268 P=4011b0 Val=4276
+DEBUG: Reloc printf: Type=4 Off=14a Addend=-4 SymVal=40106c P=4011e6 Val=-382
+DEBUG: Reloc .str.1: Type=2 Off=2b9 Addend=-4 SymVal=402270 P=401355 Val=3863
+DEBUG: Reloc printf: Type=4 Off=2e8 Addend=-4 SymVal=40106c P=401384 Val=-796
+DEBUG: Reloc .str.2: Type=2 Off=2f5 Addend=-4 SymVal=402288 P=401391 Val=3827
+DEBUG: Reloc .str.3: Type=2 Off=307 Addend=-4 SymVal=4022a0 P=4013a3 Val=3833
+DEBUG: Reloc .str.4: Type=2 Off=383 Addend=-4 SymVal=4022a8 P=40141f Val=3717
+DEBUG: Reloc .str.5: Type=2 Off=3f7 Addend=-4 SymVal=4022c8 P=401493 Val=3633
+DEBUG: Reloc printf: Type=4 Off=426 Addend=-4 SymVal=40106c P=4014c2 Val=-1114
+DEBUG: Reloc .str.6: Type=2 Off=433 Addend=-4 SymVal=4022e0 P=4014cf Val=3597
+DEBUG: Reloc .str.7: Type=2 Off=445 Addend=-4 SymVal=4022f8 P=4014e1 Val=3603
 [Driver] [INFO] Success! Executable created: /tmp/arc_test_env/io_read
 
 Run Output:
@@ -1625,10 +1607,7 @@ Writing to file...
 Reading from file:
 Hello from Arc file I/O!
 
-Result: FAIL
-Error: assertion failed.
-      Expected: "Writing to file...\\nReading from file:\\nHello from Arc file I/O!\\n"
-      Got:      "Writing to file...\nReading from file:\nHello from Arc file I/O!"
+Result: PASS
 
 --- Test: op_addition (../tests/operators/op_addition.ax) ---
 Build Output:
@@ -2535,12 +2514,12 @@ DEBUG: Reloc printf: Type=4 Off=274 Addend=-4 SymVal=40102c P=4012d0 Val=-680
 [Driver] [INFO] Success! Executable created: /tmp/arc_test_env/struct_multiple_fields
 
 Run Output:
-age=30 height=180 weight=439740488
+age=30 height=180 weight=-671452424
 
 Result: FAIL
 Error: assertion failed.
       Expected: "age=30 height=180 weight=75"
-      Got:      "age=30 height=180 weight=439740488"
+      Got:      "age=30 height=180 weight=-671452424"
 
 --- Test: struct_nested (../tests/structs/struct_nested.ax) ---
 Build Output:

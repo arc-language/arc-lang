@@ -132,6 +132,16 @@ func discoverTests(root string) ([]TestCase, error) {
 	return tests, err
 }
 
+// unescapeString converts escape sequences in the expected string
+func unescapeString(s string) string {
+	s = strings.ReplaceAll(s, "\\n", "\n")
+	s = strings.ReplaceAll(s, "\\t", "\t")
+	s = strings.ReplaceAll(s, "\\r", "\r")
+	s = strings.ReplaceAll(s, "\\\"", "\"")
+	s = strings.ReplaceAll(s, "\\\\", "\\")
+	return s
+}
+
 // parseExpectHeader reads the first line of the file looking for:
 //
 //	//@test(expect = "...")
@@ -171,7 +181,7 @@ func parseExpectHeader(path string) (string, error) {
 	}
 
 	expected := rest[openQuote+1 : openQuote+1+closeQuote]
-	return expected, nil
+	return unescapeString(expected), nil
 }
 
 func runTest(tc TestCase, arcBinary, tempDir string, log *os.File) (string, error) {

@@ -530,3 +530,23 @@ func (g *Generator) VisitExpressionStmt(ctx *parser.ExpressionStmtContext) inter
 	}
 	return val
 }
+
+func (g *Generator) VisitBreakStmt(ctx *parser.BreakStmtContext) interface{} {
+	if len(g.loopStack) == 0 {
+		return nil
+	}
+	// Jump to the block defined after the loop
+	info := g.loopStack[len(g.loopStack)-1]
+	g.ctx.Builder.CreateBr(info.breakBlock)
+	return nil
+}
+
+func (g *Generator) VisitContinueStmt(ctx *parser.ContinueStmtContext) interface{} {
+	if len(g.loopStack) == 0 {
+		return nil
+	}
+	// Jump to the loop increment/post-expression block
+	info := g.loopStack[len(g.loopStack)-1]
+	g.ctx.Builder.CreateBr(info.continueBlock)
+	return nil
+}
