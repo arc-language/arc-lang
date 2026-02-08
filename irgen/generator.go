@@ -156,8 +156,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			// Lookup: "sqlite3.DB_close" (matches semantic symbol)
 			lookupName = g.currentNamespace + "." + methodPart
 			// IR name uses dot to avoid collision with extern C symbols.
-			// e.g. "sqlite3.DB_close" can never collide with a C symbol
-			// because C identifiers cannot contain dots.
 			irName = g.currentNamespace + "." + methodPart
 		} else {
 			lookupName = methodPart
@@ -167,8 +165,6 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		// Standard Function
 		if g.currentNamespace != "" && name != "main" {
 			lookupName = g.currentNamespace + "." + name
-			// Same dot-based IR name to prevent collision with extern C.
-			// e.g. Arc's "sqlite3.open" vs extern C's "sqlite3_open"
 			irName = g.currentNamespace + "." + name
 		} else {
 			lookupName = name
@@ -242,6 +238,10 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 		g.enterScope(ctx)
 		defer g.exitScope()
 
+		// Fix: Create entry block and set insert point
+		entryBlock := g.ctx.Builder.CreateBlock("entry")
+		g.ctx.Builder.SetInsertPoint(entryBlock)
+
 		var paramNames []string
 		if ctx.ParameterList() != nil {
 			for _, param := range ctx.ParameterList().AllParameter() {
@@ -249,8 +249,7 @@ func (g *Generator) VisitFunctionDecl(ctx *parser.FunctionDeclContext) interface
 			}
 		}
 
-		// FIX: Don't create allocas for parameters
-		// Let codegen handle the stack allocation directly
+		// Don't create allocas for parameters, map them directly
 		for i, arg := range fn.Arguments {
 			if i < len(paramNames) {
 				arg.SetName(paramNames[i])
