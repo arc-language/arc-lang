@@ -1036,8 +1036,16 @@ func (c *compiler) moveValue(dstBase Register, dstDisp int, src ir.Value) {
 	}
 
 	if _, ok := src.(*ir.ConstantZero); ok {
-		for i := 0; i < size; i++ {
-			c.asm.Mov(NewMem(dstBase, dstDisp+i), ImmOp(0), 8)
+		// Optimize: Write 64-bit chunks where possible
+		offset := 0
+		for offset+8 <= size {
+			c.asm.Mov(NewMem(dstBase, dstDisp+offset), ImmOp(0), 64)
+			offset += 8
+		}
+		// Write remaining bytes
+		for offset < size {
+			c.asm.Mov(NewMem(dstBase, dstDisp+offset), ImmOp(0), 8)
+			offset++
 		}
 		return
 	}
