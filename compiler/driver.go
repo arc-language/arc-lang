@@ -10,6 +10,7 @@ import (
 	"github.com/arc-language/arc-lang/codegen/codegen"
 	"github.com/arc-language/arc-lang/linker/elf"
 	"github.com/arc-language/upkg"
+	"github.com/arc-language/upkg/pkg/env"
 )
 
 // Run is the main entry point for the compiler library.
@@ -70,21 +71,38 @@ func (c *Compiler) emitExecutable(m *ir.Module, cfg Config) error {
 
 	// Step 3: Resolve External Libraries
 
-	// Get upkg configuration to find where packages are installed
+	// Get upkg configuration and environment
 	upkgConfig := upkg.DefaultConfig()
 	installPath := upkgConfig.InstallPath
+	
+	// Initialize upkg manager to get backend type
+	mgr, err := upkg.NewManager(upkg.BackendAuto, upkgConfig)
+	if err != nil {
+		return fmt.Errorf("failed to initialize upkg: %w", err)
+	}
+	backendType := mgr.Backend()
+	mgr.Close()
+	
+	// Create environment to get proper library paths
+	environment := env.New(installPath, backendType)
 
-	// Build search paths: User Flags -> Upkg Paths -> System Paths
+	// Build search paths: User Flags -> Upkg Environment Paths -> System Paths
 	searchPaths := cfg.LibraryPaths
 	
-	// Add upkg paths (check various common layouts: lib, usr/lib, lib64)
+	// Add upkg environment paths (these know about architecture-specific paths)
+	upkgLibPaths := environment.GetLibraryPaths()
+	searchPaths = append(searchPaths, upkgLibPaths...)
+	
+	c.logger.Debug("Upkg library paths: %v", upkgLibPaths)
+
+	// Add standard system paths (Linux fallback)
 	searchPaths = append(searchPaths,
-		filepath.Join(installPath, "usr", "lib", "x86_64-linux-gnu"),  // ADD THIS LINE
-		filepath.Join(installPath, "lib", "x86_64-linux-gnu"),          // ADD THIS LINE
-		filepath.Join(installPath, "lib"),
-		filepath.Join(installPath, "usr", "lib"),
-		filepath.Join(installPath, "usr", "lib64"),
-		filepath.Join(installPath, "lib64"),
+		"/usr/lib/x86_64-linux-gnu",
+		"/lib/x86_64-linux-gnu",
+		"/usr/lib64",
+		"/lib64",
+		"/usr/lib",
+		"/lib",
 	)
 
 	ldScriptRegex := regexp.MustCompile(`(?:GROUP|INPUT)\s*\(\s*([^\s)]+)`)
@@ -178,7 +196,7 @@ func (c *Compiler) emitExecutable(m *ir.Module, cfg Config) error {
 		}
 
 		if !found {
-			return fmt.Errorf("library -l%s not found in search paths (checked upkg: %s)", lib, installPath)
+			return fmt.Errorf("library -l%s not found in search paths (searched: %v)", lib, searchPaths)
 		}
 	}
 
