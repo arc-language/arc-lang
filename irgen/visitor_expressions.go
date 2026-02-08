@@ -754,7 +754,8 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 		var pendingFnType *types.FunctionType
 
 		sym, ok := g.currentScope.Resolve(name)
-		if !ok && g.currentNamespace != "" && !isQualified {
+		// Fix: Removed !isQualified check
+		if !ok && g.currentNamespace != "" {
 			sym, ok = g.currentScope.Resolve(g.currentNamespace + "." + name)
 		}
 

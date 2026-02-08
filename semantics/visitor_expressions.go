@@ -332,7 +332,8 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 
 		// --- Direct symbol resolution (non-qualified or full qualified name match) ---
 		s, ok := a.currentScope.Resolve(name)
-		if !ok && a.currentNamespacePrefix != "" && !isQualified {
+		// Fix: Removed !isQualified check to allow resolving "Status.OK" within namespace "main" as "main.Status.OK"
+		if !ok && a.currentNamespacePrefix != "" {
 			s, ok = a.currentScope.Resolve(a.currentNamespacePrefix + "." + name)
 		}
 

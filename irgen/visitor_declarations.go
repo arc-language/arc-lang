@@ -328,6 +328,13 @@ func (g *Generator) VisitClassDecl(ctx *parser.ClassDeclContext) interface{} {
 func (g *Generator) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 	if g.Phase == 1 {
 		enumName := ctx.IDENTIFIER().GetText()
+		
+		// Prefix with namespace if available
+		prefix := enumName
+		if g.currentNamespace != "" {
+			prefix = g.currentNamespace + "." + enumName
+		}
+
 		val := int64(0)
 		for _, member := range ctx.AllEnumMember() {
 			memName := member.IDENTIFIER().GetText()
@@ -338,7 +345,9 @@ func (g *Generator) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 				}
 			}
 			constVal := g.ctx.Builder.ConstInt(types.I32, val)
-			fullName := enumName + "." + memName
+			
+			// Use the namespaced prefix for lookup
+			fullName := prefix + "." + memName
 			if sym, ok := g.currentScope.Resolve(fullName); ok {
 				sym.IRValue = constVal
 				sym.Kind = symbol.SymConst
@@ -348,7 +357,6 @@ func (g *Generator) VisitEnumDecl(ctx *parser.EnumDeclContext) interface{} {
 	}
 	return nil
 }
-
 
 func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{} {
 	// --- Phase 1: Global Variable Declarations ---
