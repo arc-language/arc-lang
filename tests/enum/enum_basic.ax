@@ -13,7 +13,7 @@ enum Status {
 
 func main() int32 {
 
-    let s = OK
+    let s: Status = Status.OK
     printf("status=%d\n", s)
 
     return 0

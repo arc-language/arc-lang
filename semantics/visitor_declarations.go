@@ -562,26 +562,54 @@ func (a *Analyzer) VisitVariableDecl(ctx *parser.VariableDeclContext) interface{
 }
 
 func (a *Analyzer) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
-	name := ctx.IDENTIFIER().GetText()
-	if a.currentNamespacePrefix != "" && name != "main" {
-		name = a.currentNamespacePrefix + "." + name
+	rawName := ctx.IDENTIFIER().GetText()
+	isGlobal := (a.currentScope.Parent == nil)
+
+	name := rawName
+	// Only apply namespace prefix to global constants
+	if isGlobal && a.currentNamespacePrefix != "" {
+		name = a.currentNamespacePrefix + "." + rawName
 	}
 
-	if a.Phase == 1 {
+	// Phase 1: Define Global Constants
+	if a.Phase == 1 && isGlobal {
 		if _, ok := a.currentScope.ResolveLocal(name); !ok {
 			var typ types.Type
-			if ctx.Type_() != nil { typ = a.resolveType(ctx.Type_()) }
-			if typ == nil { typ = types.I64 }
+			if ctx.Type_() != nil {
+				typ = a.resolveType(ctx.Type_())
+			}
+			// Default global const to I64 if untyped (placeholder)
+			if typ == nil || typ == types.Void {
+				typ = types.I64
+			}
 			a.currentScope.Define(name, symbol.SymConst, typ)
 		}
 	}
 
+	// Phase 2: Define Local Constants & Infer Types
 	if a.Phase == 2 {
 		sym, _ := a.currentScope.ResolveLocal(name)
+
+		// Fix: Define local constant if it doesn't exist (since Phase 1 skipped it)
+		if !isGlobal && sym == nil {
+			var typ types.Type
+			if ctx.Type_() != nil {
+				typ = a.resolveType(ctx.Type_())
+			}
+			if typ == nil {
+				typ = types.Void
+			}
+			sym = a.currentScope.Define(name, symbol.SymConst, typ)
+		}
+
 		if ctx.Expression() != nil {
 			exprType := a.Visit(ctx.Expression()).(types.Type)
-			if sym != nil && sym.Type == types.I64 && ctx.Type_() == nil {
-				sym.Type = exprType
+			if sym != nil {
+				// Type inference: Update if type is Void (local inferred) or I64 (global inferred placeholder)
+				// Only infer if no explicit type was provided
+				if (sym.Type == types.Void || sym.Type == types.I64) && ctx.Type_() == nil {
+					sym.Type = exprType
+				}
 			}
 		}
 	}

@@ -541,8 +541,11 @@ func (g *Generator) VisitVariableDecl(ctx *parser.VariableDeclContext) interface
 
 func (g *Generator) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 	name := ctx.IDENTIFIER().GetText()
+	isGlobal := (g.currentScope.Parent == nil)
+
 	lookupName := name
-	if g.currentNamespace != "" && name != "main" {
+	// Fix: Only apply namespace to globals
+	if isGlobal && g.currentNamespace != "" {
 		lookupName = g.currentNamespace + "." + name
 	}
 
@@ -551,17 +554,17 @@ func (g *Generator) VisitConstDecl(ctx *parser.ConstDeclContext) interface{} {
 		return nil
 	}
 
-	if g.currentScope.Parent == nil && g.Phase == 1 {
+	// Global constants are initialized in Phase 1.
+	// Local constants are initialized in Phase 2 (when the statement is visited).
+	if (isGlobal && g.Phase == 1) || (!isGlobal && g.Phase == 2) {
 		val := g.Visit(ctx.Expression())
 		if val != nil {
 			if constant, ok := val.(ir.Constant); ok {
 				sym.IRValue = constant
+			} else {
+				// Fallback if the expression isn't strictly constant (though it should be for const)
+				sym.IRValue = val
 			}
-		}
-	} else if g.currentScope.Parent != nil {
-		val := g.Visit(ctx.Expression())
-		if constant, ok := val.(ir.Constant); ok {
-			sym.IRValue = constant
 		}
 	}
 	return nil
