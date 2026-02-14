@@ -2,7 +2,6 @@ package irgen
 
 import (
 	"log"
-	"strconv"
 
 	"github.com/arc-language/arc-lang/builder/ir"
 	"github.com/arc-language/arc-lang/builder/types"
@@ -11,7 +10,11 @@ import (
 )
 
 func (g *Generator) resolveType(ctx parser.ITypeContext) types.Type {
+	if ctx == nil {
+		return types.Void
+	}
 	tc := ctx.(*parser.TypeContext)
+	
 	if tc.PrimitiveType() != nil {
 		text := tc.PrimitiveType().GetText()
 		switch text {
@@ -36,35 +39,18 @@ func (g *Generator) resolveType(ctx parser.ITypeContext) types.Type {
 		case "string": return types.NewPointer(types.I8)
 		}
 	}
-	if tc.PointerType() != nil {
-		return types.NewPointer(g.resolveType(tc.PointerType().Type_()))
+	
+	// Replaced PointerType with RawPointer check
+	if tc.RAWPTR() != nil {
+		return types.NewPointer(types.Void)
 	}
 	
 	if tc.IDENTIFIER() != nil {
 		name := tc.IDENTIFIER().GetText()
 		
-		if name == "array" && tc.GenericArgs() != nil {
-			args := tc.GenericArgs().GenericArgList().AllGenericArg()
-			if len(args) == 2 {
-				var elemType types.Type
-				if tCtx := args[0].Type_(); tCtx != nil {
-					elemType = g.resolveType(tCtx)
-				}
-				var length int64
-				if exprCtx := args[1].Expression(); exprCtx != nil {
-					if val, err := strconv.ParseInt(exprCtx.GetText(), 0, 64); err == nil {
-						length = val
-					}
-				}
-				if elemType != nil && length > 0 {
-					return types.NewArray(elemType, length)
-				}
-			}
-		}
-
 		// 1. Try resolving symbol directly
 		if s, ok := g.currentScope.Resolve(name); ok { 
-			// FIX: Classes are reference types, so they are inherently pointers in IR.
+			// Classes are reference types, so they are inherently pointers in IR.
 			if st, ok := s.Type.(*types.StructType); ok && st.IsClass {
 				return types.NewPointer(s.Type)
 			}
@@ -74,7 +60,6 @@ func (g *Generator) resolveType(ctx parser.ITypeContext) types.Type {
 		// 2. Fallback: Check current namespace
 		if g.currentNamespace != "" {
 			if s, ok := g.currentScope.Resolve(g.currentNamespace + "." + name); ok {
-				// FIX: Classes are reference types here too.
 				if st, ok := s.Type.(*types.StructType); ok && st.IsClass {
 					return types.NewPointer(s.Type)
 				}
@@ -105,8 +90,7 @@ func (g *Generator) emitCast(val ir.Value, target types.Type) ir.Value {
 			c.SetType(target)
 			return c
 		}
-		// FIX: Handle 0 initialization for Aggregates (Arrays/Structs)
-		// This converts the 'i64 0' from '{}' into a '[100 x u8] zeroinitializer'
+		// Handle 0 initialization for Aggregates (Arrays/Structs)
 		if types.IsAggregate(target) && cInt.Value == 0 {
 			return g.ctx.Builder.ConstZero(target)
 		}

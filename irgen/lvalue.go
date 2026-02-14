@@ -62,11 +62,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 			return g.getLValue(ctx.UnaryExpression(0))
 		}
 	case *parser.UnaryExpressionContext:
-		if ctx.STAR() != nil {
-			// Explicit dereference: *ptr
-			val := g.Visit(ctx.UnaryExpression()).(ir.Value)
-			return val
-		}
+		// Removed star check (syntax changed)
 		if ctx.PostfixExpression() != nil {
 			return g.getLValue(ctx.PostfixExpression())
 		}
@@ -163,9 +159,7 @@ func (g *Generator) getLValue(tree antlr.ParseTree) ir.Value {
 					return fn
 				}
 				
-				// FIX: Arguments are R-Values, not L-Values.
-				// Returning them here would cause VisitPostfixExpression to treat them 
-				// as addresses and load from them, causing a double-dereference for pointers.
+				// Arguments are R-Values, not L-Values.
 				if _, ok := sym.IRValue.(*ir.Argument); ok {
 					return nil
 				}

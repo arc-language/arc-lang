@@ -34,7 +34,6 @@ func InitGlobalScope(s *Scope) {
 
 	// --- Intrinsics ---
     
-    // alloca<T>(count) -> *T
     s.Define("alloca", SymFunc, types.NewFunction(types.NewPointer(types.I8), []types.Type{types.I64}, false))
 
 	s.Define("memset", SymFunc, types.NewFunction(types.Void, []types.Type{types.NewPointer(types.Void), types.I32, types.I64}, false))

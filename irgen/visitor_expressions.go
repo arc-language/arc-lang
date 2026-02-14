@@ -304,13 +304,7 @@ func (g *Generator) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) int
 		return g.getZeroValue(types.I64)
 	}
 
-	if ctx.STAR() != nil {
-		val := g.Visit(ctx.UnaryExpression()).(ir.Value)
-		if ptrType, ok := val.Type().(*types.PointerType); ok {
-			return g.ctx.Builder.CreateLoad(ptrType.ElementType, val, "")
-		}
-		return val
-	}
+	// Removed STAR check
 
 	if ctx.MINUS() != nil {
 		val := g.Visit(ctx.UnaryExpression()).(ir.Value)
@@ -727,14 +721,8 @@ func (g *Generator) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext)
 	if ctx.Literal() != nil {
 		return g.Visit(ctx.Literal())
 	}
-	if ctx.SizeofExpression() != nil {
-		t := g.resolveType(ctx.SizeofExpression().Type_())
-		return g.ctx.Builder.CreateSizeOf(t, "")
-	}
-	if ctx.AlignofExpression() != nil {
-		t := g.resolveType(ctx.AlignofExpression().Type_())
-		return g.ctx.Builder.CreateAlignOf(t, "")
-	}
+	// Removed SizeofExpression and AlignofExpression checks
+	
 	if ctx.Expression() != nil && ctx.LPAREN() != nil && ctx.IDENTIFIER() == nil && ctx.QualifiedIdentifier() == nil {
 		return g.Visit(ctx.Expression())
 	}
@@ -1071,14 +1059,12 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 		return g.ctx.Builder.ConstNull(types.NewPointer(types.Void))
 	}
 	if ctx.CHAR_LITERAL() != nil {
-		// Use strconv.Unquote to parse escape sequences (e.g. '\n' -> 10)
 		val, err := strconv.Unquote(txt)
 		if err == nil && len(val) > 0 {
 			r := []rune(val)[0]
 			return g.ctx.Builder.ConstInt(types.I32, int64(r))
 		}
 		
-		// Fallback for simple escapes
 		if len(txt) >= 3 && txt[0] == '\'' && txt[len(txt)-1] == '\'' {
 			inner := txt[1 : len(txt)-1]
 			if len(inner) == 2 && inner[0] == '\\' {
@@ -1096,19 +1082,13 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 		return g.getZeroValue(types.I32)
 	}
 	if ctx.INTEGER_LITERAL() != nil {
-		// Try parsing as signed int64 first
 		val, err := strconv.ParseInt(txt, 0, 64)
 		if err == nil {
 			return g.ctx.Builder.ConstInt(types.I64, val)
 		}
-		
-		// If range error (overflows int64), try uint64
-		// This handles values like 18446744073709551615
 		if uval, uerr := strconv.ParseUint(txt, 0, 64); uerr == nil {
-			// Store as int64 bit pattern (safe for LLVM IR i64)
 			return g.ctx.Builder.ConstInt(types.U64, int64(uval))
 		}
-		
 		return g.ctx.Builder.ConstInt(types.I64, val)
 	}
 	if ctx.FLOAT_LITERAL() != nil {
@@ -1129,7 +1109,6 @@ func (g *Generator) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 				unquoted = txt[1 : len(txt)-1]
 			}
 		}
-		// Process escape sequences that strconv.Unquote doesn't handle
 		unquoted = processEscapes(unquoted)
 
 		if len(unquoted) == 0 || unquoted[len(unquoted)-1] != 0 {
