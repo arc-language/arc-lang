@@ -50,8 +50,11 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#externCTypeAlias.
 	VisitExternCTypeAlias(ctx *ExternCTypeAliasContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externCOpaqueStructDecl.
-	VisitExternCOpaqueStructDecl(ctx *ExternCOpaqueStructDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#externCStructDecl.
+	VisitExternCStructDecl(ctx *ExternCStructDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externCStructField.
+	VisitExternCStructField(ctx *ExternCStructFieldContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#externCppDecl.
 	VisitExternCppDecl(ctx *ExternCppDeclContext) interface{}
@@ -86,9 +89,6 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#externCppTypeAlias.
 	VisitExternCppTypeAlias(ctx *ExternCppTypeAliasContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externCppOpaqueClassDecl.
-	VisitExternCppOpaqueClassDecl(ctx *ExternCppOpaqueClassDeclContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#externCppClassDecl.
 	VisitExternCppClassDecl(ctx *ExternCppClassDeclContext) interface{}
 
@@ -110,53 +110,20 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#externCppSelfParam.
 	VisitExternCppSelfParam(ctx *ExternCppSelfParamContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externObjCDecl.
-	VisitExternObjCDecl(ctx *ExternObjCDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#externType.
+	VisitExternType(ctx *ExternTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externObjCMember.
-	VisitExternObjCMember(ctx *ExternObjCMemberContext) interface{}
+	// Visit a parse tree produced by ArcParser#externPointerType.
+	VisitExternPointerType(ctx *ExternPointerTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externObjCStructDecl.
-	VisitExternObjCStructDecl(ctx *ExternObjCStructDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#externPrimitiveType.
+	VisitExternPrimitiveType(ctx *ExternPrimitiveTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externObjCClassDecl.
-	VisitExternObjCClassDecl(ctx *ExternObjCClassDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#externFunctionType.
+	VisitExternFunctionType(ctx *ExternFunctionTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externObjCProtocolDecl.
-	VisitExternObjCProtocolDecl(ctx *ExternObjCProtocolDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externObjCClassMember.
-	VisitExternObjCClassMember(ctx *ExternObjCClassMemberContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externObjCProtocolMember.
-	VisitExternObjCProtocolMember(ctx *ExternObjCProtocolMemberContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externObjCNewDecl.
-	VisitExternObjCNewDecl(ctx *ExternObjCNewDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externObjCPropertyDecl.
-	VisitExternObjCPropertyDecl(ctx *ExternObjCPropertyDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#propertyAttributes.
-	VisitPropertyAttributes(ctx *PropertyAttributesContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#propertyAttribute.
-	VisitPropertyAttribute(ctx *PropertyAttributeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externObjCMethodDecl.
-	VisitExternObjCMethodDecl(ctx *ExternObjCMethodDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externObjCMethodParams.
-	VisitExternObjCMethodParams(ctx *ExternObjCMethodParamsContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externObjCSelfParam.
-	VisitExternObjCSelfParam(ctx *ExternObjCSelfParamContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externObjCOpaqueClassDecl.
-	VisitExternObjCOpaqueClassDecl(ctx *ExternObjCOpaqueClassDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externObjCFunctionDecl.
-	VisitExternObjCFunctionDecl(ctx *ExternObjCFunctionDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#externTypeList.
+	VisitExternTypeList(ctx *ExternTypeListContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#genericParams.
 	VisitGenericParams(ctx *GenericParamsContext) interface{}
@@ -175,6 +142,9 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#genericArg.
 	VisitGenericArg(ctx *GenericArgContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#collectionType.
+	VisitCollectionType(ctx *CollectionTypeContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#functionDecl.
 	VisitFunctionDecl(ctx *FunctionDeclContext) interface{}
@@ -199,12 +169,6 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#structField.
 	VisitStructField(ctx *StructFieldContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#initDecl.
-	VisitInitDecl(ctx *InitDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#computeDecl.
-	VisitComputeDecl(ctx *ComputeDeclContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#classDecl.
 	VisitClassDecl(ctx *ClassDeclContext) interface{}
@@ -248,20 +212,11 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#functionType.
 	VisitFunctionType(ctx *FunctionTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#arrayType.
-	VisitArrayType(ctx *ArrayTypeContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
 	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#primitiveType.
 	VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#pointerType.
-	VisitPointerType(ctx *PointerTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#referenceType.
-	VisitReferenceType(ctx *ReferenceTypeContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#block.
 	VisitBlock(ctx *BlockContext) interface{}
@@ -353,14 +308,14 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#primaryExpression.
 	VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#castExpression.
+	VisitCastExpression(ctx *CastExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#castTargetType.
+	VisitCastTargetType(ctx *CastTargetTypeContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#builtinExpression.
 	VisitBuiltinExpression(ctx *BuiltinExpressionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#sizeofExpression.
-	VisitSizeofExpression(ctx *SizeofExpressionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#alignofExpression.
-	VisitAlignofExpression(ctx *AlignofExpressionContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#literal.
 	VisitLiteral(ctx *LiteralContext) interface{}
@@ -391,9 +346,6 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#executionStrategy.
 	VisitExecutionStrategy(ctx *ExecutionStrategyContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#contextIdentifier.
-	VisitContextIdentifier(ctx *ContextIdentifierContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#lambdaParamList.
 	VisitLambdaParamList(ctx *LambdaParamListContext) interface{}

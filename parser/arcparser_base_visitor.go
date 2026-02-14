@@ -64,7 +64,11 @@ func (v *BaseArcParserVisitor) VisitExternCTypeAlias(ctx *ExternCTypeAliasContex
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternCOpaqueStructDecl(ctx *ExternCOpaqueStructDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitExternCStructDecl(ctx *ExternCStructDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternCStructField(ctx *ExternCStructFieldContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -112,10 +116,6 @@ func (v *BaseArcParserVisitor) VisitExternCppTypeAlias(ctx *ExternCppTypeAliasCo
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternCppOpaqueClassDecl(ctx *ExternCppOpaqueClassDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseArcParserVisitor) VisitExternCppClassDecl(ctx *ExternCppClassDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -144,67 +144,23 @@ func (v *BaseArcParserVisitor) VisitExternCppSelfParam(ctx *ExternCppSelfParamCo
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternObjCDecl(ctx *ExternObjCDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitExternType(ctx *ExternTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternObjCMember(ctx *ExternObjCMemberContext) interface{} {
+func (v *BaseArcParserVisitor) VisitExternPointerType(ctx *ExternPointerTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternObjCStructDecl(ctx *ExternObjCStructDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitExternPrimitiveType(ctx *ExternPrimitiveTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternObjCClassDecl(ctx *ExternObjCClassDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitExternFunctionType(ctx *ExternFunctionTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternObjCProtocolDecl(ctx *ExternObjCProtocolDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternObjCClassMember(ctx *ExternObjCClassMemberContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternObjCProtocolMember(ctx *ExternObjCProtocolMemberContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternObjCNewDecl(ctx *ExternObjCNewDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternObjCPropertyDecl(ctx *ExternObjCPropertyDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitPropertyAttributes(ctx *PropertyAttributesContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitPropertyAttribute(ctx *PropertyAttributeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternObjCMethodDecl(ctx *ExternObjCMethodDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternObjCMethodParams(ctx *ExternObjCMethodParamsContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternObjCSelfParam(ctx *ExternObjCSelfParamContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternObjCOpaqueClassDecl(ctx *ExternObjCOpaqueClassDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternObjCFunctionDecl(ctx *ExternObjCFunctionDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitExternTypeList(ctx *ExternTypeListContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -229,6 +185,10 @@ func (v *BaseArcParserVisitor) VisitGenericArgList(ctx *GenericArgListContext) i
 }
 
 func (v *BaseArcParserVisitor) VisitGenericArg(ctx *GenericArgContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitCollectionType(ctx *CollectionTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -261,14 +221,6 @@ func (v *BaseArcParserVisitor) VisitStructMember(ctx *StructMemberContext) inter
 }
 
 func (v *BaseArcParserVisitor) VisitStructField(ctx *StructFieldContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitInitDecl(ctx *InitDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitComputeDecl(ctx *ComputeDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -328,23 +280,11 @@ func (v *BaseArcParserVisitor) VisitFunctionType(ctx *FunctionTypeContext) inter
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitArrayType(ctx *ArrayTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseArcParserVisitor) VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseArcParserVisitor) VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitPointerType(ctx *PointerTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitReferenceType(ctx *ReferenceTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -468,15 +408,15 @@ func (v *BaseArcParserVisitor) VisitPrimaryExpression(ctx *PrimaryExpressionCont
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseArcParserVisitor) VisitCastExpression(ctx *CastExpressionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitCastTargetType(ctx *CastTargetTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseArcParserVisitor) VisitBuiltinExpression(ctx *BuiltinExpressionContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitSizeofExpression(ctx *SizeofExpressionContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitAlignofExpression(ctx *AlignofExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -517,10 +457,6 @@ func (v *BaseArcParserVisitor) VisitAnonymousFuncExpression(ctx *AnonymousFuncEx
 }
 
 func (v *BaseArcParserVisitor) VisitExecutionStrategy(ctx *ExecutionStrategyContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitContextIdentifier(ctx *ContextIdentifierContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

@@ -11,9 +11,9 @@ FUNC: 'func';
 ASYNC: 'async';
 AWAIT: 'await';
 PROCESS: 'process';
+GPU: 'gpu';
 STRUCT: 'struct';
 CLASS: 'class';
-INIT: 'init';
 DEINIT: 'deinit';
 RETURN: 'return';
 IF: 'if';
@@ -29,16 +29,12 @@ SWITCH: 'switch';
 CASE: 'case';
 DEFAULT: 'default';
 ENUM: 'enum';
-COMPUTE: 'compute';
-PROPERTY: 'property';
-PROTOCOL: 'protocol';
-OPTIONAL: 'optional';
+RAWPTR: 'rawptr';
 
 // Extern triggers mode switch
 EXTERN: 'extern' -> pushMode(EXTERN_LANG_MODE);
 
 // Extern-specific keywords (used inside extern blocks)
-OPAQUE: 'opaque';
 VIRTUAL: 'virtual';
 STATIC: 'static';
 ABSTRACT: 'abstract';
@@ -73,17 +69,10 @@ BOOL: 'bool';
 CHAR: 'char';
 STRING: 'string';
 VOID: 'void';
-FLOAT16: 'float16';
-BFLOAT16: 'bfloat16';
 
 // =============================================================================
 // Operators
 // =============================================================================
-SIZEOF: 'sizeof';
-ALIGNOF: 'alignof';
-ARROW: '->';
-RANGE: '..';
-ELLIPSIS: '...';
 EQ: '==';
 NE: '!=';
 LE: '<=';
@@ -98,9 +87,13 @@ PERCENT_ASSIGN: '%=';
 BIT_OR_ASSIGN: '|=';
 BIT_AND_ASSIGN: '&=';
 BIT_XOR_ASSIGN: '^=';
+SHL_ASSIGN: '<<=';
+SHR_ASSIGN: '>>=';
 INCREMENT: '++';
 DECREMENT: '--';
 FAT_ARROW: '=>';
+RANGE: '..';
+ELLIPSIS: '...';
 PLUS: '+';
 MINUS: '-';
 STAR: '*';
@@ -178,4 +171,3 @@ mode EXTERN_LANG_MODE;
 EXTERN_WS: [ \t\r\n]+ -> skip;
 C_LANG: 'c' -> popMode;
 CPP_LANG: 'cpp' -> popMode;
-OBJC_LANG: 'objc' -> popMode;

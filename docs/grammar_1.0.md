@@ -1,8 +1,11 @@
-```markdown
-# arc Language Grammar (Version 1.2 - Core Syntax)
+# arc Language Grammar (Version 1.3 - Core Syntax)
 
 Grammar rules:
- * type declaration can only have dot.
+ * type declaration can only have dot
+ * no stars in regular arc code, stars only inside extern blocks
+ * null valid for class types only, compiler enforces this
+ * cast uses type(value) syntax, not cast<T>(value)
+ * gpu func for accelerator kernels, target set in build config
 
 Grammar to not add to the parser files:
     * Empty initializer
@@ -28,6 +31,8 @@ You usually disallow "empty" initializer lists as statements. An array literal {
 ## Import, declaration
 ```arc
 import "some/path/package"
+
+import yourpackage "some/path/package"
 
 import (
     // Standard Lib
@@ -63,9 +68,6 @@ x = 100
 ## Constants, immutable with type
 ```arc
 const x: int32 = 42
-
-const BUFFER_SIZE: usize = 1024
-let buffer: array<byte, BUFFER_SIZE> = {}
 ```
 
 ## Constants, immutable with inference
@@ -130,11 +132,14 @@ let flag: bool = true
 let enabled: bool = false
 ```
 
-## Literals, null pointer
+## Literals, null
 ```arc
-let ptr: *int32 = null
+// null is valid for class types (reference types)
+// compiler error if assigned to struct or primitive
+let client: Socket = null
+let server: net.Server = null
 
-if ptr == null {
+if client == null {
     // handle null case
 }
 ```
@@ -168,22 +173,6 @@ let quote: string = "He said \"hello\""
 let tab: string = "Column1\tColumn2"
 ```
 
-## Pointers, Basic
-```arc
-let ptr: *int32 = &value
-```
-
-## Pointers, Void (Opaque)
-```arc
-// Generic pointer to unknown memory (equivalent to C void*)
-let handle: *void = malloc(64)
-```
-
-## References, Basic
-```arc
-let ref: &int32 = value
-```
-
 ## Functions, basic
 ```arc
 func add(a: int32, b: int32) int32 {
@@ -196,22 +185,6 @@ func add(a: int32, b: int32) int32 {
 func print(msg: string) {
     
 }
-```
-
-## Functions, async gpu
-```arc
-async func process_gpu_memory<gpu>(gpu_arr: *float32, n: usize, gpu_result: *float32) {
-    let idx = gpu.thread_id()
-}
-```
-
-## Functions, async gpu await usage
-```arc
-// Await with gpu device index 1
-let result = await(1) process_gpu_memory()
-
-// Await with auto gpu
-let result = await process_gpu_memory()
 ```
 
 ## Functions, async
@@ -266,6 +239,20 @@ button.on_click(async () => {
 })
 ```
 
+## Functions, gpu
+```arc
+// All params are gpu bound, compiler maps to build target
+gpu func kernel(data: float32, n: usize) {
+    let idx = thread_id()
+    data[idx] = data[idx] * 2.0
+}
+
+// Await a gpu func
+async func main() {
+    let result = await kernel(data, n)
+}
+```
+
 ## Function Return Tuples
 ```arc
 func divide(a: int32, b: int32) (int32, bool) {
@@ -315,10 +302,10 @@ struct Point {
     y: int32
     
     func distance(self p: Point) float64 {
-        return cast<float64>(p.x * p.x + p.y * p.y)
+        return float64(p.x * p.x + p.y * p.y)
     }
     
-    func move(self p: *Point, dx: int32, dy: int32) {
+    func move(self p: Point, dx: int32, dy: int32) {
         p.x += dx
         p.y += dy
     }
@@ -334,10 +321,10 @@ struct Point {
 
 // Methods can be declared outside the struct body
 func distance(self p: Point) float64 {
-    return cast<float64>(p.x * p.x + p.y * p.y)
+    return float64(p.x * p.x + p.y * p.y)
 }
 
-func move(self p: *Point, dx: int32, dy: int32) {
+func move(self p: Point, dx: int32, dy: int32) {
     p.x += dx
     p.y += dy
 }
@@ -357,17 +344,17 @@ class Client {
     name: string
     port: int32
     
-    func connect(self c: *Client, host: string) bool {
+    func connect(self c: Client, host: string) bool {
         return true
     }
     
     // Async method
-    async func fetch_data(self c: *Client) string {
+    async func fetch_data(self c: Client) string {
         let response = await http.get("https://example.com")
         return response.body
     }
     
-    deinit(self c: *Client) {
+    deinit(self c: Client) {
         // cleanup when ref count hits 0
     }
 }
@@ -381,16 +368,16 @@ class Client {
 }
 
 // Methods can be declared outside the class body
-func connect(self c: *Client, host: string) bool {
+func connect(self c: Client, host: string) bool {
     return true
 }
 
-async func fetch_data(self c: *Client) string {
+async func fetch_data(self c: Client) string {
     let response = await http.get("https://example.com")
     return response.body
 }
 
-deinit(self c: *Client) {
+deinit(self c: Client) {
     // cleanup when ref count hits 0
 }
 ```
@@ -403,16 +390,16 @@ struct Client {
 
 // 'self' keyword allows dot notation on the instance
 // Colon used for consistency: self name: type
-func Connect(self c: *Client, host: string) bool {
+func connect(self c: Client, host: string) bool {
     return true
 }
 ```
 
 ## Methods, usage
 ```arc
-let c: Client = Client{port: 8080}
+let c = Client{port: 8080}
 // Method call using dot notation
-c.Connect("localhost")
+c.connect("localhost")
 
 // Async method call
 async func example() {
@@ -423,10 +410,19 @@ async func example() {
 ## Type Differences
 
 **class vs struct:**
-- `class` = Reference type (heap allocated, ref counted, shared via pointers)
-- `struct` = Value type (stack allocated, copied on assignment, no ref counting)
+- `class` = Reference type (heap allocated, ref counted, null allowed)
+- `struct` = Value type (stack allocated, copied on assignment, null not allowed)
 - Both support methods (inline or flat declaration style)
 - Only `class` supports `deinit` (called when ref count reaches 0)
+
+## Type Casting
+```arc
+// Primitive casts - type(value) syntax
+let x = int32(3.14)     // float to int
+let y = float64(42)     // int to float
+let z = uint8(flags)    // narrow cast
+let n = usize(count)    // to pointer-sized int
+```
 
 ## Control Flow, if-else
 ```arc
@@ -477,13 +473,13 @@ for {
 ## Control Flow, for-in loop (iterators)
 ```arc
 // Iterate over vector
-let items: vector<int32> = {1, 2, 3, 4, 5}
+let items: vector[int32] = {1, 2, 3, 4, 5}
 for item in items {
     // use item
 }
 
 // Iterate over map (key, value)
-let scores: map<string, int32> = {"alice": 100, "bob": 95}
+let scores: map[string]int32 = {"alice": 100, "bob": 95}
 for key, value in scores {
     // use key and value
 }
@@ -519,7 +515,6 @@ for let i = 0; i < 10; i++ {
 
 ## Control Flow, defer
 ```arc
-let ptr = malloc(64)
 // Execution is guaranteed at scope exit (LIFO order)
 defer free(ptr)
 ```
@@ -605,17 +600,6 @@ pos--
 --pos
 ```
 
-## Operators, pointer arithmetic
-```arc
-let ptr: *int32 = ...
-
-// Advances pointer by 1 * sizeof(int32) bytes
-let next = ptr + 1 
-
-// Moves back by 2 * sizeof(int32) bytes
-let prev = ptr - 2
-```
-
 ## Operators, comparison
 ```arc
 let eq = a == b
@@ -638,64 +622,6 @@ let neg = -value
 let not = !flag
 ```
 
-## Operators, address-of and dereference
-```arc
-// Get address of a variable (address-of operator)
-let ptr: *int32 = &value
-
-// Dereference pointer to read value
-let x = *ptr
-
-// Dereference pointer to write value
-*ptr = 42
-```
-
-## Memory, load (dereference to read)
-```arc
-let value = *ptr
-```
-
-## Memory, store (dereference to write)
-```arc
-*ptr = value
-```
-
-## Memory, indexed pointer access
-```arc
-let buffer = alloca<byte>(1024)
-
-// Read byte at offset 5
-let byte_val = buffer[5]
-
-// Write byte at offset 10
-buffer[10] = 0x42
-
-// Works with any pointer type
-let ptr: *int32 = array_base
-let third_element = ptr[2]  // Read array[2]
-ptr[3] = 100                // Write array[3] = 100
-```
-
-## Type Casting, basic
-```arc
-let result = cast<int64>(value)
-```
-
-## Type Casting, pointer conversions
-```arc
-// Cast between pointer types
-let byte_ptr = cast<*byte>(int_ptr)
-
-// Cast pointer to integer (for address arithmetic)
-let addr = cast<uint64>(ptr)
-
-// Cast integer to pointer
-let new_ptr = cast<*int32>(addr)
-
-// Cast to void pointer (generic)
-let generic = cast<*void>(typed_ptr)
-```
-
 ## Function Calls
 ```arc
 let result = add(5, 10)
@@ -703,19 +629,15 @@ let result = add(5, 10)
 
 ## Extern, C interoperability
 ```arc
+// Stars are required inside extern blocks
+// This is the C/C++ boundary, all pointer details live here
 extern c {
-    // Maps Arc 'printf' to C symbol 'printf'
-    // Uses *byte (C-String) instead of high-level string
-    func printf "printf" (*byte, ...) int32
-    
-    // Maps Arc 'sleep' to C symbol 'usleep'
+    func printf(*byte, ...) int32
     func sleep "usleep" (int32) int32
-
-    // Direct mapping (no alias needed if names match)
     func usleep(int32) int32
 }
 
-printf()
+printf("hello\n")
 ```
 
 ## Enums
@@ -751,7 +673,7 @@ struct Box<T> {
         return b.value
     }
     
-    func set(self b: *Box<T>, val: T) {
+    func set(self b: Box<T>, val: T) {
         b.value = val
     }
 }
@@ -773,16 +695,16 @@ struct Result<T, E> {
 
 ## Generics, functions, monomorphizes
 ```arc
-func swap<T>(a: *T, b: *T) {
-    let tmp: T = *a
-    *a = *b
-    *b = tmp
+func swap<T>(a: T, b: T) {
+    let tmp: T = a
+    a = b
+    b = tmp
 }
 
-func find<T>(arr: *T, len: usize, val: T) isize {
-    for let i: usize = 0; i < len; i++ {
+func find<T>(arr: vector<T>, val: T) isize {
+    for let i: usize = 0; i < arr.len; i++ {
         if arr[i] == val {
-            return cast<isize>(i)
+            return isize(i)
         }
     }
     return -1
@@ -792,7 +714,7 @@ func find<T>(arr: *T, len: usize, val: T) isize {
 ## Execution Context, process
 ```arc
 // With args and return
-let handle = process func(x: int) { 
+let handle = process func(x: int32) { 
     work(x) 
 }(1000)
 
@@ -805,7 +727,7 @@ process func() {
 ## Execution Context, async
 ```arc
 // With args and return
-async func(x: int) { 
+async func(x: int32) { 
     work(x) 
 }(1000)
 
@@ -878,38 +800,28 @@ router.handle("/api/data", async (req: Request, res: Response) => {
 
 **Note:** Both forms are async (run on smart threads). The `async` keyword only determines whether `await` is allowed inside the lambda body. Omitting `async` is ergonomic shorthand for callbacks that don't need to suspend.
 
-
 ## Functions, async callback (indirect invocation)
 
 ```arc
-// Define a simple event system with callback
 class Event {
-    // Store the async callback as a function pointer
     onTrigger: async func(string) void
     
-    // Method to register the callback
-    func register(self evt: *Event, handler: async func(string) void) {
+    func register(self evt: Event, handler: async func(string) void) {
         evt.onTrigger = handler
     }
     
-    // Method that invokes the callback indirectly
-    func send(self evt: *Event, message: string) {
-        // Indirect call through function pointer
-        // Returns Future<void>, but we fire-and-forget
+    func send(self evt: Event, message: string) {
         evt.onTrigger(message)
     }
 }
 
-// Usage
 let evt = Event{}
 
-// Register async callback
 evt.register(async (msg: string) => {
     let processed = await process_message(msg)
     fmt.printf("Processed: %s\n", processed)
 })
 
-// Trigger the event - invokes callback indirectly
 evt.send("Hello, World!")
 ```
 
@@ -918,29 +830,22 @@ evt.send("Hello, World!")
 ```arc
 class TcpServer {
     port: int32
-    // Function pointer field for the callback
     onReceive: async func(bytes) void
     
-    // Internal method that invokes the callback
-    func handle_data(self s: *TcpServer, data: bytes) {
-        // Check if callback is set
+    func handle_data(self s: TcpServer, data: bytes) {
         if s.onReceive != null {
-            // INDIRECT CALL - invoke whatever function was assigned
             s.onReceive(data)
         }
     }
 }
 
-// Usage
 let server = TcpServer{port: 8080}
 
-// Assign async callback directly to property
 server.onReceive = async (data: bytes) => {
     let decoded = await decode_packet(data)
     await store_in_db(decoded)
 }
 
-// Server invokes it indirectly when data arrives
 server.handle_data(received_bytes)
 ```
 
@@ -948,25 +853,20 @@ server.handle_data(received_bytes)
 
 ```arc
 class Button {
-    // Sync callback (no await allowed inside)
     onClick: func(int32, int32) void
     
-    // Invoke the callback when button is pressed
-    func press(self b: *Button, x: int32, y: int32) {
+    func press(self b: Button, x: int32, y: int32) {
         if b.onClick != null {
-            // INDIRECT CALL
             b.onClick(x, y)
         }
     }
 }
 
-// Usage
 let button = Button{}
 
 button.onClick = (x: int32, y: int32) => {
     fmt.printf("Clicked at (%d, %d)\n", x, y)
 }
 
-button.press(100, 200)  // Triggers the callback
-```
+button.press(100, 200)
 ```
