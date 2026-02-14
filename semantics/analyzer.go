@@ -114,8 +114,6 @@ func (a *Analyzer) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.ConstDeclContext: return a.VisitConstDecl(ctx)
 	case *parser.ExternCDeclContext: return a.VisitExternCDecl(ctx)
 	case *parser.ExternCppDeclContext: return a.VisitExternCppDecl(ctx)
-	// Added support for ObjC dispatch to match new grammar
-	case *parser.ExternObjCDeclContext: return a.VisitExternObjCDecl(ctx)
 	
 	case *parser.BlockContext: return a.VisitBlock(ctx)
 	case *parser.StatementContext: return a.VisitStatement(ctx)

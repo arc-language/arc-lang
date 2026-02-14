@@ -1,8 +1,6 @@
 package semantics
 
 import (
-	"strconv"
-
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
 	"github.com/arc-language/arc-lang/symbol"
@@ -24,17 +22,12 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 		return types.I64
 	}
 	
-	// 2. Pointers
-	if tc.PointerType() != nil {
-		return types.NewPointer(a.resolveType(tc.PointerType().Type_()))
+	// 2. Raw Pointer (void*)
+	if tc.RAWPTR() != nil {
+		return types.NewPointer(types.Void)
 	}
 
-	// 3. References
-	if tc.ReferenceType() != nil {
-		return types.NewPointer(a.resolveType(tc.ReferenceType().Type_()))
-	}
-
-	// 4. Function Types
+	// 3. Function Types
 	if tc.FunctionType() != nil {
 		ft := tc.FunctionType()
 		var retType types.Type = types.Void
@@ -49,7 +42,6 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 			}
 		}
 		
-		// Updated for ExecutionStrategy
 		isAsync := false
 		isProcess := false
 		
@@ -69,10 +61,35 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 		return types.NewFunction(retType, paramTypes, false)
 	}
 
+	// 4. Collection Types (vector[T], map[K]V, etc.)
+	if tc.CollectionType() != nil {
+		ct := tc.CollectionType()
+		baseName := ct.IDENTIFIER().GetText()
+		
+		// Resolve the generic type arguments inside [ ]
+		var typeArgs []types.Type
+		for _, tCtx := range ct.AllType_() {
+			typeArgs = append(typeArgs, a.resolveType(tCtx))
+		}
+
+		// Simple mapping for standard collections
+		if baseName == "vector" && len(typeArgs) == 1 {
+			// Vector is dynamic array
+			return types.NewSlice(typeArgs[0])
+		}
+		
+		// Fallback: treat as a generic struct instantiation if defined
+		if sym, ok := a.currentScope.Resolve(baseName); ok {
+			return sym.Type
+		}
+		
+		return types.Void
+	}
+
 	// 5. Generic/Qualified Types
 	if tc.IDENTIFIER() != nil || tc.QualifiedType() != nil {
 		var name string
-		var genericArgs parser.IGenericArgsContext
+		// var genericArgs parser.IGenericArgsContext // unused for now
 
 		if tc.QualifiedType() != nil {
 			qt := tc.QualifiedType()
@@ -80,10 +97,10 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 				if i > 0 { name += "." }
 				name += id.GetText()
 			}
-			genericArgs = qt.GenericArgs()
+			// genericArgs = qt.GenericArgs()
 		} else {
 			name = tc.IDENTIFIER().GetText()
-			genericArgs = tc.GenericArgs()
+			// genericArgs = tc.GenericArgs()
 		}
 
 		// Resolve base symbol
@@ -98,47 +115,7 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 			return types.I64
 		}
 
-		// Handle Generics (array, etc)
-		if genericArgs != nil {
-			if name == "array" {
-				args := genericArgs.GenericArgList().AllGenericArg()
-				if len(args) == 2 {
-					var elemType types.Type
-					if tCtx := args[0].Type_(); tCtx != nil {
-						elemType = a.resolveType(tCtx)
-					}
-					var length int64
-					if exprCtx := args[1].Expression(); exprCtx != nil {
-						if lit := exprCtx.GetText(); lit != "" {
-							if val, err := strconv.ParseInt(lit, 0, 64); err == nil {
-								length = val
-							}
-						}
-					}
-					if elemType != nil && length > 0 {
-						return types.NewArray(elemType, length)
-					}
-				}
-			}
-			return types.NewPointer(types.I8) 
-		}
-
 		return s.Type
-	}
-
-	// 6. Array Types [Size]Type
-	if tc.ArrayType() != nil {
-		at := tc.ArrayType()
-		elemType := a.resolveType(at.Type_())
-		
-		var length int64 = 0
-		if expr := at.Expression(); expr != nil {
-			txt := expr.GetText()
-			if val, err := strconv.ParseInt(txt, 0, 64); err == nil {
-				length = val
-			}
-		}
-		return types.NewArray(elemType, length)
 	}
 	
 	return types.I64
@@ -166,7 +143,6 @@ func areTypesCompatible(src, dest types.Type) bool {
 				return true
 			}
 			// String/Byte pointer compatibility (*i8 <-> *u8)
-			// Allows assigning string literals ("hello", *i8) to *byte (*u8)
 			if types.IsInteger(srcPtr.ElementType) && types.IsInteger(destPtr.ElementType) {
 				if srcPtr.ElementType.BitSize() == 8 && destPtr.ElementType.BitSize() == 8 {
 					return true
@@ -174,7 +150,7 @@ func areTypesCompatible(src, dest types.Type) bool {
 			}
 		}
 	}
-	// Array compatibility (recursive)
+	// Array/Slice compatibility
 	if srcArr, sOk := src.(*types.ArrayType); sOk {
 		if destArr, dOk := dest.(*types.ArrayType); dOk {
 			if srcArr.Length == destArr.Length {
