@@ -68,9 +68,12 @@ let offset: isize = -4     // Signed (offsets)
 let f: float32 = 3.14
 let d: float64 = 2.71828
 
-// Pointers and references
-let ptr: *int32 = &value
-let ref: &int32 = value
+// Slices (view into memory, ptr + length, no allocation)
+let view: []byte = buffer[0..64]
+
+// Mutable references — &var in type, & at call site
+func add_one(x: &var int32) { x += 1 }
+add_one(&i)
 
 // Structs (value types)
 struct Point {
@@ -87,11 +90,11 @@ class Client {
 
 ### Memory Management
 
-Arc uses manual memory management with explicit allocation and deallocation:
+Arc uses automatic reference counting for classes and explicit stack allocation for low-level work:
 
 ```arc
 // Stack allocation
-let buffer = alloca<byte>(4096)
+let buffer = alloca(byte, 4096)
 memset(buffer, 0, 4096)
 
 // Heap allocation (via FFI)
@@ -103,10 +106,10 @@ extern c {
 let ptr = malloc(1024)
 defer free(ptr)  // Cleanup on scope exit
 
-// Direct pointer manipulation
-let next = ptr + 1
-let value = *ptr
-*ptr = 42
+// Get address of variable for extern calls
+let val = 42
+let raw = rawptr(&val)    // address of val as raw pointer
+let sentinel = rawptr(-1) // cast integer value to raw pointer
 ```
 
 ### Foreign Function Interface
@@ -162,11 +165,15 @@ async func main() {
 Monomorphized at compile time:
 
 ```arc
-func swap<T>(a: *T, b: *T) {
-    let tmp: T = *a
-    *a = *b
-    *b = tmp
+func swap<T>(a: &var T, b: &var T) {
+    let tmp: T = a
+    a = b
+    b = tmp
 }
+
+let x = 10
+let y = 20
+swap(&x, &y)
 
 struct Box<T> {
     value: T
@@ -189,8 +196,8 @@ namespace main
 import "net"
 import "io"
 
-async func handle_request(conn: *net.TcpStream) {
-    let buffer: array<byte, 4096> = {}
+async func handle_request(conn: net.TcpStream) {
+    let buffer: vector[byte] = {}
     let bytes_read = await conn.read(&buffer)
     
     let response = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK"
@@ -214,8 +221,8 @@ async func main() {
 namespace main
 
 extern c {
-    opaque struct sqlite3 {}
-    opaque struct sqlite3_stmt {}
+    struct sqlite3 {}
+    struct sqlite3_stmt {}
     
     const SQLITE_OK: int32 = 0
     const SQLITE_ROW: int32 = 100
@@ -229,16 +236,16 @@ extern c {
 }
 
 func main() {
-    let db: *sqlite3 = null
+    let db: sqlite3 = null
     
-    if sqlite3_open("app.db", &db) != SQLITE_OK {
+    if sqlite3_open("app.db", rawptr(&db)) != SQLITE_OK {
         printf("Failed to open database\n")
         return
     }
     defer sqlite3_close(db)
     
-    let stmt: *sqlite3_stmt = null
-    sqlite3_prepare_v2(db, "SELECT name FROM users", -1, &stmt, null)
+    let stmt: sqlite3_stmt = null
+    sqlite3_prepare_v2(db, "SELECT name FROM users", -1, rawptr(&stmt), null)
     
     for sqlite3_step(stmt) == SQLITE_ROW {
         let name = sqlite3_column_text(stmt, 0)
@@ -255,9 +262,9 @@ namespace main
 import objc "AppKit"
 
 class AppDelegate: NSApplicationDelegate {
-    window: *NSWindow
+    window: NSWindow
     
-    func applicationDidFinishLaunching(self d: *AppDelegate, notif: *NSNotification) {
+    func applicationDidFinishLaunching(self d: AppDelegate, notif: NSNotification) {
         let rect = NSMakeRect(0, 0, 800, 600)
         let style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
         
@@ -271,7 +278,7 @@ class AppDelegate: NSApplicationDelegate {
 func main() {
     let app = NSApplication.sharedApplication()
     let delegate = AppDelegate{}
-    app.delegate = &delegate
+    app.delegate = delegate
     app.run()
 }
 ```
@@ -289,10 +296,10 @@ func init_module() int32 {
     
     let dev = driver.CharDevice.new("custom_device", 0)
     
-    dev.on_read(func(file: *driver.File, buffer: *byte, size: uint64) int64 {
+    dev.on_read(func(file: driver.File, buffer: []byte, size: uint64) int64 {
         let data = "Hello from kernel"
-        memcpy(buffer, data.as_bytes(), data.len())
-        return cast<int64>(data.len())
+        memcpy(rawptr(&buffer[0]), data.as_bytes(), data.len())
+        return int64(data.len())
     })
     
     return 0
@@ -342,7 +349,7 @@ func main() {
 
 ## Hardware Acceleration
 
-Arc can compile functions to run on specialized hardware when you need maximum performance:
+Arc can compile functions to run on specialized hardware when you need maximum performance. The target (cuda, metal, rocm, etc.) is set in `build.arc`, not in source code.
 
 ```arc
 namespace compute
@@ -350,14 +357,14 @@ namespace compute
 import "ai"
 
 // CPU version (default)
-func process_data(data: *float32, size: usize) {
+func process_data(data: []float32, size: usize) {
     for let i: usize = 0; i < size; i++ {
         data[i] = data[i] * 2.0
     }
 }
 
-// GPU version
-async func process_gpu<gpu.cuda>(data: *float32, size: usize) {
+// GPU version — target set in build.arc
+gpu func process_gpu(data: []float32, size: usize) {
     let idx = gpu.thread_id()
     if idx < size {
         data[idx] = data[idx] * 2.0
@@ -365,12 +372,12 @@ async func process_gpu<gpu.cuda>(data: *float32, size: usize) {
 }
 
 // TPU version
-async func process_tpu<tpu>(data: Tensor) Tensor {
+gpu func process_tpu(data: Tensor) Tensor {
     return data.multiply(2.0)
 }
 
 // Train model on GPU
-async func train<gpu.cuda>(model: *ai.Model, data: *Tensor) {
+gpu func train(model: &var ai.Model, data: Tensor) {
     for epoch in 0..100 {
         let loss = model.forward(data)
         model.backward(loss)
@@ -382,8 +389,7 @@ func main() {
     let model = ai.load_model("models/model-13b.gguf")
     let data = ai.load_tensor("training_data.bin")
     
-    // Train on NVIDIA GPU
-    await train<gpu.cuda>(&model, &data)
+    await train(&model, data)
     
     io.printf("Training complete\n")
 }
@@ -429,12 +435,12 @@ The compiler detects your platform and downloads the appropriate packages to `~/
 - FreeBSD
 
 ### Accelerators
-- NVIDIA GPUs (`<gpu.cuda>`)
-- AMD GPUs (`<gpu.rocm>`)
-- Apple Silicon (`<gpu.metal>`)
-- Intel GPUs (`<gpu.oneapi>`)
-- Google TPUs (`<tpu>`)
-- AWS Trainium (`<aws.trainium>`)
+- NVIDIA GPUs (`gpu.cuda`)
+- AMD GPUs (`gpu.rocm`)
+- Apple Silicon (`gpu.metal`)
+- Intel GPUs (`gpu.oneapi`)
+- Google TPUs (`tpu`)
+- AWS Trainium (`aws.trainium`)
 
 ---
 
