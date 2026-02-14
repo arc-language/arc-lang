@@ -8,10 +8,6 @@ compilationUnit
     : (importDecl | namespaceDecl | topLevelDecl)* EOF
     ;
 
-// =============================================================================
-// Declarations
-// =============================================================================
-
 importDecl: IMPORT (IDENTIFIER)? (STRING_LITERAL | LPAREN importSpec* RPAREN);
 importSpec: STRING_LITERAL;
 
@@ -30,15 +26,7 @@ topLevelDecl
     | externCppDecl
     ;
 
-// =============================================================================
-// Attributes
-// =============================================================================
-
 attribute: AT IDENTIFIER (LPAREN expression RPAREN)?;
-
-// =============================================================================
-// Extern C Declarations
-// =============================================================================
 
 externCDecl: EXTERN C_LANG LBRACE externCMember* RBRACE;
 
@@ -85,10 +73,6 @@ externCStructDecl
 externCStructField
     : IDENTIFIER COLON externType
     ;
-
-// =============================================================================
-// Extern C++ Declarations
-// =============================================================================
 
 externCppDecl: EXTERN CPP_LANG LBRACE externCppMember* RBRACE;
 
@@ -177,10 +161,6 @@ externCppSelfParam
     : SELF STAR CONST? IDENTIFIER
     ;
 
-// =============================================================================
-// Extern Type System (stars live here only)
-// =============================================================================
-
 externType
     : externPointerType
     | externPrimitiveType
@@ -207,10 +187,6 @@ externFunctionType
 
 externTypeList: externType (COMMA externType)*;
 
-// =============================================================================
-// Generics (structs and functions only)
-// =============================================================================
-
 genericParams: LT genericParamList GT;
 genericParamList: genericParam (COMMA genericParam)*;
 genericParam: IDENTIFIER (DOT IDENTIFIER)*;
@@ -219,21 +195,9 @@ genericArgs: LT genericArgList GT;
 genericArgList: genericArg (COMMA genericArg)*;
 genericArg: type;
 
-// =============================================================================
-// Collection Types (map, vector, set use [key]value syntax)
-// =============================================================================
-
 collectionType
     : IDENTIFIER LBRACKET type RBRACKET type?
     ;
-
-// map[string]int32  -> IDENTIFIER[keyType]valueType
-// vector[int32]     -> IDENTIFIER[elemType]
-// set[string]       -> IDENTIFIER[elemType]
-
-// =============================================================================
-// Functions
-// =============================================================================
 
 functionDecl
     : executionStrategy? FUNC IDENTIFIER genericParams?
@@ -243,34 +207,20 @@ functionDecl
 returnType: type | LPAREN typeList RPAREN;
 typeList: type (COMMA type)*;
 parameterList: parameter (COMMA parameter)* (COMMA ELLIPSIS)? | ELLIPSIS;
-parameter: SELF? IDENTIFIER COLON type;
 
-// =============================================================================
-// Structs
-// =============================================================================
+// &var in the type carries all mutability info — no var on the parameter name
+parameter: SELF? IDENTIFIER COLON type;
 
 structDecl: attribute* STRUCT IDENTIFIER genericParams? LBRACE structMember* RBRACE;
 structMember: structField | functionDecl;
 structField: IDENTIFIER COLON type;
 
-// =============================================================================
-// Classes
-// =============================================================================
-
 classDecl: CLASS IDENTIFIER genericParams? LBRACE classMember* RBRACE;
 classMember: classField | functionDecl | deinitDecl;
 classField: IDENTIFIER COLON type;
 
-// =============================================================================
-// Enums
-// =============================================================================
-
 enumDecl: ENUM IDENTIFIER (COLON primitiveType)? LBRACE enumMember* RBRACE;
 enumMember: IDENTIFIER (ASSIGN expression)?;
-
-// =============================================================================
-// Methods
-// =============================================================================
 
 methodDecl
     : executionStrategy? FUNC IDENTIFIER genericParams?
@@ -278,10 +228,6 @@ methodDecl
     ;
 
 deinitDecl: DEINIT LPAREN SELF IDENTIFIER COLON type RPAREN block;
-
-// =============================================================================
-// Variables
-// =============================================================================
 
 variableDecl
     : LET tuplePattern (COLON tupleType)? ASSIGN expression
@@ -294,11 +240,16 @@ tuplePattern: LPAREN IDENTIFIER (COMMA IDENTIFIER)+ RPAREN;
 tupleType: LPAREN typeList RPAREN;
 
 // =============================================================================
-// Type System (no stars, no arrays, no opaque)
+// Type System
+//   []byte        — slice view, ptr + length, no allocation
+//   &var int32    — mutable reference, only reference form in arc
+//   vector[byte]  — owned dynamic array, heap allocated
 // =============================================================================
 
 type
-    : primitiveType
+    : LBRACKET RBRACKET type    // []byte — slice view, ptr + length, no allocation
+    | AMP VAR type              // &var int32 — mutable reference
+    | primitiveType
     | collectionType
     | qualifiedType
     | functionType
@@ -308,9 +259,7 @@ type
     ;
 
 qualifiedType: IDENTIFIER (DOT IDENTIFIER)+ genericArgs?;
-
 functionType: executionStrategy? FUNC genericParams? LPAREN typeList? RPAREN returnType?;
-
 qualifiedIdentifier: IDENTIFIER (DOT IDENTIFIER)+;
 
 primitiveType
@@ -320,10 +269,6 @@ primitiveType
     | FLOAT32 | FLOAT64
     | BYTE | BOOL | CHAR | STRING | VOID
     ;
-
-// =============================================================================
-// Statements
-// =============================================================================
 
 block: LBRACE statement* RBRACE;
 
@@ -379,10 +324,6 @@ switchStmt: SWITCH expression LBRACE switchCase* defaultCase? RBRACE;
 switchCase: CASE expression (COMMA expression)* COLON statement*;
 defaultCase: DEFAULT COLON statement*;
 
-// =============================================================================
-// Expressions
-// =============================================================================
-
 expression: logicalOrExpression;
 logicalOrExpression: logicalAndExpression (OR logicalAndExpression)*;
 logicalAndExpression: bitOrExpression (AND bitOrExpression)*;
@@ -396,8 +337,14 @@ rangeExpression: additiveExpression (RANGE additiveExpression)?;
 additiveExpression: multiplicativeExpression ((PLUS | MINUS) multiplicativeExpression)*;
 multiplicativeExpression: unaryExpression ((STAR | SLASH | PERCENT) unaryExpression)*;
 
+// =============================================================================
+// & in unary position = take address (&val, &num)
+// & in infix position = bitwise AND (a & b) — disambiguated by grammar position
+// =============================================================================
+
 unaryExpression
-    : (MINUS | NOT | BIT_NOT | AMP) unaryExpression
+    : (MINUS | NOT | BIT_NOT) unaryExpression
+    | AMP unaryExpression               // &val — take address or pass mutable reference
     | AWAIT (LPAREN expression RPAREN)? unaryExpression
     | INCREMENT unaryExpression
     | DECREMENT unaryExpression
@@ -409,7 +356,8 @@ postfixOp
     : DOT IDENTIFIER
     | DOT IDENTIFIER LPAREN argumentList? RPAREN
     | LPAREN argumentList? RPAREN
-    | LBRACKET expression RBRACKET
+    | LBRACKET expression RBRACKET      // buf[0]  — single element
+    | LBRACKET expression RANGE expression RBRACKET  // buf[0..4] — slice
     | INCREMENT
     | DECREMENT
     ;
@@ -430,8 +378,8 @@ primaryExpression
     ;
 
 // =============================================================================
-// Cast Expression
-// type(value) style: int32(3.14), float64(x), rawptr(-1)
+// rawptr(x)    — cast value to raw pointer
+// rawptr(&val) — get raw pointer to address of val
 // =============================================================================
 
 castExpression
@@ -442,11 +390,6 @@ castTargetType
     : primitiveType
     | RAWPTR
     ;
-
-// =============================================================================
-// Compiler Builtins
-// sizeof, alignof, memset etc are intrinsics not grammar keywords
-// =============================================================================
 
 builtinExpression
     : AT IDENTIFIER LPAREN argumentList? RPAREN
@@ -479,6 +422,7 @@ structLiteral
 fieldInit: IDENTIFIER COLON expression;
 
 argumentList: argument (COMMA argument)*;
+
 argument: expression | lambdaExpression | anonymousFuncExpression;
 
 lambdaExpression
@@ -489,10 +433,6 @@ lambdaExpression
 anonymousFuncExpression
     : executionStrategy? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
     ;
-
-// =============================================================================
-// Execution Strategy
-// =============================================================================
 
 executionStrategy
     : GPU

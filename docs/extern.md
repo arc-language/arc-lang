@@ -1,4 +1,3 @@
-```markdown
 # Foreign Function Interface (`extern`)
 
 Arc provides seamless interoperability with C and C++ libraries through the
@@ -178,7 +177,8 @@ func on_signal(sig: int32) void {
 }
 
 func main() {
-    qsort(data, 5, sizeof(int32), compare_ints)
+    // rawptr(&data) — get address of data for extern call
+    qsort(rawptr(&data), 5, sizeof(int32), compare_ints)
     signal(SIGINT, on_signal)
 }
 ```
@@ -289,6 +289,7 @@ extern cpp {
 ```
 
 Generated code for virtual calls:
+
 ```asm
 ; device.Release()
 mov rax, [rcx]        ; Load vtable pointer
@@ -563,13 +564,13 @@ extern cpp {
 }
 ```
 
-| Convention   | Description               | Platform    |
-|--------------|---------------------------|-------------|
-| `cdecl`      | Caller cleans stack       | All         |
-| `stdcall`    | Callee cleans stack       | Windows x86 |
-| `thiscall`   | `this` in ECX/RCX         | MSVC C++    |
-| `vectorcall` | SIMD registers            | Windows     |
-| `fastcall`   | First args in registers   | Legacy      |
+| Convention | Description | Platform |
+| --- | --- | --- |
+| `cdecl` | Caller cleans stack | All |
+| `stdcall` | Callee cleans stack | Windows x86 |
+| `thiscall` | `this` in ECX/RCX | MSVC C++ |
+| `vectorcall` | SIMD registers | Windows |
+| `fastcall` | First args in registers | Legacy |
 
 ---
 
@@ -650,14 +651,15 @@ func main() {
     let device: DirectX.ID3D11Device = null
     let context: DirectX.ID3D11DeviceContext = null
     
+    // rawptr(&x) — get address of pointer for output params
     let hr = DirectX.D3D11CreateDevice(
         null,
         D3D_DRIVER_TYPE_HARDWARE,
         null, 0, null, 0,
         D3D11_SDK_VERSION,
-        device,
+        rawptr(&device),   // **ID3D11Device
         null,
-        context
+        rawptr(&context)   // **ID3D11DeviceContext
     )
     
     if hr != 0 {
@@ -677,7 +679,8 @@ func main() {
     }
     
     let buffer: DirectX.ID3D11Buffer = null
-    hr = device.CreateBuffer(desc, init_data, buffer)
+    
+    hr = device.CreateBuffer(rawptr(&desc), init_data, rawptr(&buffer))
     
     if hr == 0 {
         defer buffer.Release()
@@ -720,7 +723,8 @@ extern c {
 func main() {
     let db: sqlite3 = null
     
-    if sqlite3_open("test.db", db) != SQLITE_OK {
+    // rawptr(&db) — pass address of pointer for output param
+    if sqlite3_open("test.db", rawptr(&db)) != SQLITE_OK {
         printf("Failed to open: %s\n", sqlite3_errmsg(db))
         return
     }
@@ -729,7 +733,7 @@ func main() {
     let stmt: sqlite3_stmt = null
     let sql = "SELECT id, name FROM users"
     
-    if sqlite3_prepare_v2(db, sql, -1, stmt, null) != SQLITE_OK {
+    if sqlite3_prepare_v2(db, sql, -1, rawptr(&stmt), null) != SQLITE_OK {
         printf("Failed to prepare: %s\n", sqlite3_errmsg(db))
         return
     }
@@ -850,19 +854,19 @@ extern cpp {
 
 ## Comparison: `extern c` vs `extern cpp`
 
-| Feature           | `extern c`            | `extern cpp`          |
-|-------------------|-----------------------|-----------------------|
-| Name mangling     | None                  | C++ ABI mangling      |
-| Namespaces        | N/A                   | Nested access paths   |
-| Classes           | N/A                   | Full support          |
-| Virtual methods   | N/A                   | `virtual` keyword     |
-| Constructors      | N/A                   | `new(...) *T`         |
-| Destructors       | N/A                   | `delete(self *T)`     |
-| Static methods    | N/A                   | `static func`         |
-| Abstract types    | N/A                   | `abstract class`      |
-| Overloading       | N/A                   | Via mangling          |
-| Symbol override   | `func name "symbol"`  | `func name "symbol"`  |
-| Function pointers | ✅                    | ✅                    |
+| Feature | `extern c` | `extern cpp` |
+| --- | --- | --- |
+| Name mangling | None | C++ ABI mangling |
+| Namespaces | N/A | Nested access paths |
+| Classes | N/A | Full support |
+| Virtual methods | N/A | `virtual` keyword |
+| Constructors | N/A | `new(...) *T` |
+| Destructors | N/A | `delete(self *T)` |
+| Static methods | N/A | `static func` |
+| Abstract types | N/A | `abstract class` |
+| Overloading | N/A | Via mangling |
+| Symbol override | `func name "symbol"` | `func name "symbol"` |
+| Function pointers | ✅ | ✅ |
 
 ---
 
@@ -920,4 +924,8 @@ struct Aligned { ... }
 
 @packed
 struct Packed { ... }
+
+// rawptr usage
+rawptr(-1)      // cast value to raw pointer
+rawptr(&val)    // get address of val as raw pointer
 ```

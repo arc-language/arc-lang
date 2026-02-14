@@ -1,4 +1,4 @@
-# arc Compiler Intrinsics (Version 1.3)
+# arc Compiler Intrinsics (Version 1.4)
 
 > **Note**: All intrinsics are compiler-handled functions, not parser keywords.
 > They are mapped in the compiler's intrinsic registry, not built into the grammar.
@@ -172,18 +172,27 @@ let z = uint8(flags)    // narrow cast
 let n = usize(count)    // to pointer-sized int
 ```
 
-### rawptr - Integer to raw pointer
+### rawptr - Two forms
 ```arc
-// rawptr(value) - cast integer to raw untyped pointer
-// Only needed for low-level extern interop
+// rawptr(value) — cast integer value to raw untyped pointer
+// rawptr(&val)  — get address of variable as raw pointer (like & in C)
 
+// 1. Cast integer value to pointer
 // SQLITE_TRANSIENT = -1 as pointer, tells sqlite to copy the string
 let transient = rawptr(-1)
 sqlite3_bind_text(stmt, 1, val, len, transient)
 
-// Address arithmetic
+// 2. Get address of a variable
+let x = 100
+let ptr = rawptr(&x)    // ptr points TO x
+
+// 3. Pointer arithmetic (via usize)
 let addr = usize(some_ptr)
 let offset_ptr = rawptr(addr + 16)
+
+// 4. Pass address to extern output params
+let db: sqlite3 = null
+sqlite3_open("test.db", rawptr(&db))   // extern expects **sqlite3
 ```
 
 ## GPU Functions
@@ -228,4 +237,8 @@ memcpy(copy, original, sizeof(Point))
 // Syscall buffer pattern
 let buffer = alloca(byte, 4096)
 let bytes_read = syscall(SYS_READ, fd, buffer, 4096)
+
+// Pass variable address to extern
+let result: SomeType = null
+extern_func(rawptr(&result))
 ```

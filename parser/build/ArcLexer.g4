@@ -6,6 +6,7 @@ lexer grammar ArcLexer;
 IMPORT: 'import';
 NAMESPACE: 'namespace';
 LET: 'let';
+VAR: 'var'; // Added for mutable references
 CONST: 'const';
 FUNC: 'func';
 ASYNC: 'async';
