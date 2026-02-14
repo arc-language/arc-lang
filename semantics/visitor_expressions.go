@@ -1,7 +1,6 @@
 package semantics
 
 import (
-
 	"github.com/arc-language/arc-lang/builder/types"
 	"github.com/arc-language/arc-lang/parser"
 	"github.com/arc-language/arc-lang/symbol"
@@ -109,14 +108,7 @@ func (a *Analyzer) VisitUnaryExpression(ctx *parser.UnaryExpressionContext) inte
 			return types.NewPointer(valType)
 		}
 		
-		if ctx.STAR() != nil {
-			if ptr, ok := valType.(*types.PointerType); ok {
-				return ptr.ElementType
-			}
-			a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, 
-				"Cannot dereference non-pointer type '%s'", valType.String())
-			return types.Void
-		}
+		// Note: Dereference (*) removed in this grammar revision (Swift-style)
 
 		if ctx.MINUS() != nil || ctx.NOT() != nil || ctx.BIT_NOT() != nil {
 			return valType
@@ -287,11 +279,8 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 	if ctx.AnonymousFuncExpression() != nil {
 		return a.Visit(ctx.AnonymousFuncExpression())
 	}
-	if ctx.SizeofExpression() != nil {
-		return types.U64
-	}
-	if ctx.AlignofExpression() != nil {
-		return types.U64
+	if ctx.BuiltinExpression() != nil {
+		return a.Visit(ctx.BuiltinExpression())
 	}
 
 	var name string
@@ -314,25 +303,12 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 
 	if name != "" {
 		if ctx.GenericArgs() != nil && !isQualified {
-			args := ctx.GenericArgs().GenericArgList().AllGenericArg()
-			if name == "cast" || name == "bit_cast" {
-				if len(args) > 0 && args[0].Type_() != nil {
-					return a.resolveType(args[0].Type_())
-				}
-				return types.I64
-			}
-			if name == "alloca" {
-				if len(args) > 0 && args[0].Type_() != nil {
-					elemType := a.resolveType(args[0].Type_())
-					return types.NewPointer(elemType)
-				}
-				return types.NewPointer(types.I8)
-			}
+			// Handle generics if implemented
+			return types.Void
 		}
 
 		// --- Direct symbol resolution (non-qualified or full qualified name match) ---
 		s, ok := a.currentScope.Resolve(name)
-		// Fix: Removed !isQualified check to allow resolving "Status.OK" within namespace "main" as "main.Status.OK"
 		if !ok && a.currentNamespacePrefix != "" {
 			s, ok = a.currentScope.Resolve(a.currentNamespacePrefix + "." + name)
 		}
@@ -433,6 +409,20 @@ func (a *Analyzer) VisitPrimaryExpression(ctx *parser.PrimaryExpressionContext) 
 	return types.Void
 }
 
+// --- Builtin Expressions (sizeof/alignof etc) ---
+
+func (a *Analyzer) VisitBuiltinExpression(ctx *parser.BuiltinExpressionContext) interface{} {
+	name := ctx.IDENTIFIER().GetText()
+	
+	if name == "sizeof" || name == "alignof" {
+		return types.U64 // usize
+	}
+	
+	// Handle other builtins like memset/memcpy if needed or return generic
+	// For now assume void return for side-effect builtins
+	return types.Void
+}
+
 // --- Literals & Structures ---
 
 func (a *Analyzer) VisitStructLiteral(ctx *parser.StructLiteralContext) interface{} {
@@ -468,10 +458,8 @@ func (a *Analyzer) VisitStructLiteral(ctx *parser.StructLiteralContext) interfac
 	}
 
 	// 4. Validate Fields
-	// Note: Classes use the same indices map as structs for logical fields
 	indices, hasIndices := a.structIndices[st.Name]
 	
-	// If it's a class with no user fields defined yet, indices might be empty/nil, which is fine
 	if !hasIndices && len(ctx.AllFieldInit()) > 0 {
 		a.bag.Report(a.file, ctx.GetStart().GetLine(), 0, "Type '%s' has no fields to initialize", name)
 		return sym.Type
@@ -528,6 +516,7 @@ func (a *Analyzer) VisitInitializerList(ctx *parser.InitializerListContext) inte
 		}
 	}
 	
+	// Create array type with fixed length based on elements
 	return types.NewArray(elemType, int64(len(ctx.AllExpression())))
 }
 
@@ -557,7 +546,7 @@ func (a *Analyzer) VisitAnonymousFuncExpression(ctx *parser.AnonymousFuncExpress
 		}
 	}
 
-	// 3. Construct Function Type (Updated for ExecutionStrategy)
+	// 3. Construct Function Type
 	var fnType *types.FunctionType
 	
 	isAsync := false

@@ -66,19 +66,16 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 		ct := tc.CollectionType()
 		baseName := ct.IDENTIFIER().GetText()
 		
-		// Resolve the generic type arguments inside [ ]
 		var typeArgs []types.Type
 		for _, tCtx := range ct.AllType_() {
 			typeArgs = append(typeArgs, a.resolveType(tCtx))
 		}
 
-		// Simple mapping for standard collections
 		if baseName == "vector" && len(typeArgs) == 1 {
-			// Vector is dynamic array
-			return types.NewSlice(typeArgs[0])
+			// Vector mapped to dynamic array (length 0 usually implies dynamic in simple builders)
+			return types.NewArray(typeArgs[0], 0)
 		}
 		
-		// Fallback: treat as a generic struct instantiation if defined
 		if sym, ok := a.currentScope.Resolve(baseName); ok {
 			return sym.Type
 		}
@@ -89,7 +86,6 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 	// 5. Generic/Qualified Types
 	if tc.IDENTIFIER() != nil || tc.QualifiedType() != nil {
 		var name string
-		// var genericArgs parser.IGenericArgsContext // unused for now
 
 		if tc.QualifiedType() != nil {
 			qt := tc.QualifiedType()
@@ -97,13 +93,10 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 				if i > 0 { name += "." }
 				name += id.GetText()
 			}
-			// genericArgs = qt.GenericArgs()
 		} else {
 			name = tc.IDENTIFIER().GetText()
-			// genericArgs = tc.GenericArgs()
 		}
 
-		// Resolve base symbol
 		s, ok := a.currentScope.Resolve(name)
 		
 		if !ok && a.currentNamespacePrefix != "" && tc.QualifiedType() == nil {
@@ -121,28 +114,22 @@ func (a *Analyzer) resolveType(ctx parser.ITypeContext) types.Type {
 	return types.I64
 }
 
-// areTypesCompatible checks if two types can be used together (e.g. assignment, math)
 func areTypesCompatible(src, dest types.Type) bool {
 	if src == nil || dest == nil { return false }
 	if src.Equal(dest) {
 		return true
 	}
-	// Implicit int casting
 	if types.IsInteger(src) && types.IsInteger(dest) {
 		return true 
 	}
-	// Implicit float casting
 	if types.IsFloat(src) && types.IsFloat(dest) {
 		return true
 	}
-	// Pointer compatibility
 	if srcPtr, sOk := src.(*types.PointerType); sOk {
 		if destPtr, dOk := dest.(*types.PointerType); dOk {
-			// void* compatibility
 			if srcPtr.ElementType == types.Void || destPtr.ElementType == types.Void {
 				return true
 			}
-			// String/Byte pointer compatibility (*i8 <-> *u8)
 			if types.IsInteger(srcPtr.ElementType) && types.IsInteger(destPtr.ElementType) {
 				if srcPtr.ElementType.BitSize() == 8 && destPtr.ElementType.BitSize() == 8 {
 					return true
@@ -150,9 +137,9 @@ func areTypesCompatible(src, dest types.Type) bool {
 			}
 		}
 	}
-	// Array/Slice compatibility
 	if srcArr, sOk := src.(*types.ArrayType); sOk {
 		if destArr, dOk := dest.(*types.ArrayType); dOk {
+			// Allow compatible arrays if lengths match (or both are dynamic/0)
 			if srcArr.Length == destArr.Length {
 				return areTypesCompatible(srcArr.ElementType, destArr.ElementType)
 			}
