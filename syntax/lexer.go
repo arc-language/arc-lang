@@ -5,6 +5,35 @@ import (
 	"github.com/arc-language/arc-lang/parser"
 )
 
+// listTokenSource is a simple antlr.TokenSource backed by a pre-built slice of tokens.
+type listTokenSource struct {
+	tokens []antlr.Token
+	index  int
+	source *antlr.TokenSourceCharStreamPair
+}
+
+func newListTokenSource(tokens []antlr.Token) *listTokenSource {
+	src := &listTokenSource{tokens: tokens, index: 0}
+	// The source pair is used for position info; we can leave it nil-safe by
+	// pointing at a dummy stream. antlr only uses it for GetSourceName.
+	src.source = antlr.NewTokenSourceCharStreamPair(src, nil)
+	return src
+}
+
+func (l *listTokenSource) NextToken() antlr.Token {
+	if l.index >= len(l.tokens) {
+		// Return EOF
+		tok := antlr.NewCommonToken(l.source, antlr.TokenEOF, antlr.TokenDefaultChannel, -1, -1)
+		return tok
+	}
+	t := l.tokens[l.index]
+	l.index++
+	return t
+}
+
+func (l *listTokenSource) GetSourceName() string  { return "<list>" }
+func (l *listTokenSource) GetInputStream() antlr.CharStream { return nil }
+
 // createTokenStream wraps the generated lexer to perform Automatic Semicolon Insertion (ASI).
 // It returns a token stream that includes synthetic SEMI tokens where newlines imply termination.
 func createTokenStream(input string) *antlr.CommonTokenStream {
@@ -25,29 +54,25 @@ func createTokenStream(input string) *antlr.CommonTokenStream {
 
 		// Check if we need to insert a semicolon after this token.
 		if shouldInsertSemi(t, i, allTokens) {
-			// Create a synthetic semicolon token.
-			// We calculate its position relative to the current token to keep source maps sane.
-			semi := antlr.NewCommonToken(
-				lexer.GetTokenSource(),
-				parser.ArcLexerSEMI,
-				";",
-				antlr.TokenDefaultChannel,
-				-1, -1,
-			)
+			// Build the synthetic token source pair for position attribution.
+			// We reuse the original token's source so source maps stay sane.
+			src := antlr.NewTokenSourceCharStreamPair(lexer, lexer.GetInputStream())
+			semi := antlr.NewCommonToken(src, parser.ArcLexerSEMI, antlr.TokenDefaultChannel, -1, -1)
+			semi.SetText(";")
 			semi.SetLine(t.GetLine())
 			semi.SetColumn(t.GetColumn() + len(t.GetText()))
-			
+
 			processedTokens = append(processedTokens, semi)
 		}
 	}
 
 	// 3. Create a new stream from our modified token list.
-	tokenSource := antlr.NewListTokenSource(processedTokens)
+	tokenSource := newListTokenSource(processedTokens)
 	return antlr.NewCommonTokenStream(tokenSource, antlr.TokenDefaultChannel)
 }
 
 // shouldInsertSemi determines if a SEMI token should be inserted after token t.
-// Rule: Insert SEMI if the current token is a "statement ender" AND 
+// Rule: Insert SEMI if the current token is a "statement ender" AND
 // the next token is on a new line (or if we are at EOF).
 func shouldInsertSemi(t antlr.Token, index int, all []antlr.Token) bool {
 	// Condition A: We must be at the effective end of a line.

@@ -1,7 +1,6 @@
 package syntax
 
 import (
-	"github.com/antlr4-go/antlr/v4"
 	"github.com/arc-language/arc-lang/parser"
 )
 
