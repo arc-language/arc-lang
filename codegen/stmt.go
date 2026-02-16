@@ -28,6 +28,7 @@ func (cg *Codegen) genStmt(stmt ast.Stmt) error {
 	case *ast.DeclStmt:
 		return cg.genDeclStmt(s)
 	case *ast.AssignStmt:
+		fmt.Printf("DEBUG genStmt: AssignStmt target=%T op=%s value=%T\n", s.Target, s.Op, s.Value)
 		return cg.genAssignStmt(s)
 	case *ast.ReturnStmt:
 		return cg.genReturn(s)
@@ -57,6 +58,8 @@ func (cg *Codegen) genStmt(stmt ast.Stmt) error {
 		return cg.genBlock(s)
 	case *ast.DeferStmt:
 		cg.genExpr(s.Call)
+	default:
+		fmt.Printf("DEBUG genStmt: unknown stmt type %T\n", stmt)
 	}
 	return nil
 }
