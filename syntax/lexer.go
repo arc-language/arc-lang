@@ -7,10 +7,11 @@ import (
 
 // tokenSliceSource implements antlr.TokenSource backed by a pre-built token slice.
 // The full TokenSource interface requires: NextToken, GetLine, GetCharPositionInLine,
-// GetInputStream, and GetSourceName.
+// GetInputStream, GetSourceName, GetTokenFactory, and SetTokenFactory.
 type tokenSliceSource struct {
-	tokens []antlr.Token
-	index  int
+	tokens  []antlr.Token
+	index   int
+	factory antlr.TokenFactory
 }
 
 func (s *tokenSliceSource) NextToken() antlr.Token {
@@ -28,10 +29,20 @@ func (s *tokenSliceSource) NextToken() antlr.Token {
 	return t
 }
 
-func (s *tokenSliceSource) GetLine() int                      { return 0 }
-func (s *tokenSliceSource) GetCharPositionInLine() int        { return 0 }
-func (s *tokenSliceSource) GetInputStream() antlr.CharStream  { return nil }
-func (s *tokenSliceSource) GetSourceName() string             { return "<slice>" }
+func (s *tokenSliceSource) GetLine() int                     { return 0 }
+func (s *tokenSliceSource) GetCharPositionInLine() int       { return 0 }
+func (s *tokenSliceSource) GetInputStream() antlr.CharStream { return nil }
+func (s *tokenSliceSource) GetSourceName() string            { return "<slice>" }
+
+// GetTokenFactory implements antlr.TokenSource
+func (s *tokenSliceSource) GetTokenFactory() antlr.TokenFactory {
+	return s.factory
+}
+
+// SetTokenFactory implements antlr.TokenSource
+func (s *tokenSliceSource) SetTokenFactory(f antlr.TokenFactory) {
+	s.factory = f
+}
 
 // createTokenStream wraps the generated lexer to perform Automatic Semicolon Insertion (ASI).
 // It returns a token stream that includes synthetic SEMI tokens where newlines imply termination.
@@ -68,7 +79,10 @@ func createTokenStream(input string) *antlr.CommonTokenStream {
 	// 3. Build a stream from the original lexer (satisfies the Lexer type requirement),
 	//    then swap the token source for our pre-built slice.
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
-	stream.SetTokenSource(&tokenSliceSource{tokens: processedTokens})
+	stream.SetTokenSource(&tokenSliceSource{
+		tokens:  processedTokens,
+		factory: antlr.CommonTokenFactoryDEFAULT,
+	})
 	return stream
 }
 
