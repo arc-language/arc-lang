@@ -7,7 +7,7 @@ options { tokenVocab = ArcLexer; }
 // ═══════════════════════════════════════════════
 
 compilationUnit
-    : namespaceDecl semi topLevelDecl* EOF
+    : namespaceDecl topLevelDecl* EOF
     ;
 
 namespaceDecl

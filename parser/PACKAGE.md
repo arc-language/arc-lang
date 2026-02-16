@@ -1776,8 +1776,6 @@ func (*CompilationUnitContext) IsCompilationUnitContext()
 
 func (s *CompilationUnitContext) NamespaceDecl() INamespaceDeclContext
 
-func (s *CompilationUnitContext) Semi() ISemiContext
-
 func (s *CompilationUnitContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 func (s *CompilationUnitContext) TopLevelDecl(i int) ITopLevelDeclContext
@@ -3225,7 +3223,6 @@ type ICompilationUnitContext interface {
 
 	// Getter signatures
 	NamespaceDecl() INamespaceDeclContext
-	Semi() ISemiContext
 	EOF() antlr.TerminalNode
 	AllTopLevelDecl() []ITopLevelDeclContext
 	TopLevelDecl(i int) ITopLevelDeclContext

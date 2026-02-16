@@ -1,6 +1,6 @@
-namespace main
+namespace main;
 
-func main() void {
+func main() {
 
 
 }
