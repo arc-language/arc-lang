@@ -1102,6 +1102,10 @@ func (t *translator) primary(ctx parser.IPrimaryContext) ast.Expr {
 			End_:  t.pos(p.GetStop()),
 		}
 
+	// ── Bare initializer: {...} ──
+	case *parser.BareInitExprContext:
+		return t.initializerBlock(p.InitializerBlock())
+
 	// ── Typed initializer: Point{x:1} or Box[int32]{...} ──
 	case *parser.TypedInitExprContext:
 		// FIX: Check if it's a QualifiedName OR a simple IDENTIFIER
