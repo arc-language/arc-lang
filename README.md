@@ -16,7 +16,7 @@
 
 Arc is a modern systems programming language for building native applications, servers, CLI tools, AI model inference, and kernel drivers with high performance.
 
-Arc uses automatic reference counting for memory safety, provides zero-cost abstractions, and seamless C/C++/Objective-C interoperability. The language compiles to efficient native code for x86-64, ARM64, and other CPU architectures.
+Arc uses automatic reference counting for memory safety, provides zero-cost abstractions, and seamless C/C++ interoperability. The language compiles to efficient native code for x86-64, ARM64, and other CPU architectures.
 
 **Hardware acceleration built-in:** When you need it, Arc functions can also compile to GPUs and TPUs without leaving your codebase or learning new APIs.
 
@@ -29,7 +29,6 @@ Arc uses automatic reference counting for memory safety, provides zero-cost abst
 ```arc
 import "ai"
 import "io"
-
 
 func main() {
     // Load model from file
@@ -52,6 +51,7 @@ func main() {
         io.printf("%s", text)
     }
 }
+
 ```
 
 ### Type System
@@ -73,8 +73,8 @@ let d: float64 = 2.71828
 let view: []byte = buffer[0..64]
 
 // Mutable references — &mut in type, & at call site
-func add_one(x: &mut int32) { x += 1 }
-add_one(&i)
+func increment(x: &mut int32) { x += 1 }
+increment(&i)
 
 // Interfaces (value types — stack allocated with let)
 interface Point {
@@ -87,6 +87,7 @@ interface Client {
     name: string
     port: int32
 }
+
 ```
 
 ### Memory Management
@@ -112,11 +113,12 @@ defer free(ptr)  // Cleanup on scope exit
 let val = 42
 let raw = memptr(&val)    // address of val as memory pointer
 let sentinel = memptr(-1) // cast integer value to memory pointer
+
 ```
 
 ### Foreign Function Interface
 
-Direct interop with C, C++, and Objective-C:
+Direct interop with C and C++:
 
 ```arc
 // C libraries
@@ -138,14 +140,6 @@ extern cpp {
     }
 }
 
-// Objective-C frameworks
-extern objc {
-    class NSWindow {
-        new "initWithContentRect:styleMask:backing:defer:" (
-            NSRect, uint64, uint64, bool
-        ) *NSWindow
-    }
-}
 ```
 
 ### Async/Await
@@ -157,17 +151,18 @@ async func fetch_data(url: string) string {
 }
 
 async func main() {
-    let data = await fetch_data("https://api.example.com")
+    let data = await fetch_data("[https://api.example.com](https://api.example.com)")
     io.print(data)
 }
+
 ```
 
 ### Generics
 
-Monomorphized at compile time:
+Monomorphized at compile time. Note the use of square brackets `[...]` for type parameters.
 
 ```arc
-func swap<T>(a: &mut T, b: &mut T) {
+func swap[T](a: &mut T, b: &mut T) {
     let tmp: T = a
     a = b
     b = tmp
@@ -177,13 +172,14 @@ let x = 10
 let y = 20
 swap(&x, &y)
 
-interface Box<T> {
+interface Box[T] {
     value: T
 }
 
-func get(self b: Box<T>) T {
+func get[T](self b: Box[T]) T {
     return b.value
 }
+
 ```
 
 ---
@@ -212,9 +208,13 @@ async func main() {
     
     for {
         let (conn, addr) = await listener.accept()
-        spawn handle_request(conn)
+        // Fire-and-forget concurrent processing
+        process func(c: net.TcpStream) {
+             handle_request(c)
+        }(conn)
     }
 }
+
 ```
 
 ### Database Application
@@ -254,35 +254,54 @@ func main() {
         printf("User: %s\n", name)
     }
 }
+
 ```
 
-### Native GUI Application
+### Graphics Application (DirectX 11)
 
 ```arc
 namespace main
 
-import objc "AppKit"
+type HRESULT = int32
+const D3D11_SDK_VERSION: uint32 = 7
+const D3D_DRIVER_TYPE_HARDWARE: uint32 = 1
 
-interface AppDelegate: NSApplicationDelegate {
-    window: NSWindow
-}
+extern cpp {
+    namespace DirectX {
+        func D3D11CreateDevice(
+            *void, uint32, *void, uint32, *uint32, uint32,
+            uint32, **ID3D11Device, *uint32, **ID3D11DeviceContext
+        ) HRESULT
 
-func applicationDidFinishLaunching(self d: AppDelegate, notif: NSNotification) {
-    let rect = NSMakeRect(0, 0, 800, 600)
-    let style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
-    
-    d.window = NSWindow.new(rect, style, NSBackingStoreBuffered, false)
-    d.window.title = NSString.from("Arc Application")
-    d.window.center()
-    d.window.makeKeyAndOrderFront(null)
+        class ID3D11Device {
+            virtual func Release(self *ID3D11Device) uint32
+        }
+        
+        class ID3D11DeviceContext {
+            virtual func Release(self *ID3D11DeviceContext) uint32
+        }
+    }
 }
 
 func main() {
-    let app = NSApplication.sharedApplication()
-    var delegate = AppDelegate{}
-    app.delegate = delegate
-    app.run()
+    var device:  DirectX.ID3D11Device        = null
+    var context: DirectX.ID3D11DeviceContext = null
+
+    // Direct C++ Interop
+    let hr = DirectX.D3D11CreateDevice(
+        null, D3D_DRIVER_TYPE_HARDWARE, null, 0, null, 0,
+        D3D11_SDK_VERSION, memptr(&device), null, memptr(&context)
+    )
+
+    if hr != 0 {
+        return
+    }
+    defer device.Release()
+    defer context.Release()
+    
+    // Use device...
 }
+
 ```
 
 ### Kernel Module
@@ -310,41 +329,7 @@ func init_module() int32 {
 func cleanup_module() {
     log.info("Driver unloading")
 }
-```
 
-### AI Model Inference
-
-```arc
-namespace main
-
-import "ai"
-import "io"
-
-func main() {
-    // Load model
-    let model = ai.load_model("models/model-7b.gguf")
-    defer model.free()
-    
-    // Configure
-    let config = ai.InferenceConfig{
-        temperature: 0.7,
-        top_p: 0.9,
-        max_tokens: 512
-    }
-    
-    // Generate
-    let prompt = "Explain quantum computing:"
-    let tokens = model.tokenize(prompt)
-    
-    io.printf("Generating...\n")
-    
-    for token in model.generate(tokens, config) {
-        let text = model.decode(token)
-        io.printf("%s", text)
-    }
-    
-    io.printf("\n")
-}
 ```
 
 ---
@@ -367,7 +352,8 @@ func process_data(data: []float32, size: usize) {
 
 // GPU version — target set in build.arc
 gpu func process_gpu(data: []float32, size: usize) {
-    let idx = gpu.thread_id()
+    // Note: thread_id() is an intrinsic valid only inside gpu func
+    let idx = thread_id()
     if idx < size {
         data[idx] = data[idx] * 2.0
     }
@@ -395,6 +381,7 @@ func main() {
     
     io.printf("Training complete\n")
 }
+
 ```
 
 ---
@@ -417,6 +404,7 @@ import "ai"
 func main() {
     // Use imported libraries
 }
+
 ```
 
 The compiler detects your platform and downloads the appropriate packages to `~/.arc/cache/`.
@@ -426,33 +414,37 @@ The compiler detects your platform and downloads the appropriate packages to `~/
 ## Supported Targets
 
 ### CPU Architectures
-- x86-64 (Intel, AMD)
-- ARM64 (Apple Silicon, ARM servers)
-- RISC-V (in progress)
+
+* x86-64 (Intel, AMD)
+* ARM64 (Apple Silicon, ARM servers)
+* RISC-V (in progress)
 
 ### Operating Systems
-- Linux (Ubuntu, Debian, Arch, Fedora, Alpine, etc.)
-- macOS (Intel and Apple Silicon)
-- Windows (x64)
-- FreeBSD
+
+* Linux (Ubuntu, Debian, Arch, Fedora, Alpine, etc.)
+* macOS (Intel and Apple Silicon)
+* Windows (x64)
+* FreeBSD
 
 ### Accelerators
-- NVIDIA GPUs (`gpu.cuda`)
-- AMD GPUs (`gpu.rocm`)
-- Apple Silicon (`gpu.metal`)
-- Intel GPUs (`gpu.oneapi`)
-- Google TPUs (`tpu`)
-- AWS Trainium (`aws.trainium`)
+
+* NVIDIA GPUs (`gpu.cuda`)
+* AMD GPUs (`gpu.rocm`)
+* Apple Silicon (`gpu.metal`)
+* Intel GPUs (`gpu.oneapi`)
+* Google TPUs (`tpu`)
+* AWS Trainium (`aws.trainium`)
 
 ---
 
 ## Installation
 
 ```bash
-git clone https://github.com/arc-language/arc-lang
+git clone [https://github.com/arc-language/arc-lang](https://github.com/arc-language/arc-lang)
 cd arc-lang/cmd
 ./build build
 ./test_runner
+
 ```
 
 ### Build a Program
@@ -460,18 +452,19 @@ cd arc-lang/cmd
 ```bash
 ./arc build main.ax -o main
 ./main
+
 ```
 
 ---
 
 ## Documentation
 
-- **[Language Reference](docs/reference.md)** - Complete syntax and semantics
-- **[Grammar Specification](docs/grammar_1.0.md)** - Language grammar
-- **[Package Management](docs/package_manager.md)** - Dependency resolution
-- **[Foreign Function Interface](docs/extern.md)** - C/C++/Objective-C interop
-- **[Kernel Drivers](docs/kernel_drivers.md)** - Systems programming
-- **[Compiler Intrinsics](docs/intrinsics_1.2.md)** - Built-in functions
+* **[Language Reference](https://www.google.com/search?q=docs/reference.md)** - Complete syntax and semantics
+* **[Grammar Specification](https://www.google.com/search?q=docs/grammar_1.0.md)** - Language grammar
+* **[Package Management](https://www.google.com/search?q=docs/package_manager.md)** - Dependency resolution
+* **[Foreign Function Interface](https://www.google.com/search?q=docs/extern.md)** - C/C++ interop
+* **[Kernel Drivers](https://www.google.com/search?q=docs/kernel_drivers.md)** - Systems programming
+* **[Compiler Intrinsics](https://www.google.com/search?q=docs/intrinsics_1.2.md)** - Built-in functions
 
 ---
 
@@ -480,19 +473,21 @@ cd arc-lang/cmd
 **Beta Release**
 
 Working:
-- Core language features
-- C/C++/Objective-C FFI
-- Package management
-- CPU compilation (x86-64, ARM64)
-- GPU compilation (CUDA, Metal)
-- Kernel driver support
+
+* Core language features
+* C/C++ FFI
+* Package management
+* CPU compilation (x86-64, ARM64)
+* GPU compilation (CUDA, Metal)
+* Kernel driver support
 
 In Development:
-- Standard library
-- AI model runtime
-- TPU backend
-- Additional GPU targets
-- Tooling (LSP, debugger)
+
+* Standard library
+* AI model runtime
+* TPU backend
+* Additional GPU targets
+* Tooling (LSP, debugger)
 
 ---
 
@@ -500,8 +495,8 @@ In Development:
 
 Licensed under either of
 
-* Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+* Apache License, Version 2.0 ([LICENSE-APACHE](https://www.google.com/search?q=LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+* MIT license ([LICENSE-MIT](https://www.google.com/search?q=LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
 
