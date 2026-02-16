@@ -257,6 +257,7 @@ func (a *Analyzer) checkDeclStmt(s *ast.DeclStmt, scope *Scope) {
 }
 
 // inferCompositeLitType recursively pushes the expected type down into a composite literal.
+// In checker.go
 func (a *Analyzer) inferCompositeLitType(expr ast.Expr, typeRef ast.TypeRef) {
 	if expr == nil || typeRef == nil {
 		return
@@ -277,6 +278,7 @@ func (a *Analyzer) inferCompositeLitType(expr ast.Expr, typeRef ast.TypeRef) {
 			if kv, ok := f.(*ast.KeyValueExpr); ok {
 				val = kv.Value
 			}
+			// Recursively infer type for nested array elements
 			a.inferCompositeLitType(val, t.Elem)
 		}
 	case *ast.VectorType:
@@ -285,8 +287,12 @@ func (a *Analyzer) inferCompositeLitType(expr ast.Expr, typeRef ast.TypeRef) {
 			if kv, ok := f.(*ast.KeyValueExpr); ok {
 				val = kv.Value
 			}
+			// Recursively infer type for nested vector elements
 			a.inferCompositeLitType(val, t.Elem)
 		}
+	case *ast.NamedType:
+		// For struct types, we might need to infer nested types
+		// but we'd need to look up the struct definition
 	}
 }
 
