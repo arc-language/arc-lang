@@ -11,23 +11,14 @@ import (
 	"github.com/arc-language/arc-lang/builder/types"
 )
 
-// genExpr translates an AST expression into an IR Value.
-// It returns nil for void-typed calls and unreachable branches.
 func (cg *Codegen) genExpr(expr ast.Expr) ir.Value {
 	if expr == nil {
 		return nil
 	}
 	switch e := expr.(type) {
-
-	// ── Literals ──────────────────────────────────────────────────────────────
-
 	case *ast.BasicLit:
 		return cg.genBasicLit(e)
-
-	// ── Identifier ────────────────────────────────────────────────────────────
-
 	case *ast.Ident:
-		// Check for compile-time constants / intrinsic names first.
 		switch e.Name {
 		case "true":
 			return cg.Builder.True()
@@ -36,96 +27,50 @@ func (cg *Codegen) genExpr(expr ast.Expr) ir.Value {
 		case "null":
 			return cg.Builder.ConstNull(types.NewPointer(types.Void))
 		}
-
-		// Look up as a local variable (alloca pointer).
 		alloca := cg.lookupVar(e.Name)
 		if alloca != nil {
 			pt := alloca.Type().(*types.PointerType)
 			return cg.Builder.CreateLoad(pt.ElementType, alloca, e.Name)
 		}
-
-		// Look up as a module-level function value (function pointer).
 		if fn := cg.Module.GetFunction(e.Name); fn != nil {
 			return fn
 		}
-		// Look up as a global variable.
 		if g := cg.Module.GetGlobal(e.Name); g != nil {
 			pt := g.Type().(*types.PointerType)
 			return cg.Builder.CreateLoad(pt.ElementType, g, e.Name)
 		}
 		panic(fmt.Sprintf("codegen: undefined identifier %q", e.Name))
-
-	// ── Selector (member access) ──────────────────────────────────────────────
-
 	case *ast.SelectorExpr:
 		return cg.genSelector(e)
-
-	// ── Index ─────────────────────────────────────────────────────────────────
-
 	case *ast.IndexExpr:
 		return cg.genIndex(e)
-
-	// ── Unary ─────────────────────────────────────────────────────────────────
-
 	case *ast.UnaryExpr:
 		return cg.genUnary(e)
-
-	// ── Binary ────────────────────────────────────────────────────────────────
-
 	case *ast.BinaryExpr:
 		return cg.genBinary(e)
-
-	// ── Call ──────────────────────────────────────────────────────────────────
-
 	case *ast.CallExpr:
 		return cg.genCall(e)
-
-	// ── Cast ──────────────────────────────────────────────────────────────────
-
 	case *ast.CastExpr:
 		return cg.genCast(e)
-
-	// ── Composite literal ─────────────────────────────────────────────────────
-
 	case *ast.CompositeLit:
 		return cg.genCompositeLit(e)
-
-	// ── Tuple ─────────────────────────────────────────────────────────────────
-
 	case *ast.TupleLit:
 		return cg.genTupleLit(e)
-
-	// ── New / delete ──────────────────────────────────────────────────────────
-
 	case *ast.NewExpr:
 		return cg.genNew(e)
-
 	case *ast.NewArrayExpr:
 		return cg.genNewArray(e)
-
 	case *ast.DeleteExpr:
 		return cg.genDelete(e)
-
-	// ── Range ─────────────────────────────────────────────────────────────────
-
 	case *ast.RangeExpr:
-		// Range expressions are consumed by for-in; hitting one here is unusual.
-		// Return the low bound as a best-effort.
 		return cg.genExpr(e.Low)
-
-	// ── Await ─────────────────────────────────────────────────────────────────
-
 	case *ast.AwaitExpr:
-		// Should have been rewritten by the lower pass, but handle defensively.
 		handle := cg.genExpr(e.X)
 		inst := cg.Builder.CreateAwaitTask(handle, types.Void, "await")
 		return inst
 	}
-
 	return nil
 }
-
-// ─── Literals ─────────────────────────────────────────────────────────────────
 
 func (cg *Codegen) genBasicLit(e *ast.BasicLit) ir.Value {
 	switch e.Kind {
@@ -135,7 +80,6 @@ func (cg *Codegen) genBasicLit(e *ast.BasicLit) ir.Value {
 			v = 0
 		}
 		return cg.Builder.ConstInt(types.I32, v)
-
 	case "HEX":
 		raw := strings.TrimPrefix(e.Value, "0x")
 		raw = strings.TrimPrefix(raw, "0X")
@@ -144,26 +88,20 @@ func (cg *Codegen) genBasicLit(e *ast.BasicLit) ir.Value {
 			v = 0
 		}
 		return cg.Builder.ConstInt(types.I64, v)
-
 	case "FLOAT":
 		v, err := strconv.ParseFloat(e.Value, 64)
 		if err != nil {
 			v = 0
 		}
 		return cg.Builder.ConstFloat(types.F64, v)
-
 	case "STRING":
-		// Strip surrounding quotes.
 		s := e.Value
 		if len(s) >= 2 && s[0] == '"' {
 			s = s[1 : len(s)-1]
 		}
-		// Process escape sequences.
 		s = processEscapes(s)
 		return cg.createGlobalString(s)
-
 	case "CHAR":
-		// 'x' → unicode code point as i32.
 		s := e.Value
 		if len(s) >= 2 && s[0] == '\'' {
 			s = s[1 : len(s)-1]
@@ -174,13 +112,11 @@ func (cg *Codegen) genBasicLit(e *ast.BasicLit) ir.Value {
 			r = rune(s[0])
 		}
 		return cg.Builder.ConstInt(types.I32, int64(r))
-
 	case "BOOL":
 		if e.Value == "true" {
 			return cg.Builder.True()
 		}
 		return cg.Builder.False()
-
 	case "NULL":
 		return cg.Builder.ConstNull(types.NewPointer(types.Void))
 	}
@@ -198,10 +134,7 @@ func processEscapes(s string) string {
 	return s
 }
 
-// ─── Selector ────────────────────────────────────────────────────────────────
-
 func (cg *Codegen) genSelector(e *ast.SelectorExpr) ir.Value {
-	// Generate the base as an l-value so we can GEP into it.
 	basePtr := cg.genLValue(e.X)
 	if basePtr != nil {
 		pt, ok := basePtr.Type().(*types.PointerType)
@@ -216,7 +149,6 @@ func (cg *Codegen) genSelector(e *ast.SelectorExpr) ir.Value {
 			}
 		}
 	}
-	// Fall back: qualify the name and look it up as a function (enum member, etc.).
 	qualName := fmt.Sprintf("%s.%s", cg.exprName(e.X), e.Sel)
 	if fn := cg.Module.GetFunction(qualName); fn != nil {
 		return fn
@@ -224,7 +156,6 @@ func (cg *Codegen) genSelector(e *ast.SelectorExpr) ir.Value {
 	return nil
 }
 
-// exprName extracts a textual name from a simple expression (Ident or Selector).
 func (cg *Codegen) exprName(e ast.Expr) string {
 	switch v := e.(type) {
 	case *ast.Ident:
@@ -235,23 +166,17 @@ func (cg *Codegen) exprName(e ast.Expr) string {
 	return ""
 }
 
-// ─── Index ────────────────────────────────────────────────────────────────────
-
 func (cg *Codegen) genIndex(e *ast.IndexExpr) ir.Value {
-	// Delegate to genLValue for correct pointer arithmetic (handling arrays vs slices)
 	ptr := cg.genLValue(e)
 	if ptr == nil {
 		return nil
 	}
-	// The result of genLValue is the address of the element. Load it.
 	pt, ok := ptr.Type().(*types.PointerType)
 	if !ok {
 		return nil
 	}
 	return cg.Builder.CreateLoad(pt.ElementType, ptr, "elem")
 }
-
-// ─── Unary ────────────────────────────────────────────────────────────────────
 
 func (cg *Codegen) genUnary(e *ast.UnaryExpr) ir.Value {
 	x := cg.genExpr(e.X)
@@ -266,39 +191,30 @@ func (cg *Codegen) genUnary(e *ast.UnaryExpr) ir.Value {
 		}
 		return cg.Builder.CreateSub(zero, x, "neg")
 	case "!":
-		// !x == x == 0
 		zero := cg.Builder.ConstInt(types.I1, 0)
 		return cg.Builder.CreateICmpEQ(x, zero, "not")
 	case "~":
-		// ~x == x ^ -1
 		allOnes := cg.Builder.ConstInt(types.I32, -1)
 		return cg.Builder.CreateXor(x, allOnes, "bitnot")
 	case "&":
-		// Address-of: return the alloca pointer directly.
 		return cg.genLValue(e.X)
 	}
 	return x
 }
 
-// ─── Binary ───────────────────────────────────────────────────────────────────
-
 func (cg *Codegen) genBinary(e *ast.BinaryExpr) ir.Value {
-	// Short-circuit logical operators.
 	if e.Op == "&&" {
 		return cg.genLogicalAnd(e)
 	}
 	if e.Op == "||" {
 		return cg.genLogicalOr(e)
 	}
-
 	lhs := cg.genExpr(e.Left)
 	rhs := cg.genExpr(e.Right)
 	if lhs == nil || rhs == nil {
 		return nil
 	}
-
 	isFloat := lhs.Type().Kind() == types.FloatKind
-
 	switch e.Op {
 	case "+":
 		if isFloat {
@@ -341,7 +257,6 @@ func (cg *Codegen) genBinary(e *ast.BinaryExpr) ir.Value {
 			return cg.Builder.CreateLShr(lhs, rhs, "")
 		}
 		return cg.Builder.CreateAShr(lhs, rhs, "")
-	// Comparisons — return i1
 	case "==":
 		if isFloat {
 			return cg.Builder.CreateFCmp(ir.FCmpOEQ, lhs, rhs, "")
@@ -377,7 +292,6 @@ func (cg *Codegen) genBinary(e *ast.BinaryExpr) ir.Value {
 }
 
 func (cg *Codegen) genLogicalAnd(e *ast.BinaryExpr) ir.Value {
-	// if lhs == false, result = false; else result = rhs
 	lhs := cg.genExpr(e.Left)
 	if lhs.Type().BitSize() != 1 {
 		lhs = cg.Builder.CreateICmpNE(lhs, cg.Builder.ConstInt(types.I32, 0), "")
@@ -385,14 +299,9 @@ func (cg *Codegen) genLogicalAnd(e *ast.BinaryExpr) ir.Value {
 	rhsBlock := cg.Builder.CreateBlock("and.rhs")
 	mergeBlock := cg.Builder.CreateBlock("and.merge")
 	shortBlock := cg.Builder.CreateBlock("and.short")
-
 	cg.Builder.CreateCondBr(lhs, rhsBlock, shortBlock)
-
-	// short-circuit: lhs was false.
 	cg.Builder.SetInsertPoint(shortBlock)
 	cg.Builder.CreateBr(mergeBlock)
-
-	// rhs block
 	cg.Builder.SetInsertPoint(rhsBlock)
 	rhs := cg.genExpr(e.Right)
 	if rhs.Type().BitSize() != 1 {
@@ -400,7 +309,6 @@ func (cg *Codegen) genLogicalAnd(e *ast.BinaryExpr) ir.Value {
 	}
 	rhsDone := cg.Builder.CurrentBlock()
 	cg.Builder.CreateBr(mergeBlock)
-
 	cg.Builder.SetInsertPoint(mergeBlock)
 	phi := cg.Builder.CreatePhi(types.I1, "and")
 	phi.AddIncoming(cg.Builder.False(), shortBlock)
@@ -416,12 +324,9 @@ func (cg *Codegen) genLogicalOr(e *ast.BinaryExpr) ir.Value {
 	rhsBlock := cg.Builder.CreateBlock("or.rhs")
 	mergeBlock := cg.Builder.CreateBlock("or.merge")
 	shortBlock := cg.Builder.CreateBlock("or.short")
-
 	cg.Builder.CreateCondBr(lhs, shortBlock, rhsBlock)
-
 	cg.Builder.SetInsertPoint(shortBlock)
 	cg.Builder.CreateBr(mergeBlock)
-
 	cg.Builder.SetInsertPoint(rhsBlock)
 	rhs := cg.genExpr(e.Right)
 	if rhs.Type().BitSize() != 1 {
@@ -429,7 +334,6 @@ func (cg *Codegen) genLogicalOr(e *ast.BinaryExpr) ir.Value {
 	}
 	rhsDone := cg.Builder.CurrentBlock()
 	cg.Builder.CreateBr(mergeBlock)
-
 	cg.Builder.SetInsertPoint(mergeBlock)
 	phi := cg.Builder.CreatePhi(types.I1, "or")
 	phi.AddIncoming(cg.Builder.True(), shortBlock)
@@ -437,10 +341,7 @@ func (cg *Codegen) genLogicalOr(e *ast.BinaryExpr) ir.Value {
 	return phi
 }
 
-// ─── Calls ────────────────────────────────────────────────────────────────────
-
 func (cg *Codegen) genCall(e *ast.CallExpr) ir.Value {
-	// Generate arguments first; they may define new locals.
 	args := make([]ir.Value, 0, len(e.Args))
 	for _, arg := range e.Args {
 		v := cg.genExpr(arg)
@@ -448,11 +349,7 @@ func (cg *Codegen) genCall(e *ast.CallExpr) ir.Value {
 			args = append(args, v)
 		}
 	}
-
-	// Resolve the callee.
 	fnName := cg.exprName(e.Fun)
-
-	// Built-in intrinsics injected by the lower pass or the runtime.
 	switch fnName {
 	case "decref":
 		if len(args) > 0 {
@@ -460,7 +357,6 @@ func (cg *Codegen) genCall(e *ast.CallExpr) ir.Value {
 		}
 		return nil
 	case "syscall_spawn":
-		// syscall_spawn(entryFn, pkt) -> ThreadHandle (*i8)
 		if len(args) >= 1 {
 			if fn, ok := args[0].(*ir.Function); ok {
 				return cg.Builder.CreateAsyncTask(fn, args[1:], "handle")
@@ -486,8 +382,6 @@ func (cg *Codegen) genCall(e *ast.CallExpr) ir.Value {
 		}
 		return nil
 	}
-
-	// Direct call to a module function.
 	if irFn := cg.Module.GetFunction(fnName); irFn != nil {
 		call := cg.Builder.CreateCall(irFn, args, "")
 		if irFn.FuncType.ReturnType.Kind() == types.VoidKind {
@@ -495,8 +389,6 @@ func (cg *Codegen) genCall(e *ast.CallExpr) ir.Value {
 		}
 		return call
 	}
-
-	// Indirect call via a function-pointer value.
 	calleeVal := cg.genExpr(e.Fun)
 	if calleeVal != nil {
 		call := cg.Builder.CreateIndirectCall(calleeVal, args, "")
@@ -505,11 +397,8 @@ func (cg *Codegen) genCall(e *ast.CallExpr) ir.Value {
 		}
 		return call
 	}
-
 	panic(fmt.Sprintf("codegen: unresolved callee %q", fnName))
 }
-
-// ─── Cast ─────────────────────────────────────────────────────────────────────
 
 func (cg *Codegen) genCast(e *ast.CastExpr) ir.Value {
 	src := cg.genExpr(e.X)
@@ -520,16 +409,13 @@ func (cg *Codegen) genCast(e *ast.CastExpr) ir.Value {
 	return cg.emitCast(src, dest)
 }
 
-// emitCast emits the cheapest correct cast between src and dest.
 func (cg *Codegen) emitCast(src ir.Value, dest types.Type) ir.Value {
 	srcType := src.Type()
 	if srcType.Equal(dest) {
 		return src
 	}
-
 	srcBits := srcType.BitSize()
 	dstBits := dest.BitSize()
-
 	switch {
 	case srcType.Kind() == types.PointerKind && dest.Kind() == types.PointerKind:
 		return cg.Builder.CreateBitCast(src, dest, "")
@@ -565,19 +451,15 @@ func (cg *Codegen) emitCast(src ir.Value, dest types.Type) ir.Value {
 	}
 }
 
-// ─── Composite literals ───────────────────────────────────────────────────────
-
 func (cg *Codegen) genCompositeLit(e *ast.CompositeLit) ir.Value {
 	if e.Type == nil {
 		return nil
 	}
 	irType := cg.TypeGen.GenType(e.Type)
 
-	// Case 1: Structs
 	if st, ok := irType.(*types.StructType); ok {
 		alloca := cg.Builder.CreateAlloca(st, "composite")
 		cg.Builder.CreateStore(cg.Builder.ConstZero(st), alloca)
-
 		for _, field := range e.Fields {
 			switch f := field.(type) {
 			case *ast.KeyValueExpr:
@@ -595,34 +477,24 @@ func (cg *Codegen) genCompositeLit(e *ast.CompositeLit) ir.Value {
 				}
 				fieldPtr := cg.Builder.CreateStructGEP(st, alloca, idx, keyName+".ptr")
 				cg.Builder.CreateStore(val, fieldPtr)
-			default:
-				// Positional init is not common for structs in Arc; skip.
 			}
 		}
 		return cg.Builder.CreateLoad(st, alloca, "composite.val")
 	}
 
-	// Case 2: Arrays (fixed-size)
 	if at, ok := irType.(*types.ArrayType); ok {
 		alloca := cg.Builder.CreateAlloca(at, "array.lit")
 		cg.Builder.CreateStore(cg.Builder.ConstZero(at), alloca)
-
 		for i, field := range e.Fields {
-			// Unwrap KeyValueExpr if present; otherwise use raw expression.
-			// (Assuming positional initialization for arrays for now)
-			var valExpr ast.Expr
+			var valExpr ast.Expr = field
 			if kv, ok := field.(*ast.KeyValueExpr); ok {
 				valExpr = kv.Value
-			} else {
-				valExpr = field.(ast.Expr)
 			}
-
 			val := cg.genExpr(valExpr)
 			if val == nil {
 				continue
 			}
 			val = cg.emitCast(val, at.ElementType)
-
 			zero := cg.Builder.ConstInt(types.I32, 0)
 			idx := cg.Builder.ConstInt(types.I32, int64(i))
 			elemPtr := cg.Builder.CreateInBoundsGEP(at, alloca, []ir.Value{zero, idx}, fmt.Sprintf("elem.%d.ptr", i))
@@ -630,7 +502,6 @@ func (cg *Codegen) genCompositeLit(e *ast.CompositeLit) ir.Value {
 		}
 		return cg.Builder.CreateLoad(at, alloca, "array.val")
 	}
-
 	return nil
 }
 
@@ -645,7 +516,6 @@ func (cg *Codegen) genTupleLit(e *ast.TupleLit) ir.Value {
 		vals[i] = v
 		fieldTypes[i] = v.Type()
 	}
-
 	st := types.NewStruct("", fieldTypes, false)
 	var agg ir.Value = cg.Builder.ConstUndef(st)
 	for i, v := range vals {
@@ -654,15 +524,11 @@ func (cg *Codegen) genTupleLit(e *ast.TupleLit) ir.Value {
 	return agg
 }
 
-// ─── New / delete ─────────────────────────────────────────────────────────────
-
 func (cg *Codegen) genNew(e *ast.NewExpr) ir.Value {
 	irType := cg.TypeGen.GenType(e.Type)
 	sz := cg.Builder.CreateSizeOf(irType, "sz")
 	rawPtr := cg.Builder.CreateCallByName("arc_alloc", types.NewPointer(types.Void), []ir.Value{sz}, "raw")
 	ptr := cg.emitCast(rawPtr, types.NewPointer(irType))
-
-	// Fill fields if an initialiser block was provided.
 	if e.Init != nil {
 		if st, ok := irType.(*types.StructType); ok {
 			for _, field := range e.Init.Fields {
@@ -684,7 +550,6 @@ func (cg *Codegen) genNew(e *ast.NewExpr) ir.Value {
 			}
 		}
 	}
-
 	return ptr
 }
 
@@ -694,7 +559,6 @@ func (cg *Codegen) genNewArray(e *ast.NewArrayExpr) ir.Value {
 	if count == nil {
 		count = cg.Builder.ConstInt(types.I64, 0)
 	}
-	// Extend count to i64 if needed.
 	if count.Type().BitSize() < 64 {
 		count = cg.emitCast(count, types.I64)
 	}

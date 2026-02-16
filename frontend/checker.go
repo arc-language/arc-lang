@@ -43,8 +43,6 @@ func (a *Analyzer) errorf(pos ast.Position, format string, args ...any) {
 }
 
 // ─── Pass 1: Symbol Discovery ─────────────────────────────────────────────────
-// Walk top-level declarations and register every exported name so that
-// forward references inside function bodies resolve correctly.
 
 func (a *Analyzer) discoverSymbols(file *ast.File) {
 	for _, decl := range file.Decls {
@@ -61,7 +59,6 @@ func (a *Analyzer) discoverSymbols(file *ast.File) {
 			if prev := a.GlobalScope.Insert(d.Name, &Symbol{Name: d.Name, Kind: "enum", Decl: d}); prev != nil {
 				a.errorf(d.Start, "enum %q redeclared in this block", d.Name)
 			}
-			// Register each member as EnumName.MemberName in the global scope.
 			for _, m := range d.Members {
 				qual := d.Name + "." + m.Name
 				a.GlobalScope.Insert(qual, &Symbol{Name: qual, Kind: "enumMember", Decl: m})
@@ -148,13 +145,11 @@ func (a *Analyzer) checkDecl(decl ast.Decl, scope *Scope) {
 				a.checkExpr(m.Value, scope)
 			}
 		}
-	// InterfaceDecl, TypeAliasDecl, ExternDecl need no body checking.
 	}
 }
 
 func (a *Analyzer) checkFuncDecl(d *ast.FuncDecl, parent *Scope) {
 	fnScope := NewScope(parent, ScopeFunc)
-
 	if d.Self != nil {
 		fnScope.Insert(d.Self.Name, &Symbol{Name: d.Self.Name, Kind: "param", Decl: d, Type: d.Self.Type})
 	}
@@ -163,11 +158,9 @@ func (a *Analyzer) checkFuncDecl(d *ast.FuncDecl, parent *Scope) {
 			a.errorf(p.Start, "parameter %q redeclared", p.Name)
 		}
 	}
-
 	if d.IsAsync && d.IsGpu {
 		a.errorf(d.Start, "func %q cannot be both async and gpu", d.Name)
 	}
-
 	if d.Body != nil {
 		a.checkBlock(d.Body, fnScope)
 	}
@@ -229,8 +222,6 @@ func (a *Analyzer) checkStmt(stmt ast.Stmt, scope *Scope) {
 				a.checkStmt(st, defScope)
 			}
 		}
-	case *ast.BreakStmt, *ast.ContinueStmt:
-		// Validated in a later pass that checks loop nesting.
 	}
 }
 
@@ -266,18 +257,15 @@ func (a *Analyzer) checkDeclStmt(s *ast.DeclStmt, scope *Scope) {
 	}
 }
 
-// inferCompositeLitType recursively pushes the expected type down into a composite literal
-// and its children (e.g. for multidimensional arrays).
+// inferCompositeLitType recursively pushes the expected type down into a composite literal.
 func (a *Analyzer) inferCompositeLitType(expr ast.Expr, typeRef ast.TypeRef) {
 	lit, ok := expr.(*ast.CompositeLit)
 	if !ok || typeRef == nil {
 		return
 	}
-	// Only overwrite if missing.
 	if lit.Type == nil {
 		lit.Type = typeRef
 	}
-
 	// Recurse for container types.
 	switch t := typeRef.(type) {
 	case *ast.ArrayType:
@@ -341,7 +329,6 @@ func (a *Analyzer) checkExpr(expr ast.Expr, scope *Scope) {
 		}
 	case *ast.SelectorExpr:
 		a.checkExpr(e.X, scope)
-		// Field resolution happens in a later pass once types are fully inferred.
 	case *ast.IndexExpr:
 		a.checkExpr(e.X, scope)
 		a.checkExpr(e.Index, scope)
@@ -359,7 +346,6 @@ func (a *Analyzer) checkExpr(expr ast.Expr, scope *Scope) {
 			a.checkExpr(f, scope)
 		}
 	case *ast.KeyValueExpr:
-		// Key in a field init is an Ident naming the field — don't resolve it as a variable.
 		a.checkExpr(e.Value, scope)
 	case *ast.TupleLit:
 		for _, el := range e.Elems {
@@ -377,7 +363,7 @@ func (a *Analyzer) checkExpr(expr ast.Expr, scope *Scope) {
 			procScope.Insert(p.Name, &Symbol{Name: p.Name, Kind: "param", Decl: p, Type: p.Type})
 		}
 		for _, arg := range e.Args {
-			a.checkExpr(arg, scope) // args evaluated in outer scope
+			a.checkExpr(arg, scope)
 		}
 		a.checkBlock(e.Body, procScope)
 	case *ast.NewExpr:
@@ -388,7 +374,5 @@ func (a *Analyzer) checkExpr(expr ast.Expr, scope *Scope) {
 		a.checkExpr(e.X, scope)
 	case *ast.CastExpr:
 		a.checkExpr(e.X, scope)
-	case *ast.BasicLit:
-		// Always valid.
 	}
 }
