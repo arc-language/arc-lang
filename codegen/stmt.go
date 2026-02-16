@@ -326,12 +326,15 @@ func (cg *Codegen) genIf(s *ast.IfStmt) error {
 }
 
 func (cg *Codegen) genFor(s *ast.ForStmt) error {
+	fmt.Printf("DEBUG genFor: entering\n")
 	cg.pushScope()
 	defer cg.popScope()
 	if s.Init != nil {
+		fmt.Printf("DEBUG genFor: executing init\n")
 		if err := cg.genStmt(s.Init); err != nil {
 			return err
 		}
+		fmt.Printf("DEBUG genFor: scope after init has %d entries\n", len(cg.scopes[len(cg.scopes)-1]))
 	}
 	condBlock := cg.Builder.CreateBlock("for.cond")
 	bodyBlock := cg.Builder.CreateBlock("for.body")
@@ -340,7 +343,11 @@ func (cg *Codegen) genFor(s *ast.ForStmt) error {
 	cg.Builder.CreateBr(condBlock)
 	cg.Builder.SetInsertPoint(condBlock)
 	if s.Cond != nil {
+		fmt.Printf("DEBUG genFor: evaluating condition\n")
 		cond := cg.genExpr(s.Cond)
+		if cond == nil {
+			return fmt.Errorf("for condition produced nil")
+		}
 		if cond.Type().BitSize() != 1 {
 			zero := cg.Builder.ConstInt(types.I32, 0)
 			cond = cg.Builder.CreateICmpNE(cond, zero, "cond")
@@ -351,6 +358,7 @@ func (cg *Codegen) genFor(s *ast.ForStmt) error {
 	}
 	cg.pushLoop(postBlock, endBlock)
 	cg.Builder.SetInsertPoint(bodyBlock)
+	fmt.Printf("DEBUG genFor: executing body, current scopes=%d\n", len(cg.scopes))
 	if err := cg.genBlock(s.Body); err != nil {
 		return err
 	}
@@ -360,7 +368,9 @@ func (cg *Codegen) genFor(s *ast.ForStmt) error {
 	}
 	cg.Builder.SetInsertPoint(postBlock)
 	if s.Post != nil {
+		fmt.Printf("DEBUG genFor: executing post, scopes=%d\n", len(cg.scopes))
 		if err := cg.genStmt(s.Post); err != nil {
+			fmt.Printf("DEBUG genFor: post statement error: %v\n", err)
 			return err
 		}
 	}

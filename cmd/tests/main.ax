@@ -1,4 +1,4 @@
-//@test(expect = "matrix[1][1]=4")
+//@test(expect = "sum=10")
 namespace main
 
 extern c {
@@ -7,11 +7,11 @@ extern c {
 
 func main() int32 {
 
-    let matrix: [2][2]int32 = {
-        {1, 2},
-        {3, 4}
+    let sum = 0
+    for let i = 0; i < 5; i++ {
+        sum += i
     }
-    printf("matrix[1][1]=%d\n", matrix[1][1])
+    printf("sum=%d\n", sum)
 
     return 0
 }
