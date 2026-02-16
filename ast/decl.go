@@ -47,6 +47,9 @@ type ConstSpec struct {
 	Start Position
 }
 
+func (s *ConstSpec) Pos() Position { return s.Start }
+func (s *ConstSpec) End() Position { return s.Start }
+
 // ConstDecl represents "const X = 1" or "const ( X = 1; Y = 2 )".
 type ConstDecl struct {
 	Specs []*ConstSpec
@@ -80,6 +83,9 @@ type SelfParam struct {
 	Start Position
 }
 
+func (s *SelfParam) Pos() Position { return s.Start }
+func (s *SelfParam) End() Position { return s.Start }
+
 // Field is a name:type pair used in params, interface fields, and generic params.
 type Field struct {
 	Name  string
@@ -87,18 +93,21 @@ type Field struct {
 	Start Position
 }
 
+func (f *Field) Pos() Position { return f.Start }
+func (f *Field) End() Position { return f.Start }
+
 // FuncDecl represents any function: plain, async, gpu, method, or generic.
 type FuncDecl struct {
 	Attrs         []*Attribute
 	Name          string
 	IsAsync       bool
 	IsGpu         bool
-	Self          *SelfParam  // nil for free functions
-	GenericParams []string    // ["T", "U"] — names only; constraints TBD
+	Self          *SelfParam // nil for free functions
+	GenericParams []string   // ["T", "U"] — names only; constraints TBD
 	Params        []*Field
-	IsVariadic    bool        // true if last param is "..."
-	ReturnType    TypeRef     // nil for void; TupleType for multiple returns
-	Body          *BlockStmt  // nil for extern declarations
+	IsVariadic    bool       // true if last param is "..."
+	ReturnType    TypeRef    // nil for void; TupleType for multiple returns
+	Body          *BlockStmt // nil for extern declarations
 	Start         Position
 }
 
@@ -142,6 +151,9 @@ type EnumMember struct {
 	Start Position
 }
 
+func (m *EnumMember) Pos() Position { return m.Start }
+func (m *EnumMember) End() Position { return m.Start }
+
 // EnumDecl represents "enum Direction: uint8 { ... }".
 type EnumDecl struct {
 	Name           string
@@ -156,10 +168,10 @@ func (d *EnumDecl) declNode()     {}
 
 // TypeAliasDecl represents "type FILE = opaque" or "type X = SomeType".
 type TypeAliasDecl struct {
-	Name   string
+	Name     string
 	IsOpaque bool
-	Type   TypeRef // nil when IsOpaque
-	Start  Position
+	Type     TypeRef // nil when IsOpaque
+	Start    Position
 }
 
 func (d *TypeAliasDecl) Pos() Position { return d.Start }
@@ -196,6 +208,8 @@ type ExternFunc struct {
 	Start      Position
 }
 
+func (e *ExternFunc) Pos() Position    { return e.Start }
+func (e *ExternFunc) End() Position    { return e.Start }
 func (e *ExternFunc) externMemberNode() {}
 
 // ExternTypeAlias is "type Comparator = func(*void,*void) int32" inside extern.
@@ -205,7 +219,23 @@ type ExternTypeAlias struct {
 	Start Position
 }
 
+func (e *ExternTypeAlias) Pos() Position    { return e.Start }
+func (e *ExternTypeAlias) End() Position    { return e.Start }
 func (e *ExternTypeAlias) externMemberNode() {}
+
+// ExternType describes a C/C++ struct, union, or typedef binding inside an extern block.
+// Kind is one of: "struct", "union", "typedef".
+type ExternType struct {
+	Kind   string   // "struct", "union", or "typedef"
+	Name   string   // Arc-side name
+	Symbol string   // C-side name if different; empty = same as Name
+	Fields []*Field // nil for opaque / typedef forms
+	Start  Position
+}
+
+func (e *ExternType) Pos() Position    { return e.Start }
+func (e *ExternType) End() Position    { return e.Start }
+func (e *ExternType) externMemberNode() {}
 
 // ExternNamespace wraps a "namespace Foo { ... }" block inside extern cpp.
 type ExternNamespace struct {
@@ -214,6 +244,8 @@ type ExternNamespace struct {
 	Start   Position
 }
 
+func (e *ExternNamespace) Pos() Position    { return e.Start }
+func (e *ExternNamespace) End() Position    { return e.Start }
 func (e *ExternNamespace) externMemberNode() {}
 
 // ExternClass wraps a "class ID3D11Device { ... }" block inside extern cpp.
@@ -225,6 +257,8 @@ type ExternClass struct {
 	Start      Position
 }
 
+func (e *ExternClass) Pos() Position    { return e.Start }
+func (e *ExternClass) End() Position    { return e.Start }
 func (e *ExternClass) externMemberNode() {}
 
 // ExternMethodKind distinguishes the four kinds of class members.
@@ -249,3 +283,6 @@ type ExternMethod struct {
 	IsConst    bool // true for "const" methods
 	Start      Position
 }
+
+func (e *ExternMethod) Pos() Position { return e.Start }
+func (e *ExternMethod) End() Position { return e.Start }
