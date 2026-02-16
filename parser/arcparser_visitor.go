@@ -329,6 +329,9 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#TypedInitExpr.
 	VisitTypedInitExpr(ctx *TypedInitExprContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#BareInitExpr.
+	VisitBareInitExpr(ctx *BareInitExprContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#VectorLiteral.
 	VisitVectorLiteral(ctx *VectorLiteralContext) interface{}
 

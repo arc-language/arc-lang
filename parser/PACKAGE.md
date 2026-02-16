@@ -1021,6 +1021,9 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#TypedInitExpr.
 	VisitTypedInitExpr(ctx *TypedInitExprContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#BareInitExpr.
+	VisitBareInitExpr(ctx *BareInitExprContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#VectorLiteral.
 	VisitVectorLiteral(ctx *VectorLiteralContext) interface{}
 
@@ -1275,6 +1278,18 @@ func (s *AwaitExprContext) Expression() IExpressionContext
 
 func (s *AwaitExprContext) GetRuleContext() antlr.RuleContext
 
+type BareInitExprContext struct {
+	PrimaryContext
+}
+
+func NewBareInitExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *BareInitExprContext
+
+func (s *BareInitExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *BareInitExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *BareInitExprContext) InitializerBlock() IInitializerBlockContext
+
 type BaseArcParserVisitor struct {
 	*antlr.BaseParseTreeVisitor
 }
@@ -1296,6 +1311,8 @@ func (v *BaseArcParserVisitor) VisitAssignmentTarget(ctx *AssignmentTargetContex
 func (v *BaseArcParserVisitor) VisitAttribute(ctx *AttributeContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitAwaitExpr(ctx *AwaitExprContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitBareInitExpr(ctx *BareInitExprContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitBaseType(ctx *BaseTypeContext) interface{}
 

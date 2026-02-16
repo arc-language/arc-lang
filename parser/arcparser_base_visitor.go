@@ -436,6 +436,10 @@ func (v *BaseArcParserVisitor) VisitTypedInitExpr(ctx *TypedInitExprContext) int
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseArcParserVisitor) VisitBareInitExpr(ctx *BareInitExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseArcParserVisitor) VisitVectorLiteral(ctx *VectorLiteralContext) interface{} {
 	return v.VisitChildren(ctx)
 }
