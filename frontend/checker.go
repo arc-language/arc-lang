@@ -237,6 +237,10 @@ func (a *Analyzer) checkStmt(stmt ast.Stmt, scope *Scope) {
 func (a *Analyzer) checkDeclStmt(s *ast.DeclStmt, scope *Scope) {
 	switch d := s.Decl.(type) {
 	case *ast.VarDecl:
+		// Propagate type to CompositeLit if explicit type is present
+		if d.Type != nil && d.Value != nil {
+			a.inferCompositeLitType(d.Value, d.Type)
+		}
 		if d.Value != nil {
 			a.checkExpr(d.Value, scope)
 		}
@@ -249,12 +253,48 @@ func (a *Analyzer) checkDeclStmt(s *ast.DeclStmt, scope *Scope) {
 		}
 	case *ast.ConstDecl:
 		for _, spec := range d.Specs {
+			if spec.Type != nil && spec.Value != nil {
+				a.inferCompositeLitType(spec.Value, spec.Type)
+			}
 			if spec.Value != nil {
 				a.checkExpr(spec.Value, scope)
 			}
 			if prev := scope.Insert(spec.Name, &Symbol{Name: spec.Name, Kind: "const", Decl: spec}); prev != nil {
 				a.errorf(spec.Start, "const %q redeclared in this block", spec.Name)
 			}
+		}
+	}
+}
+
+// inferCompositeLitType recursively pushes the expected type down into a composite literal
+// and its children (e.g. for multidimensional arrays).
+func (a *Analyzer) inferCompositeLitType(expr ast.Expr, typeRef ast.TypeRef) {
+	lit, ok := expr.(*ast.CompositeLit)
+	if !ok || typeRef == nil {
+		return
+	}
+	// Only overwrite if missing.
+	if lit.Type == nil {
+		lit.Type = typeRef
+	}
+
+	// Recurse for container types.
+	switch t := typeRef.(type) {
+	case *ast.ArrayType:
+		for _, f := range lit.Fields {
+			val := f
+			if kv, ok := f.(*ast.KeyValueExpr); ok {
+				val = kv.Value
+			}
+			a.inferCompositeLitType(val, t.Elem)
+		}
+	case *ast.VectorType:
+		for _, f := range lit.Fields {
+			val := f
+			if kv, ok := f.(*ast.KeyValueExpr); ok {
+				val = kv.Value
+			}
+			a.inferCompositeLitType(val, t.Elem)
 		}
 	}
 }

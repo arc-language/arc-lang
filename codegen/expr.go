@@ -238,12 +238,12 @@ func (cg *Codegen) exprName(e ast.Expr) string {
 // ─── Index ────────────────────────────────────────────────────────────────────
 
 func (cg *Codegen) genIndex(e *ast.IndexExpr) ir.Value {
-	// Delegate to genLValue to handle proper address calculation for arrays/slices.
+	// Delegate to genLValue for correct pointer arithmetic (handling arrays vs slices)
 	ptr := cg.genLValue(e)
 	if ptr == nil {
 		return nil
 	}
-	// The result of genLValue is the address of the element. We just load it.
+	// The result of genLValue is the address of the element. Load it.
 	pt, ok := ptr.Type().(*types.PointerType)
 	if !ok {
 		return nil
@@ -572,38 +572,66 @@ func (cg *Codegen) genCompositeLit(e *ast.CompositeLit) ir.Value {
 		return nil
 	}
 	irType := cg.TypeGen.GenType(e.Type)
-	st, ok := irType.(*types.StructType)
-	if !ok {
-		return nil
+
+	// Case 1: Structs
+	if st, ok := irType.(*types.StructType); ok {
+		alloca := cg.Builder.CreateAlloca(st, "composite")
+		cg.Builder.CreateStore(cg.Builder.ConstZero(st), alloca)
+
+		for _, field := range e.Fields {
+			switch f := field.(type) {
+			case *ast.KeyValueExpr:
+				keyName := ""
+				if id, ok := f.Key.(*ast.Ident); ok {
+					keyName = id.Name
+				}
+				idx := cg.TypeGen.FieldIndex(st.Name, keyName)
+				if idx < 0 {
+					continue
+				}
+				val := cg.genExpr(f.Value)
+				if val == nil {
+					continue
+				}
+				fieldPtr := cg.Builder.CreateStructGEP(st, alloca, idx, keyName+".ptr")
+				cg.Builder.CreateStore(val, fieldPtr)
+			default:
+				// Positional init is not common for structs in Arc; skip.
+			}
+		}
+		return cg.Builder.CreateLoad(st, alloca, "composite.val")
 	}
 
-	// Allocate a temporary stack slot, zero-initialise, then fill fields.
-	alloca := cg.Builder.CreateAlloca(st, "composite")
-	cg.Builder.CreateStore(cg.Builder.ConstZero(st), alloca)
+	// Case 2: Arrays (fixed-size)
+	if at, ok := irType.(*types.ArrayType); ok {
+		alloca := cg.Builder.CreateAlloca(at, "array.lit")
+		cg.Builder.CreateStore(cg.Builder.ConstZero(at), alloca)
 
-	for _, field := range e.Fields {
-		switch f := field.(type) {
-		case *ast.KeyValueExpr:
-			keyName := ""
-			if id, ok := f.Key.(*ast.Ident); ok {
-				keyName = id.Name
+		for i, field := range e.Fields {
+			// Unwrap KeyValueExpr if present; otherwise use raw expression.
+			// (Assuming positional initialization for arrays for now)
+			var valExpr ast.Expr
+			if kv, ok := field.(*ast.KeyValueExpr); ok {
+				valExpr = kv.Value
+			} else {
+				valExpr = field.(ast.Expr)
 			}
-			idx := cg.TypeGen.FieldIndex(st.Name, keyName)
-			if idx < 0 {
-				continue
-			}
-			val := cg.genExpr(f.Value)
+
+			val := cg.genExpr(valExpr)
 			if val == nil {
 				continue
 			}
-			fieldPtr := cg.Builder.CreateStructGEP(st, alloca, idx, keyName+".ptr")
-			cg.Builder.CreateStore(val, fieldPtr)
-		default:
-			// Positional init is not common for structs in Arc; skip.
+			val = cg.emitCast(val, at.ElementType)
+
+			zero := cg.Builder.ConstInt(types.I32, 0)
+			idx := cg.Builder.ConstInt(types.I32, int64(i))
+			elemPtr := cg.Builder.CreateInBoundsGEP(at, alloca, []ir.Value{zero, idx}, fmt.Sprintf("elem.%d.ptr", i))
+			cg.Builder.CreateStore(val, elemPtr)
 		}
+		return cg.Builder.CreateLoad(at, alloca, "array.val")
 	}
 
-	return cg.Builder.CreateLoad(st, alloca, "composite.val")
+	return nil
 }
 
 func (cg *Codegen) genTupleLit(e *ast.TupleLit) ir.Value {
