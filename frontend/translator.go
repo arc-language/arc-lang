@@ -1104,7 +1104,14 @@ func (t *translator) primary(ctx parser.IPrimaryContext) ast.Expr {
 
 	// ── Typed initializer: Point{x:1} or Box[int32]{...} ──
 	case *parser.TypedInitExprContext:
-		name := p.QualifiedName().GetText()
+		// FIX: Check if it's a QualifiedName OR a simple IDENTIFIER
+		name := ""
+		if p.QualifiedName() != nil {
+			name = p.QualifiedName().GetText()
+		} else {
+			name = p.IDENTIFIER().GetText()
+		}
+
 		var gargs []ast.TypeRef
 		if p.GenericArgs() != nil {
 			for _, tr := range p.GenericArgs().AllTypeRef() {
