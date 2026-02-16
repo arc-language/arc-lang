@@ -494,7 +494,7 @@ primary
     // Typed Initializer: Point{...} or routes{...}
     | (qualifiedName | IDENTIFIER) genericArgs? initializerBlock       # TypedInitExpr
 
-    // FIX: Bare Initializer: {...}. Required for array/struct inference like 'let x: [2]int = {1, 2}'
+    // Bare Initializer: {...} (for array/struct inference)
     | initializerBlock          # BareInitExpr
 
     | VECTOR LBRACKET typeRef RBRACKET initializerBlock                # VectorLiteral
@@ -522,9 +522,9 @@ primary
 
 initializerBlock
     : LBRACE RBRACE
-    | LBRACE fieldInit (COMMA fieldInit)* COMMA? RBRACE
-    | LBRACE expression (COMMA expression)* COMMA? RBRACE
-    | LBRACE mapEntry (COMMA mapEntry)* COMMA? RBRACE
+    | LBRACE fieldInit (COMMA fieldInit)* COMMA? semi? RBRACE
+    | LBRACE expression (COMMA expression)* COMMA? semi? RBRACE
+    | LBRACE mapEntry (COMMA mapEntry)* COMMA? semi? RBRACE
     ;
 
 fieldInit

@@ -4058,6 +4058,7 @@ type IInitializerBlockContext interface {
 	FieldInit(i int) IFieldInitContext
 	AllCOMMA() []antlr.TerminalNode
 	COMMA(i int) antlr.TerminalNode
+	Semi() ISemiContext
 	AllExpression() []IExpressionContext
 	Expression(i int) IExpressionContext
 	AllMapEntry() []IMapEntryContext
@@ -4787,6 +4788,8 @@ func (s *InitializerBlockContext) LBRACE() antlr.TerminalNode
 func (s *InitializerBlockContext) MapEntry(i int) IMapEntryContext
 
 func (s *InitializerBlockContext) RBRACE() antlr.TerminalNode
+
+func (s *InitializerBlockContext) Semi() ISemiContext
 
 func (s *InitializerBlockContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 

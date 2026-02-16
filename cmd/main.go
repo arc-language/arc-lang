@@ -39,16 +39,18 @@ const usage = `Arc compiler
 
 Usage:
   arc build <file> [flags]   Compile and link a dynamic binary (default)
-  arc ir     <file> [flags]  Emit IR text
+  arc ir     <file> [flags]  Emit IR text to stdout or -o file
   arc obj    <file> [flags]  Emit relocatable object (.o)
   arc exe    <file> [flags]  Emit static ELF executable
 
 Flags:
-  -o <path>      Output file (default derived from source name)
-  -L <dir>       Library search path (repeatable)
-  -l <name>      Link against shared library, e.g. -l c (repeatable)
-  -entry <sym>   Entry point symbol for dynamic binaries (default: _start)
-  -debug-ast     Print the lowered AST before codegen
+  -o <path>        Output file (default derived from source name)
+  -L <dir>         Library search path (repeatable)
+  -l <name>        Link against shared library, e.g. -l c (repeatable)
+  -entry <sym>     Entry point symbol for dynamic binaries (default: _start)
+  -debug-ast       Print the lowered AST before codegen
+  -print-ir        Print the generated IR to stderr during any build mode
+  -dump-ir <path>  Write the generated IR to a file during any build mode
 `
 
 func main() {
@@ -94,6 +96,8 @@ func main() {
 	outputFile := fs.String("o", "", "Output file")
 	entryPoint := fs.String("entry", "_start", "Entry point symbol (bin mode only)")
 	debugAST   := fs.Bool("debug-ast", false, "Print the lowered AST before codegen")
+	printIR    := fs.Bool("print-ir", false, "Print generated IR to stderr")
+	dumpIR     := fs.String("dump-ir", "", "Write generated IR to this file")
 
 	var libPaths multiFlag
 	var linkLibs multiFlag
@@ -158,18 +162,33 @@ func main() {
 		fatalf("codegen error: %v", err)
 	}
 
+	// IR debug output — runs for every mode when requested
+	irText := irModule.String()
+
+	if *printIR {
+		fmt.Fprintln(os.Stderr, "── generated IR ─────────────────────────────")
+		fmt.Fprint(os.Stderr, irText)
+		fmt.Fprintln(os.Stderr, "─────────────────────────────────────────────")
+	}
+
+	if *dumpIR != "" {
+		if err := os.WriteFile(*dumpIR, []byte(irText), 0o644); err != nil {
+			fatalf("cannot write IR dump to '%s': %v", *dumpIR, err)
+		}
+		log.Printf("IR dumped  →  %s", *dumpIR)
+	}
+
 	// Phase 5: Backend
 	switch mode {
 
 	case emitIR:
-		ir := irModule.String()
 		if *outputFile != "" {
-			if err := os.WriteFile(*outputFile, []byte(ir), 0o644); err != nil {
+			if err := os.WriteFile(*outputFile, []byte(irText), 0o644); err != nil {
 				fatalf("cannot write '%s': %v", *outputFile, err)
 			}
 			log.Printf("compiled '%s'  →  %s  (IR)", sourceFile, *outputFile)
 		} else {
-			fmt.Print(ir)
+			fmt.Print(irText)
 		}
 
 	case emitObj:
