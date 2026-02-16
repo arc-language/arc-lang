@@ -198,6 +198,28 @@ func (cg *Codegen) genUnary(e *ast.UnaryExpr) ir.Value {
 		return cg.Builder.CreateXor(x, allOnes, "bitnot")
 	case "&":
 		return cg.genLValue(e.X)
+	case "++", "--":
+		// Postfix increment/decrement: load, modify, store, return original value
+		ptr := cg.genLValue(e.X)
+		if ptr == nil {
+			return nil
+		}
+		pt := ptr.Type().(*types.PointerType)
+		cur := cg.Builder.CreateLoad(pt.ElementType, ptr, "")
+		one := cg.Builder.ConstInt(types.I32, 1)
+		if it, ok := pt.ElementType.(*types.IntType); ok && it.BitWidth != 32 {
+			one = &ir.ConstantInt{}
+			one.SetType(pt.ElementType)
+			one.Value = 1
+		}
+		var next ir.Value
+		if e.Op == "++" {
+			next = cg.Builder.CreateAdd(cur, one, "")
+		} else {
+			next = cg.Builder.CreateSub(cur, one, "")
+		}
+		cg.Builder.CreateStore(next, ptr)
+		return cur // Return original value for postfix operators
 	}
 	return x
 }
