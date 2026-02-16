@@ -1,18 +1,16 @@
 lexer grammar ArcLexer;
 
 // ─────────────────────────────────────────────
-//  NOTE: This grammar expects a post-lexer semicolon insertion pass
-//  (similar to Go). After lexing, a token filter inserts synthetic SEMI
-//  tokens at newlines when the preceding token is one of:
-//    IDENTIFIER, INT_LIT, FLOAT_LIT, STRING_LIT, CHAR_LIT,
-//    TRUE, FALSE, NULL, RETURN, BREAK, CONTINUE,
-//    RPAREN, RBRACKET, RBRACE, INC, DEC,
-//    or any primitive type keyword.
-//  The parser consumes SEMI as an optional statement terminator.
+//  NOTE: Post-Lexer Semicolon Insertion Rule
+//  This grammar assumes a TokenSource filter runs after the lexer.
+//  It MUST insert a SEMI token when a newline occurs after:
+//    1. Identifiers & Literals (IDENTIFIER, INT_LIT, STRING_LIT, etc.)
+//    2. Keywords: RETURN, BREAK, CONTINUE, FALLTHROUGH
+//    3. Operators: INC (++), DEC (--), RPAREN ), RBRACKET ], RBRACE }
+//    4. Primitive types (int32, string, etc.)
 // ─────────────────────────────────────────────
 
-// ── Keywords: structure ──────────────────────
-
+// ── Keywords: Structure ──────────────────────
 NAMESPACE   : 'namespace';
 IMPORT      : 'import';
 FUNC        : 'func';
@@ -46,29 +44,25 @@ SELF        : 'self';
 MUT         : 'mut';
 VOID        : 'void';
 
-// ── Keywords: literals ───────────────────────
-
+// ── Keywords: Literals ───────────────────────
 NULL        : 'null';
 TRUE        : 'true';
 FALSE       : 'false';
 
-// ── Keywords: extern ─────────────────────────
-
+// ── Keywords: Extern ─────────────────────────
 CLASS       : 'class';
 VIRTUAL     : 'virtual';
 STATIC      : 'static';
 ABSTRACT    : 'abstract';
 
-// ── Keywords: calling conventions ────────────
-
+// ── Keywords: Calling Conventions ────────────
 CDECL       : 'cdecl';
 STDCALL     : 'stdcall';
 THISCALL    : 'thiscall';
 VECTORCALL  : 'vectorcall';
 FASTCALL    : 'fastcall';
 
-// ── Keywords: primitive types ────────────────
-
+// ── Keywords: Primitive Types ────────────────
 INT8        : 'int8';
 INT16       : 'int16';
 INT32       : 'int32';
@@ -86,13 +80,11 @@ BOOL        : 'bool';
 CHAR        : 'char';
 STRING      : 'string';
 
-// ── Keywords: collection types ───────────────
-
+// ── Keywords: Collections ────────────────────
 VECTOR      : 'vector';
 MAP         : 'map';
 
-// ── Operators: multi-char (order matters) ────
-
+// ── Operators: Multi-char ────────────────────
 ARROW       : '=>';
 ELLIPSIS    : '...';
 RANGE       : '..';
@@ -117,8 +109,7 @@ XOR_ASSIGN  : '^=';
 SHL_ASSIGN  : '<<=';
 SHR_ASSIGN  : '>>=';
 
-// ── Operators: single-char ───────────────────
-
+// ── Operators: Single-char ───────────────────
 LPAREN      : '(';
 RPAREN      : ')';
 LBRACKET    : '[';
@@ -146,48 +137,18 @@ AT          : '@';
 UNDERSCORE  : '_';
 
 // ── Literals ─────────────────────────────────
-
-HEX_LIT
-    : '0' [xX] [0-9a-fA-F] [0-9a-fA-F_]*
-    ;
-
-FLOAT_LIT
-    : [0-9] [0-9_]* '.' [0-9] [0-9_]* ([eE] [+\-]? [0-9]+)?
-    | [0-9] [0-9_]* [eE] [+\-]? [0-9]+
-    ;
-
-INT_LIT
-    : [0-9] [0-9_]*
-    ;
-
-CHAR_LIT
-    : '\'' ( '\\' [nrt\\'0] | ~['\\\r\n] ) '\''
-    ;
-
-STRING_LIT
-    : '"' ( '\\' [nrt\\"0] | ~["\\\r\n] )* '"'
-    ;
+HEX_LIT     : '0' [xX] [0-9a-fA-F] [0-9a-fA-F_]*;
+FLOAT_LIT   : [0-9] [0-9_]* '.' [0-9] [0-9_]* ([eE] [+\-]? [0-9]+)?
+            | [0-9] [0-9_]* [eE] [+\-]? [0-9]+;
+INT_LIT     : [0-9] [0-9_]*;
+CHAR_LIT    : '\'' ( '\\' [nrt\\'0] | ~['\\\r\n] ) '\'';
+STRING_LIT  : '"' ( '\\' [nrt\\"0] | ~["\\\r\n] )* '"';
 
 // ── Identifiers ──────────────────────────────
+IDENTIFIER  : [a-zA-Z_] [a-zA-Z0-9_]*;
 
-IDENTIFIER
-    : [a-zA-Z_] [a-zA-Z0-9_]*
-    ;
-
-// ── Whitespace and comments ──────────────────
-
-NL
-    : [\r\n]+ -> channel(HIDDEN)
-    ;
-
-WS
-    : [ \t]+ -> skip
-    ;
-
-LINE_COMMENT
-    : '//' ~[\r\n]* -> channel(HIDDEN)
-    ;
-
-BLOCK_COMMENT
-    : '/*' .*? '*/' -> channel(HIDDEN)
-    ;
+// ── Whitespace and Comments ──────────────────
+NL          : [\r\n]+ -> channel(HIDDEN);
+WS          : [ \t]+ -> skip;
+LINE_COMMENT: '//' ~[\r\n]* -> channel(HIDDEN);
+BLOCK_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);

@@ -1964,6 +1964,8 @@ func (s *EnumDeclContext) PrimitiveType() IPrimitiveTypeContext
 
 func (s *EnumDeclContext) RBRACE() antlr.TerminalNode
 
+func (s *EnumDeclContext) Semi() ISemiContext
+
 func (s *EnumDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type EnumMemberContext struct {
@@ -3331,6 +3333,7 @@ type IEnumDeclContext interface {
 	PrimitiveType() IPrimitiveTypeContext
 	AllEnumMember() []IEnumMemberContext
 	EnumMember(i int) IEnumMemberContext
+	Semi() ISemiContext
 
 	// IsEnumDeclContext differentiates from other interfaces.
 	IsEnumDeclContext()
@@ -4168,6 +4171,7 @@ type INamespaceDeclContext interface {
 	NAMESPACE() antlr.TerminalNode
 	AllIDENTIFIER() []antlr.TerminalNode
 	IDENTIFIER(i int) antlr.TerminalNode
+	Semi() ISemiContext
 	AllDOT() []antlr.TerminalNode
 	DOT(i int) antlr.TerminalNode
 
@@ -4437,7 +4441,6 @@ type ITopLevelDeclContext interface {
 
 	// Getter signatures
 	ImportDecl() IImportDeclContext
-	Semi() ISemiContext
 	ConstDecl() IConstDeclContext
 	TopLevelVarDecl() ITopLevelVarDeclContext
 	TopLevelLetDecl() ITopLevelLetDeclContext
@@ -4449,6 +4452,7 @@ type ITopLevelDeclContext interface {
 	EnumDecl() IEnumDeclContext
 	TypeAliasDecl() ITypeAliasDeclContext
 	ExternDecl() IExternDeclContext
+	Semi() ISemiContext
 
 	// IsTopLevelDeclContext differentiates from other interfaces.
 	IsTopLevelDeclContext()
@@ -4466,6 +4470,7 @@ type ITopLevelLetDeclContext interface {
 	IDENTIFIER() antlr.TerminalNode
 	ASSIGN() antlr.TerminalNode
 	Expression() IExpressionContext
+	Semi() ISemiContext
 	COLON() antlr.TerminalNode
 	TypeRef() ITypeRefContext
 
@@ -4485,6 +4490,7 @@ type ITopLevelVarDeclContext interface {
 	IDENTIFIER() antlr.TerminalNode
 	ASSIGN() antlr.TerminalNode
 	Expression() IExpressionContext
+	Semi() ISemiContext
 	COLON() antlr.TerminalNode
 	TypeRef() ITypeRefContext
 	NULL() antlr.TerminalNode
@@ -4524,6 +4530,7 @@ type ITypeAliasDeclContext interface {
 	IDENTIFIER() antlr.TerminalNode
 	ASSIGN() antlr.TerminalNode
 	OPAQUE() antlr.TerminalNode
+	Semi() ISemiContext
 	TypeRef() ITypeRefContext
 
 	// IsTypeAliasDeclContext differentiates from other interfaces.
@@ -5113,6 +5120,8 @@ func (s *NamespaceDeclContext) IDENTIFIER(i int) antlr.TerminalNode
 func (*NamespaceDeclContext) IsNamespaceDeclContext()
 
 func (s *NamespaceDeclContext) NAMESPACE() antlr.TerminalNode
+
+func (s *NamespaceDeclContext) Semi() ISemiContext
 
 func (s *NamespaceDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
@@ -5858,6 +5867,8 @@ func (*TopLevelLetDeclContext) IsTopLevelLetDeclContext()
 
 func (s *TopLevelLetDeclContext) LET() antlr.TerminalNode
 
+func (s *TopLevelLetDeclContext) Semi() ISemiContext
+
 func (s *TopLevelLetDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 func (s *TopLevelLetDeclContext) TypeRef() ITypeRefContext
@@ -5888,6 +5899,8 @@ func (s *TopLevelVarDeclContext) IDENTIFIER() antlr.TerminalNode
 func (*TopLevelVarDeclContext) IsTopLevelVarDeclContext()
 
 func (s *TopLevelVarDeclContext) NULL() antlr.TerminalNode
+
+func (s *TopLevelVarDeclContext) Semi() ISemiContext
 
 func (s *TopLevelVarDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
@@ -5982,6 +5995,8 @@ func (s *TypeAliasDeclContext) IDENTIFIER() antlr.TerminalNode
 func (*TypeAliasDeclContext) IsTypeAliasDeclContext()
 
 func (s *TypeAliasDeclContext) OPAQUE() antlr.TerminalNode
+
+func (s *TypeAliasDeclContext) Semi() ISemiContext
 
 func (s *TypeAliasDeclContext) TYPE() antlr.TerminalNode
 
