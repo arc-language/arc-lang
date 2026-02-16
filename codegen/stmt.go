@@ -88,17 +88,22 @@ func (cg *Codegen) genDeclStmt(s *ast.DeclStmt) error {
 func (cg *Codegen) genVarDecl(d *ast.VarDecl) error {
 	var alloca *ir.AllocaInst
 	if d.Value != nil {
+		fmt.Printf("DEBUG genVarDecl: %s has Value (type=%T)\n", d.Name, d.Value)
 		val := cg.genExpr(d.Value)
 		if val == nil {
+			fmt.Printf("DEBUG genVarDecl: genExpr returned nil for %s\n", d.Name)
 			return fmt.Errorf("genVarDecl: init expr for %q produced nil value", d.Name)
 		}
+		fmt.Printf("DEBUG genVarDecl: genExpr returned %T for %s\n", val, d.Name)
 		alloca = cg.Builder.CreateAlloca(val.Type(), d.Name)
 		cg.Builder.CreateStore(val, alloca)
 	} else if d.Type != nil {
+		fmt.Printf("DEBUG genVarDecl: %s has no Value, using Type\n", d.Name)
 		irType := cg.TypeGen.GenType(d.Type)
 		alloca = cg.Builder.CreateAlloca(irType, d.Name)
 		cg.Builder.CreateStore(cg.Builder.ConstZero(irType), alloca)
 	} else if d.IsNull {
+		fmt.Printf("DEBUG genVarDecl: %s is null\n", d.Name)
 		irType := cg.TypeGen.GenType(d.Type)
 		alloca = cg.Builder.CreateAlloca(irType, d.Name)
 		if pt, ok := irType.(*types.PointerType); ok {
