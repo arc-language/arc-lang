@@ -5,7 +5,9 @@ import (
 	"github.com/arc-language/arc-lang/parser"
 )
 
-// tokenSliceSource implements antlr.TokenSource backed by a pre-built slice.
+// tokenSliceSource implements antlr.TokenSource backed by a pre-built token slice.
+// The full TokenSource interface requires: NextToken, GetLine, GetCharPositionInLine,
+// GetInputStream, and GetSourceName.
 type tokenSliceSource struct {
 	tokens []antlr.Token
 	index  int
@@ -13,23 +15,23 @@ type tokenSliceSource struct {
 
 func (s *tokenSliceSource) NextToken() antlr.Token {
 	if s.index >= len(s.tokens) {
-		// Return a bare EOF token.
-		tok := antlr.CommonTokenFactoryDEFAULT.Create(
+		return antlr.CommonTokenFactoryDEFAULT.Create(
 			&antlr.TokenSourceCharStreamPair{},
 			antlr.TokenEOF,
 			"<EOF>",
 			antlr.TokenDefaultChannel,
 			-1, -1, 0, 0,
 		)
-		return tok
 	}
 	t := s.tokens[s.index]
 	s.index++
 	return t
 }
 
-func (s *tokenSliceSource) GetSourceName() string      { return "<slice>" }
-func (s *tokenSliceSource) GetInputStream() antlr.CharStream { return nil }
+func (s *tokenSliceSource) GetLine() int                      { return 0 }
+func (s *tokenSliceSource) GetCharPositionInLine() int        { return 0 }
+func (s *tokenSliceSource) GetInputStream() antlr.CharStream  { return nil }
+func (s *tokenSliceSource) GetSourceName() string             { return "<slice>" }
 
 // createTokenStream wraps the generated lexer to perform Automatic Semicolon Insertion (ASI).
 // It returns a token stream that includes synthetic SEMI tokens where newlines imply termination.
@@ -42,7 +44,7 @@ func createTokenStream(input string) *antlr.CommonTokenStream {
 	allTokens := lexer.GetAllTokens()
 	var processedTokens []antlr.Token
 
-	// Grab the lexer's source pair once for use when minting synthetic tokens.
+	// Grab the lexer's source pair once for minting synthetic tokens.
 	sourcePair := lexer.GetTokenSourceCharStreamPair()
 
 	// 2. Iterate through tokens and inject SEMI where appropriate.
@@ -50,8 +52,6 @@ func createTokenStream(input string) *antlr.CommonTokenStream {
 		processedTokens = append(processedTokens, t)
 
 		if shouldInsertSemi(t, i, allTokens) {
-			// Use the factory so the token is a proper CommonToken with all
-			// fields set correctly. Line and column come from the real token.
 			semi := antlr.CommonTokenFactoryDEFAULT.Create(
 				sourcePair,
 				parser.ArcLexerSEMI,
@@ -65,18 +65,15 @@ func createTokenStream(input string) *antlr.CommonTokenStream {
 		}
 	}
 
-	// 3. Build the stream from the original lexer, then swap the token source
-	//    for our slice so the parser sees the modified token sequence.
+	// 3. Build a stream from the original lexer (satisfies the Lexer type requirement),
+	//    then swap the token source for our pre-built slice.
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	stream.SetTokenSource(&tokenSliceSource{tokens: processedTokens})
 	return stream
 }
 
 // shouldInsertSemi determines if a SEMI token should be inserted after token t.
-// Rule: Insert SEMI if the current token is a "statement ender" AND
-// the next token is on a new line (or if we are at EOF).
 func shouldInsertSemi(t antlr.Token, index int, all []antlr.Token) bool {
-	// Condition A: We must be at the effective end of a line.
 	isLast := index >= len(all)-1
 	if !isLast {
 		next := all[index+1]
@@ -85,7 +82,6 @@ func shouldInsertSemi(t antlr.Token, index int, all []antlr.Token) bool {
 		}
 	}
 
-	// Condition B: The current token must be one that is allowed to end a statement.
 	switch t.GetTokenType() {
 	case parser.ArcLexerIDENTIFIER,
 		parser.ArcLexerINT_LIT,
