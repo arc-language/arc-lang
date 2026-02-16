@@ -326,11 +326,11 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#NullLiteral.
 	VisitNullLiteral(ctx *NullLiteralContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#IdentExpr.
-	VisitIdentExpr(ctx *IdentExprContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#QualifiedExpr.
 	VisitQualifiedExpr(ctx *QualifiedExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#IdentExpr.
+	VisitIdentExpr(ctx *IdentExprContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#PrimitiveTypeExpr.
 	VisitPrimitiveTypeExpr(ctx *PrimitiveTypeExprContext) interface{}

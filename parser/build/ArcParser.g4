@@ -11,7 +11,7 @@ compilationUnit
     ;
 
 namespaceDecl
-    : NAMESPACE qualifiedName
+    : NAMESPACE IDENTIFIER (DOT IDENTIFIER)*
     ;
 
 topLevelDecl
@@ -45,9 +45,9 @@ importSpec
     ;
 
 importAlias
-    : IDENTIFIER        // named import
-    | UNDERSCORE        // blank import
-    | DOT               // dot import
+    : IDENTIFIER
+    | UNDERSCORE
+    | DOT
     ;
 
 // ═══════════════════════════════════════════════
@@ -100,16 +100,16 @@ paramList
 param
     : selfParam
     | IDENTIFIER COLON paramType
-    | ELLIPSIS                          // variadic (arc-level)
+    | ELLIPSIS
     ;
 
 selfParam
-    : SELF IDENTIFIER COLON paramType                    // self by value
-    | SELF AMP MUT IDENTIFIER COLON paramType            // self by mutable ref
+    : SELF IDENTIFIER COLON paramType
+    | SELF AMP MUT IDENTIFIER COLON paramType
     ;
 
 paramType
-    : AMP MUT typeRef                   // &mut T
+    : AMP MUT typeRef
     | typeRef
     ;
 
@@ -168,7 +168,7 @@ typeAliasDecl
 // ═══════════════════════════════════════════════
 
 attribute
-    : AT IDENTIFIER (LPAREN expression RPAREN)?         // @packed, @align(16)
+    : AT IDENTIFIER (LPAREN expression RPAREN)?
     ;
 
 // ═══════════════════════════════════════════════
@@ -181,7 +181,7 @@ typeRef
     ;
 
 functionType
-    : ASYNC? FUNC LPAREN typeList? RPAREN typeRef?      // async func(T,U) V
+    : ASYNC? FUNC LPAREN typeList? RPAREN typeRef?
     ;
 
 baseType
@@ -191,11 +191,12 @@ baseType
     | STRING
     | BYTE
     | CHAR
-    | qualifiedName genericArgs?                        // Point, Box[int32], net.Socket
-    | VECTOR LBRACKET typeRef RBRACKET                  // vector[T]
-    | MAP LBRACKET typeRef RBRACKET typeRef             // map[K]V
-    | LBRACKET RBRACKET typeRef                         // []T   (slice)
-    | LBRACKET expression RBRACKET typeRef              // [N]T  (fixed array)
+    | qualifiedName genericArgs?
+    | IDENTIFIER genericArgs?
+    | VECTOR LBRACKET typeRef RBRACKET
+    | MAP LBRACKET typeRef RBRACKET typeRef
+    | LBRACKET RBRACKET typeRef
+    | LBRACKET expression RBRACKET typeRef
     ;
 
 primitiveType
@@ -214,7 +215,7 @@ typeList
 // ═══════════════════════════════════════════════
 
 externDecl
-    : EXTERN IDENTIFIER LBRACE externMember* RBRACE     // extern c { ... } / extern cpp { ... }
+    : EXTERN IDENTIFIER LBRACE externMember* RBRACE
     ;
 
 externMember
@@ -235,7 +236,7 @@ callingConvention
     ;
 
 externSymbol
-    : STRING_LIT                                        // "printf", "?Clamp@Math@@..."
+    : STRING_LIT
     ;
 
 externParamList
@@ -248,13 +249,13 @@ externParam
     ;
 
 externReturnType
-    : CONST? externType                                 // const for C++ const methods
+    : CONST? externType
     ;
 
 externType
-    : STAR STAR externType                              // **T
-    | STAR CONST? externType                            // *T, *const T
-    | AMP CONST? externType                             // &T, &const T (C++ refs)
+    : STAR STAR externType
+    | STAR CONST? externType
+    | AMP CONST? externType
     | primitiveType
     | VOID
     | BOOL
@@ -263,13 +264,14 @@ externType
     | CHAR
     | USIZE | ISIZE
     | qualifiedName
-    | LBRACKET expression RBRACKET externType           // [N]T
+    | IDENTIFIER
+    | LBRACKET expression RBRACKET externType
     ;
 
 // ── Extern Namespaces ────────────────────────
 
 externNamespace
-    : NAMESPACE qualifiedName LBRACE externMember* RBRACE
+    : NAMESPACE IDENTIFIER (DOT IDENTIFIER)* LBRACE externMember* RBRACE
     ;
 
 // ── Extern Classes ───────────────────────────
@@ -296,11 +298,11 @@ externStaticMethod
     ;
 
 externConstructor
-    : NEW LPAREN externParamList? RPAREN externType     // new(...) *ClassName
+    : NEW LPAREN externParamList? RPAREN externType
     ;
 
 externDestructor
-    : DELETE LPAREN externMethodParam RPAREN VOID?      // delete(self *T) void
+    : DELETE LPAREN externMethodParam RPAREN VOID?
     ;
 
 externMethodParamList
@@ -308,7 +310,7 @@ externMethodParamList
     ;
 
 externMethodParam
-    : SELF externType                                   // self *ClassName, self *const ClassName
+    : SELF externType
     ;
 
 // ── Extern Type Alias (inside extern block) ──
@@ -345,7 +347,7 @@ statement
     ;
 
 letStatement
-    : LET LPAREN IDENTIFIER (COMMA IDENTIFIER)+ RPAREN ASSIGN expression    // destructuring
+    : LET LPAREN IDENTIFIER (COMMA IDENTIFIER)+ RPAREN ASSIGN expression
     | LET IDENTIFIER (COLON typeRef)? ASSIGN expression
     ;
 
@@ -356,7 +358,7 @@ varStatement
 
 returnStatement
     : RETURN expression?
-    | RETURN LPAREN expression (COMMA expression)+ RPAREN     // return (a, b)
+    | RETURN LPAREN expression (COMMA expression)+ RPAREN
     ;
 
 breakStatement
@@ -368,7 +370,7 @@ continueStatement
     ;
 
 deferStatement
-    : DEFER expression                                  // defer delete(x), defer close(fd)
+    : DEFER expression
     ;
 
 ifStatement
@@ -380,10 +382,10 @@ forStatement
     ;
 
 forHeader
-    : forInit SEMI expression SEMI forPost              // C-style
-    | forIterator                                       // for-in
-    | expression                                        // while-style
-    |                                                   // infinite
+    : forInit SEMI expression SEMI forPost
+    | forIterator
+    | expression
+    |
     ;
 
 forInit
@@ -398,7 +400,7 @@ forPost
     ;
 
 forIterator
-    : IDENTIFIER (COMMA IDENTIFIER)? IN expression      // for item in items / for k, v in map
+    : IDENTIFIER (COMMA IDENTIFIER)? IN expression
     ;
 
 switchStatement
@@ -423,9 +425,9 @@ assignmentStatement
     ;
 
 assignmentTarget
-    : expression DOT IDENTIFIER                         // a.b
-    | expression LBRACKET expression RBRACKET           // a[i]
-    | IDENTIFIER                                        // x
+    : expression DOT IDENTIFIER
+    | expression LBRACKET expression RBRACKET
+    | IDENTIFIER
     ;
 
 assignOp
@@ -473,7 +475,7 @@ expression
     | expression AND expression                                         # LogicalAndExpr
     | expression OR expression                                          # LogicalOrExpr
 
-    // ── Range (for `0..10`) ──
+    // ── Range ──
     | expression RANGE expression                                       # RangeExpr
     ;
 
@@ -487,10 +489,10 @@ primary
     | FALSE                                                             # FalseLiteral
     | NULL                                                              # NullLiteral
 
-    | IDENTIFIER                                                        # IdentExpr
     | qualifiedName                                                     # QualifiedExpr
+    | IDENTIFIER                                                        # IdentExpr
 
-    // ── Type in expression position (casts, sizeof, etc.) ──
+    // ── Type in expression position ──
     | primitiveType                                                     # PrimitiveTypeExpr
 
     // ── Parenthesized / tuple ──
@@ -517,7 +519,7 @@ primary
       LPAREN argumentList? RPAREN                                       # ProcessExpr
     ;
 
-// ── Initializer block { field: val, ... } or { val, ... } or { k: v, ... } ──
+// ── Initializer block ────────────────────────
 
 initializerBlock
     : LBRACE RBRACE

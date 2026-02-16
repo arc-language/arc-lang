@@ -432,11 +432,11 @@ func (v *BaseArcParserVisitor) VisitNullLiteral(ctx *NullLiteralContext) interfa
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitIdentExpr(ctx *IdentExprContext) interface{} {
+func (v *BaseArcParserVisitor) VisitQualifiedExpr(ctx *QualifiedExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitQualifiedExpr(ctx *QualifiedExprContext) interface{} {
+func (v *BaseArcParserVisitor) VisitIdentExpr(ctx *IdentExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

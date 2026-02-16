@@ -1018,11 +1018,11 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#NullLiteral.
 	VisitNullLiteral(ctx *NullLiteralContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#IdentExpr.
-	VisitIdentExpr(ctx *IdentExprContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#QualifiedExpr.
 	VisitQualifiedExpr(ctx *QualifiedExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#IdentExpr.
+	VisitIdentExpr(ctx *IdentExprContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#PrimitiveTypeExpr.
 	VisitPrimitiveTypeExpr(ctx *PrimitiveTypeExprContext) interface{}
@@ -1559,6 +1559,8 @@ func (s *BaseTypeContext) GenericArgs() IGenericArgsContext
 func (s *BaseTypeContext) GetParser() antlr.Parser
 
 func (s *BaseTypeContext) GetRuleContext() antlr.RuleContext
+
+func (s *BaseTypeContext) IDENTIFIER() antlr.TerminalNode
 
 func (*BaseTypeContext) IsBaseTypeContext()
 
@@ -2394,7 +2396,13 @@ func NewExternNamespaceContext(parser antlr.Parser, parent antlr.ParserRuleConte
 
 func (s *ExternNamespaceContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
+func (s *ExternNamespaceContext) AllDOT() []antlr.TerminalNode
+
 func (s *ExternNamespaceContext) AllExternMember() []IExternMemberContext
+
+func (s *ExternNamespaceContext) AllIDENTIFIER() []antlr.TerminalNode
+
+func (s *ExternNamespaceContext) DOT(i int) antlr.TerminalNode
 
 func (s *ExternNamespaceContext) ExternMember(i int) IExternMemberContext
 
@@ -2402,13 +2410,13 @@ func (s *ExternNamespaceContext) GetParser() antlr.Parser
 
 func (s *ExternNamespaceContext) GetRuleContext() antlr.RuleContext
 
+func (s *ExternNamespaceContext) IDENTIFIER(i int) antlr.TerminalNode
+
 func (*ExternNamespaceContext) IsExternNamespaceContext()
 
 func (s *ExternNamespaceContext) LBRACE() antlr.TerminalNode
 
 func (s *ExternNamespaceContext) NAMESPACE() antlr.TerminalNode
-
-func (s *ExternNamespaceContext) QualifiedName() IQualifiedNameContext
 
 func (s *ExternNamespaceContext) RBRACE() antlr.TerminalNode
 
@@ -2600,6 +2608,8 @@ func (s *ExternTypeContext) ExternType() IExternTypeContext
 func (s *ExternTypeContext) GetParser() antlr.Parser
 
 func (s *ExternTypeContext) GetRuleContext() antlr.RuleContext
+
+func (s *ExternTypeContext) IDENTIFIER() antlr.TerminalNode
 
 func (s *ExternTypeContext) ISIZE() antlr.TerminalNode
 
@@ -3144,6 +3154,7 @@ type IBaseTypeContext interface {
 	CHAR() antlr.TerminalNode
 	QualifiedName() IQualifiedNameContext
 	GenericArgs() IGenericArgsContext
+	IDENTIFIER() antlr.TerminalNode
 	VECTOR() antlr.TerminalNode
 	LBRACKET() antlr.TerminalNode
 	AllTypeRef() []ITypeRefContext
@@ -3580,9 +3591,12 @@ type IExternNamespaceContext interface {
 
 	// Getter signatures
 	NAMESPACE() antlr.TerminalNode
-	QualifiedName() IQualifiedNameContext
+	AllIDENTIFIER() []antlr.TerminalNode
+	IDENTIFIER(i int) antlr.TerminalNode
 	LBRACE() antlr.TerminalNode
 	RBRACE() antlr.TerminalNode
+	AllDOT() []antlr.TerminalNode
+	DOT(i int) antlr.TerminalNode
 	AllExternMember() []IExternMemberContext
 	ExternMember(i int) IExternMemberContext
 
@@ -3711,6 +3725,7 @@ type IExternTypeContext interface {
 	USIZE() antlr.TerminalNode
 	ISIZE() antlr.TerminalNode
 	QualifiedName() IQualifiedNameContext
+	IDENTIFIER() antlr.TerminalNode
 	LBRACKET() antlr.TerminalNode
 	Expression() IExpressionContext
 	RBRACKET() antlr.TerminalNode
@@ -4154,7 +4169,10 @@ type INamespaceDeclContext interface {
 
 	// Getter signatures
 	NAMESPACE() antlr.TerminalNode
-	QualifiedName() IQualifiedNameContext
+	AllIDENTIFIER() []antlr.TerminalNode
+	IDENTIFIER(i int) antlr.TerminalNode
+	AllDOT() []antlr.TerminalNode
+	DOT(i int) antlr.TerminalNode
 
 	// IsNamespaceDeclContext differentiates from other interfaces.
 	IsNamespaceDeclContext()
@@ -5083,15 +5101,21 @@ func NewNamespaceDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext
 
 func (s *NamespaceDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
+func (s *NamespaceDeclContext) AllDOT() []antlr.TerminalNode
+
+func (s *NamespaceDeclContext) AllIDENTIFIER() []antlr.TerminalNode
+
+func (s *NamespaceDeclContext) DOT(i int) antlr.TerminalNode
+
 func (s *NamespaceDeclContext) GetParser() antlr.Parser
 
 func (s *NamespaceDeclContext) GetRuleContext() antlr.RuleContext
 
+func (s *NamespaceDeclContext) IDENTIFIER(i int) antlr.TerminalNode
+
 func (*NamespaceDeclContext) IsNamespaceDeclContext()
 
 func (s *NamespaceDeclContext) NAMESPACE() antlr.TerminalNode
-
-func (s *NamespaceDeclContext) QualifiedName() IQualifiedNameContext
 
 func (s *NamespaceDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
