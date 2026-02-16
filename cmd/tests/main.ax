@@ -1,15 +1,11 @@
 namespace main
 
-interface routes {
-    s: string
-    m: int64
+extern c {
+    func printf(*byte, ...) int32
 }
 
 func main() {
 
-    var m = routes{
-        s: "Building Arc compiler...",
-        m: 1000,
-    }
+    printf("Building compiler...")
 
 }

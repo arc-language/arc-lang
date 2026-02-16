@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/arc-language/arc-lang/backend/backend"
-	backendelf "github.com/arc-language/arc-lang/backend/format/elf"
+	backendelf "github.com/arc-language/arc-lang/linker/elf"
 	"github.com/arc-language/arc-lang/codegen"
 	"github.com/arc-language/arc-lang/frontend"
 	"github.com/arc-language/arc-lang/lower"
@@ -19,7 +19,7 @@ import (
 // multiFlag accumulates repeated flags, e.g. -L /usr/lib -L /lib
 type multiFlag []string
 
-func (f *multiFlag) String() string  { return strings.Join(*f, ", ") }
+func (f *multiFlag) String() string { return strings.Join(*f, ", ") }
 func (f *multiFlag) Set(v string) error {
 	*f = append(*f, v)
 	return nil
@@ -29,44 +29,84 @@ func (f *multiFlag) Set(v string) error {
 type emitMode int
 
 const (
-	emitIR  emitMode = iota // -emit ir  → IR text
-	emitObj                 // -emit obj → relocatable .o
-	emitExe                 // -emit exe → static ELF executable
-	emitBin                 // -emit bin → dynamic ELF executable
+	emitIR  emitMode = iota // ir  → IR text
+	emitObj                 // obj → relocatable .o
+	emitExe                 // exe → static ELF executable
+	emitBin                 // bin → dynamic ELF executable
 )
 
+const usage = `Arc compiler
+
+Usage:
+  arc build <file> [flags]   Compile and link a dynamic binary (default)
+  arc ir     <file> [flags]  Emit IR text
+  arc obj    <file> [flags]  Emit relocatable object (.o)
+  arc exe    <file> [flags]  Emit static ELF executable
+
+Flags:
+  -o <path>      Output file (default derived from source name)
+  -L <dir>       Library search path (repeatable)
+  -l <name>      Link against shared library, e.g. -l c (repeatable)
+  -entry <sym>   Entry point symbol for dynamic binaries (default: _start)
+  -debug-ast     Print the lowered AST before codegen
+`
+
 func main() {
-	sourceFile := flag.String("src", "main.ax", "Source file to compile")
-	outputFile := flag.String("o", "", "Output file (default derived from source name)")
-	emitStr    := flag.String("emit", "ir", "Output type: ir | obj | exe | bin")
-	debugAST   := flag.Bool("debug-ast", false, "Print the lowered AST before codegen")
-	entryPoint := flag.String("entry", "_start", "Entry point symbol (bin mode only)")
+	if len(os.Args) < 2 {
+		fmt.Fprint(os.Stderr, usage)
+		os.Exit(1)
+	}
 
-	var libPaths multiFlag
-	var linkLibs multiFlag
-	flag.Var(&libPaths, "L", "Library search path (repeatable)")
-	flag.Var(&linkLibs, "l", "Link against shared library, e.g. -l c (repeatable)")
+	// First arg is the subcommand
+	subcommand := os.Args[1]
 
-	flag.Parse()
-
-	// Resolve emit mode
 	var mode emitMode
-	switch strings.ToLower(*emitStr) {
+	switch subcommand {
+	case "build":
+		mode = emitBin
 	case "ir":
 		mode = emitIR
 	case "obj", "object":
 		mode = emitObj
 	case "exe", "exec", "static":
 		mode = emitExe
-	case "bin", "binary", "dynamic":
-		mode = emitBin
+	case "help", "-h", "--help":
+		fmt.Fprint(os.Stderr, usage)
+		os.Exit(0)
 	default:
-		fatalf("unknown emit mode '%s' (want ir|obj|exe|bin)", *emitStr)
+		fmt.Fprintf(os.Stderr, "error: unknown subcommand '%s'\n\n", subcommand)
+		fmt.Fprint(os.Stderr, usage)
+		os.Exit(1)
+	}
+
+	// Second arg is the source file (positional)
+	if len(os.Args) < 3 {
+		fmt.Fprintf(os.Stderr, "error: missing source file\n\n")
+		fmt.Fprint(os.Stderr, usage)
+		os.Exit(1)
+	}
+
+	sourceFile := os.Args[2]
+
+	// Parse the remaining flags after the source file
+	fs := flag.NewFlagSet("arc", flag.ExitOnError)
+
+	outputFile := fs.String("o", "", "Output file")
+	entryPoint := fs.String("entry", "_start", "Entry point symbol (bin mode only)")
+	debugAST   := fs.Bool("debug-ast", false, "Print the lowered AST before codegen")
+
+	var libPaths multiFlag
+	var linkLibs multiFlag
+	fs.Var(&libPaths, "L", "Library search path (repeatable)")
+	fs.Var(&linkLibs, "l", "Link against shared library (repeatable)")
+
+	if err := fs.Parse(os.Args[3:]); err != nil {
+		fatalf("%v", err)
 	}
 
 	// Default output path
-	ext        := filepath.Ext(*sourceFile)
-	moduleName := strings.TrimSuffix(filepath.Base(*sourceFile), ext)
+	ext        := filepath.Ext(sourceFile)
+	moduleName := strings.TrimSuffix(filepath.Base(sourceFile), ext)
 
 	if *outputFile == "" {
 		switch mode {
@@ -80,9 +120,9 @@ func main() {
 	}
 
 	// Read source
-	code, err := os.ReadFile(*sourceFile)
+	code, err := os.ReadFile(sourceFile)
 	if err != nil {
-		fatalf("cannot read '%s': %v", *sourceFile, err)
+		fatalf("cannot read '%s': %v", sourceFile, err)
 	}
 
 	// Phase 1: Parse
@@ -127,7 +167,7 @@ func main() {
 			if err := os.WriteFile(*outputFile, []byte(ir), 0o644); err != nil {
 				fatalf("cannot write '%s': %v", *outputFile, err)
 			}
-			log.Printf("compiled '%s'  →  %s  (IR)", *sourceFile, *outputFile)
+			log.Printf("compiled '%s'  →  %s  (IR)", sourceFile, *outputFile)
 		} else {
 			fmt.Print(ir)
 		}
@@ -140,10 +180,10 @@ func main() {
 		if err != nil {
 			fatalf("object generation failed: %v", err)
 		}
-		if err := writeExe(*outputFile, objBytes, 0o644); err != nil {
+		if err := writeFile(*outputFile, objBytes, 0o644); err != nil {
 			fatalf("cannot write '%s': %v", *outputFile, err)
 		}
-		log.Printf("compiled '%s'  →  %s  (%d bytes)", *sourceFile, *outputFile, len(objBytes))
+		log.Printf("compiled '%s'  →  %s  (%d bytes)", sourceFile, *outputFile, len(objBytes))
 
 	case emitExe:
 		if err := backend.Generate(irModule); err != nil {
@@ -153,10 +193,10 @@ func main() {
 		if err != nil {
 			fatalf("executable generation failed: %v", err)
 		}
-		if err := writeExe(*outputFile, exeBytes, 0o755); err != nil {
+		if err := writeFile(*outputFile, exeBytes, 0o755); err != nil {
 			fatalf("cannot write '%s': %v", *outputFile, err)
 		}
-		log.Printf("compiled '%s'  →  %s  (%d bytes, static)", *sourceFile, *outputFile, len(exeBytes))
+		log.Printf("compiled '%s'  →  %s  (%d bytes, static)", sourceFile, *outputFile, len(exeBytes))
 
 	case emitBin:
 		if err := backend.Generate(irModule); err != nil {
@@ -180,7 +220,7 @@ func main() {
 		if err := linker.Link(*outputFile); err != nil {
 			fatalf("link failed: %v", err)
 		}
-		log.Printf("compiled '%s'  →  %s  (dynamic)", *sourceFile, *outputFile)
+		log.Printf("compiled '%s'  →  %s  (dynamic)", sourceFile, *outputFile)
 	}
 }
 
@@ -199,8 +239,13 @@ func resolveSharedLibs(linker *backendelf.Linker, libs, paths multiFlag) error {
 				if err != nil {
 					continue
 				}
+				// Skip linker scripts and other non-ELF files
+				if !isELF(data) {
+					continue
+				}
 				if err := linker.AddSharedLib(full, data); err != nil {
-					return fmt.Errorf("loading '%s': %w", full, err)
+					log.Printf("warning: skipping '%s': %v", full, err)
+					continue
 				}
 				log.Printf("linked shared library  %s", full)
 				found = true
@@ -218,18 +263,32 @@ func resolveSharedLibs(linker *backendelf.Linker, libs, paths multiFlag) error {
 	return nil
 }
 
+// isELF returns true if data begins with the ELF magic number.
+func isELF(data []byte) bool {
+	return len(data) >= 4 &&
+		data[0] == 0x7f &&
+		data[1] == 'E' &&
+		data[2] == 'L' &&
+		data[3] == 'F'
+}
+
+// libCandidates returns filenames to try for a -l<name> flag.
+// Versioned names are tried before the bare .so to avoid linker scripts.
 func libCandidates(name string) []string {
 	if strings.HasPrefix(name, "lib") &&
 		(strings.HasSuffix(name, ".so") || strings.Contains(name, ".so.")) {
 		return []string{name}
 	}
 	return []string{
-		"lib" + name + ".so",
 		"lib" + name + ".so.6",
 		"lib" + name + ".so.2",
+		"lib" + name + ".so.5",
+		"lib" + name + ".so.1",
+		"lib" + name + ".so",
 	}
 }
 
+// systemLibDirs returns the standard shared library search paths on Linux.
 func systemLibDirs() []string {
 	return []string{
 		"/lib/x86_64-linux-gnu",
@@ -241,7 +300,8 @@ func systemLibDirs() []string {
 	}
 }
 
-func writeExe(path string, data []byte, perm os.FileMode) error {
+// writeFile writes data to path and sets the given permissions.
+func writeFile(path string, data []byte, perm os.FileMode) error {
 	if err := os.WriteFile(path, data, perm); err != nil {
 		return err
 	}
