@@ -12,14 +12,6 @@ func (v *BaseArcParserVisitor) VisitCompilationUnit(ctx *CompilationUnitContext)
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitImportDecl(ctx *ImportDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitImportSpec(ctx *ImportSpecContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseArcParserVisitor) VisitNamespaceDecl(ctx *NamespaceDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -28,203 +20,43 @@ func (v *BaseArcParserVisitor) VisitTopLevelDecl(ctx *TopLevelDeclContext) inter
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitAttribute(ctx *AttributeContext) interface{} {
+func (v *BaseArcParserVisitor) VisitSemi(ctx *SemiContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternCDecl(ctx *ExternCDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitImportDecl(ctx *ImportDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternCMember(ctx *ExternCMemberContext) interface{} {
+func (v *BaseArcParserVisitor) VisitImportSpec(ctx *ImportSpecContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternCFunctionDecl(ctx *ExternCFunctionDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitImportAlias(ctx *ImportAliasContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitCCallingConvention(ctx *CCallingConventionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitConstDecl(ctx *ConstDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternCParameterList(ctx *ExternCParameterListContext) interface{} {
+func (v *BaseArcParserVisitor) VisitConstSpec(ctx *ConstSpecContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternCParameter(ctx *ExternCParameterContext) interface{} {
+func (v *BaseArcParserVisitor) VisitTopLevelVarDecl(ctx *TopLevelVarDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternCConstDecl(ctx *ExternCConstDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitTopLevelLetDecl(ctx *TopLevelLetDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternCTypeAlias(ctx *ExternCTypeAliasContext) interface{} {
+func (v *BaseArcParserVisitor) VisitFuncDecl(ctx *FuncDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExternCStructDecl(ctx *ExternCStructDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCStructField(ctx *ExternCStructFieldContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppDecl(ctx *ExternCppDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppMember(ctx *ExternCppMemberContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppNamespaceDecl(ctx *ExternCppNamespaceDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternNamespacePath(ctx *ExternNamespacePathContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppFunctionDecl(ctx *ExternCppFunctionDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitCppCallingConvention(ctx *CppCallingConventionContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppParameterList(ctx *ExternCppParameterListContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppParameter(ctx *ExternCppParameterContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppParamType(ctx *ExternCppParamTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppConstDecl(ctx *ExternCppConstDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppTypeAlias(ctx *ExternCppTypeAliasContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppClassDecl(ctx *ExternCppClassDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppClassMember(ctx *ExternCppClassMemberContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppConstructorDecl(ctx *ExternCppConstructorDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppDestructorDecl(ctx *ExternCppDestructorDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppMethodDecl(ctx *ExternCppMethodDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppMethodParams(ctx *ExternCppMethodParamsContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternCppSelfParam(ctx *ExternCppSelfParamContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternType(ctx *ExternTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternPointerType(ctx *ExternPointerTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternPrimitiveType(ctx *ExternPrimitiveTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternFunctionType(ctx *ExternFunctionTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExternTypeList(ctx *ExternTypeListContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitGenericParams(ctx *GenericParamsContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitGenericParamList(ctx *GenericParamListContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitGenericParam(ctx *GenericParamContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitGenericArgs(ctx *GenericArgsContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitGenericArgList(ctx *GenericArgListContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitGenericArg(ctx *GenericArgContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitType(ctx *TypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitCollectionType(ctx *CollectionTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitQualifiedType(ctx *QualifiedTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitFunctionType(ctx *FunctionTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitTypeList(ctx *TypeListContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitReturnType(ctx *ReturnTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitFunctionDecl(ctx *FunctionDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitMethodDecl(ctx *MethodDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitFuncModifier(ctx *FuncModifierContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -232,27 +64,43 @@ func (v *BaseArcParserVisitor) VisitDeinitDecl(ctx *DeinitDeclContext) interface
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitStructDecl(ctx *StructDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitParamList(ctx *ParamListContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitStructMember(ctx *StructMemberContext) interface{} {
+func (v *BaseArcParserVisitor) VisitParam(ctx *ParamContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitStructField(ctx *StructFieldContext) interface{} {
+func (v *BaseArcParserVisitor) VisitSelfParam(ctx *SelfParamContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitClassDecl(ctx *ClassDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitParamType(ctx *ParamTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitClassMember(ctx *ClassMemberContext) interface{} {
+func (v *BaseArcParserVisitor) VisitReturnType(ctx *ReturnTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitClassField(ctx *ClassFieldContext) interface{} {
+func (v *BaseArcParserVisitor) VisitTupleType(ctx *TupleTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitGenericParams(ctx *GenericParamsContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitGenericArgs(ctx *GenericArgsContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitInterfaceDecl(ctx *InterfaceDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitInterfaceField(ctx *InterfaceFieldContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -264,27 +112,111 @@ func (v *BaseArcParserVisitor) VisitEnumMember(ctx *EnumMemberContext) interface
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitVariableDecl(ctx *VariableDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitTypeAliasDecl(ctx *TypeAliasDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitConstDecl(ctx *ConstDeclContext) interface{} {
+func (v *BaseArcParserVisitor) VisitAttribute(ctx *AttributeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitTuplePattern(ctx *TuplePatternContext) interface{} {
+func (v *BaseArcParserVisitor) VisitTypeRef(ctx *TypeRefContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitTupleType(ctx *TupleTypeContext) interface{} {
+func (v *BaseArcParserVisitor) VisitFunctionType(ctx *FunctionTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitParameterList(ctx *ParameterListContext) interface{} {
+func (v *BaseArcParserVisitor) VisitBaseType(ctx *BaseTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitParameter(ctx *ParameterContext) interface{} {
+func (v *BaseArcParserVisitor) VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitTypeList(ctx *TypeListContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternDecl(ctx *ExternDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternMember(ctx *ExternMemberContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternFuncDecl(ctx *ExternFuncDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitCallingConvention(ctx *CallingConventionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternSymbol(ctx *ExternSymbolContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternParamList(ctx *ExternParamListContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternParam(ctx *ExternParamContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternReturnType(ctx *ExternReturnTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternType(ctx *ExternTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternNamespace(ctx *ExternNamespaceContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternClass(ctx *ExternClassContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternClassMember(ctx *ExternClassMemberContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternVirtualMethod(ctx *ExternVirtualMethodContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternStaticMethod(ctx *ExternStaticMethodContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternConstructor(ctx *ExternConstructorContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternDestructor(ctx *ExternDestructorContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternMethodParamList(ctx *ExternMethodParamListContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternMethodParam(ctx *ExternMethodParamContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternTypeAlias(ctx *ExternTypeAliasContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitExternFunctionPtrType(ctx *ExternFunctionPtrTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -296,43 +228,55 @@ func (v *BaseArcParserVisitor) VisitStatement(ctx *StatementContext) interface{}
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitAssignmentStmt(ctx *AssignmentStmtContext) interface{} {
+func (v *BaseArcParserVisitor) VisitLetStatement(ctx *LetStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitAssignmentOp(ctx *AssignmentOpContext) interface{} {
+func (v *BaseArcParserVisitor) VisitVarStatement(ctx *VarStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExpressionStmt(ctx *ExpressionStmtContext) interface{} {
+func (v *BaseArcParserVisitor) VisitReturnStatement(ctx *ReturnStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitReturnStmt(ctx *ReturnStmtContext) interface{} {
+func (v *BaseArcParserVisitor) VisitBreakStatement(ctx *BreakStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitDeferStmt(ctx *DeferStmtContext) interface{} {
+func (v *BaseArcParserVisitor) VisitContinueStatement(ctx *ContinueStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitBreakStmt(ctx *BreakStmtContext) interface{} {
+func (v *BaseArcParserVisitor) VisitDeferStatement(ctx *DeferStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitContinueStmt(ctx *ContinueStmtContext) interface{} {
+func (v *BaseArcParserVisitor) VisitIfStatement(ctx *IfStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitIfStmt(ctx *IfStmtContext) interface{} {
+func (v *BaseArcParserVisitor) VisitForStatement(ctx *ForStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitForStmt(ctx *ForStmtContext) interface{} {
+func (v *BaseArcParserVisitor) VisitForHeader(ctx *ForHeaderContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitSwitchStmt(ctx *SwitchStmtContext) interface{} {
+func (v *BaseArcParserVisitor) VisitForInit(ctx *ForInitContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitForPost(ctx *ForPostContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitForIterator(ctx *ForIteratorContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitSwitchStatement(ctx *SwitchStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -340,111 +284,215 @@ func (v *BaseArcParserVisitor) VisitSwitchCase(ctx *SwitchCaseContext) interface
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitDefaultCase(ctx *DefaultCaseContext) interface{} {
+func (v *BaseArcParserVisitor) VisitSwitchDefault(ctx *SwitchDefaultContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitExpression(ctx *ExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitExpressionList(ctx *ExpressionListContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitLogicalOrExpression(ctx *LogicalOrExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitAssignmentStatement(ctx *AssignmentStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitLogicalAndExpression(ctx *LogicalAndExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitAssignmentTarget(ctx *AssignmentTargetContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitBitOrExpression(ctx *BitOrExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitAssignOp(ctx *AssignOpContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitBitXorExpression(ctx *BitXorExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitExpressionStatement(ctx *ExpressionStatementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitBitAndExpression(ctx *BitAndExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitMulExpr(ctx *MulExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitEqualityExpression(ctx *EqualityExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitBitwiseAndExpr(ctx *BitwiseAndExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitRelationalExpression(ctx *RelationalExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitBitwiseOrExpr(ctx *BitwiseOrExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitShiftExpression(ctx *ShiftExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitPostDecrement(ctx *PostDecrementContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitRangeExpression(ctx *RangeExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitUnaryMinus(ctx *UnaryMinusContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitAdditiveExpression(ctx *AdditiveExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitAddExpr(ctx *AddExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitMultiplicativeExpression(ctx *MultiplicativeExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitRelationalExpr(ctx *RelationalExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitUnaryExpression(ctx *UnaryExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitRangeExpr(ctx *RangeExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitPostfixExpression(ctx *PostfixExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitLogicalAndExpr(ctx *LogicalAndExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitPostfixOp(ctx *PostfixOpContext) interface{} {
+func (v *BaseArcParserVisitor) VisitIndexExpr(ctx *IndexExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitLogicalNot(ctx *LogicalNotContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitNewExpression(ctx *NewExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitLogicalOrExpr(ctx *LogicalOrExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitDeleteExpression(ctx *DeleteExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitAwaitExpr(ctx *AwaitExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitCastExpression(ctx *CastExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitEqualityExpr(ctx *EqualityExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitCastTargetType(ctx *CastTargetTypeContext) interface{} {
+func (v *BaseArcParserVisitor) VisitMemberAccess(ctx *MemberAccessContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitBuiltinExpression(ctx *BuiltinExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitAddressOf(ctx *AddressOfContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitLiteral(ctx *LiteralContext) interface{} {
+func (v *BaseArcParserVisitor) VisitPrimaryExpr(ctx *PrimaryExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitInitializerList(ctx *InitializerListContext) interface{} {
+func (v *BaseArcParserVisitor) VisitSliceExpr(ctx *SliceExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitInitializerEntry(ctx *InitializerEntryContext) interface{} {
+func (v *BaseArcParserVisitor) VisitCallExpr(ctx *CallExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitStructLiteral(ctx *StructLiteralContext) interface{} {
+func (v *BaseArcParserVisitor) VisitPostIncrement(ctx *PostIncrementContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitBitwiseXorExpr(ctx *BitwiseXorExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitBitwiseNot(ctx *BitwiseNotContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitShiftExpr(ctx *ShiftExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitIntLiteral(ctx *IntLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitHexLiteral(ctx *HexLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitFloatLiteral(ctx *FloatLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitStringLiteral(ctx *StringLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitCharLiteral(ctx *CharLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitTrueLiteral(ctx *TrueLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitFalseLiteral(ctx *FalseLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitNullLiteral(ctx *NullLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitIdentExpr(ctx *IdentExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitQualifiedExpr(ctx *QualifiedExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitPrimitiveTypeExpr(ctx *PrimitiveTypeExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitParenExpr(ctx *ParenExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitTupleLiteral(ctx *TupleLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitNewExpr(ctx *NewExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitNewArrayExpr(ctx *NewArrayExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitDeleteExpr(ctx *DeleteExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitTypedInitExpr(ctx *TypedInitExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitVectorLiteral(ctx *VectorLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitMapLiteral(ctx *MapLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitLambdaExpr(ctx *LambdaExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitProcessExpr(ctx *ProcessExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitInitializerBlock(ctx *InitializerBlockContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseArcParserVisitor) VisitFieldInit(ctx *FieldInitContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitMapEntry(ctx *MapEntryContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -456,18 +504,6 @@ func (v *BaseArcParserVisitor) VisitArgument(ctx *ArgumentContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitLambdaExpression(ctx *LambdaExpressionContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitAnonymousFuncExpression(ctx *AnonymousFuncExpressionContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitExecutionStrategy(ctx *ExecutionStrategyContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseArcParserVisitor) VisitLambdaParamList(ctx *LambdaParamListContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -476,6 +512,6 @@ func (v *BaseArcParserVisitor) VisitLambdaParam(ctx *LambdaParamContext) interfa
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseArcParserVisitor) VisitTupleExpression(ctx *TupleExpressionContext) interface{} {
+func (v *BaseArcParserVisitor) VisitQualifiedName(ctx *QualifiedNameContext) interface{} {
 	return v.VisitChildren(ctx)
 }

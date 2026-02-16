@@ -3,368 +3,342 @@
 CONSTANTS
 
 const (
-	ArcLexerIMPORT          = 1
-	ArcLexerNAMESPACE       = 2
-	ArcLexerLET             = 3
-	ArcLexerVAR             = 4
-	ArcLexerCONST           = 5
-	ArcLexerFUNC            = 6
-	ArcLexerASYNC           = 7
-	ArcLexerAWAIT           = 8
-	ArcLexerPROCESS         = 9
-	ArcLexerGPU             = 10
-	ArcLexerSTRUCT          = 11
-	ArcLexerCLASS           = 12
-	ArcLexerDEINIT          = 13
-	ArcLexerRETURN          = 14
-	ArcLexerIF              = 15
-	ArcLexerELSE            = 16
-	ArcLexerFOR             = 17
-	ArcLexerIN              = 18
-	ArcLexerBREAK           = 19
-	ArcLexerCONTINUE        = 20
-	ArcLexerDEFER           = 21
-	ArcLexerSELF            = 22
-	ArcLexerNULL            = 23
-	ArcLexerSWITCH          = 24
-	ArcLexerCASE            = 25
-	ArcLexerDEFAULT         = 26
-	ArcLexerENUM            = 27
-	ArcLexerRAWPTR          = 28
-	ArcLexerNEW             = 29
-	ArcLexerDELETE          = 30
-	ArcLexerEXTERN          = 31
-	ArcLexerVIRTUAL         = 32
-	ArcLexerSTATIC          = 33
-	ArcLexerABSTRACT        = 34
-	ArcLexerTYPE            = 35
-	ArcLexerSTDCALL         = 36
-	ArcLexerCDECL           = 37
-	ArcLexerFASTCALL        = 38
-	ArcLexerVECTORCALL      = 39
-	ArcLexerTHISCALL        = 40
-	ArcLexerINT8            = 41
-	ArcLexerINT16           = 42
-	ArcLexerINT32           = 43
-	ArcLexerINT64           = 44
-	ArcLexerUINT8           = 45
-	ArcLexerUINT16          = 46
-	ArcLexerUINT32          = 47
-	ArcLexerUINT64          = 48
-	ArcLexerUSIZE           = 49
-	ArcLexerISIZE           = 50
-	ArcLexerFLOAT32         = 51
-	ArcLexerFLOAT64         = 52
-	ArcLexerBYTE            = 53
-	ArcLexerBOOL            = 54
-	ArcLexerCHAR            = 55
-	ArcLexerSTRING          = 56
-	ArcLexerVOID            = 57
-	ArcLexerEQ              = 58
-	ArcLexerNE              = 59
-	ArcLexerLE              = 60
-	ArcLexerGE              = 61
-	ArcLexerAND             = 62
-	ArcLexerOR              = 63
-	ArcLexerPLUS_ASSIGN     = 64
-	ArcLexerMINUS_ASSIGN    = 65
-	ArcLexerSTAR_ASSIGN     = 66
-	ArcLexerSLASH_ASSIGN    = 67
-	ArcLexerPERCENT_ASSIGN  = 68
-	ArcLexerBIT_OR_ASSIGN   = 69
-	ArcLexerBIT_AND_ASSIGN  = 70
-	ArcLexerBIT_XOR_ASSIGN  = 71
-	ArcLexerSHL_ASSIGN      = 72
-	ArcLexerSHR_ASSIGN      = 73
-	ArcLexerINCREMENT       = 74
-	ArcLexerDECREMENT       = 75
-	ArcLexerFAT_ARROW       = 76
-	ArcLexerRANGE           = 77
-	ArcLexerELLIPSIS        = 78
-	ArcLexerPLUS            = 79
-	ArcLexerMINUS           = 80
-	ArcLexerSTAR            = 81
-	ArcLexerSLASH           = 82
-	ArcLexerPERCENT         = 83
-	ArcLexerLT              = 84
-	ArcLexerGT              = 85
-	ArcLexerNOT             = 86
-	ArcLexerAMP             = 87
-	ArcLexerBIT_OR          = 88
-	ArcLexerBIT_XOR         = 89
-	ArcLexerBIT_NOT         = 90
-	ArcLexerAT              = 91
-	ArcLexerASSIGN          = 92
-	ArcLexerLPAREN          = 93
-	ArcLexerRPAREN          = 94
-	ArcLexerLBRACE          = 95
-	ArcLexerRBRACE          = 96
-	ArcLexerLBRACKET        = 97
-	ArcLexerRBRACKET        = 98
-	ArcLexerCOMMA           = 99
-	ArcLexerCOLON           = 100
-	ArcLexerSEMICOLON       = 101
-	ArcLexerDOT             = 102
-	ArcLexerUNDERSCORE      = 103
-	ArcLexerBOOLEAN_LITERAL = 104
-	ArcLexerINTEGER_LITERAL = 105
-	ArcLexerFLOAT_LITERAL   = 106
-	ArcLexerSTRING_LITERAL  = 107
-	ArcLexerCHAR_LITERAL    = 108
-	ArcLexerIDENTIFIER      = 109
-	ArcLexerWS              = 110
-	ArcLexerLINE_COMMENT    = 111
-	ArcLexerBLOCK_COMMENT   = 112
-	ArcLexerEXTERN_WS       = 113
-	ArcLexerC_LANG          = 114
-	ArcLexerCPP_LANG        = 115
+	ArcLexerNAMESPACE     = 1
+	ArcLexerIMPORT        = 2
+	ArcLexerFUNC          = 3
+	ArcLexerASYNC         = 4
+	ArcLexerGPU           = 5
+	ArcLexerINTERFACE     = 6
+	ArcLexerENUM          = 7
+	ArcLexerCONST         = 8
+	ArcLexerLET           = 9
+	ArcLexerVAR           = 10
+	ArcLexerNEW           = 11
+	ArcLexerDELETE        = 12
+	ArcLexerDEFER         = 13
+	ArcLexerDEINIT        = 14
+	ArcLexerRETURN        = 15
+	ArcLexerIF            = 16
+	ArcLexerELSE          = 17
+	ArcLexerFOR           = 18
+	ArcLexerIN            = 19
+	ArcLexerSWITCH        = 20
+	ArcLexerCASE          = 21
+	ArcLexerDEFAULT       = 22
+	ArcLexerBREAK         = 23
+	ArcLexerCONTINUE      = 24
+	ArcLexerPROCESS       = 25
+	ArcLexerAWAIT         = 26
+	ArcLexerEXTERN        = 27
+	ArcLexerTYPE          = 28
+	ArcLexerOPAQUE        = 29
+	ArcLexerSELF          = 30
+	ArcLexerMUT           = 31
+	ArcLexerVOID          = 32
+	ArcLexerNULL          = 33
+	ArcLexerTRUE          = 34
+	ArcLexerFALSE         = 35
+	ArcLexerCLASS         = 36
+	ArcLexerVIRTUAL       = 37
+	ArcLexerSTATIC        = 38
+	ArcLexerABSTRACT      = 39
+	ArcLexerCDECL         = 40
+	ArcLexerSTDCALL       = 41
+	ArcLexerTHISCALL      = 42
+	ArcLexerVECTORCALL    = 43
+	ArcLexerFASTCALL      = 44
+	ArcLexerINT8          = 45
+	ArcLexerINT16         = 46
+	ArcLexerINT32         = 47
+	ArcLexerINT64         = 48
+	ArcLexerUINT8         = 49
+	ArcLexerUINT16        = 50
+	ArcLexerUINT32        = 51
+	ArcLexerUINT64        = 52
+	ArcLexerUSIZE         = 53
+	ArcLexerISIZE         = 54
+	ArcLexerFLOAT32       = 55
+	ArcLexerFLOAT64       = 56
+	ArcLexerBYTE          = 57
+	ArcLexerBOOL          = 58
+	ArcLexerCHAR          = 59
+	ArcLexerSTRING        = 60
+	ArcLexerVECTOR        = 61
+	ArcLexerMAP           = 62
+	ArcLexerARROW         = 63
+	ArcLexerELLIPSIS      = 64
+	ArcLexerRANGE         = 65
+	ArcLexerLSHIFT        = 66
+	ArcLexerRSHIFT        = 67
+	ArcLexerLE            = 68
+	ArcLexerGE            = 69
+	ArcLexerEQ            = 70
+	ArcLexerNEQ           = 71
+	ArcLexerAND           = 72
+	ArcLexerOR            = 73
+	ArcLexerINC           = 74
+	ArcLexerDEC           = 75
+	ArcLexerADD_ASSIGN    = 76
+	ArcLexerSUB_ASSIGN    = 77
+	ArcLexerMUL_ASSIGN    = 78
+	ArcLexerDIV_ASSIGN    = 79
+	ArcLexerMOD_ASSIGN    = 80
+	ArcLexerAND_ASSIGN    = 81
+	ArcLexerOR_ASSIGN     = 82
+	ArcLexerXOR_ASSIGN    = 83
+	ArcLexerSHL_ASSIGN    = 84
+	ArcLexerSHR_ASSIGN    = 85
+	ArcLexerLPAREN        = 86
+	ArcLexerRPAREN        = 87
+	ArcLexerLBRACKET      = 88
+	ArcLexerRBRACKET      = 89
+	ArcLexerLBRACE        = 90
+	ArcLexerRBRACE        = 91
+	ArcLexerDOT           = 92
+	ArcLexerCOMMA         = 93
+	ArcLexerCOLON         = 94
+	ArcLexerSEMI          = 95
+	ArcLexerASSIGN        = 96
+	ArcLexerPLUS          = 97
+	ArcLexerMINUS         = 98
+	ArcLexerSTAR          = 99
+	ArcLexerSLASH         = 100
+	ArcLexerPERCENT       = 101
+	ArcLexerAMP           = 102
+	ArcLexerPIPE          = 103
+	ArcLexerCARET         = 104
+	ArcLexerTILDE         = 105
+	ArcLexerBANG          = 106
+	ArcLexerLT            = 107
+	ArcLexerGT            = 108
+	ArcLexerAT            = 109
+	ArcLexerUNDERSCORE    = 110
+	ArcLexerHEX_LIT       = 111
+	ArcLexerFLOAT_LIT     = 112
+	ArcLexerINT_LIT       = 113
+	ArcLexerCHAR_LIT      = 114
+	ArcLexerSTRING_LIT    = 115
+	ArcLexerIDENTIFIER    = 116
+	ArcLexerNL            = 117
+	ArcLexerWS            = 118
+	ArcLexerLINE_COMMENT  = 119
+	ArcLexerBLOCK_COMMENT = 120
 )
     ArcLexer tokens.
 
 const (
-	ArcParserEOF             = antlr.TokenEOF
-	ArcParserIMPORT          = 1
-	ArcParserNAMESPACE       = 2
-	ArcParserLET             = 3
-	ArcParserVAR             = 4
-	ArcParserCONST           = 5
-	ArcParserFUNC            = 6
-	ArcParserASYNC           = 7
-	ArcParserAWAIT           = 8
-	ArcParserPROCESS         = 9
-	ArcParserGPU             = 10
-	ArcParserSTRUCT          = 11
-	ArcParserCLASS           = 12
-	ArcParserDEINIT          = 13
-	ArcParserRETURN          = 14
-	ArcParserIF              = 15
-	ArcParserELSE            = 16
-	ArcParserFOR             = 17
-	ArcParserIN              = 18
-	ArcParserBREAK           = 19
-	ArcParserCONTINUE        = 20
-	ArcParserDEFER           = 21
-	ArcParserSELF            = 22
-	ArcParserNULL            = 23
-	ArcParserSWITCH          = 24
-	ArcParserCASE            = 25
-	ArcParserDEFAULT         = 26
-	ArcParserENUM            = 27
-	ArcParserRAWPTR          = 28
-	ArcParserNEW             = 29
-	ArcParserDELETE          = 30
-	ArcParserEXTERN          = 31
-	ArcParserVIRTUAL         = 32
-	ArcParserSTATIC          = 33
-	ArcParserABSTRACT        = 34
-	ArcParserTYPE            = 35
-	ArcParserSTDCALL         = 36
-	ArcParserCDECL           = 37
-	ArcParserFASTCALL        = 38
-	ArcParserVECTORCALL      = 39
-	ArcParserTHISCALL        = 40
-	ArcParserINT8            = 41
-	ArcParserINT16           = 42
-	ArcParserINT32           = 43
-	ArcParserINT64           = 44
-	ArcParserUINT8           = 45
-	ArcParserUINT16          = 46
-	ArcParserUINT32          = 47
-	ArcParserUINT64          = 48
-	ArcParserUSIZE           = 49
-	ArcParserISIZE           = 50
-	ArcParserFLOAT32         = 51
-	ArcParserFLOAT64         = 52
-	ArcParserBYTE            = 53
-	ArcParserBOOL            = 54
-	ArcParserCHAR            = 55
-	ArcParserSTRING          = 56
-	ArcParserVOID            = 57
-	ArcParserEQ              = 58
-	ArcParserNE              = 59
-	ArcParserLE              = 60
-	ArcParserGE              = 61
-	ArcParserAND             = 62
-	ArcParserOR              = 63
-	ArcParserPLUS_ASSIGN     = 64
-	ArcParserMINUS_ASSIGN    = 65
-	ArcParserSTAR_ASSIGN     = 66
-	ArcParserSLASH_ASSIGN    = 67
-	ArcParserPERCENT_ASSIGN  = 68
-	ArcParserBIT_OR_ASSIGN   = 69
-	ArcParserBIT_AND_ASSIGN  = 70
-	ArcParserBIT_XOR_ASSIGN  = 71
-	ArcParserSHL_ASSIGN      = 72
-	ArcParserSHR_ASSIGN      = 73
-	ArcParserINCREMENT       = 74
-	ArcParserDECREMENT       = 75
-	ArcParserFAT_ARROW       = 76
-	ArcParserRANGE           = 77
-	ArcParserELLIPSIS        = 78
-	ArcParserPLUS            = 79
-	ArcParserMINUS           = 80
-	ArcParserSTAR            = 81
-	ArcParserSLASH           = 82
-	ArcParserPERCENT         = 83
-	ArcParserLT              = 84
-	ArcParserGT              = 85
-	ArcParserNOT             = 86
-	ArcParserAMP             = 87
-	ArcParserBIT_OR          = 88
-	ArcParserBIT_XOR         = 89
-	ArcParserBIT_NOT         = 90
-	ArcParserAT              = 91
-	ArcParserASSIGN          = 92
-	ArcParserLPAREN          = 93
-	ArcParserRPAREN          = 94
-	ArcParserLBRACE          = 95
-	ArcParserRBRACE          = 96
-	ArcParserLBRACKET        = 97
-	ArcParserRBRACKET        = 98
-	ArcParserCOMMA           = 99
-	ArcParserCOLON           = 100
-	ArcParserSEMICOLON       = 101
-	ArcParserDOT             = 102
-	ArcParserUNDERSCORE      = 103
-	ArcParserBOOLEAN_LITERAL = 104
-	ArcParserINTEGER_LITERAL = 105
-	ArcParserFLOAT_LITERAL   = 106
-	ArcParserSTRING_LITERAL  = 107
-	ArcParserCHAR_LITERAL    = 108
-	ArcParserIDENTIFIER      = 109
-	ArcParserWS              = 110
-	ArcParserLINE_COMMENT    = 111
-	ArcParserBLOCK_COMMENT   = 112
-	ArcParserEXTERN_WS       = 113
-	ArcParserC_LANG          = 114
-	ArcParserCPP_LANG        = 115
+	ArcParserEOF           = antlr.TokenEOF
+	ArcParserNAMESPACE     = 1
+	ArcParserIMPORT        = 2
+	ArcParserFUNC          = 3
+	ArcParserASYNC         = 4
+	ArcParserGPU           = 5
+	ArcParserINTERFACE     = 6
+	ArcParserENUM          = 7
+	ArcParserCONST         = 8
+	ArcParserLET           = 9
+	ArcParserVAR           = 10
+	ArcParserNEW           = 11
+	ArcParserDELETE        = 12
+	ArcParserDEFER         = 13
+	ArcParserDEINIT        = 14
+	ArcParserRETURN        = 15
+	ArcParserIF            = 16
+	ArcParserELSE          = 17
+	ArcParserFOR           = 18
+	ArcParserIN            = 19
+	ArcParserSWITCH        = 20
+	ArcParserCASE          = 21
+	ArcParserDEFAULT       = 22
+	ArcParserBREAK         = 23
+	ArcParserCONTINUE      = 24
+	ArcParserPROCESS       = 25
+	ArcParserAWAIT         = 26
+	ArcParserEXTERN        = 27
+	ArcParserTYPE          = 28
+	ArcParserOPAQUE        = 29
+	ArcParserSELF          = 30
+	ArcParserMUT           = 31
+	ArcParserVOID          = 32
+	ArcParserNULL          = 33
+	ArcParserTRUE          = 34
+	ArcParserFALSE         = 35
+	ArcParserCLASS         = 36
+	ArcParserVIRTUAL       = 37
+	ArcParserSTATIC        = 38
+	ArcParserABSTRACT      = 39
+	ArcParserCDECL         = 40
+	ArcParserSTDCALL       = 41
+	ArcParserTHISCALL      = 42
+	ArcParserVECTORCALL    = 43
+	ArcParserFASTCALL      = 44
+	ArcParserINT8          = 45
+	ArcParserINT16         = 46
+	ArcParserINT32         = 47
+	ArcParserINT64         = 48
+	ArcParserUINT8         = 49
+	ArcParserUINT16        = 50
+	ArcParserUINT32        = 51
+	ArcParserUINT64        = 52
+	ArcParserUSIZE         = 53
+	ArcParserISIZE         = 54
+	ArcParserFLOAT32       = 55
+	ArcParserFLOAT64       = 56
+	ArcParserBYTE          = 57
+	ArcParserBOOL          = 58
+	ArcParserCHAR          = 59
+	ArcParserSTRING        = 60
+	ArcParserVECTOR        = 61
+	ArcParserMAP           = 62
+	ArcParserARROW         = 63
+	ArcParserELLIPSIS      = 64
+	ArcParserRANGE         = 65
+	ArcParserLSHIFT        = 66
+	ArcParserRSHIFT        = 67
+	ArcParserLE            = 68
+	ArcParserGE            = 69
+	ArcParserEQ            = 70
+	ArcParserNEQ           = 71
+	ArcParserAND           = 72
+	ArcParserOR            = 73
+	ArcParserINC           = 74
+	ArcParserDEC           = 75
+	ArcParserADD_ASSIGN    = 76
+	ArcParserSUB_ASSIGN    = 77
+	ArcParserMUL_ASSIGN    = 78
+	ArcParserDIV_ASSIGN    = 79
+	ArcParserMOD_ASSIGN    = 80
+	ArcParserAND_ASSIGN    = 81
+	ArcParserOR_ASSIGN     = 82
+	ArcParserXOR_ASSIGN    = 83
+	ArcParserSHL_ASSIGN    = 84
+	ArcParserSHR_ASSIGN    = 85
+	ArcParserLPAREN        = 86
+	ArcParserRPAREN        = 87
+	ArcParserLBRACKET      = 88
+	ArcParserRBRACKET      = 89
+	ArcParserLBRACE        = 90
+	ArcParserRBRACE        = 91
+	ArcParserDOT           = 92
+	ArcParserCOMMA         = 93
+	ArcParserCOLON         = 94
+	ArcParserSEMI          = 95
+	ArcParserASSIGN        = 96
+	ArcParserPLUS          = 97
+	ArcParserMINUS         = 98
+	ArcParserSTAR          = 99
+	ArcParserSLASH         = 100
+	ArcParserPERCENT       = 101
+	ArcParserAMP           = 102
+	ArcParserPIPE          = 103
+	ArcParserCARET         = 104
+	ArcParserTILDE         = 105
+	ArcParserBANG          = 106
+	ArcParserLT            = 107
+	ArcParserGT            = 108
+	ArcParserAT            = 109
+	ArcParserUNDERSCORE    = 110
+	ArcParserHEX_LIT       = 111
+	ArcParserFLOAT_LIT     = 112
+	ArcParserINT_LIT       = 113
+	ArcParserCHAR_LIT      = 114
+	ArcParserSTRING_LIT    = 115
+	ArcParserIDENTIFIER    = 116
+	ArcParserNL            = 117
+	ArcParserWS            = 118
+	ArcParserLINE_COMMENT  = 119
+	ArcParserBLOCK_COMMENT = 120
 )
     ArcParser tokens.
 
 const (
-	ArcParserRULE_compilationUnit          = 0
-	ArcParserRULE_importDecl               = 1
-	ArcParserRULE_importSpec               = 2
-	ArcParserRULE_namespaceDecl            = 3
-	ArcParserRULE_topLevelDecl             = 4
-	ArcParserRULE_attribute                = 5
-	ArcParserRULE_externCDecl              = 6
-	ArcParserRULE_externCMember            = 7
-	ArcParserRULE_externCFunctionDecl      = 8
-	ArcParserRULE_cCallingConvention       = 9
-	ArcParserRULE_externCParameterList     = 10
-	ArcParserRULE_externCParameter         = 11
-	ArcParserRULE_externCConstDecl         = 12
-	ArcParserRULE_externCTypeAlias         = 13
-	ArcParserRULE_externCStructDecl        = 14
-	ArcParserRULE_externCStructField       = 15
-	ArcParserRULE_externCppDecl            = 16
-	ArcParserRULE_externCppMember          = 17
-	ArcParserRULE_externCppNamespaceDecl   = 18
-	ArcParserRULE_externNamespacePath      = 19
-	ArcParserRULE_externCppFunctionDecl    = 20
-	ArcParserRULE_cppCallingConvention     = 21
-	ArcParserRULE_externCppParameterList   = 22
-	ArcParserRULE_externCppParameter       = 23
-	ArcParserRULE_externCppParamType       = 24
-	ArcParserRULE_externCppConstDecl       = 25
-	ArcParserRULE_externCppTypeAlias       = 26
-	ArcParserRULE_externCppClassDecl       = 27
-	ArcParserRULE_externCppClassMember     = 28
-	ArcParserRULE_externCppConstructorDecl = 29
-	ArcParserRULE_externCppDestructorDecl  = 30
-	ArcParserRULE_externCppMethodDecl      = 31
-	ArcParserRULE_externCppMethodParams    = 32
-	ArcParserRULE_externCppSelfParam       = 33
-	ArcParserRULE_externType               = 34
-	ArcParserRULE_externPointerType        = 35
-	ArcParserRULE_externPrimitiveType      = 36
-	ArcParserRULE_externFunctionType       = 37
-	ArcParserRULE_externTypeList           = 38
-	ArcParserRULE_genericParams            = 39
-	ArcParserRULE_genericParamList         = 40
-	ArcParserRULE_genericParam             = 41
-	ArcParserRULE_genericArgs              = 42
-	ArcParserRULE_genericArgList           = 43
-	ArcParserRULE_genericArg               = 44
-	ArcParserRULE_type                     = 45
-	ArcParserRULE_collectionType           = 46
-	ArcParserRULE_qualifiedType            = 47
-	ArcParserRULE_functionType             = 48
-	ArcParserRULE_primitiveType            = 49
-	ArcParserRULE_typeList                 = 50
-	ArcParserRULE_returnType               = 51
-	ArcParserRULE_qualifiedIdentifier      = 52
-	ArcParserRULE_functionDecl             = 53
-	ArcParserRULE_methodDecl               = 54
-	ArcParserRULE_deinitDecl               = 55
-	ArcParserRULE_structDecl               = 56
-	ArcParserRULE_structMember             = 57
-	ArcParserRULE_structField              = 58
-	ArcParserRULE_classDecl                = 59
-	ArcParserRULE_classMember              = 60
-	ArcParserRULE_classField               = 61
-	ArcParserRULE_enumDecl                 = 62
-	ArcParserRULE_enumMember               = 63
-	ArcParserRULE_variableDecl             = 64
-	ArcParserRULE_constDecl                = 65
-	ArcParserRULE_tuplePattern             = 66
-	ArcParserRULE_tupleType                = 67
-	ArcParserRULE_parameterList            = 68
-	ArcParserRULE_parameter                = 69
-	ArcParserRULE_block                    = 70
-	ArcParserRULE_statement                = 71
-	ArcParserRULE_assignmentStmt           = 72
-	ArcParserRULE_assignmentOp             = 73
-	ArcParserRULE_expressionStmt           = 74
-	ArcParserRULE_returnStmt               = 75
-	ArcParserRULE_deferStmt                = 76
-	ArcParserRULE_breakStmt                = 77
-	ArcParserRULE_continueStmt             = 78
-	ArcParserRULE_ifStmt                   = 79
-	ArcParserRULE_forStmt                  = 80
-	ArcParserRULE_switchStmt               = 81
-	ArcParserRULE_switchCase               = 82
-	ArcParserRULE_defaultCase              = 83
-	ArcParserRULE_expression               = 84
-	ArcParserRULE_logicalOrExpression      = 85
-	ArcParserRULE_logicalAndExpression     = 86
-	ArcParserRULE_bitOrExpression          = 87
-	ArcParserRULE_bitXorExpression         = 88
-	ArcParserRULE_bitAndExpression         = 89
-	ArcParserRULE_equalityExpression       = 90
-	ArcParserRULE_relationalExpression     = 91
-	ArcParserRULE_shiftExpression          = 92
-	ArcParserRULE_rangeExpression          = 93
-	ArcParserRULE_additiveExpression       = 94
-	ArcParserRULE_multiplicativeExpression = 95
-	ArcParserRULE_unaryExpression          = 96
-	ArcParserRULE_postfixExpression        = 97
-	ArcParserRULE_postfixOp                = 98
-	ArcParserRULE_primaryExpression        = 99
-	ArcParserRULE_newExpression            = 100
-	ArcParserRULE_deleteExpression         = 101
-	ArcParserRULE_castExpression           = 102
-	ArcParserRULE_castTargetType           = 103
-	ArcParserRULE_builtinExpression        = 104
-	ArcParserRULE_literal                  = 105
-	ArcParserRULE_initializerList          = 106
-	ArcParserRULE_initializerEntry         = 107
-	ArcParserRULE_structLiteral            = 108
-	ArcParserRULE_fieldInit                = 109
-	ArcParserRULE_argumentList             = 110
-	ArcParserRULE_argument                 = 111
-	ArcParserRULE_lambdaExpression         = 112
-	ArcParserRULE_anonymousFuncExpression  = 113
-	ArcParserRULE_executionStrategy        = 114
-	ArcParserRULE_lambdaParamList          = 115
-	ArcParserRULE_lambdaParam              = 116
-	ArcParserRULE_tupleExpression          = 117
+	ArcParserRULE_compilationUnit       = 0
+	ArcParserRULE_namespaceDecl         = 1
+	ArcParserRULE_topLevelDecl          = 2
+	ArcParserRULE_semi                  = 3
+	ArcParserRULE_importDecl            = 4
+	ArcParserRULE_importSpec            = 5
+	ArcParserRULE_importAlias           = 6
+	ArcParserRULE_constDecl             = 7
+	ArcParserRULE_constSpec             = 8
+	ArcParserRULE_topLevelVarDecl       = 9
+	ArcParserRULE_topLevelLetDecl       = 10
+	ArcParserRULE_funcDecl              = 11
+	ArcParserRULE_funcModifier          = 12
+	ArcParserRULE_deinitDecl            = 13
+	ArcParserRULE_paramList             = 14
+	ArcParserRULE_param                 = 15
+	ArcParserRULE_selfParam             = 16
+	ArcParserRULE_paramType             = 17
+	ArcParserRULE_returnType            = 18
+	ArcParserRULE_tupleType             = 19
+	ArcParserRULE_genericParams         = 20
+	ArcParserRULE_genericArgs           = 21
+	ArcParserRULE_interfaceDecl         = 22
+	ArcParserRULE_interfaceField        = 23
+	ArcParserRULE_enumDecl              = 24
+	ArcParserRULE_enumMember            = 25
+	ArcParserRULE_typeAliasDecl         = 26
+	ArcParserRULE_attribute             = 27
+	ArcParserRULE_typeRef               = 28
+	ArcParserRULE_functionType          = 29
+	ArcParserRULE_baseType              = 30
+	ArcParserRULE_primitiveType         = 31
+	ArcParserRULE_typeList              = 32
+	ArcParserRULE_externDecl            = 33
+	ArcParserRULE_externMember          = 34
+	ArcParserRULE_externFuncDecl        = 35
+	ArcParserRULE_callingConvention     = 36
+	ArcParserRULE_externSymbol          = 37
+	ArcParserRULE_externParamList       = 38
+	ArcParserRULE_externParam           = 39
+	ArcParserRULE_externReturnType      = 40
+	ArcParserRULE_externType            = 41
+	ArcParserRULE_externNamespace       = 42
+	ArcParserRULE_externClass           = 43
+	ArcParserRULE_externClassMember     = 44
+	ArcParserRULE_externVirtualMethod   = 45
+	ArcParserRULE_externStaticMethod    = 46
+	ArcParserRULE_externConstructor     = 47
+	ArcParserRULE_externDestructor      = 48
+	ArcParserRULE_externMethodParamList = 49
+	ArcParserRULE_externMethodParam     = 50
+	ArcParserRULE_externTypeAlias       = 51
+	ArcParserRULE_externFunctionPtrType = 52
+	ArcParserRULE_block                 = 53
+	ArcParserRULE_statement             = 54
+	ArcParserRULE_letStatement          = 55
+	ArcParserRULE_varStatement          = 56
+	ArcParserRULE_returnStatement       = 57
+	ArcParserRULE_breakStatement        = 58
+	ArcParserRULE_continueStatement     = 59
+	ArcParserRULE_deferStatement        = 60
+	ArcParserRULE_ifStatement           = 61
+	ArcParserRULE_forStatement          = 62
+	ArcParserRULE_forHeader             = 63
+	ArcParserRULE_forInit               = 64
+	ArcParserRULE_forPost               = 65
+	ArcParserRULE_forIterator           = 66
+	ArcParserRULE_switchStatement       = 67
+	ArcParserRULE_switchCase            = 68
+	ArcParserRULE_switchDefault         = 69
+	ArcParserRULE_expressionList        = 70
+	ArcParserRULE_assignmentStatement   = 71
+	ArcParserRULE_assignmentTarget      = 72
+	ArcParserRULE_assignOp              = 73
+	ArcParserRULE_expressionStatement   = 74
+	ArcParserRULE_expression            = 75
+	ArcParserRULE_primary               = 76
+	ArcParserRULE_initializerBlock      = 77
+	ArcParserRULE_fieldInit             = 78
+	ArcParserRULE_mapEntry              = 79
+	ArcParserRULE_argumentList          = 80
+	ArcParserRULE_argument              = 81
+	ArcParserRULE_lambdaParamList       = 82
+	ArcParserRULE_lambdaParam           = 83
+	ArcParserRULE_qualifiedName         = 84
 )
     ArcParser rules.
-
-const ArcLexerEXTERN_LANG_MODE = 1
-    ArcLexerEXTERN_LANG_MODE is the ArcLexer mode.
 
 
 VARIABLES
@@ -406,192 +380,130 @@ func ArcParserInit()
     during the first call to NewArcParser(). You can call this function if you
     wish to initialize the static state ahead of time.
 
-func InitEmptyAdditiveExpressionContext(p *AdditiveExpressionContext)
-func InitEmptyAnonymousFuncExpressionContext(p *AnonymousFuncExpressionContext)
 func InitEmptyArgumentContext(p *ArgumentContext)
 func InitEmptyArgumentListContext(p *ArgumentListContext)
-func InitEmptyAssignmentOpContext(p *AssignmentOpContext)
-func InitEmptyAssignmentStmtContext(p *AssignmentStmtContext)
+func InitEmptyAssignOpContext(p *AssignOpContext)
+func InitEmptyAssignmentStatementContext(p *AssignmentStatementContext)
+func InitEmptyAssignmentTargetContext(p *AssignmentTargetContext)
 func InitEmptyAttributeContext(p *AttributeContext)
-func InitEmptyBitAndExpressionContext(p *BitAndExpressionContext)
-func InitEmptyBitOrExpressionContext(p *BitOrExpressionContext)
-func InitEmptyBitXorExpressionContext(p *BitXorExpressionContext)
+func InitEmptyBaseTypeContext(p *BaseTypeContext)
 func InitEmptyBlockContext(p *BlockContext)
-func InitEmptyBreakStmtContext(p *BreakStmtContext)
-func InitEmptyBuiltinExpressionContext(p *BuiltinExpressionContext)
-func InitEmptyCCallingConventionContext(p *CCallingConventionContext)
-func InitEmptyCastExpressionContext(p *CastExpressionContext)
-func InitEmptyCastTargetTypeContext(p *CastTargetTypeContext)
-func InitEmptyClassDeclContext(p *ClassDeclContext)
-func InitEmptyClassFieldContext(p *ClassFieldContext)
-func InitEmptyClassMemberContext(p *ClassMemberContext)
-func InitEmptyCollectionTypeContext(p *CollectionTypeContext)
+func InitEmptyBreakStatementContext(p *BreakStatementContext)
+func InitEmptyCallingConventionContext(p *CallingConventionContext)
 func InitEmptyCompilationUnitContext(p *CompilationUnitContext)
 func InitEmptyConstDeclContext(p *ConstDeclContext)
-func InitEmptyContinueStmtContext(p *ContinueStmtContext)
-func InitEmptyCppCallingConventionContext(p *CppCallingConventionContext)
-func InitEmptyDefaultCaseContext(p *DefaultCaseContext)
-func InitEmptyDeferStmtContext(p *DeferStmtContext)
+func InitEmptyConstSpecContext(p *ConstSpecContext)
+func InitEmptyContinueStatementContext(p *ContinueStatementContext)
+func InitEmptyDeferStatementContext(p *DeferStatementContext)
 func InitEmptyDeinitDeclContext(p *DeinitDeclContext)
-func InitEmptyDeleteExpressionContext(p *DeleteExpressionContext)
 func InitEmptyEnumDeclContext(p *EnumDeclContext)
 func InitEmptyEnumMemberContext(p *EnumMemberContext)
-func InitEmptyEqualityExpressionContext(p *EqualityExpressionContext)
-func InitEmptyExecutionStrategyContext(p *ExecutionStrategyContext)
 func InitEmptyExpressionContext(p *ExpressionContext)
-func InitEmptyExpressionStmtContext(p *ExpressionStmtContext)
-func InitEmptyExternCConstDeclContext(p *ExternCConstDeclContext)
-func InitEmptyExternCDeclContext(p *ExternCDeclContext)
-func InitEmptyExternCFunctionDeclContext(p *ExternCFunctionDeclContext)
-func InitEmptyExternCMemberContext(p *ExternCMemberContext)
-func InitEmptyExternCParameterContext(p *ExternCParameterContext)
-func InitEmptyExternCParameterListContext(p *ExternCParameterListContext)
-func InitEmptyExternCStructDeclContext(p *ExternCStructDeclContext)
-func InitEmptyExternCStructFieldContext(p *ExternCStructFieldContext)
-func InitEmptyExternCTypeAliasContext(p *ExternCTypeAliasContext)
-func InitEmptyExternCppClassDeclContext(p *ExternCppClassDeclContext)
-func InitEmptyExternCppClassMemberContext(p *ExternCppClassMemberContext)
-func InitEmptyExternCppConstDeclContext(p *ExternCppConstDeclContext)
-func InitEmptyExternCppConstructorDeclContext(p *ExternCppConstructorDeclContext)
-func InitEmptyExternCppDeclContext(p *ExternCppDeclContext)
-func InitEmptyExternCppDestructorDeclContext(p *ExternCppDestructorDeclContext)
-func InitEmptyExternCppFunctionDeclContext(p *ExternCppFunctionDeclContext)
-func InitEmptyExternCppMemberContext(p *ExternCppMemberContext)
-func InitEmptyExternCppMethodDeclContext(p *ExternCppMethodDeclContext)
-func InitEmptyExternCppMethodParamsContext(p *ExternCppMethodParamsContext)
-func InitEmptyExternCppNamespaceDeclContext(p *ExternCppNamespaceDeclContext)
-func InitEmptyExternCppParamTypeContext(p *ExternCppParamTypeContext)
-func InitEmptyExternCppParameterContext(p *ExternCppParameterContext)
-func InitEmptyExternCppParameterListContext(p *ExternCppParameterListContext)
-func InitEmptyExternCppSelfParamContext(p *ExternCppSelfParamContext)
-func InitEmptyExternCppTypeAliasContext(p *ExternCppTypeAliasContext)
-func InitEmptyExternFunctionTypeContext(p *ExternFunctionTypeContext)
-func InitEmptyExternNamespacePathContext(p *ExternNamespacePathContext)
-func InitEmptyExternPointerTypeContext(p *ExternPointerTypeContext)
-func InitEmptyExternPrimitiveTypeContext(p *ExternPrimitiveTypeContext)
+func InitEmptyExpressionListContext(p *ExpressionListContext)
+func InitEmptyExpressionStatementContext(p *ExpressionStatementContext)
+func InitEmptyExternClassContext(p *ExternClassContext)
+func InitEmptyExternClassMemberContext(p *ExternClassMemberContext)
+func InitEmptyExternConstructorContext(p *ExternConstructorContext)
+func InitEmptyExternDeclContext(p *ExternDeclContext)
+func InitEmptyExternDestructorContext(p *ExternDestructorContext)
+func InitEmptyExternFuncDeclContext(p *ExternFuncDeclContext)
+func InitEmptyExternFunctionPtrTypeContext(p *ExternFunctionPtrTypeContext)
+func InitEmptyExternMemberContext(p *ExternMemberContext)
+func InitEmptyExternMethodParamContext(p *ExternMethodParamContext)
+func InitEmptyExternMethodParamListContext(p *ExternMethodParamListContext)
+func InitEmptyExternNamespaceContext(p *ExternNamespaceContext)
+func InitEmptyExternParamContext(p *ExternParamContext)
+func InitEmptyExternParamListContext(p *ExternParamListContext)
+func InitEmptyExternReturnTypeContext(p *ExternReturnTypeContext)
+func InitEmptyExternStaticMethodContext(p *ExternStaticMethodContext)
+func InitEmptyExternSymbolContext(p *ExternSymbolContext)
+func InitEmptyExternTypeAliasContext(p *ExternTypeAliasContext)
 func InitEmptyExternTypeContext(p *ExternTypeContext)
-func InitEmptyExternTypeListContext(p *ExternTypeListContext)
+func InitEmptyExternVirtualMethodContext(p *ExternVirtualMethodContext)
 func InitEmptyFieldInitContext(p *FieldInitContext)
-func InitEmptyForStmtContext(p *ForStmtContext)
-func InitEmptyFunctionDeclContext(p *FunctionDeclContext)
+func InitEmptyForHeaderContext(p *ForHeaderContext)
+func InitEmptyForInitContext(p *ForInitContext)
+func InitEmptyForIteratorContext(p *ForIteratorContext)
+func InitEmptyForPostContext(p *ForPostContext)
+func InitEmptyForStatementContext(p *ForStatementContext)
+func InitEmptyFuncDeclContext(p *FuncDeclContext)
+func InitEmptyFuncModifierContext(p *FuncModifierContext)
 func InitEmptyFunctionTypeContext(p *FunctionTypeContext)
-func InitEmptyGenericArgContext(p *GenericArgContext)
-func InitEmptyGenericArgListContext(p *GenericArgListContext)
 func InitEmptyGenericArgsContext(p *GenericArgsContext)
-func InitEmptyGenericParamContext(p *GenericParamContext)
-func InitEmptyGenericParamListContext(p *GenericParamListContext)
 func InitEmptyGenericParamsContext(p *GenericParamsContext)
-func InitEmptyIfStmtContext(p *IfStmtContext)
+func InitEmptyIfStatementContext(p *IfStatementContext)
+func InitEmptyImportAliasContext(p *ImportAliasContext)
 func InitEmptyImportDeclContext(p *ImportDeclContext)
 func InitEmptyImportSpecContext(p *ImportSpecContext)
-func InitEmptyInitializerEntryContext(p *InitializerEntryContext)
-func InitEmptyInitializerListContext(p *InitializerListContext)
-func InitEmptyLambdaExpressionContext(p *LambdaExpressionContext)
+func InitEmptyInitializerBlockContext(p *InitializerBlockContext)
+func InitEmptyInterfaceDeclContext(p *InterfaceDeclContext)
+func InitEmptyInterfaceFieldContext(p *InterfaceFieldContext)
 func InitEmptyLambdaParamContext(p *LambdaParamContext)
 func InitEmptyLambdaParamListContext(p *LambdaParamListContext)
-func InitEmptyLiteralContext(p *LiteralContext)
-func InitEmptyLogicalAndExpressionContext(p *LogicalAndExpressionContext)
-func InitEmptyLogicalOrExpressionContext(p *LogicalOrExpressionContext)
-func InitEmptyMethodDeclContext(p *MethodDeclContext)
-func InitEmptyMultiplicativeExpressionContext(p *MultiplicativeExpressionContext)
+func InitEmptyLetStatementContext(p *LetStatementContext)
+func InitEmptyMapEntryContext(p *MapEntryContext)
 func InitEmptyNamespaceDeclContext(p *NamespaceDeclContext)
-func InitEmptyNewExpressionContext(p *NewExpressionContext)
-func InitEmptyParameterContext(p *ParameterContext)
-func InitEmptyParameterListContext(p *ParameterListContext)
-func InitEmptyPostfixExpressionContext(p *PostfixExpressionContext)
-func InitEmptyPostfixOpContext(p *PostfixOpContext)
-func InitEmptyPrimaryExpressionContext(p *PrimaryExpressionContext)
+func InitEmptyParamContext(p *ParamContext)
+func InitEmptyParamListContext(p *ParamListContext)
+func InitEmptyParamTypeContext(p *ParamTypeContext)
+func InitEmptyPrimaryContext(p *PrimaryContext)
 func InitEmptyPrimitiveTypeContext(p *PrimitiveTypeContext)
-func InitEmptyQualifiedIdentifierContext(p *QualifiedIdentifierContext)
-func InitEmptyQualifiedTypeContext(p *QualifiedTypeContext)
-func InitEmptyRangeExpressionContext(p *RangeExpressionContext)
-func InitEmptyRelationalExpressionContext(p *RelationalExpressionContext)
-func InitEmptyReturnStmtContext(p *ReturnStmtContext)
+func InitEmptyQualifiedNameContext(p *QualifiedNameContext)
+func InitEmptyReturnStatementContext(p *ReturnStatementContext)
 func InitEmptyReturnTypeContext(p *ReturnTypeContext)
-func InitEmptyShiftExpressionContext(p *ShiftExpressionContext)
+func InitEmptySelfParamContext(p *SelfParamContext)
+func InitEmptySemiContext(p *SemiContext)
 func InitEmptyStatementContext(p *StatementContext)
-func InitEmptyStructDeclContext(p *StructDeclContext)
-func InitEmptyStructFieldContext(p *StructFieldContext)
-func InitEmptyStructLiteralContext(p *StructLiteralContext)
-func InitEmptyStructMemberContext(p *StructMemberContext)
 func InitEmptySwitchCaseContext(p *SwitchCaseContext)
-func InitEmptySwitchStmtContext(p *SwitchStmtContext)
+func InitEmptySwitchDefaultContext(p *SwitchDefaultContext)
+func InitEmptySwitchStatementContext(p *SwitchStatementContext)
 func InitEmptyTopLevelDeclContext(p *TopLevelDeclContext)
-func InitEmptyTupleExpressionContext(p *TupleExpressionContext)
-func InitEmptyTuplePatternContext(p *TuplePatternContext)
+func InitEmptyTopLevelLetDeclContext(p *TopLevelLetDeclContext)
+func InitEmptyTopLevelVarDeclContext(p *TopLevelVarDeclContext)
 func InitEmptyTupleTypeContext(p *TupleTypeContext)
-func InitEmptyTypeContext(p *TypeContext)
+func InitEmptyTypeAliasDeclContext(p *TypeAliasDeclContext)
 func InitEmptyTypeListContext(p *TypeListContext)
-func InitEmptyUnaryExpressionContext(p *UnaryExpressionContext)
-func InitEmptyVariableDeclContext(p *VariableDeclContext)
+func InitEmptyTypeRefContext(p *TypeRefContext)
+func InitEmptyVarStatementContext(p *VarStatementContext)
 
 TYPES
 
-type AdditiveExpressionContext struct {
-	antlr.BaseParserRuleContext
+type AddExprContext struct {
+	ExpressionContext
 	// Has unexported fields.
 }
 
-func NewAdditiveExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *AdditiveExpressionContext
+func NewAddExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *AddExprContext
 
-func NewEmptyAdditiveExpressionContext() *AdditiveExpressionContext
+func (s *AddExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *AdditiveExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *AddExprContext) AllExpression() []IExpressionContext
 
-func (s *AdditiveExpressionContext) AllMINUS() []antlr.TerminalNode
+func (s *AddExprContext) Expression(i int) IExpressionContext
 
-func (s *AdditiveExpressionContext) AllMultiplicativeExpression() []IMultiplicativeExpressionContext
+func (s *AddExprContext) GetOp() antlr.Token
 
-func (s *AdditiveExpressionContext) AllPLUS() []antlr.TerminalNode
+func (s *AddExprContext) GetRuleContext() antlr.RuleContext
 
-func (s *AdditiveExpressionContext) GetParser() antlr.Parser
+func (s *AddExprContext) MINUS() antlr.TerminalNode
 
-func (s *AdditiveExpressionContext) GetRuleContext() antlr.RuleContext
+func (s *AddExprContext) PLUS() antlr.TerminalNode
 
-func (*AdditiveExpressionContext) IsAdditiveExpressionContext()
+func (s *AddExprContext) SetOp(v antlr.Token)
 
-func (s *AdditiveExpressionContext) MINUS(i int) antlr.TerminalNode
-
-func (s *AdditiveExpressionContext) MultiplicativeExpression(i int) IMultiplicativeExpressionContext
-
-func (s *AdditiveExpressionContext) PLUS(i int) antlr.TerminalNode
-
-func (s *AdditiveExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type AnonymousFuncExpressionContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
+type AddressOfContext struct {
+	ExpressionContext
 }
 
-func NewAnonymousFuncExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *AnonymousFuncExpressionContext
+func NewAddressOfContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *AddressOfContext
 
-func NewEmptyAnonymousFuncExpressionContext() *AnonymousFuncExpressionContext
+func (s *AddressOfContext) AMP() antlr.TerminalNode
 
-func (s *AnonymousFuncExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *AddressOfContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *AnonymousFuncExpressionContext) Block() IBlockContext
+func (s *AddressOfContext) Expression() IExpressionContext
 
-func (s *AnonymousFuncExpressionContext) ExecutionStrategy() IExecutionStrategyContext
-
-func (s *AnonymousFuncExpressionContext) FUNC() antlr.TerminalNode
-
-func (s *AnonymousFuncExpressionContext) GenericParams() IGenericParamsContext
-
-func (s *AnonymousFuncExpressionContext) GetParser() antlr.Parser
-
-func (s *AnonymousFuncExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (*AnonymousFuncExpressionContext) IsAnonymousFuncExpressionContext()
-
-func (s *AnonymousFuncExpressionContext) LPAREN() antlr.TerminalNode
-
-func (s *AnonymousFuncExpressionContext) ParameterList() IParameterListContext
-
-func (s *AnonymousFuncExpressionContext) RPAREN() antlr.TerminalNode
-
-func (s *AnonymousFuncExpressionContext) ReturnType() IReturnTypeContext
-
-func (s *AnonymousFuncExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *AddressOfContext) GetRuleContext() antlr.RuleContext
 
 type ArcLexer struct {
 	*antlr.BaseLexer
@@ -611,241 +523,179 @@ func NewArcParser(input antlr.TokenStream) *ArcParser
     NewArcParser produces a new parser instance for the optional input
     antlr.TokenStream.
 
-func (p *ArcParser) AdditiveExpression() (localctx IAdditiveExpressionContext)
-
-func (p *ArcParser) AnonymousFuncExpression() (localctx IAnonymousFuncExpressionContext)
-
 func (p *ArcParser) Argument() (localctx IArgumentContext)
 
 func (p *ArcParser) ArgumentList() (localctx IArgumentListContext)
 
-func (p *ArcParser) AssignmentOp() (localctx IAssignmentOpContext)
+func (p *ArcParser) AssignOp() (localctx IAssignOpContext)
 
-func (p *ArcParser) AssignmentStmt() (localctx IAssignmentStmtContext)
+func (p *ArcParser) AssignmentStatement() (localctx IAssignmentStatementContext)
+
+func (p *ArcParser) AssignmentTarget() (localctx IAssignmentTargetContext)
 
 func (p *ArcParser) Attribute() (localctx IAttributeContext)
 
-func (p *ArcParser) BitAndExpression() (localctx IBitAndExpressionContext)
-
-func (p *ArcParser) BitOrExpression() (localctx IBitOrExpressionContext)
-
-func (p *ArcParser) BitXorExpression() (localctx IBitXorExpressionContext)
+func (p *ArcParser) BaseType() (localctx IBaseTypeContext)
 
 func (p *ArcParser) Block() (localctx IBlockContext)
 
-func (p *ArcParser) BreakStmt() (localctx IBreakStmtContext)
+func (p *ArcParser) BreakStatement() (localctx IBreakStatementContext)
 
-func (p *ArcParser) BuiltinExpression() (localctx IBuiltinExpressionContext)
-
-func (p *ArcParser) CCallingConvention() (localctx ICCallingConventionContext)
-
-func (p *ArcParser) CastExpression() (localctx ICastExpressionContext)
-
-func (p *ArcParser) CastTargetType() (localctx ICastTargetTypeContext)
-
-func (p *ArcParser) ClassDecl() (localctx IClassDeclContext)
-
-func (p *ArcParser) ClassField() (localctx IClassFieldContext)
-
-func (p *ArcParser) ClassMember() (localctx IClassMemberContext)
-
-func (p *ArcParser) CollectionType() (localctx ICollectionTypeContext)
+func (p *ArcParser) CallingConvention() (localctx ICallingConventionContext)
 
 func (p *ArcParser) CompilationUnit() (localctx ICompilationUnitContext)
 
 func (p *ArcParser) ConstDecl() (localctx IConstDeclContext)
 
-func (p *ArcParser) ContinueStmt() (localctx IContinueStmtContext)
+func (p *ArcParser) ConstSpec() (localctx IConstSpecContext)
 
-func (p *ArcParser) CppCallingConvention() (localctx ICppCallingConventionContext)
+func (p *ArcParser) ContinueStatement() (localctx IContinueStatementContext)
 
-func (p *ArcParser) DefaultCase() (localctx IDefaultCaseContext)
-
-func (p *ArcParser) DeferStmt() (localctx IDeferStmtContext)
+func (p *ArcParser) DeferStatement() (localctx IDeferStatementContext)
 
 func (p *ArcParser) DeinitDecl() (localctx IDeinitDeclContext)
-
-func (p *ArcParser) DeleteExpression() (localctx IDeleteExpressionContext)
 
 func (p *ArcParser) EnumDecl() (localctx IEnumDeclContext)
 
 func (p *ArcParser) EnumMember() (localctx IEnumMemberContext)
 
-func (p *ArcParser) EqualityExpression() (localctx IEqualityExpressionContext)
-
-func (p *ArcParser) ExecutionStrategy() (localctx IExecutionStrategyContext)
-
 func (p *ArcParser) Expression() (localctx IExpressionContext)
 
-func (p *ArcParser) ExpressionStmt() (localctx IExpressionStmtContext)
+func (p *ArcParser) ExpressionList() (localctx IExpressionListContext)
 
-func (p *ArcParser) ExternCConstDecl() (localctx IExternCConstDeclContext)
+func (p *ArcParser) ExpressionStatement() (localctx IExpressionStatementContext)
 
-func (p *ArcParser) ExternCDecl() (localctx IExternCDeclContext)
+func (p *ArcParser) Expression_Sempred(localctx antlr.RuleContext, predIndex int) bool
 
-func (p *ArcParser) ExternCFunctionDecl() (localctx IExternCFunctionDeclContext)
+func (p *ArcParser) ExternClass() (localctx IExternClassContext)
 
-func (p *ArcParser) ExternCMember() (localctx IExternCMemberContext)
+func (p *ArcParser) ExternClassMember() (localctx IExternClassMemberContext)
 
-func (p *ArcParser) ExternCParameter() (localctx IExternCParameterContext)
+func (p *ArcParser) ExternConstructor() (localctx IExternConstructorContext)
 
-func (p *ArcParser) ExternCParameterList() (localctx IExternCParameterListContext)
+func (p *ArcParser) ExternDecl() (localctx IExternDeclContext)
 
-func (p *ArcParser) ExternCStructDecl() (localctx IExternCStructDeclContext)
+func (p *ArcParser) ExternDestructor() (localctx IExternDestructorContext)
 
-func (p *ArcParser) ExternCStructField() (localctx IExternCStructFieldContext)
+func (p *ArcParser) ExternFuncDecl() (localctx IExternFuncDeclContext)
 
-func (p *ArcParser) ExternCTypeAlias() (localctx IExternCTypeAliasContext)
+func (p *ArcParser) ExternFunctionPtrType() (localctx IExternFunctionPtrTypeContext)
 
-func (p *ArcParser) ExternCppClassDecl() (localctx IExternCppClassDeclContext)
+func (p *ArcParser) ExternMember() (localctx IExternMemberContext)
 
-func (p *ArcParser) ExternCppClassMember() (localctx IExternCppClassMemberContext)
+func (p *ArcParser) ExternMethodParam() (localctx IExternMethodParamContext)
 
-func (p *ArcParser) ExternCppConstDecl() (localctx IExternCppConstDeclContext)
+func (p *ArcParser) ExternMethodParamList() (localctx IExternMethodParamListContext)
 
-func (p *ArcParser) ExternCppConstructorDecl() (localctx IExternCppConstructorDeclContext)
+func (p *ArcParser) ExternNamespace() (localctx IExternNamespaceContext)
 
-func (p *ArcParser) ExternCppDecl() (localctx IExternCppDeclContext)
+func (p *ArcParser) ExternParam() (localctx IExternParamContext)
 
-func (p *ArcParser) ExternCppDestructorDecl() (localctx IExternCppDestructorDeclContext)
+func (p *ArcParser) ExternParamList() (localctx IExternParamListContext)
 
-func (p *ArcParser) ExternCppFunctionDecl() (localctx IExternCppFunctionDeclContext)
+func (p *ArcParser) ExternReturnType() (localctx IExternReturnTypeContext)
 
-func (p *ArcParser) ExternCppMember() (localctx IExternCppMemberContext)
+func (p *ArcParser) ExternStaticMethod() (localctx IExternStaticMethodContext)
 
-func (p *ArcParser) ExternCppMethodDecl() (localctx IExternCppMethodDeclContext)
-
-func (p *ArcParser) ExternCppMethodParams() (localctx IExternCppMethodParamsContext)
-
-func (p *ArcParser) ExternCppNamespaceDecl() (localctx IExternCppNamespaceDeclContext)
-
-func (p *ArcParser) ExternCppParamType() (localctx IExternCppParamTypeContext)
-
-func (p *ArcParser) ExternCppParameter() (localctx IExternCppParameterContext)
-
-func (p *ArcParser) ExternCppParameterList() (localctx IExternCppParameterListContext)
-
-func (p *ArcParser) ExternCppSelfParam() (localctx IExternCppSelfParamContext)
-
-func (p *ArcParser) ExternCppTypeAlias() (localctx IExternCppTypeAliasContext)
-
-func (p *ArcParser) ExternFunctionType() (localctx IExternFunctionTypeContext)
-
-func (p *ArcParser) ExternNamespacePath() (localctx IExternNamespacePathContext)
-
-func (p *ArcParser) ExternPointerType() (localctx IExternPointerTypeContext)
-
-func (p *ArcParser) ExternPrimitiveType() (localctx IExternPrimitiveTypeContext)
+func (p *ArcParser) ExternSymbol() (localctx IExternSymbolContext)
 
 func (p *ArcParser) ExternType() (localctx IExternTypeContext)
 
-func (p *ArcParser) ExternTypeList() (localctx IExternTypeListContext)
+func (p *ArcParser) ExternTypeAlias() (localctx IExternTypeAliasContext)
+
+func (p *ArcParser) ExternVirtualMethod() (localctx IExternVirtualMethodContext)
 
 func (p *ArcParser) FieldInit() (localctx IFieldInitContext)
 
-func (p *ArcParser) ForStmt() (localctx IForStmtContext)
+func (p *ArcParser) ForHeader() (localctx IForHeaderContext)
 
-func (p *ArcParser) FunctionDecl() (localctx IFunctionDeclContext)
+func (p *ArcParser) ForInit() (localctx IForInitContext)
+
+func (p *ArcParser) ForIterator() (localctx IForIteratorContext)
+
+func (p *ArcParser) ForPost() (localctx IForPostContext)
+
+func (p *ArcParser) ForStatement() (localctx IForStatementContext)
+
+func (p *ArcParser) FuncDecl() (localctx IFuncDeclContext)
+
+func (p *ArcParser) FuncModifier() (localctx IFuncModifierContext)
 
 func (p *ArcParser) FunctionType() (localctx IFunctionTypeContext)
 
-func (p *ArcParser) GenericArg() (localctx IGenericArgContext)
-
-func (p *ArcParser) GenericArgList() (localctx IGenericArgListContext)
-
 func (p *ArcParser) GenericArgs() (localctx IGenericArgsContext)
-
-func (p *ArcParser) GenericParam() (localctx IGenericParamContext)
-
-func (p *ArcParser) GenericParamList() (localctx IGenericParamListContext)
 
 func (p *ArcParser) GenericParams() (localctx IGenericParamsContext)
 
-func (p *ArcParser) IfStmt() (localctx IIfStmtContext)
+func (p *ArcParser) IfStatement() (localctx IIfStatementContext)
+
+func (p *ArcParser) ImportAlias() (localctx IImportAliasContext)
 
 func (p *ArcParser) ImportDecl() (localctx IImportDeclContext)
 
 func (p *ArcParser) ImportSpec() (localctx IImportSpecContext)
 
-func (p *ArcParser) InitializerEntry() (localctx IInitializerEntryContext)
+func (p *ArcParser) InitializerBlock() (localctx IInitializerBlockContext)
 
-func (p *ArcParser) InitializerList() (localctx IInitializerListContext)
+func (p *ArcParser) InterfaceDecl() (localctx IInterfaceDeclContext)
 
-func (p *ArcParser) LambdaExpression() (localctx ILambdaExpressionContext)
+func (p *ArcParser) InterfaceField() (localctx IInterfaceFieldContext)
 
 func (p *ArcParser) LambdaParam() (localctx ILambdaParamContext)
 
 func (p *ArcParser) LambdaParamList() (localctx ILambdaParamListContext)
 
-func (p *ArcParser) Literal() (localctx ILiteralContext)
+func (p *ArcParser) LetStatement() (localctx ILetStatementContext)
 
-func (p *ArcParser) LogicalAndExpression() (localctx ILogicalAndExpressionContext)
-
-func (p *ArcParser) LogicalOrExpression() (localctx ILogicalOrExpressionContext)
-
-func (p *ArcParser) MethodDecl() (localctx IMethodDeclContext)
-
-func (p *ArcParser) MultiplicativeExpression() (localctx IMultiplicativeExpressionContext)
+func (p *ArcParser) MapEntry() (localctx IMapEntryContext)
 
 func (p *ArcParser) NamespaceDecl() (localctx INamespaceDeclContext)
 
-func (p *ArcParser) NewExpression() (localctx INewExpressionContext)
+func (p *ArcParser) Param() (localctx IParamContext)
 
-func (p *ArcParser) Parameter() (localctx IParameterContext)
+func (p *ArcParser) ParamList() (localctx IParamListContext)
 
-func (p *ArcParser) ParameterList() (localctx IParameterListContext)
+func (p *ArcParser) ParamType() (localctx IParamTypeContext)
 
-func (p *ArcParser) PostfixExpression() (localctx IPostfixExpressionContext)
-
-func (p *ArcParser) PostfixOp() (localctx IPostfixOpContext)
-
-func (p *ArcParser) PrimaryExpression() (localctx IPrimaryExpressionContext)
+func (p *ArcParser) Primary() (localctx IPrimaryContext)
 
 func (p *ArcParser) PrimitiveType() (localctx IPrimitiveTypeContext)
 
-func (p *ArcParser) QualifiedIdentifier() (localctx IQualifiedIdentifierContext)
+func (p *ArcParser) QualifiedName() (localctx IQualifiedNameContext)
 
-func (p *ArcParser) QualifiedType() (localctx IQualifiedTypeContext)
-
-func (p *ArcParser) RangeExpression() (localctx IRangeExpressionContext)
-
-func (p *ArcParser) RelationalExpression() (localctx IRelationalExpressionContext)
-
-func (p *ArcParser) ReturnStmt() (localctx IReturnStmtContext)
+func (p *ArcParser) ReturnStatement() (localctx IReturnStatementContext)
 
 func (p *ArcParser) ReturnType() (localctx IReturnTypeContext)
 
-func (p *ArcParser) ShiftExpression() (localctx IShiftExpressionContext)
+func (p *ArcParser) SelfParam() (localctx ISelfParamContext)
+
+func (p *ArcParser) Semi() (localctx ISemiContext)
+
+func (p *ArcParser) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex int) bool
 
 func (p *ArcParser) Statement() (localctx IStatementContext)
 
-func (p *ArcParser) StructDecl() (localctx IStructDeclContext)
-
-func (p *ArcParser) StructField() (localctx IStructFieldContext)
-
-func (p *ArcParser) StructLiteral() (localctx IStructLiteralContext)
-
-func (p *ArcParser) StructMember() (localctx IStructMemberContext)
-
 func (p *ArcParser) SwitchCase() (localctx ISwitchCaseContext)
 
-func (p *ArcParser) SwitchStmt() (localctx ISwitchStmtContext)
+func (p *ArcParser) SwitchDefault() (localctx ISwitchDefaultContext)
+
+func (p *ArcParser) SwitchStatement() (localctx ISwitchStatementContext)
 
 func (p *ArcParser) TopLevelDecl() (localctx ITopLevelDeclContext)
 
-func (p *ArcParser) TupleExpression() (localctx ITupleExpressionContext)
+func (p *ArcParser) TopLevelLetDecl() (localctx ITopLevelLetDeclContext)
 
-func (p *ArcParser) TuplePattern() (localctx ITuplePatternContext)
+func (p *ArcParser) TopLevelVarDecl() (localctx ITopLevelVarDeclContext)
 
 func (p *ArcParser) TupleType() (localctx ITupleTypeContext)
 
+func (p *ArcParser) TypeAliasDecl() (localctx ITypeAliasDeclContext)
+
 func (p *ArcParser) TypeList() (localctx ITypeListContext)
 
-func (p *ArcParser) Type_() (localctx ITypeContext)
+func (p *ArcParser) TypeRef() (localctx ITypeRefContext)
 
-func (p *ArcParser) UnaryExpression() (localctx IUnaryExpressionContext)
-
-func (p *ArcParser) VariableDecl() (localctx IVariableDeclContext)
+func (p *ArcParser) VarStatement() (localctx IVarStatementContext)
 
 type ArcParserVisitor interface {
 	antlr.ParseTreeVisitor
@@ -853,188 +703,74 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#compilationUnit.
 	VisitCompilationUnit(ctx *CompilationUnitContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#importDecl.
-	VisitImportDecl(ctx *ImportDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#importSpec.
-	VisitImportSpec(ctx *ImportSpecContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#namespaceDecl.
 	VisitNamespaceDecl(ctx *NamespaceDeclContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#topLevelDecl.
 	VisitTopLevelDecl(ctx *TopLevelDeclContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#attribute.
-	VisitAttribute(ctx *AttributeContext) interface{}
+	// Visit a parse tree produced by ArcParser#semi.
+	VisitSemi(ctx *SemiContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externCDecl.
-	VisitExternCDecl(ctx *ExternCDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#importDecl.
+	VisitImportDecl(ctx *ImportDeclContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externCMember.
-	VisitExternCMember(ctx *ExternCMemberContext) interface{}
+	// Visit a parse tree produced by ArcParser#importSpec.
+	VisitImportSpec(ctx *ImportSpecContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externCFunctionDecl.
-	VisitExternCFunctionDecl(ctx *ExternCFunctionDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#importAlias.
+	VisitImportAlias(ctx *ImportAliasContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#cCallingConvention.
-	VisitCCallingConvention(ctx *CCallingConventionContext) interface{}
+	// Visit a parse tree produced by ArcParser#constDecl.
+	VisitConstDecl(ctx *ConstDeclContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externCParameterList.
-	VisitExternCParameterList(ctx *ExternCParameterListContext) interface{}
+	// Visit a parse tree produced by ArcParser#constSpec.
+	VisitConstSpec(ctx *ConstSpecContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externCParameter.
-	VisitExternCParameter(ctx *ExternCParameterContext) interface{}
+	// Visit a parse tree produced by ArcParser#topLevelVarDecl.
+	VisitTopLevelVarDecl(ctx *TopLevelVarDeclContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externCConstDecl.
-	VisitExternCConstDecl(ctx *ExternCConstDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#topLevelLetDecl.
+	VisitTopLevelLetDecl(ctx *TopLevelLetDeclContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externCTypeAlias.
-	VisitExternCTypeAlias(ctx *ExternCTypeAliasContext) interface{}
+	// Visit a parse tree produced by ArcParser#funcDecl.
+	VisitFuncDecl(ctx *FuncDeclContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#externCStructDecl.
-	VisitExternCStructDecl(ctx *ExternCStructDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCStructField.
-	VisitExternCStructField(ctx *ExternCStructFieldContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppDecl.
-	VisitExternCppDecl(ctx *ExternCppDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppMember.
-	VisitExternCppMember(ctx *ExternCppMemberContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppNamespaceDecl.
-	VisitExternCppNamespaceDecl(ctx *ExternCppNamespaceDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externNamespacePath.
-	VisitExternNamespacePath(ctx *ExternNamespacePathContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppFunctionDecl.
-	VisitExternCppFunctionDecl(ctx *ExternCppFunctionDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#cppCallingConvention.
-	VisitCppCallingConvention(ctx *CppCallingConventionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppParameterList.
-	VisitExternCppParameterList(ctx *ExternCppParameterListContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppParameter.
-	VisitExternCppParameter(ctx *ExternCppParameterContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppParamType.
-	VisitExternCppParamType(ctx *ExternCppParamTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppConstDecl.
-	VisitExternCppConstDecl(ctx *ExternCppConstDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppTypeAlias.
-	VisitExternCppTypeAlias(ctx *ExternCppTypeAliasContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppClassDecl.
-	VisitExternCppClassDecl(ctx *ExternCppClassDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppClassMember.
-	VisitExternCppClassMember(ctx *ExternCppClassMemberContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppConstructorDecl.
-	VisitExternCppConstructorDecl(ctx *ExternCppConstructorDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppDestructorDecl.
-	VisitExternCppDestructorDecl(ctx *ExternCppDestructorDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppMethodDecl.
-	VisitExternCppMethodDecl(ctx *ExternCppMethodDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppMethodParams.
-	VisitExternCppMethodParams(ctx *ExternCppMethodParamsContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externCppSelfParam.
-	VisitExternCppSelfParam(ctx *ExternCppSelfParamContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externType.
-	VisitExternType(ctx *ExternTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externPointerType.
-	VisitExternPointerType(ctx *ExternPointerTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externPrimitiveType.
-	VisitExternPrimitiveType(ctx *ExternPrimitiveTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externFunctionType.
-	VisitExternFunctionType(ctx *ExternFunctionTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#externTypeList.
-	VisitExternTypeList(ctx *ExternTypeListContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#genericParams.
-	VisitGenericParams(ctx *GenericParamsContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#genericParamList.
-	VisitGenericParamList(ctx *GenericParamListContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#genericParam.
-	VisitGenericParam(ctx *GenericParamContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#genericArgs.
-	VisitGenericArgs(ctx *GenericArgsContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#genericArgList.
-	VisitGenericArgList(ctx *GenericArgListContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#genericArg.
-	VisitGenericArg(ctx *GenericArgContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#type.
-	VisitType(ctx *TypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#collectionType.
-	VisitCollectionType(ctx *CollectionTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#qualifiedType.
-	VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#functionType.
-	VisitFunctionType(ctx *FunctionTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#primitiveType.
-	VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#typeList.
-	VisitTypeList(ctx *TypeListContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#returnType.
-	VisitReturnType(ctx *ReturnTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
-	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#functionDecl.
-	VisitFunctionDecl(ctx *FunctionDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#methodDecl.
-	VisitMethodDecl(ctx *MethodDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#funcModifier.
+	VisitFuncModifier(ctx *FuncModifierContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#deinitDecl.
 	VisitDeinitDecl(ctx *DeinitDeclContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#structDecl.
-	VisitStructDecl(ctx *StructDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#paramList.
+	VisitParamList(ctx *ParamListContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#structMember.
-	VisitStructMember(ctx *StructMemberContext) interface{}
+	// Visit a parse tree produced by ArcParser#param.
+	VisitParam(ctx *ParamContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#structField.
-	VisitStructField(ctx *StructFieldContext) interface{}
+	// Visit a parse tree produced by ArcParser#selfParam.
+	VisitSelfParam(ctx *SelfParamContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#classDecl.
-	VisitClassDecl(ctx *ClassDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#paramType.
+	VisitParamType(ctx *ParamTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#classMember.
-	VisitClassMember(ctx *ClassMemberContext) interface{}
+	// Visit a parse tree produced by ArcParser#returnType.
+	VisitReturnType(ctx *ReturnTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#classField.
-	VisitClassField(ctx *ClassFieldContext) interface{}
+	// Visit a parse tree produced by ArcParser#tupleType.
+	VisitTupleType(ctx *TupleTypeContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#genericParams.
+	VisitGenericParams(ctx *GenericParamsContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#genericArgs.
+	VisitGenericArgs(ctx *GenericArgsContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#interfaceDecl.
+	VisitInterfaceDecl(ctx *InterfaceDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#interfaceField.
+	VisitInterfaceField(ctx *InterfaceFieldContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#enumDecl.
 	VisitEnumDecl(ctx *EnumDeclContext) interface{}
@@ -1042,23 +778,86 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#enumMember.
 	VisitEnumMember(ctx *EnumMemberContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#variableDecl.
-	VisitVariableDecl(ctx *VariableDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#typeAliasDecl.
+	VisitTypeAliasDecl(ctx *TypeAliasDeclContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#constDecl.
-	VisitConstDecl(ctx *ConstDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#attribute.
+	VisitAttribute(ctx *AttributeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#tuplePattern.
-	VisitTuplePattern(ctx *TuplePatternContext) interface{}
+	// Visit a parse tree produced by ArcParser#typeRef.
+	VisitTypeRef(ctx *TypeRefContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#tupleType.
-	VisitTupleType(ctx *TupleTypeContext) interface{}
+	// Visit a parse tree produced by ArcParser#functionType.
+	VisitFunctionType(ctx *FunctionTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#parameterList.
-	VisitParameterList(ctx *ParameterListContext) interface{}
+	// Visit a parse tree produced by ArcParser#baseType.
+	VisitBaseType(ctx *BaseTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#parameter.
-	VisitParameter(ctx *ParameterContext) interface{}
+	// Visit a parse tree produced by ArcParser#primitiveType.
+	VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#typeList.
+	VisitTypeList(ctx *TypeListContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externDecl.
+	VisitExternDecl(ctx *ExternDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externMember.
+	VisitExternMember(ctx *ExternMemberContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externFuncDecl.
+	VisitExternFuncDecl(ctx *ExternFuncDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#callingConvention.
+	VisitCallingConvention(ctx *CallingConventionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externSymbol.
+	VisitExternSymbol(ctx *ExternSymbolContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externParamList.
+	VisitExternParamList(ctx *ExternParamListContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externParam.
+	VisitExternParam(ctx *ExternParamContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externReturnType.
+	VisitExternReturnType(ctx *ExternReturnTypeContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externType.
+	VisitExternType(ctx *ExternTypeContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externNamespace.
+	VisitExternNamespace(ctx *ExternNamespaceContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externClass.
+	VisitExternClass(ctx *ExternClassContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externClassMember.
+	VisitExternClassMember(ctx *ExternClassMemberContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externVirtualMethod.
+	VisitExternVirtualMethod(ctx *ExternVirtualMethodContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externStaticMethod.
+	VisitExternStaticMethod(ctx *ExternStaticMethodContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externConstructor.
+	VisitExternConstructor(ctx *ExternConstructorContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externDestructor.
+	VisitExternDestructor(ctx *ExternDestructorContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externMethodParamList.
+	VisitExternMethodParamList(ctx *ExternMethodParamListContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externMethodParam.
+	VisitExternMethodParam(ctx *ExternMethodParamContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externTypeAlias.
+	VisitExternTypeAlias(ctx *ExternTypeAliasContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#externFunctionPtrType.
+	VisitExternFunctionPtrType(ctx *ExternFunctionPtrTypeContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#block.
 	VisitBlock(ctx *BlockContext) interface{}
@@ -1066,119 +865,206 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#statement.
 	VisitStatement(ctx *StatementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#assignmentStmt.
-	VisitAssignmentStmt(ctx *AssignmentStmtContext) interface{}
+	// Visit a parse tree produced by ArcParser#letStatement.
+	VisitLetStatement(ctx *LetStatementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#assignmentOp.
-	VisitAssignmentOp(ctx *AssignmentOpContext) interface{}
+	// Visit a parse tree produced by ArcParser#varStatement.
+	VisitVarStatement(ctx *VarStatementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#expressionStmt.
-	VisitExpressionStmt(ctx *ExpressionStmtContext) interface{}
+	// Visit a parse tree produced by ArcParser#returnStatement.
+	VisitReturnStatement(ctx *ReturnStatementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#returnStmt.
-	VisitReturnStmt(ctx *ReturnStmtContext) interface{}
+	// Visit a parse tree produced by ArcParser#breakStatement.
+	VisitBreakStatement(ctx *BreakStatementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#deferStmt.
-	VisitDeferStmt(ctx *DeferStmtContext) interface{}
+	// Visit a parse tree produced by ArcParser#continueStatement.
+	VisitContinueStatement(ctx *ContinueStatementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#breakStmt.
-	VisitBreakStmt(ctx *BreakStmtContext) interface{}
+	// Visit a parse tree produced by ArcParser#deferStatement.
+	VisitDeferStatement(ctx *DeferStatementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#continueStmt.
-	VisitContinueStmt(ctx *ContinueStmtContext) interface{}
+	// Visit a parse tree produced by ArcParser#ifStatement.
+	VisitIfStatement(ctx *IfStatementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#ifStmt.
-	VisitIfStmt(ctx *IfStmtContext) interface{}
+	// Visit a parse tree produced by ArcParser#forStatement.
+	VisitForStatement(ctx *ForStatementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#forStmt.
-	VisitForStmt(ctx *ForStmtContext) interface{}
+	// Visit a parse tree produced by ArcParser#forHeader.
+	VisitForHeader(ctx *ForHeaderContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#switchStmt.
-	VisitSwitchStmt(ctx *SwitchStmtContext) interface{}
+	// Visit a parse tree produced by ArcParser#forInit.
+	VisitForInit(ctx *ForInitContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#forPost.
+	VisitForPost(ctx *ForPostContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#forIterator.
+	VisitForIterator(ctx *ForIteratorContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#switchStatement.
+	VisitSwitchStatement(ctx *SwitchStatementContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#switchCase.
 	VisitSwitchCase(ctx *SwitchCaseContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#defaultCase.
-	VisitDefaultCase(ctx *DefaultCaseContext) interface{}
+	// Visit a parse tree produced by ArcParser#switchDefault.
+	VisitSwitchDefault(ctx *SwitchDefaultContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#expression.
-	VisitExpression(ctx *ExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#expressionList.
+	VisitExpressionList(ctx *ExpressionListContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#logicalOrExpression.
-	VisitLogicalOrExpression(ctx *LogicalOrExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#assignmentStatement.
+	VisitAssignmentStatement(ctx *AssignmentStatementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#logicalAndExpression.
-	VisitLogicalAndExpression(ctx *LogicalAndExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#assignmentTarget.
+	VisitAssignmentTarget(ctx *AssignmentTargetContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#bitOrExpression.
-	VisitBitOrExpression(ctx *BitOrExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#assignOp.
+	VisitAssignOp(ctx *AssignOpContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#bitXorExpression.
-	VisitBitXorExpression(ctx *BitXorExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#expressionStatement.
+	VisitExpressionStatement(ctx *ExpressionStatementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#bitAndExpression.
-	VisitBitAndExpression(ctx *BitAndExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#MulExpr.
+	VisitMulExpr(ctx *MulExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#equalityExpression.
-	VisitEqualityExpression(ctx *EqualityExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#BitwiseAndExpr.
+	VisitBitwiseAndExpr(ctx *BitwiseAndExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#relationalExpression.
-	VisitRelationalExpression(ctx *RelationalExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#BitwiseOrExpr.
+	VisitBitwiseOrExpr(ctx *BitwiseOrExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#shiftExpression.
-	VisitShiftExpression(ctx *ShiftExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#PostDecrement.
+	VisitPostDecrement(ctx *PostDecrementContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#rangeExpression.
-	VisitRangeExpression(ctx *RangeExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#UnaryMinus.
+	VisitUnaryMinus(ctx *UnaryMinusContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#additiveExpression.
-	VisitAdditiveExpression(ctx *AdditiveExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#AddExpr.
+	VisitAddExpr(ctx *AddExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#multiplicativeExpression.
-	VisitMultiplicativeExpression(ctx *MultiplicativeExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#RelationalExpr.
+	VisitRelationalExpr(ctx *RelationalExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#unaryExpression.
-	VisitUnaryExpression(ctx *UnaryExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#RangeExpr.
+	VisitRangeExpr(ctx *RangeExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#postfixExpression.
-	VisitPostfixExpression(ctx *PostfixExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#LogicalAndExpr.
+	VisitLogicalAndExpr(ctx *LogicalAndExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#postfixOp.
-	VisitPostfixOp(ctx *PostfixOpContext) interface{}
+	// Visit a parse tree produced by ArcParser#IndexExpr.
+	VisitIndexExpr(ctx *IndexExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#primaryExpression.
-	VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#LogicalNot.
+	VisitLogicalNot(ctx *LogicalNotContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#newExpression.
-	VisitNewExpression(ctx *NewExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#LogicalOrExpr.
+	VisitLogicalOrExpr(ctx *LogicalOrExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#deleteExpression.
-	VisitDeleteExpression(ctx *DeleteExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#AwaitExpr.
+	VisitAwaitExpr(ctx *AwaitExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#castExpression.
-	VisitCastExpression(ctx *CastExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#EqualityExpr.
+	VisitEqualityExpr(ctx *EqualityExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#castTargetType.
-	VisitCastTargetType(ctx *CastTargetTypeContext) interface{}
+	// Visit a parse tree produced by ArcParser#MemberAccess.
+	VisitMemberAccess(ctx *MemberAccessContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#builtinExpression.
-	VisitBuiltinExpression(ctx *BuiltinExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#AddressOf.
+	VisitAddressOf(ctx *AddressOfContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#literal.
-	VisitLiteral(ctx *LiteralContext) interface{}
+	// Visit a parse tree produced by ArcParser#PrimaryExpr.
+	VisitPrimaryExpr(ctx *PrimaryExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#initializerList.
-	VisitInitializerList(ctx *InitializerListContext) interface{}
+	// Visit a parse tree produced by ArcParser#SliceExpr.
+	VisitSliceExpr(ctx *SliceExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#initializerEntry.
-	VisitInitializerEntry(ctx *InitializerEntryContext) interface{}
+	// Visit a parse tree produced by ArcParser#CallExpr.
+	VisitCallExpr(ctx *CallExprContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#structLiteral.
-	VisitStructLiteral(ctx *StructLiteralContext) interface{}
+	// Visit a parse tree produced by ArcParser#PostIncrement.
+	VisitPostIncrement(ctx *PostIncrementContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#BitwiseXorExpr.
+	VisitBitwiseXorExpr(ctx *BitwiseXorExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#BitwiseNot.
+	VisitBitwiseNot(ctx *BitwiseNotContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#ShiftExpr.
+	VisitShiftExpr(ctx *ShiftExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#IntLiteral.
+	VisitIntLiteral(ctx *IntLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#HexLiteral.
+	VisitHexLiteral(ctx *HexLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#FloatLiteral.
+	VisitFloatLiteral(ctx *FloatLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#StringLiteral.
+	VisitStringLiteral(ctx *StringLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#CharLiteral.
+	VisitCharLiteral(ctx *CharLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#TrueLiteral.
+	VisitTrueLiteral(ctx *TrueLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#FalseLiteral.
+	VisitFalseLiteral(ctx *FalseLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#NullLiteral.
+	VisitNullLiteral(ctx *NullLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#IdentExpr.
+	VisitIdentExpr(ctx *IdentExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#QualifiedExpr.
+	VisitQualifiedExpr(ctx *QualifiedExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#PrimitiveTypeExpr.
+	VisitPrimitiveTypeExpr(ctx *PrimitiveTypeExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#ParenExpr.
+	VisitParenExpr(ctx *ParenExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#TupleLiteral.
+	VisitTupleLiteral(ctx *TupleLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#NewExpr.
+	VisitNewExpr(ctx *NewExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#NewArrayExpr.
+	VisitNewArrayExpr(ctx *NewArrayExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#DeleteExpr.
+	VisitDeleteExpr(ctx *DeleteExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#TypedInitExpr.
+	VisitTypedInitExpr(ctx *TypedInitExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#VectorLiteral.
+	VisitVectorLiteral(ctx *VectorLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#MapLiteral.
+	VisitMapLiteral(ctx *MapLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#LambdaExpr.
+	VisitLambdaExpr(ctx *LambdaExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#ProcessExpr.
+	VisitProcessExpr(ctx *ProcessExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#initializerBlock.
+	VisitInitializerBlock(ctx *InitializerBlockContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#fieldInit.
 	VisitFieldInit(ctx *FieldInitContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#mapEntry.
+	VisitMapEntry(ctx *MapEntryContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#argumentList.
 	VisitArgumentList(ctx *ArgumentListContext) interface{}
@@ -1186,23 +1072,14 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#argument.
 	VisitArgument(ctx *ArgumentContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#lambdaExpression.
-	VisitLambdaExpression(ctx *LambdaExpressionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#anonymousFuncExpression.
-	VisitAnonymousFuncExpression(ctx *AnonymousFuncExpressionContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#executionStrategy.
-	VisitExecutionStrategy(ctx *ExecutionStrategyContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#lambdaParamList.
 	VisitLambdaParamList(ctx *LambdaParamListContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#lambdaParam.
 	VisitLambdaParam(ctx *LambdaParamContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#tupleExpression.
-	VisitTupleExpression(ctx *TupleExpressionContext) interface{}
+	// Visit a parse tree produced by ArcParser#qualifiedName.
+	VisitQualifiedName(ctx *QualifiedNameContext) interface{}
 }
     A complete Visitor for a parse tree produced by ArcParser.
 
@@ -1217,8 +1094,6 @@ func NewEmptyArgumentContext() *ArgumentContext
 
 func (s *ArgumentContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ArgumentContext) AnonymousFuncExpression() IAnonymousFuncExpressionContext
-
 func (s *ArgumentContext) Expression() IExpressionContext
 
 func (s *ArgumentContext) GetParser() antlr.Parser
@@ -1226,8 +1101,6 @@ func (s *ArgumentContext) GetParser() antlr.Parser
 func (s *ArgumentContext) GetRuleContext() antlr.RuleContext
 
 func (*ArgumentContext) IsArgumentContext()
-
-func (s *ArgumentContext) LambdaExpression() ILambdaExpressionContext
 
 func (s *ArgumentContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
@@ -1258,71 +1131,106 @@ func (*ArgumentListContext) IsArgumentListContext()
 
 func (s *ArgumentListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type AssignmentOpContext struct {
+type AssignOpContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewAssignmentOpContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *AssignmentOpContext
+func NewAssignOpContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *AssignOpContext
 
-func NewEmptyAssignmentOpContext() *AssignmentOpContext
+func NewEmptyAssignOpContext() *AssignOpContext
 
-func (s *AssignmentOpContext) ASSIGN() antlr.TerminalNode
+func (s *AssignOpContext) ADD_ASSIGN() antlr.TerminalNode
 
-func (s *AssignmentOpContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *AssignOpContext) AND_ASSIGN() antlr.TerminalNode
 
-func (s *AssignmentOpContext) BIT_AND_ASSIGN() antlr.TerminalNode
+func (s *AssignOpContext) ASSIGN() antlr.TerminalNode
 
-func (s *AssignmentOpContext) BIT_OR_ASSIGN() antlr.TerminalNode
+func (s *AssignOpContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *AssignmentOpContext) BIT_XOR_ASSIGN() antlr.TerminalNode
+func (s *AssignOpContext) DIV_ASSIGN() antlr.TerminalNode
 
-func (s *AssignmentOpContext) GetParser() antlr.Parser
+func (s *AssignOpContext) GetParser() antlr.Parser
 
-func (s *AssignmentOpContext) GetRuleContext() antlr.RuleContext
+func (s *AssignOpContext) GetRuleContext() antlr.RuleContext
 
-func (*AssignmentOpContext) IsAssignmentOpContext()
+func (*AssignOpContext) IsAssignOpContext()
 
-func (s *AssignmentOpContext) MINUS_ASSIGN() antlr.TerminalNode
+func (s *AssignOpContext) MOD_ASSIGN() antlr.TerminalNode
 
-func (s *AssignmentOpContext) PERCENT_ASSIGN() antlr.TerminalNode
+func (s *AssignOpContext) MUL_ASSIGN() antlr.TerminalNode
 
-func (s *AssignmentOpContext) PLUS_ASSIGN() antlr.TerminalNode
+func (s *AssignOpContext) OR_ASSIGN() antlr.TerminalNode
 
-func (s *AssignmentOpContext) SHL_ASSIGN() antlr.TerminalNode
+func (s *AssignOpContext) SHL_ASSIGN() antlr.TerminalNode
 
-func (s *AssignmentOpContext) SHR_ASSIGN() antlr.TerminalNode
+func (s *AssignOpContext) SHR_ASSIGN() antlr.TerminalNode
 
-func (s *AssignmentOpContext) SLASH_ASSIGN() antlr.TerminalNode
+func (s *AssignOpContext) SUB_ASSIGN() antlr.TerminalNode
 
-func (s *AssignmentOpContext) STAR_ASSIGN() antlr.TerminalNode
+func (s *AssignOpContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *AssignmentOpContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *AssignOpContext) XOR_ASSIGN() antlr.TerminalNode
 
-type AssignmentStmtContext struct {
+type AssignmentStatementContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewAssignmentStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *AssignmentStmtContext
+func NewAssignmentStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *AssignmentStatementContext
 
-func NewEmptyAssignmentStmtContext() *AssignmentStmtContext
+func NewEmptyAssignmentStatementContext() *AssignmentStatementContext
 
-func (s *AssignmentStmtContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *AssignmentStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *AssignmentStmtContext) AssignmentOp() IAssignmentOpContext
+func (s *AssignmentStatementContext) AssignOp() IAssignOpContext
 
-func (s *AssignmentStmtContext) Expression() IExpressionContext
+func (s *AssignmentStatementContext) AssignmentTarget() IAssignmentTargetContext
 
-func (s *AssignmentStmtContext) GetParser() antlr.Parser
+func (s *AssignmentStatementContext) DEC() antlr.TerminalNode
 
-func (s *AssignmentStmtContext) GetRuleContext() antlr.RuleContext
+func (s *AssignmentStatementContext) Expression() IExpressionContext
 
-func (*AssignmentStmtContext) IsAssignmentStmtContext()
+func (s *AssignmentStatementContext) GetParser() antlr.Parser
 
-func (s *AssignmentStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *AssignmentStatementContext) GetRuleContext() antlr.RuleContext
 
-func (s *AssignmentStmtContext) UnaryExpression() IUnaryExpressionContext
+func (s *AssignmentStatementContext) INC() antlr.TerminalNode
+
+func (*AssignmentStatementContext) IsAssignmentStatementContext()
+
+func (s *AssignmentStatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type AssignmentTargetContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewAssignmentTargetContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *AssignmentTargetContext
+
+func NewEmptyAssignmentTargetContext() *AssignmentTargetContext
+
+func (s *AssignmentTargetContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *AssignmentTargetContext) AllExpression() []IExpressionContext
+
+func (s *AssignmentTargetContext) DOT() antlr.TerminalNode
+
+func (s *AssignmentTargetContext) Expression(i int) IExpressionContext
+
+func (s *AssignmentTargetContext) GetParser() antlr.Parser
+
+func (s *AssignmentTargetContext) GetRuleContext() antlr.RuleContext
+
+func (s *AssignmentTargetContext) IDENTIFIER() antlr.TerminalNode
+
+func (*AssignmentTargetContext) IsAssignmentTargetContext()
+
+func (s *AssignmentTargetContext) LBRACKET() antlr.TerminalNode
+
+func (s *AssignmentTargetContext) RBRACKET() antlr.TerminalNode
+
+func (s *AssignmentTargetContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type AttributeContext struct {
 	antlr.BaseParserRuleContext
@@ -1353,326 +1261,388 @@ func (s *AttributeContext) RPAREN() antlr.TerminalNode
 
 func (s *AttributeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
+type AwaitExprContext struct {
+	ExpressionContext
+}
+
+func NewAwaitExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *AwaitExprContext
+
+func (s *AwaitExprContext) AWAIT() antlr.TerminalNode
+
+func (s *AwaitExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *AwaitExprContext) Expression() IExpressionContext
+
+func (s *AwaitExprContext) GetRuleContext() antlr.RuleContext
+
 type BaseArcParserVisitor struct {
 	*antlr.BaseParseTreeVisitor
 }
 
-func (v *BaseArcParserVisitor) VisitAdditiveExpression(ctx *AdditiveExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitAddExpr(ctx *AddExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitAnonymousFuncExpression(ctx *AnonymousFuncExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitAddressOf(ctx *AddressOfContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitArgument(ctx *ArgumentContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitArgumentList(ctx *ArgumentListContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitAssignmentOp(ctx *AssignmentOpContext) interface{}
+func (v *BaseArcParserVisitor) VisitAssignOp(ctx *AssignOpContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitAssignmentStmt(ctx *AssignmentStmtContext) interface{}
+func (v *BaseArcParserVisitor) VisitAssignmentStatement(ctx *AssignmentStatementContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitAssignmentTarget(ctx *AssignmentTargetContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitAttribute(ctx *AttributeContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitBitAndExpression(ctx *BitAndExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitAwaitExpr(ctx *AwaitExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitBitOrExpression(ctx *BitOrExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitBaseType(ctx *BaseTypeContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitBitXorExpression(ctx *BitXorExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitBitwiseAndExpr(ctx *BitwiseAndExprContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitBitwiseNot(ctx *BitwiseNotContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitBitwiseOrExpr(ctx *BitwiseOrExprContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitBitwiseXorExpr(ctx *BitwiseXorExprContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitBlock(ctx *BlockContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitBreakStmt(ctx *BreakStmtContext) interface{}
+func (v *BaseArcParserVisitor) VisitBreakStatement(ctx *BreakStatementContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitBuiltinExpression(ctx *BuiltinExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitCallExpr(ctx *CallExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitCCallingConvention(ctx *CCallingConventionContext) interface{}
+func (v *BaseArcParserVisitor) VisitCallingConvention(ctx *CallingConventionContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitCastExpression(ctx *CastExpressionContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitCastTargetType(ctx *CastTargetTypeContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitClassDecl(ctx *ClassDeclContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitClassField(ctx *ClassFieldContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitClassMember(ctx *ClassMemberContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitCollectionType(ctx *CollectionTypeContext) interface{}
+func (v *BaseArcParserVisitor) VisitCharLiteral(ctx *CharLiteralContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitCompilationUnit(ctx *CompilationUnitContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitConstDecl(ctx *ConstDeclContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitContinueStmt(ctx *ContinueStmtContext) interface{}
+func (v *BaseArcParserVisitor) VisitConstSpec(ctx *ConstSpecContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitCppCallingConvention(ctx *CppCallingConventionContext) interface{}
+func (v *BaseArcParserVisitor) VisitContinueStatement(ctx *ContinueStatementContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitDefaultCase(ctx *DefaultCaseContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitDeferStmt(ctx *DeferStmtContext) interface{}
+func (v *BaseArcParserVisitor) VisitDeferStatement(ctx *DeferStatementContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitDeinitDecl(ctx *DeinitDeclContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitDeleteExpression(ctx *DeleteExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitDeleteExpr(ctx *DeleteExprContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitEnumDecl(ctx *EnumDeclContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitEnumMember(ctx *EnumMemberContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitEqualityExpression(ctx *EqualityExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitEqualityExpr(ctx *EqualityExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExecutionStrategy(ctx *ExecutionStrategyContext) interface{}
+func (v *BaseArcParserVisitor) VisitExpressionList(ctx *ExpressionListContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExpression(ctx *ExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitExpressionStatement(ctx *ExpressionStatementContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExpressionStmt(ctx *ExpressionStmtContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternClass(ctx *ExternClassContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCConstDecl(ctx *ExternCConstDeclContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternClassMember(ctx *ExternClassMemberContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCDecl(ctx *ExternCDeclContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternConstructor(ctx *ExternConstructorContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCFunctionDecl(ctx *ExternCFunctionDeclContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternDecl(ctx *ExternDeclContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCMember(ctx *ExternCMemberContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternDestructor(ctx *ExternDestructorContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCParameter(ctx *ExternCParameterContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternFuncDecl(ctx *ExternFuncDeclContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCParameterList(ctx *ExternCParameterListContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternFunctionPtrType(ctx *ExternFunctionPtrTypeContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCStructDecl(ctx *ExternCStructDeclContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternMember(ctx *ExternMemberContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCStructField(ctx *ExternCStructFieldContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternMethodParam(ctx *ExternMethodParamContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCTypeAlias(ctx *ExternCTypeAliasContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternMethodParamList(ctx *ExternMethodParamListContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCppClassDecl(ctx *ExternCppClassDeclContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternNamespace(ctx *ExternNamespaceContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCppClassMember(ctx *ExternCppClassMemberContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternParam(ctx *ExternParamContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCppConstDecl(ctx *ExternCppConstDeclContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternParamList(ctx *ExternParamListContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCppConstructorDecl(ctx *ExternCppConstructorDeclContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternReturnType(ctx *ExternReturnTypeContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCppDecl(ctx *ExternCppDeclContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternStaticMethod(ctx *ExternStaticMethodContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternCppDestructorDecl(ctx *ExternCppDestructorDeclContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternCppFunctionDecl(ctx *ExternCppFunctionDeclContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternCppMember(ctx *ExternCppMemberContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternCppMethodDecl(ctx *ExternCppMethodDeclContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternCppMethodParams(ctx *ExternCppMethodParamsContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternCppNamespaceDecl(ctx *ExternCppNamespaceDeclContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternCppParamType(ctx *ExternCppParamTypeContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternCppParameter(ctx *ExternCppParameterContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternCppParameterList(ctx *ExternCppParameterListContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternCppSelfParam(ctx *ExternCppSelfParamContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternCppTypeAlias(ctx *ExternCppTypeAliasContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternFunctionType(ctx *ExternFunctionTypeContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternNamespacePath(ctx *ExternNamespacePathContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternPointerType(ctx *ExternPointerTypeContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitExternPrimitiveType(ctx *ExternPrimitiveTypeContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternSymbol(ctx *ExternSymbolContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitExternType(ctx *ExternTypeContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitExternTypeList(ctx *ExternTypeListContext) interface{}
+func (v *BaseArcParserVisitor) VisitExternTypeAlias(ctx *ExternTypeAliasContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitExternVirtualMethod(ctx *ExternVirtualMethodContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitFalseLiteral(ctx *FalseLiteralContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitFieldInit(ctx *FieldInitContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitForStmt(ctx *ForStmtContext) interface{}
+func (v *BaseArcParserVisitor) VisitFloatLiteral(ctx *FloatLiteralContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitFunctionDecl(ctx *FunctionDeclContext) interface{}
+func (v *BaseArcParserVisitor) VisitForHeader(ctx *ForHeaderContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitForInit(ctx *ForInitContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitForIterator(ctx *ForIteratorContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitForPost(ctx *ForPostContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitForStatement(ctx *ForStatementContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitFuncDecl(ctx *FuncDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitFuncModifier(ctx *FuncModifierContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitFunctionType(ctx *FunctionTypeContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitGenericArg(ctx *GenericArgContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitGenericArgList(ctx *GenericArgListContext) interface{}
-
 func (v *BaseArcParserVisitor) VisitGenericArgs(ctx *GenericArgsContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitGenericParam(ctx *GenericParamContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitGenericParamList(ctx *GenericParamListContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitGenericParams(ctx *GenericParamsContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitIfStmt(ctx *IfStmtContext) interface{}
+func (v *BaseArcParserVisitor) VisitHexLiteral(ctx *HexLiteralContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitIdentExpr(ctx *IdentExprContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitIfStatement(ctx *IfStatementContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitImportAlias(ctx *ImportAliasContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitImportDecl(ctx *ImportDeclContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitImportSpec(ctx *ImportSpecContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitInitializerEntry(ctx *InitializerEntryContext) interface{}
+func (v *BaseArcParserVisitor) VisitIndexExpr(ctx *IndexExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitInitializerList(ctx *InitializerListContext) interface{}
+func (v *BaseArcParserVisitor) VisitInitializerBlock(ctx *InitializerBlockContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitLambdaExpression(ctx *LambdaExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitIntLiteral(ctx *IntLiteralContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitInterfaceDecl(ctx *InterfaceDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitInterfaceField(ctx *InterfaceFieldContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitLambdaExpr(ctx *LambdaExprContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitLambdaParam(ctx *LambdaParamContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitLambdaParamList(ctx *LambdaParamListContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitLiteral(ctx *LiteralContext) interface{}
+func (v *BaseArcParserVisitor) VisitLetStatement(ctx *LetStatementContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitLogicalAndExpression(ctx *LogicalAndExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitLogicalAndExpr(ctx *LogicalAndExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitLogicalOrExpression(ctx *LogicalOrExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitLogicalNot(ctx *LogicalNotContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitMethodDecl(ctx *MethodDeclContext) interface{}
+func (v *BaseArcParserVisitor) VisitLogicalOrExpr(ctx *LogicalOrExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitMultiplicativeExpression(ctx *MultiplicativeExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitMapEntry(ctx *MapEntryContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitMapLiteral(ctx *MapLiteralContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitMemberAccess(ctx *MemberAccessContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitMulExpr(ctx *MulExprContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitNamespaceDecl(ctx *NamespaceDeclContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitNewExpression(ctx *NewExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitNewArrayExpr(ctx *NewArrayExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitParameter(ctx *ParameterContext) interface{}
+func (v *BaseArcParserVisitor) VisitNewExpr(ctx *NewExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitParameterList(ctx *ParameterListContext) interface{}
+func (v *BaseArcParserVisitor) VisitNullLiteral(ctx *NullLiteralContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitPostfixExpression(ctx *PostfixExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitParam(ctx *ParamContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitPostfixOp(ctx *PostfixOpContext) interface{}
+func (v *BaseArcParserVisitor) VisitParamList(ctx *ParamListContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitParamType(ctx *ParamTypeContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitParenExpr(ctx *ParenExprContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitPostDecrement(ctx *PostDecrementContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitPostIncrement(ctx *PostIncrementContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitPrimaryExpr(ctx *PrimaryExprContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
+func (v *BaseArcParserVisitor) VisitPrimitiveTypeExpr(ctx *PrimitiveTypeExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
+func (v *BaseArcParserVisitor) VisitProcessExpr(ctx *ProcessExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitRangeExpression(ctx *RangeExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitQualifiedExpr(ctx *QualifiedExprContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitRelationalExpression(ctx *RelationalExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitQualifiedName(ctx *QualifiedNameContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitReturnStmt(ctx *ReturnStmtContext) interface{}
+func (v *BaseArcParserVisitor) VisitRangeExpr(ctx *RangeExprContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitRelationalExpr(ctx *RelationalExprContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitReturnStatement(ctx *ReturnStatementContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitReturnType(ctx *ReturnTypeContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitShiftExpression(ctx *ShiftExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitSelfParam(ctx *SelfParamContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitSemi(ctx *SemiContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitShiftExpr(ctx *ShiftExprContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitSliceExpr(ctx *SliceExprContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitStatement(ctx *StatementContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitStructDecl(ctx *StructDeclContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitStructField(ctx *StructFieldContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitStructLiteral(ctx *StructLiteralContext) interface{}
-
-func (v *BaseArcParserVisitor) VisitStructMember(ctx *StructMemberContext) interface{}
+func (v *BaseArcParserVisitor) VisitStringLiteral(ctx *StringLiteralContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitSwitchCase(ctx *SwitchCaseContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitSwitchStmt(ctx *SwitchStmtContext) interface{}
+func (v *BaseArcParserVisitor) VisitSwitchDefault(ctx *SwitchDefaultContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitSwitchStatement(ctx *SwitchStatementContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitTopLevelDecl(ctx *TopLevelDeclContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitTupleExpression(ctx *TupleExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitTopLevelLetDecl(ctx *TopLevelLetDeclContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitTuplePattern(ctx *TuplePatternContext) interface{}
+func (v *BaseArcParserVisitor) VisitTopLevelVarDecl(ctx *TopLevelVarDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitTrueLiteral(ctx *TrueLiteralContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitTupleLiteral(ctx *TupleLiteralContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitTupleType(ctx *TupleTypeContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitType(ctx *TypeContext) interface{}
+func (v *BaseArcParserVisitor) VisitTypeAliasDecl(ctx *TypeAliasDeclContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitTypeList(ctx *TypeListContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitUnaryExpression(ctx *UnaryExpressionContext) interface{}
+func (v *BaseArcParserVisitor) VisitTypeRef(ctx *TypeRefContext) interface{}
 
-func (v *BaseArcParserVisitor) VisitVariableDecl(ctx *VariableDeclContext) interface{}
+func (v *BaseArcParserVisitor) VisitTypedInitExpr(ctx *TypedInitExprContext) interface{}
 
-type BitAndExpressionContext struct {
+func (v *BaseArcParserVisitor) VisitUnaryMinus(ctx *UnaryMinusContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitVarStatement(ctx *VarStatementContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitVectorLiteral(ctx *VectorLiteralContext) interface{}
+
+type BaseTypeContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewBitAndExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *BitAndExpressionContext
+func NewBaseTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *BaseTypeContext
 
-func NewEmptyBitAndExpressionContext() *BitAndExpressionContext
+func NewEmptyBaseTypeContext() *BaseTypeContext
 
-func (s *BitAndExpressionContext) AMP(i int) antlr.TerminalNode
+func (s *BaseTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *BitAndExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *BaseTypeContext) AllTypeRef() []ITypeRefContext
 
-func (s *BitAndExpressionContext) AllAMP() []antlr.TerminalNode
+func (s *BaseTypeContext) BOOL() antlr.TerminalNode
 
-func (s *BitAndExpressionContext) AllEqualityExpression() []IEqualityExpressionContext
+func (s *BaseTypeContext) BYTE() antlr.TerminalNode
 
-func (s *BitAndExpressionContext) EqualityExpression(i int) IEqualityExpressionContext
+func (s *BaseTypeContext) CHAR() antlr.TerminalNode
 
-func (s *BitAndExpressionContext) GetParser() antlr.Parser
+func (s *BaseTypeContext) Expression() IExpressionContext
 
-func (s *BitAndExpressionContext) GetRuleContext() antlr.RuleContext
+func (s *BaseTypeContext) GenericArgs() IGenericArgsContext
 
-func (*BitAndExpressionContext) IsBitAndExpressionContext()
+func (s *BaseTypeContext) GetParser() antlr.Parser
 
-func (s *BitAndExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *BaseTypeContext) GetRuleContext() antlr.RuleContext
 
-type BitOrExpressionContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
+func (*BaseTypeContext) IsBaseTypeContext()
+
+func (s *BaseTypeContext) LBRACKET() antlr.TerminalNode
+
+func (s *BaseTypeContext) MAP() antlr.TerminalNode
+
+func (s *BaseTypeContext) PrimitiveType() IPrimitiveTypeContext
+
+func (s *BaseTypeContext) QualifiedName() IQualifiedNameContext
+
+func (s *BaseTypeContext) RBRACKET() antlr.TerminalNode
+
+func (s *BaseTypeContext) STRING() antlr.TerminalNode
+
+func (s *BaseTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *BaseTypeContext) TypeRef(i int) ITypeRefContext
+
+func (s *BaseTypeContext) VECTOR() antlr.TerminalNode
+
+func (s *BaseTypeContext) VOID() antlr.TerminalNode
+
+type BitwiseAndExprContext struct {
+	ExpressionContext
 }
 
-func NewBitOrExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *BitOrExpressionContext
+func NewBitwiseAndExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *BitwiseAndExprContext
 
-func NewEmptyBitOrExpressionContext() *BitOrExpressionContext
+func (s *BitwiseAndExprContext) AMP() antlr.TerminalNode
 
-func (s *BitOrExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *BitwiseAndExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *BitOrExpressionContext) AllBIT_OR() []antlr.TerminalNode
+func (s *BitwiseAndExprContext) AllExpression() []IExpressionContext
 
-func (s *BitOrExpressionContext) AllBitXorExpression() []IBitXorExpressionContext
+func (s *BitwiseAndExprContext) Expression(i int) IExpressionContext
 
-func (s *BitOrExpressionContext) BIT_OR(i int) antlr.TerminalNode
+func (s *BitwiseAndExprContext) GetRuleContext() antlr.RuleContext
 
-func (s *BitOrExpressionContext) BitXorExpression(i int) IBitXorExpressionContext
-
-func (s *BitOrExpressionContext) GetParser() antlr.Parser
-
-func (s *BitOrExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (*BitOrExpressionContext) IsBitOrExpressionContext()
-
-func (s *BitOrExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type BitXorExpressionContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
+type BitwiseNotContext struct {
+	ExpressionContext
 }
 
-func NewBitXorExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *BitXorExpressionContext
+func NewBitwiseNotContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *BitwiseNotContext
 
-func NewEmptyBitXorExpressionContext() *BitXorExpressionContext
+func (s *BitwiseNotContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *BitXorExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *BitwiseNotContext) Expression() IExpressionContext
 
-func (s *BitXorExpressionContext) AllBIT_XOR() []antlr.TerminalNode
+func (s *BitwiseNotContext) GetRuleContext() antlr.RuleContext
 
-func (s *BitXorExpressionContext) AllBitAndExpression() []IBitAndExpressionContext
+func (s *BitwiseNotContext) TILDE() antlr.TerminalNode
 
-func (s *BitXorExpressionContext) BIT_XOR(i int) antlr.TerminalNode
+type BitwiseOrExprContext struct {
+	ExpressionContext
+}
 
-func (s *BitXorExpressionContext) BitAndExpression(i int) IBitAndExpressionContext
+func NewBitwiseOrExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *BitwiseOrExprContext
 
-func (s *BitXorExpressionContext) GetParser() antlr.Parser
+func (s *BitwiseOrExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *BitXorExpressionContext) GetRuleContext() antlr.RuleContext
+func (s *BitwiseOrExprContext) AllExpression() []IExpressionContext
 
-func (*BitXorExpressionContext) IsBitXorExpressionContext()
+func (s *BitwiseOrExprContext) Expression(i int) IExpressionContext
 
-func (s *BitXorExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *BitwiseOrExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *BitwiseOrExprContext) PIPE() antlr.TerminalNode
+
+type BitwiseXorExprContext struct {
+	ExpressionContext
+}
+
+func NewBitwiseXorExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *BitwiseXorExprContext
+
+func (s *BitwiseXorExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *BitwiseXorExprContext) AllExpression() []IExpressionContext
+
+func (s *BitwiseXorExprContext) CARET() antlr.TerminalNode
+
+func (s *BitwiseXorExprContext) Expression(i int) IExpressionContext
+
+func (s *BitwiseXorExprContext) GetRuleContext() antlr.RuleContext
 
 type BlockContext struct {
 	antlr.BaseParserRuleContext
@@ -1701,242 +1671,85 @@ func (s *BlockContext) Statement(i int) IStatementContext
 
 func (s *BlockContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type BreakStmtContext struct {
+type BreakStatementContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewBreakStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *BreakStmtContext
+func NewBreakStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *BreakStatementContext
 
-func NewEmptyBreakStmtContext() *BreakStmtContext
+func NewEmptyBreakStatementContext() *BreakStatementContext
 
-func (s *BreakStmtContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *BreakStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *BreakStmtContext) BREAK() antlr.TerminalNode
+func (s *BreakStatementContext) BREAK() antlr.TerminalNode
 
-func (s *BreakStmtContext) GetParser() antlr.Parser
+func (s *BreakStatementContext) GetParser() antlr.Parser
 
-func (s *BreakStmtContext) GetRuleContext() antlr.RuleContext
+func (s *BreakStatementContext) GetRuleContext() antlr.RuleContext
 
-func (*BreakStmtContext) IsBreakStmtContext()
+func (*BreakStatementContext) IsBreakStatementContext()
 
-func (s *BreakStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *BreakStatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type BuiltinExpressionContext struct {
+type CallExprContext struct {
+	ExpressionContext
+}
+
+func NewCallExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *CallExprContext
+
+func (s *CallExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *CallExprContext) ArgumentList() IArgumentListContext
+
+func (s *CallExprContext) Expression() IExpressionContext
+
+func (s *CallExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *CallExprContext) LPAREN() antlr.TerminalNode
+
+func (s *CallExprContext) RPAREN() antlr.TerminalNode
+
+type CallingConventionContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewBuiltinExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *BuiltinExpressionContext
+func NewCallingConventionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *CallingConventionContext
 
-func NewEmptyBuiltinExpressionContext() *BuiltinExpressionContext
+func NewEmptyCallingConventionContext() *CallingConventionContext
 
-func (s *BuiltinExpressionContext) AT() antlr.TerminalNode
+func (s *CallingConventionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *BuiltinExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *CallingConventionContext) CDECL() antlr.TerminalNode
 
-func (s *BuiltinExpressionContext) ArgumentList() IArgumentListContext
+func (s *CallingConventionContext) FASTCALL() antlr.TerminalNode
 
-func (s *BuiltinExpressionContext) GetParser() antlr.Parser
+func (s *CallingConventionContext) GetParser() antlr.Parser
 
-func (s *BuiltinExpressionContext) GetRuleContext() antlr.RuleContext
+func (s *CallingConventionContext) GetRuleContext() antlr.RuleContext
 
-func (s *BuiltinExpressionContext) IDENTIFIER() antlr.TerminalNode
+func (*CallingConventionContext) IsCallingConventionContext()
 
-func (*BuiltinExpressionContext) IsBuiltinExpressionContext()
+func (s *CallingConventionContext) STDCALL() antlr.TerminalNode
 
-func (s *BuiltinExpressionContext) LPAREN() antlr.TerminalNode
+func (s *CallingConventionContext) THISCALL() antlr.TerminalNode
 
-func (s *BuiltinExpressionContext) RPAREN() antlr.TerminalNode
+func (s *CallingConventionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *BuiltinExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *CallingConventionContext) VECTORCALL() antlr.TerminalNode
 
-type CCallingConventionContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
+type CharLiteralContext struct {
+	PrimaryContext
 }
 
-func NewCCallingConventionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *CCallingConventionContext
+func NewCharLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *CharLiteralContext
 
-func NewEmptyCCallingConventionContext() *CCallingConventionContext
+func (s *CharLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *CCallingConventionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *CharLiteralContext) CHAR_LIT() antlr.TerminalNode
 
-func (s *CCallingConventionContext) CDECL() antlr.TerminalNode
-
-func (s *CCallingConventionContext) FASTCALL() antlr.TerminalNode
-
-func (s *CCallingConventionContext) GetParser() antlr.Parser
-
-func (s *CCallingConventionContext) GetRuleContext() antlr.RuleContext
-
-func (*CCallingConventionContext) IsCCallingConventionContext()
-
-func (s *CCallingConventionContext) STDCALL() antlr.TerminalNode
-
-func (s *CCallingConventionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type CastExpressionContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewCastExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *CastExpressionContext
-
-func NewEmptyCastExpressionContext() *CastExpressionContext
-
-func (s *CastExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *CastExpressionContext) CastTargetType() ICastTargetTypeContext
-
-func (s *CastExpressionContext) Expression() IExpressionContext
-
-func (s *CastExpressionContext) GetParser() antlr.Parser
-
-func (s *CastExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (*CastExpressionContext) IsCastExpressionContext()
-
-func (s *CastExpressionContext) LPAREN() antlr.TerminalNode
-
-func (s *CastExpressionContext) RPAREN() antlr.TerminalNode
-
-func (s *CastExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type CastTargetTypeContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewCastTargetTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *CastTargetTypeContext
-
-func NewEmptyCastTargetTypeContext() *CastTargetTypeContext
-
-func (s *CastTargetTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *CastTargetTypeContext) GetParser() antlr.Parser
-
-func (s *CastTargetTypeContext) GetRuleContext() antlr.RuleContext
-
-func (*CastTargetTypeContext) IsCastTargetTypeContext()
-
-func (s *CastTargetTypeContext) PrimitiveType() IPrimitiveTypeContext
-
-func (s *CastTargetTypeContext) RAWPTR() antlr.TerminalNode
-
-func (s *CastTargetTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ClassDeclContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewClassDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ClassDeclContext
-
-func NewEmptyClassDeclContext() *ClassDeclContext
-
-func (s *ClassDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ClassDeclContext) AllClassMember() []IClassMemberContext
-
-func (s *ClassDeclContext) CLASS() antlr.TerminalNode
-
-func (s *ClassDeclContext) ClassMember(i int) IClassMemberContext
-
-func (s *ClassDeclContext) GenericParams() IGenericParamsContext
-
-func (s *ClassDeclContext) GetParser() antlr.Parser
-
-func (s *ClassDeclContext) GetRuleContext() antlr.RuleContext
-
-func (s *ClassDeclContext) IDENTIFIER() antlr.TerminalNode
-
-func (*ClassDeclContext) IsClassDeclContext()
-
-func (s *ClassDeclContext) LBRACE() antlr.TerminalNode
-
-func (s *ClassDeclContext) RBRACE() antlr.TerminalNode
-
-func (s *ClassDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ClassFieldContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewClassFieldContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ClassFieldContext
-
-func NewEmptyClassFieldContext() *ClassFieldContext
-
-func (s *ClassFieldContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ClassFieldContext) COLON() antlr.TerminalNode
-
-func (s *ClassFieldContext) GetParser() antlr.Parser
-
-func (s *ClassFieldContext) GetRuleContext() antlr.RuleContext
-
-func (s *ClassFieldContext) IDENTIFIER() antlr.TerminalNode
-
-func (*ClassFieldContext) IsClassFieldContext()
-
-func (s *ClassFieldContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *ClassFieldContext) Type_() ITypeContext
-
-type ClassMemberContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewClassMemberContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ClassMemberContext
-
-func NewEmptyClassMemberContext() *ClassMemberContext
-
-func (s *ClassMemberContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ClassMemberContext) ClassField() IClassFieldContext
-
-func (s *ClassMemberContext) DeinitDecl() IDeinitDeclContext
-
-func (s *ClassMemberContext) FunctionDecl() IFunctionDeclContext
-
-func (s *ClassMemberContext) GetParser() antlr.Parser
-
-func (s *ClassMemberContext) GetRuleContext() antlr.RuleContext
-
-func (*ClassMemberContext) IsClassMemberContext()
-
-func (s *ClassMemberContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type CollectionTypeContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewCollectionTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *CollectionTypeContext
-
-func NewEmptyCollectionTypeContext() *CollectionTypeContext
-
-func (s *CollectionTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *CollectionTypeContext) AllType_() []ITypeContext
-
-func (s *CollectionTypeContext) GetParser() antlr.Parser
-
-func (s *CollectionTypeContext) GetRuleContext() antlr.RuleContext
-
-func (s *CollectionTypeContext) IDENTIFIER() antlr.TerminalNode
-
-func (*CollectionTypeContext) IsCollectionTypeContext()
-
-func (s *CollectionTypeContext) LBRACKET() antlr.TerminalNode
-
-func (s *CollectionTypeContext) RBRACKET() antlr.TerminalNode
-
-func (s *CollectionTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *CollectionTypeContext) Type_(i int) ITypeContext
+func (s *CharLiteralContext) GetRuleContext() antlr.RuleContext
 
 type CompilationUnitContext struct {
 	antlr.BaseParserRuleContext
@@ -1949,10 +1762,6 @@ func NewEmptyCompilationUnitContext() *CompilationUnitContext
 
 func (s *CompilationUnitContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *CompilationUnitContext) AllImportDecl() []IImportDeclContext
-
-func (s *CompilationUnitContext) AllNamespaceDecl() []INamespaceDeclContext
-
 func (s *CompilationUnitContext) AllTopLevelDecl() []ITopLevelDeclContext
 
 func (s *CompilationUnitContext) EOF() antlr.TerminalNode
@@ -1961,11 +1770,11 @@ func (s *CompilationUnitContext) GetParser() antlr.Parser
 
 func (s *CompilationUnitContext) GetRuleContext() antlr.RuleContext
 
-func (s *CompilationUnitContext) ImportDecl(i int) IImportDeclContext
-
 func (*CompilationUnitContext) IsCompilationUnitContext()
 
-func (s *CompilationUnitContext) NamespaceDecl(i int) INamespaceDeclContext
+func (s *CompilationUnitContext) NamespaceDecl() INamespaceDeclContext
+
+func (s *CompilationUnitContext) Semi() ISemiContext
 
 func (s *CompilationUnitContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
@@ -1980,129 +1789,100 @@ func NewConstDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, in
 
 func NewEmptyConstDeclContext() *ConstDeclContext
 
-func (s *ConstDeclContext) ASSIGN() antlr.TerminalNode
-
 func (s *ConstDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ConstDeclContext) COLON() antlr.TerminalNode
+func (s *ConstDeclContext) AllConstSpec() []IConstSpecContext
 
 func (s *ConstDeclContext) CONST() antlr.TerminalNode
 
-func (s *ConstDeclContext) Expression() IExpressionContext
+func (s *ConstDeclContext) ConstSpec(i int) IConstSpecContext
 
 func (s *ConstDeclContext) GetParser() antlr.Parser
 
 func (s *ConstDeclContext) GetRuleContext() antlr.RuleContext
 
-func (s *ConstDeclContext) IDENTIFIER() antlr.TerminalNode
-
 func (*ConstDeclContext) IsConstDeclContext()
+
+func (s *ConstDeclContext) LPAREN() antlr.TerminalNode
+
+func (s *ConstDeclContext) RPAREN() antlr.TerminalNode
 
 func (s *ConstDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *ConstDeclContext) Type_() ITypeContext
-
-type ContinueStmtContext struct {
+type ConstSpecContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewContinueStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ContinueStmtContext
+func NewConstSpecContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ConstSpecContext
 
-func NewEmptyContinueStmtContext() *ContinueStmtContext
+func NewEmptyConstSpecContext() *ConstSpecContext
 
-func (s *ContinueStmtContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ConstSpecContext) ASSIGN() antlr.TerminalNode
 
-func (s *ContinueStmtContext) CONTINUE() antlr.TerminalNode
+func (s *ConstSpecContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ContinueStmtContext) GetParser() antlr.Parser
+func (s *ConstSpecContext) COLON() antlr.TerminalNode
 
-func (s *ContinueStmtContext) GetRuleContext() antlr.RuleContext
+func (s *ConstSpecContext) Expression() IExpressionContext
 
-func (*ContinueStmtContext) IsContinueStmtContext()
+func (s *ConstSpecContext) GetParser() antlr.Parser
 
-func (s *ContinueStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ConstSpecContext) GetRuleContext() antlr.RuleContext
 
-type CppCallingConventionContext struct {
+func (s *ConstSpecContext) IDENTIFIER() antlr.TerminalNode
+
+func (*ConstSpecContext) IsConstSpecContext()
+
+func (s *ConstSpecContext) Semi() ISemiContext
+
+func (s *ConstSpecContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *ConstSpecContext) TypeRef() ITypeRefContext
+
+type ContinueStatementContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewCppCallingConventionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *CppCallingConventionContext
+func NewContinueStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ContinueStatementContext
 
-func NewEmptyCppCallingConventionContext() *CppCallingConventionContext
+func NewEmptyContinueStatementContext() *ContinueStatementContext
 
-func (s *CppCallingConventionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ContinueStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *CppCallingConventionContext) CDECL() antlr.TerminalNode
+func (s *ContinueStatementContext) CONTINUE() antlr.TerminalNode
 
-func (s *CppCallingConventionContext) FASTCALL() antlr.TerminalNode
+func (s *ContinueStatementContext) GetParser() antlr.Parser
 
-func (s *CppCallingConventionContext) GetParser() antlr.Parser
+func (s *ContinueStatementContext) GetRuleContext() antlr.RuleContext
 
-func (s *CppCallingConventionContext) GetRuleContext() antlr.RuleContext
+func (*ContinueStatementContext) IsContinueStatementContext()
 
-func (*CppCallingConventionContext) IsCppCallingConventionContext()
+func (s *ContinueStatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *CppCallingConventionContext) STDCALL() antlr.TerminalNode
-
-func (s *CppCallingConventionContext) THISCALL() antlr.TerminalNode
-
-func (s *CppCallingConventionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *CppCallingConventionContext) VECTORCALL() antlr.TerminalNode
-
-type DefaultCaseContext struct {
+type DeferStatementContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewDefaultCaseContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *DefaultCaseContext
+func NewDeferStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *DeferStatementContext
 
-func NewEmptyDefaultCaseContext() *DefaultCaseContext
+func NewEmptyDeferStatementContext() *DeferStatementContext
 
-func (s *DefaultCaseContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *DeferStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *DefaultCaseContext) AllStatement() []IStatementContext
+func (s *DeferStatementContext) DEFER() antlr.TerminalNode
 
-func (s *DefaultCaseContext) COLON() antlr.TerminalNode
+func (s *DeferStatementContext) Expression() IExpressionContext
 
-func (s *DefaultCaseContext) DEFAULT() antlr.TerminalNode
+func (s *DeferStatementContext) GetParser() antlr.Parser
 
-func (s *DefaultCaseContext) GetParser() antlr.Parser
+func (s *DeferStatementContext) GetRuleContext() antlr.RuleContext
 
-func (s *DefaultCaseContext) GetRuleContext() antlr.RuleContext
+func (*DeferStatementContext) IsDeferStatementContext()
 
-func (*DefaultCaseContext) IsDefaultCaseContext()
-
-func (s *DefaultCaseContext) Statement(i int) IStatementContext
-
-func (s *DefaultCaseContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type DeferStmtContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewDeferStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *DeferStmtContext
-
-func NewEmptyDeferStmtContext() *DeferStmtContext
-
-func (s *DeferStmtContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *DeferStmtContext) AssignmentStmt() IAssignmentStmtContext
-
-func (s *DeferStmtContext) DEFER() antlr.TerminalNode
-
-func (s *DeferStmtContext) Expression() IExpressionContext
-
-func (s *DeferStmtContext) GetParser() antlr.Parser
-
-func (s *DeferStmtContext) GetRuleContext() antlr.RuleContext
-
-func (*DeferStmtContext) IsDeferStmtContext()
-
-func (s *DeferStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *DeferStatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type DeinitDeclContext struct {
 	antlr.BaseParserRuleContext
@@ -2117,15 +1897,11 @@ func (s *DeinitDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
 func (s *DeinitDeclContext) Block() IBlockContext
 
-func (s *DeinitDeclContext) COLON() antlr.TerminalNode
-
 func (s *DeinitDeclContext) DEINIT() antlr.TerminalNode
 
 func (s *DeinitDeclContext) GetParser() antlr.Parser
 
 func (s *DeinitDeclContext) GetRuleContext() antlr.RuleContext
-
-func (s *DeinitDeclContext) IDENTIFIER() antlr.TerminalNode
 
 func (*DeinitDeclContext) IsDeinitDeclContext()
 
@@ -2133,38 +1909,27 @@ func (s *DeinitDeclContext) LPAREN() antlr.TerminalNode
 
 func (s *DeinitDeclContext) RPAREN() antlr.TerminalNode
 
-func (s *DeinitDeclContext) SELF() antlr.TerminalNode
+func (s *DeinitDeclContext) SelfParam() ISelfParamContext
 
 func (s *DeinitDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *DeinitDeclContext) Type_() ITypeContext
-
-type DeleteExpressionContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
+type DeleteExprContext struct {
+	PrimaryContext
 }
 
-func NewDeleteExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *DeleteExpressionContext
+func NewDeleteExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *DeleteExprContext
 
-func NewEmptyDeleteExpressionContext() *DeleteExpressionContext
+func (s *DeleteExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *DeleteExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *DeleteExprContext) DELETE() antlr.TerminalNode
 
-func (s *DeleteExpressionContext) DELETE() antlr.TerminalNode
+func (s *DeleteExprContext) Expression() IExpressionContext
 
-func (s *DeleteExpressionContext) Expression() IExpressionContext
+func (s *DeleteExprContext) GetRuleContext() antlr.RuleContext
 
-func (s *DeleteExpressionContext) GetParser() antlr.Parser
+func (s *DeleteExprContext) LPAREN() antlr.TerminalNode
 
-func (s *DeleteExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (*DeleteExpressionContext) IsDeleteExpressionContext()
-
-func (s *DeleteExpressionContext) LPAREN() antlr.TerminalNode
-
-func (s *DeleteExpressionContext) RPAREN() antlr.TerminalNode
-
-func (s *DeleteExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *DeleteExprContext) RPAREN() antlr.TerminalNode
 
 type EnumDeclContext struct {
 	antlr.BaseParserRuleContext
@@ -2224,63 +1989,32 @@ func (s *EnumMemberContext) IDENTIFIER() antlr.TerminalNode
 
 func (*EnumMemberContext) IsEnumMemberContext()
 
+func (s *EnumMemberContext) Semi() ISemiContext
+
 func (s *EnumMemberContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type EqualityExpressionContext struct {
-	antlr.BaseParserRuleContext
+type EqualityExprContext struct {
+	ExpressionContext
 	// Has unexported fields.
 }
 
-func NewEmptyEqualityExpressionContext() *EqualityExpressionContext
+func NewEqualityExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *EqualityExprContext
 
-func NewEqualityExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *EqualityExpressionContext
+func (s *EqualityExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *EqualityExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *EqualityExprContext) AllExpression() []IExpressionContext
 
-func (s *EqualityExpressionContext) AllEQ() []antlr.TerminalNode
+func (s *EqualityExprContext) EQ() antlr.TerminalNode
 
-func (s *EqualityExpressionContext) AllNE() []antlr.TerminalNode
+func (s *EqualityExprContext) Expression(i int) IExpressionContext
 
-func (s *EqualityExpressionContext) AllRelationalExpression() []IRelationalExpressionContext
+func (s *EqualityExprContext) GetOp() antlr.Token
 
-func (s *EqualityExpressionContext) EQ(i int) antlr.TerminalNode
+func (s *EqualityExprContext) GetRuleContext() antlr.RuleContext
 
-func (s *EqualityExpressionContext) GetParser() antlr.Parser
+func (s *EqualityExprContext) NEQ() antlr.TerminalNode
 
-func (s *EqualityExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (*EqualityExpressionContext) IsEqualityExpressionContext()
-
-func (s *EqualityExpressionContext) NE(i int) antlr.TerminalNode
-
-func (s *EqualityExpressionContext) RelationalExpression(i int) IRelationalExpressionContext
-
-func (s *EqualityExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExecutionStrategyContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExecutionStrategyContext() *ExecutionStrategyContext
-
-func NewExecutionStrategyContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExecutionStrategyContext
-
-func (s *ExecutionStrategyContext) ASYNC() antlr.TerminalNode
-
-func (s *ExecutionStrategyContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExecutionStrategyContext) GPU() antlr.TerminalNode
-
-func (s *ExecutionStrategyContext) GetParser() antlr.Parser
-
-func (s *ExecutionStrategyContext) GetRuleContext() antlr.RuleContext
-
-func (*ExecutionStrategyContext) IsExecutionStrategyContext()
-
-func (s *ExecutionStrategyContext) PROCESS() antlr.TerminalNode
-
-func (s *ExecutionStrategyContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *EqualityExprContext) SetOp(v antlr.Token)
 
 type ExpressionContext struct {
 	antlr.BaseParserRuleContext
@@ -2291,7 +2025,7 @@ func NewEmptyExpressionContext() *ExpressionContext
 
 func NewExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExpressionContext
 
-func (s *ExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExpressionContext) CopyAll(ctx *ExpressionContext)
 
 func (s *ExpressionContext) GetParser() antlr.Parser
 
@@ -2299,909 +2033,542 @@ func (s *ExpressionContext) GetRuleContext() antlr.RuleContext
 
 func (*ExpressionContext) IsExpressionContext()
 
-func (s *ExpressionContext) LogicalOrExpression() ILogicalOrExpressionContext
-
 func (s *ExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type ExpressionStmtContext struct {
+type ExpressionListContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExpressionStmtContext() *ExpressionStmtContext
+func NewEmptyExpressionListContext() *ExpressionListContext
 
-func NewExpressionStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExpressionStmtContext
+func NewExpressionListContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExpressionListContext
 
-func (s *ExpressionStmtContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExpressionListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExpressionStmtContext) Expression() IExpressionContext
+func (s *ExpressionListContext) AllCOMMA() []antlr.TerminalNode
 
-func (s *ExpressionStmtContext) GetParser() antlr.Parser
+func (s *ExpressionListContext) AllExpression() []IExpressionContext
 
-func (s *ExpressionStmtContext) GetRuleContext() antlr.RuleContext
+func (s *ExpressionListContext) COMMA(i int) antlr.TerminalNode
 
-func (*ExpressionStmtContext) IsExpressionStmtContext()
+func (s *ExpressionListContext) Expression(i int) IExpressionContext
 
-func (s *ExpressionStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ExpressionListContext) GetParser() antlr.Parser
 
-type ExternCConstDeclContext struct {
+func (s *ExpressionListContext) GetRuleContext() antlr.RuleContext
+
+func (*ExpressionListContext) IsExpressionListContext()
+
+func (s *ExpressionListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExpressionStatementContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCConstDeclContext() *ExternCConstDeclContext
+func NewEmptyExpressionStatementContext() *ExpressionStatementContext
 
-func NewExternCConstDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCConstDeclContext
+func NewExpressionStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExpressionStatementContext
 
-func (s *ExternCConstDeclContext) ASSIGN() antlr.TerminalNode
+func (s *ExpressionStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCConstDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExpressionStatementContext) Expression() IExpressionContext
 
-func (s *ExternCConstDeclContext) COLON() antlr.TerminalNode
+func (s *ExpressionStatementContext) GetParser() antlr.Parser
 
-func (s *ExternCConstDeclContext) CONST() antlr.TerminalNode
+func (s *ExpressionStatementContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCConstDeclContext) Expression() IExpressionContext
+func (*ExpressionStatementContext) IsExpressionStatementContext()
 
-func (s *ExternCConstDeclContext) ExternType() IExternTypeContext
+func (s *ExpressionStatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *ExternCConstDeclContext) GetParser() antlr.Parser
-
-func (s *ExternCConstDeclContext) GetRuleContext() antlr.RuleContext
-
-func (s *ExternCConstDeclContext) IDENTIFIER() antlr.TerminalNode
-
-func (*ExternCConstDeclContext) IsExternCConstDeclContext()
-
-func (s *ExternCConstDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCDeclContext struct {
+type ExternClassContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCDeclContext() *ExternCDeclContext
+func NewEmptyExternClassContext() *ExternClassContext
 
-func NewExternCDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCDeclContext
+func NewExternClassContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternClassContext
 
-func (s *ExternCDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternClassContext) ABSTRACT() antlr.TerminalNode
 
-func (s *ExternCDeclContext) AllExternCMember() []IExternCMemberContext
+func (s *ExternClassContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCDeclContext) C_LANG() antlr.TerminalNode
+func (s *ExternClassContext) AllExternClassMember() []IExternClassMemberContext
 
-func (s *ExternCDeclContext) EXTERN() antlr.TerminalNode
+func (s *ExternClassContext) CLASS() antlr.TerminalNode
 
-func (s *ExternCDeclContext) ExternCMember(i int) IExternCMemberContext
+func (s *ExternClassContext) ExternClassMember(i int) IExternClassMemberContext
 
-func (s *ExternCDeclContext) GetParser() antlr.Parser
+func (s *ExternClassContext) ExternSymbol() IExternSymbolContext
 
-func (s *ExternCDeclContext) GetRuleContext() antlr.RuleContext
+func (s *ExternClassContext) GetParser() antlr.Parser
 
-func (*ExternCDeclContext) IsExternCDeclContext()
+func (s *ExternClassContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCDeclContext) LBRACE() antlr.TerminalNode
+func (s *ExternClassContext) IDENTIFIER() antlr.TerminalNode
 
-func (s *ExternCDeclContext) RBRACE() antlr.TerminalNode
+func (*ExternClassContext) IsExternClassContext()
 
-func (s *ExternCDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ExternClassContext) LBRACE() antlr.TerminalNode
 
-type ExternCFunctionDeclContext struct {
+func (s *ExternClassContext) RBRACE() antlr.TerminalNode
+
+func (s *ExternClassContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternClassMemberContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCFunctionDeclContext() *ExternCFunctionDeclContext
+func NewEmptyExternClassMemberContext() *ExternClassMemberContext
 
-func NewExternCFunctionDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCFunctionDeclContext
+func NewExternClassMemberContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternClassMemberContext
 
-func (s *ExternCFunctionDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternClassMemberContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCFunctionDeclContext) CCallingConvention() ICCallingConventionContext
+func (s *ExternClassMemberContext) ExternConstructor() IExternConstructorContext
 
-func (s *ExternCFunctionDeclContext) ExternCParameterList() IExternCParameterListContext
+func (s *ExternClassMemberContext) ExternDestructor() IExternDestructorContext
 
-func (s *ExternCFunctionDeclContext) ExternType() IExternTypeContext
+func (s *ExternClassMemberContext) ExternStaticMethod() IExternStaticMethodContext
 
-func (s *ExternCFunctionDeclContext) FUNC() antlr.TerminalNode
+func (s *ExternClassMemberContext) ExternVirtualMethod() IExternVirtualMethodContext
 
-func (s *ExternCFunctionDeclContext) GetParser() antlr.Parser
+func (s *ExternClassMemberContext) GetParser() antlr.Parser
 
-func (s *ExternCFunctionDeclContext) GetRuleContext() antlr.RuleContext
+func (s *ExternClassMemberContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCFunctionDeclContext) IDENTIFIER() antlr.TerminalNode
+func (*ExternClassMemberContext) IsExternClassMemberContext()
 
-func (*ExternCFunctionDeclContext) IsExternCFunctionDeclContext()
+func (s *ExternClassMemberContext) Semi() ISemiContext
 
-func (s *ExternCFunctionDeclContext) LPAREN() antlr.TerminalNode
+func (s *ExternClassMemberContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *ExternCFunctionDeclContext) RPAREN() antlr.TerminalNode
-
-func (s *ExternCFunctionDeclContext) STRING_LITERAL() antlr.TerminalNode
-
-func (s *ExternCFunctionDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCMemberContext struct {
+type ExternConstructorContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCMemberContext() *ExternCMemberContext
+func NewEmptyExternConstructorContext() *ExternConstructorContext
 
-func NewExternCMemberContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCMemberContext
+func NewExternConstructorContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternConstructorContext
 
-func (s *ExternCMemberContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternConstructorContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCMemberContext) ExternCConstDecl() IExternCConstDeclContext
+func (s *ExternConstructorContext) ExternParamList() IExternParamListContext
 
-func (s *ExternCMemberContext) ExternCFunctionDecl() IExternCFunctionDeclContext
+func (s *ExternConstructorContext) ExternType() IExternTypeContext
 
-func (s *ExternCMemberContext) ExternCStructDecl() IExternCStructDeclContext
+func (s *ExternConstructorContext) GetParser() antlr.Parser
 
-func (s *ExternCMemberContext) ExternCTypeAlias() IExternCTypeAliasContext
+func (s *ExternConstructorContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCMemberContext) GetParser() antlr.Parser
+func (*ExternConstructorContext) IsExternConstructorContext()
 
-func (s *ExternCMemberContext) GetRuleContext() antlr.RuleContext
+func (s *ExternConstructorContext) LPAREN() antlr.TerminalNode
 
-func (*ExternCMemberContext) IsExternCMemberContext()
+func (s *ExternConstructorContext) NEW() antlr.TerminalNode
 
-func (s *ExternCMemberContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ExternConstructorContext) RPAREN() antlr.TerminalNode
 
-type ExternCParameterContext struct {
+func (s *ExternConstructorContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternDeclContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCParameterContext() *ExternCParameterContext
+func NewEmptyExternDeclContext() *ExternDeclContext
 
-func NewExternCParameterContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCParameterContext
+func NewExternDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternDeclContext
 
-func (s *ExternCParameterContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCParameterContext) COLON() antlr.TerminalNode
+func (s *ExternDeclContext) AllExternMember() []IExternMemberContext
 
-func (s *ExternCParameterContext) ExternType() IExternTypeContext
+func (s *ExternDeclContext) EXTERN() antlr.TerminalNode
 
-func (s *ExternCParameterContext) GetParser() antlr.Parser
+func (s *ExternDeclContext) ExternMember(i int) IExternMemberContext
 
-func (s *ExternCParameterContext) GetRuleContext() antlr.RuleContext
+func (s *ExternDeclContext) GetParser() antlr.Parser
 
-func (s *ExternCParameterContext) IDENTIFIER() antlr.TerminalNode
+func (s *ExternDeclContext) GetRuleContext() antlr.RuleContext
 
-func (*ExternCParameterContext) IsExternCParameterContext()
+func (s *ExternDeclContext) IDENTIFIER() antlr.TerminalNode
 
-func (s *ExternCParameterContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (*ExternDeclContext) IsExternDeclContext()
 
-type ExternCParameterListContext struct {
+func (s *ExternDeclContext) LBRACE() antlr.TerminalNode
+
+func (s *ExternDeclContext) RBRACE() antlr.TerminalNode
+
+func (s *ExternDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternDestructorContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCParameterListContext() *ExternCParameterListContext
+func NewEmptyExternDestructorContext() *ExternDestructorContext
 
-func NewExternCParameterListContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCParameterListContext
+func NewExternDestructorContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternDestructorContext
 
-func (s *ExternCParameterListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternDestructorContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCParameterListContext) AllCOMMA() []antlr.TerminalNode
+func (s *ExternDestructorContext) DELETE() antlr.TerminalNode
 
-func (s *ExternCParameterListContext) AllExternCParameter() []IExternCParameterContext
+func (s *ExternDestructorContext) ExternMethodParam() IExternMethodParamContext
 
-func (s *ExternCParameterListContext) COMMA(i int) antlr.TerminalNode
+func (s *ExternDestructorContext) GetParser() antlr.Parser
 
-func (s *ExternCParameterListContext) ELLIPSIS() antlr.TerminalNode
+func (s *ExternDestructorContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCParameterListContext) ExternCParameter(i int) IExternCParameterContext
+func (*ExternDestructorContext) IsExternDestructorContext()
 
-func (s *ExternCParameterListContext) GetParser() antlr.Parser
+func (s *ExternDestructorContext) LPAREN() antlr.TerminalNode
 
-func (s *ExternCParameterListContext) GetRuleContext() antlr.RuleContext
+func (s *ExternDestructorContext) RPAREN() antlr.TerminalNode
 
-func (*ExternCParameterListContext) IsExternCParameterListContext()
+func (s *ExternDestructorContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *ExternCParameterListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ExternDestructorContext) VOID() antlr.TerminalNode
 
-type ExternCStructDeclContext struct {
+type ExternFuncDeclContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCStructDeclContext() *ExternCStructDeclContext
+func NewEmptyExternFuncDeclContext() *ExternFuncDeclContext
 
-func NewExternCStructDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCStructDeclContext
+func NewExternFuncDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternFuncDeclContext
 
-func (s *ExternCStructDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternFuncDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCStructDeclContext) AllExternCStructField() []IExternCStructFieldContext
+func (s *ExternFuncDeclContext) CallingConvention() ICallingConventionContext
 
-func (s *ExternCStructDeclContext) ExternCStructField(i int) IExternCStructFieldContext
+func (s *ExternFuncDeclContext) ExternParamList() IExternParamListContext
 
-func (s *ExternCStructDeclContext) GetParser() antlr.Parser
+func (s *ExternFuncDeclContext) ExternReturnType() IExternReturnTypeContext
 
-func (s *ExternCStructDeclContext) GetRuleContext() antlr.RuleContext
+func (s *ExternFuncDeclContext) ExternSymbol() IExternSymbolContext
 
-func (s *ExternCStructDeclContext) IDENTIFIER() antlr.TerminalNode
+func (s *ExternFuncDeclContext) FUNC() antlr.TerminalNode
 
-func (*ExternCStructDeclContext) IsExternCStructDeclContext()
+func (s *ExternFuncDeclContext) GetParser() antlr.Parser
 
-func (s *ExternCStructDeclContext) LBRACE() antlr.TerminalNode
+func (s *ExternFuncDeclContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCStructDeclContext) RBRACE() antlr.TerminalNode
+func (s *ExternFuncDeclContext) IDENTIFIER() antlr.TerminalNode
 
-func (s *ExternCStructDeclContext) STRUCT() antlr.TerminalNode
+func (*ExternFuncDeclContext) IsExternFuncDeclContext()
 
-func (s *ExternCStructDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ExternFuncDeclContext) LPAREN() antlr.TerminalNode
 
-type ExternCStructFieldContext struct {
+func (s *ExternFuncDeclContext) RPAREN() antlr.TerminalNode
+
+func (s *ExternFuncDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternFunctionPtrTypeContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCStructFieldContext() *ExternCStructFieldContext
+func NewEmptyExternFunctionPtrTypeContext() *ExternFunctionPtrTypeContext
 
-func NewExternCStructFieldContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCStructFieldContext
+func NewExternFunctionPtrTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternFunctionPtrTypeContext
 
-func (s *ExternCStructFieldContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternFunctionPtrTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCStructFieldContext) COLON() antlr.TerminalNode
+func (s *ExternFunctionPtrTypeContext) ExternParamList() IExternParamListContext
 
-func (s *ExternCStructFieldContext) ExternType() IExternTypeContext
+func (s *ExternFunctionPtrTypeContext) ExternReturnType() IExternReturnTypeContext
 
-func (s *ExternCStructFieldContext) GetParser() antlr.Parser
+func (s *ExternFunctionPtrTypeContext) FUNC() antlr.TerminalNode
 
-func (s *ExternCStructFieldContext) GetRuleContext() antlr.RuleContext
+func (s *ExternFunctionPtrTypeContext) GetParser() antlr.Parser
 
-func (s *ExternCStructFieldContext) IDENTIFIER() antlr.TerminalNode
+func (s *ExternFunctionPtrTypeContext) GetRuleContext() antlr.RuleContext
 
-func (*ExternCStructFieldContext) IsExternCStructFieldContext()
+func (*ExternFunctionPtrTypeContext) IsExternFunctionPtrTypeContext()
 
-func (s *ExternCStructFieldContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ExternFunctionPtrTypeContext) LPAREN() antlr.TerminalNode
 
-type ExternCTypeAliasContext struct {
+func (s *ExternFunctionPtrTypeContext) RPAREN() antlr.TerminalNode
+
+func (s *ExternFunctionPtrTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternMemberContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCTypeAliasContext() *ExternCTypeAliasContext
+func NewEmptyExternMemberContext() *ExternMemberContext
 
-func NewExternCTypeAliasContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCTypeAliasContext
+func NewExternMemberContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternMemberContext
 
-func (s *ExternCTypeAliasContext) ASSIGN() antlr.TerminalNode
+func (s *ExternMemberContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCTypeAliasContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternMemberContext) ExternClass() IExternClassContext
 
-func (s *ExternCTypeAliasContext) ExternType() IExternTypeContext
+func (s *ExternMemberContext) ExternFuncDecl() IExternFuncDeclContext
 
-func (s *ExternCTypeAliasContext) GetParser() antlr.Parser
+func (s *ExternMemberContext) ExternNamespace() IExternNamespaceContext
 
-func (s *ExternCTypeAliasContext) GetRuleContext() antlr.RuleContext
+func (s *ExternMemberContext) ExternTypeAlias() IExternTypeAliasContext
 
-func (s *ExternCTypeAliasContext) IDENTIFIER() antlr.TerminalNode
+func (s *ExternMemberContext) GetParser() antlr.Parser
 
-func (*ExternCTypeAliasContext) IsExternCTypeAliasContext()
+func (s *ExternMemberContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCTypeAliasContext) TYPE() antlr.TerminalNode
+func (*ExternMemberContext) IsExternMemberContext()
 
-func (s *ExternCTypeAliasContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ExternMemberContext) Semi() ISemiContext
 
-type ExternCppClassDeclContext struct {
+func (s *ExternMemberContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternMethodParamContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCppClassDeclContext() *ExternCppClassDeclContext
+func NewEmptyExternMethodParamContext() *ExternMethodParamContext
 
-func NewExternCppClassDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppClassDeclContext
+func NewExternMethodParamContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternMethodParamContext
 
-func (s *ExternCppClassDeclContext) ABSTRACT() antlr.TerminalNode
+func (s *ExternMethodParamContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCppClassDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternMethodParamContext) ExternType() IExternTypeContext
 
-func (s *ExternCppClassDeclContext) AllExternCppClassMember() []IExternCppClassMemberContext
+func (s *ExternMethodParamContext) GetParser() antlr.Parser
 
-func (s *ExternCppClassDeclContext) CLASS() antlr.TerminalNode
+func (s *ExternMethodParamContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCppClassDeclContext) ExternCppClassMember(i int) IExternCppClassMemberContext
+func (*ExternMethodParamContext) IsExternMethodParamContext()
 
-func (s *ExternCppClassDeclContext) GetParser() antlr.Parser
+func (s *ExternMethodParamContext) SELF() antlr.TerminalNode
 
-func (s *ExternCppClassDeclContext) GetRuleContext() antlr.RuleContext
+func (s *ExternMethodParamContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *ExternCppClassDeclContext) IDENTIFIER() antlr.TerminalNode
-
-func (*ExternCppClassDeclContext) IsExternCppClassDeclContext()
-
-func (s *ExternCppClassDeclContext) LBRACE() antlr.TerminalNode
-
-func (s *ExternCppClassDeclContext) RBRACE() antlr.TerminalNode
-
-func (s *ExternCppClassDeclContext) STRING_LITERAL() antlr.TerminalNode
-
-func (s *ExternCppClassDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCppClassMemberContext struct {
+type ExternMethodParamListContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCppClassMemberContext() *ExternCppClassMemberContext
+func NewEmptyExternMethodParamListContext() *ExternMethodParamListContext
 
-func NewExternCppClassMemberContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppClassMemberContext
+func NewExternMethodParamListContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternMethodParamListContext
 
-func (s *ExternCppClassMemberContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternMethodParamListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCppClassMemberContext) ExternCppConstructorDecl() IExternCppConstructorDeclContext
+func (s *ExternMethodParamListContext) AllCOMMA() []antlr.TerminalNode
 
-func (s *ExternCppClassMemberContext) ExternCppDestructorDecl() IExternCppDestructorDeclContext
+func (s *ExternMethodParamListContext) AllExternParam() []IExternParamContext
 
-func (s *ExternCppClassMemberContext) ExternCppMethodDecl() IExternCppMethodDeclContext
+func (s *ExternMethodParamListContext) COMMA(i int) antlr.TerminalNode
 
-func (s *ExternCppClassMemberContext) GetParser() antlr.Parser
+func (s *ExternMethodParamListContext) ELLIPSIS() antlr.TerminalNode
 
-func (s *ExternCppClassMemberContext) GetRuleContext() antlr.RuleContext
+func (s *ExternMethodParamListContext) ExternMethodParam() IExternMethodParamContext
 
-func (*ExternCppClassMemberContext) IsExternCppClassMemberContext()
+func (s *ExternMethodParamListContext) ExternParam(i int) IExternParamContext
 
-func (s *ExternCppClassMemberContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ExternMethodParamListContext) GetParser() antlr.Parser
 
-type ExternCppConstDeclContext struct {
+func (s *ExternMethodParamListContext) GetRuleContext() antlr.RuleContext
+
+func (*ExternMethodParamListContext) IsExternMethodParamListContext()
+
+func (s *ExternMethodParamListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ExternNamespaceContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCppConstDeclContext() *ExternCppConstDeclContext
+func NewEmptyExternNamespaceContext() *ExternNamespaceContext
 
-func NewExternCppConstDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppConstDeclContext
+func NewExternNamespaceContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternNamespaceContext
 
-func (s *ExternCppConstDeclContext) ASSIGN() antlr.TerminalNode
+func (s *ExternNamespaceContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCppConstDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternNamespaceContext) AllExternMember() []IExternMemberContext
 
-func (s *ExternCppConstDeclContext) COLON() antlr.TerminalNode
+func (s *ExternNamespaceContext) ExternMember(i int) IExternMemberContext
 
-func (s *ExternCppConstDeclContext) CONST() antlr.TerminalNode
+func (s *ExternNamespaceContext) GetParser() antlr.Parser
 
-func (s *ExternCppConstDeclContext) Expression() IExpressionContext
+func (s *ExternNamespaceContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCppConstDeclContext) ExternType() IExternTypeContext
+func (*ExternNamespaceContext) IsExternNamespaceContext()
 
-func (s *ExternCppConstDeclContext) GetParser() antlr.Parser
+func (s *ExternNamespaceContext) LBRACE() antlr.TerminalNode
 
-func (s *ExternCppConstDeclContext) GetRuleContext() antlr.RuleContext
+func (s *ExternNamespaceContext) NAMESPACE() antlr.TerminalNode
 
-func (s *ExternCppConstDeclContext) IDENTIFIER() antlr.TerminalNode
+func (s *ExternNamespaceContext) QualifiedName() IQualifiedNameContext
 
-func (*ExternCppConstDeclContext) IsExternCppConstDeclContext()
+func (s *ExternNamespaceContext) RBRACE() antlr.TerminalNode
 
-func (s *ExternCppConstDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ExternNamespaceContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type ExternCppConstructorDeclContext struct {
+type ExternParamContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCppConstructorDeclContext() *ExternCppConstructorDeclContext
+func NewEmptyExternParamContext() *ExternParamContext
 
-func NewExternCppConstructorDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppConstructorDeclContext
+func NewExternParamContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternParamContext
 
-func (s *ExternCppConstructorDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternParamContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCppConstructorDeclContext) ExternCppParameterList() IExternCppParameterListContext
+func (s *ExternParamContext) ExternType() IExternTypeContext
 
-func (s *ExternCppConstructorDeclContext) ExternType() IExternTypeContext
+func (s *ExternParamContext) GetParser() antlr.Parser
 
-func (s *ExternCppConstructorDeclContext) GetParser() antlr.Parser
+func (s *ExternParamContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCppConstructorDeclContext) GetRuleContext() antlr.RuleContext
+func (*ExternParamContext) IsExternParamContext()
 
-func (*ExternCppConstructorDeclContext) IsExternCppConstructorDeclContext()
+func (s *ExternParamContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *ExternCppConstructorDeclContext) LPAREN() antlr.TerminalNode
-
-func (s *ExternCppConstructorDeclContext) NEW() antlr.TerminalNode
-
-func (s *ExternCppConstructorDeclContext) RPAREN() antlr.TerminalNode
-
-func (s *ExternCppConstructorDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCppDeclContext struct {
+type ExternParamListContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCppDeclContext() *ExternCppDeclContext
+func NewEmptyExternParamListContext() *ExternParamListContext
 
-func NewExternCppDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppDeclContext
+func NewExternParamListContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternParamListContext
 
-func (s *ExternCppDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternParamListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCppDeclContext) AllExternCppMember() []IExternCppMemberContext
+func (s *ExternParamListContext) AllCOMMA() []antlr.TerminalNode
 
-func (s *ExternCppDeclContext) CPP_LANG() antlr.TerminalNode
+func (s *ExternParamListContext) AllExternParam() []IExternParamContext
 
-func (s *ExternCppDeclContext) EXTERN() antlr.TerminalNode
+func (s *ExternParamListContext) COMMA(i int) antlr.TerminalNode
 
-func (s *ExternCppDeclContext) ExternCppMember(i int) IExternCppMemberContext
+func (s *ExternParamListContext) ELLIPSIS() antlr.TerminalNode
 
-func (s *ExternCppDeclContext) GetParser() antlr.Parser
+func (s *ExternParamListContext) ExternParam(i int) IExternParamContext
 
-func (s *ExternCppDeclContext) GetRuleContext() antlr.RuleContext
+func (s *ExternParamListContext) GetParser() antlr.Parser
 
-func (*ExternCppDeclContext) IsExternCppDeclContext()
+func (s *ExternParamListContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCppDeclContext) LBRACE() antlr.TerminalNode
+func (*ExternParamListContext) IsExternParamListContext()
 
-func (s *ExternCppDeclContext) RBRACE() antlr.TerminalNode
+func (s *ExternParamListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *ExternCppDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCppDestructorDeclContext struct {
+type ExternReturnTypeContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCppDestructorDeclContext() *ExternCppDestructorDeclContext
+func NewEmptyExternReturnTypeContext() *ExternReturnTypeContext
 
-func NewExternCppDestructorDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppDestructorDeclContext
+func NewExternReturnTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternReturnTypeContext
 
-func (s *ExternCppDestructorDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternReturnTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCppDestructorDeclContext) DELETE() antlr.TerminalNode
+func (s *ExternReturnTypeContext) CONST() antlr.TerminalNode
 
-func (s *ExternCppDestructorDeclContext) ExternCppSelfParam() IExternCppSelfParamContext
+func (s *ExternReturnTypeContext) ExternType() IExternTypeContext
 
-func (s *ExternCppDestructorDeclContext) ExternType() IExternTypeContext
+func (s *ExternReturnTypeContext) GetParser() antlr.Parser
 
-func (s *ExternCppDestructorDeclContext) GetParser() antlr.Parser
+func (s *ExternReturnTypeContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCppDestructorDeclContext) GetRuleContext() antlr.RuleContext
+func (*ExternReturnTypeContext) IsExternReturnTypeContext()
 
-func (*ExternCppDestructorDeclContext) IsExternCppDestructorDeclContext()
+func (s *ExternReturnTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *ExternCppDestructorDeclContext) LPAREN() antlr.TerminalNode
-
-func (s *ExternCppDestructorDeclContext) RPAREN() antlr.TerminalNode
-
-func (s *ExternCppDestructorDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCppFunctionDeclContext struct {
+type ExternStaticMethodContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCppFunctionDeclContext() *ExternCppFunctionDeclContext
+func NewEmptyExternStaticMethodContext() *ExternStaticMethodContext
 
-func NewExternCppFunctionDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppFunctionDeclContext
+func NewExternStaticMethodContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternStaticMethodContext
 
-func (s *ExternCppFunctionDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternStaticMethodContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCppFunctionDeclContext) CppCallingConvention() ICppCallingConventionContext
+func (s *ExternStaticMethodContext) ExternParamList() IExternParamListContext
 
-func (s *ExternCppFunctionDeclContext) ExternCppParameterList() IExternCppParameterListContext
+func (s *ExternStaticMethodContext) ExternReturnType() IExternReturnTypeContext
 
-func (s *ExternCppFunctionDeclContext) ExternType() IExternTypeContext
+func (s *ExternStaticMethodContext) ExternSymbol() IExternSymbolContext
 
-func (s *ExternCppFunctionDeclContext) FUNC() antlr.TerminalNode
+func (s *ExternStaticMethodContext) FUNC() antlr.TerminalNode
 
-func (s *ExternCppFunctionDeclContext) GetParser() antlr.Parser
+func (s *ExternStaticMethodContext) GetParser() antlr.Parser
 
-func (s *ExternCppFunctionDeclContext) GetRuleContext() antlr.RuleContext
+func (s *ExternStaticMethodContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCppFunctionDeclContext) IDENTIFIER() antlr.TerminalNode
+func (s *ExternStaticMethodContext) IDENTIFIER() antlr.TerminalNode
 
-func (*ExternCppFunctionDeclContext) IsExternCppFunctionDeclContext()
+func (*ExternStaticMethodContext) IsExternStaticMethodContext()
 
-func (s *ExternCppFunctionDeclContext) LPAREN() antlr.TerminalNode
+func (s *ExternStaticMethodContext) LPAREN() antlr.TerminalNode
 
-func (s *ExternCppFunctionDeclContext) RPAREN() antlr.TerminalNode
+func (s *ExternStaticMethodContext) RPAREN() antlr.TerminalNode
 
-func (s *ExternCppFunctionDeclContext) STRING_LITERAL() antlr.TerminalNode
+func (s *ExternStaticMethodContext) STATIC() antlr.TerminalNode
 
-func (s *ExternCppFunctionDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ExternStaticMethodContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type ExternCppMemberContext struct {
+type ExternSymbolContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCppMemberContext() *ExternCppMemberContext
+func NewEmptyExternSymbolContext() *ExternSymbolContext
 
-func NewExternCppMemberContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppMemberContext
+func NewExternSymbolContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternSymbolContext
 
-func (s *ExternCppMemberContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternSymbolContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCppMemberContext) ExternCppClassDecl() IExternCppClassDeclContext
+func (s *ExternSymbolContext) GetParser() antlr.Parser
 
-func (s *ExternCppMemberContext) ExternCppConstDecl() IExternCppConstDeclContext
+func (s *ExternSymbolContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCppMemberContext) ExternCppFunctionDecl() IExternCppFunctionDeclContext
+func (*ExternSymbolContext) IsExternSymbolContext()
 
-func (s *ExternCppMemberContext) ExternCppNamespaceDecl() IExternCppNamespaceDeclContext
+func (s *ExternSymbolContext) STRING_LIT() antlr.TerminalNode
 
-func (s *ExternCppMemberContext) ExternCppTypeAlias() IExternCppTypeAliasContext
+func (s *ExternSymbolContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *ExternCppMemberContext) GetParser() antlr.Parser
-
-func (s *ExternCppMemberContext) GetRuleContext() antlr.RuleContext
-
-func (*ExternCppMemberContext) IsExternCppMemberContext()
-
-func (s *ExternCppMemberContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCppMethodDeclContext struct {
+type ExternTypeAliasContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternCppMethodDeclContext() *ExternCppMethodDeclContext
+func NewEmptyExternTypeAliasContext() *ExternTypeAliasContext
 
-func NewExternCppMethodDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppMethodDeclContext
+func NewExternTypeAliasContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternTypeAliasContext
 
-func (s *ExternCppMethodDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternTypeAliasContext) ASSIGN() antlr.TerminalNode
 
-func (s *ExternCppMethodDeclContext) CONST() antlr.TerminalNode
+func (s *ExternTypeAliasContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternCppMethodDeclContext) CppCallingConvention() ICppCallingConventionContext
+func (s *ExternTypeAliasContext) ExternFunctionPtrType() IExternFunctionPtrTypeContext
 
-func (s *ExternCppMethodDeclContext) ExternCppMethodParams() IExternCppMethodParamsContext
+func (s *ExternTypeAliasContext) GetParser() antlr.Parser
 
-func (s *ExternCppMethodDeclContext) ExternType() IExternTypeContext
+func (s *ExternTypeAliasContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternCppMethodDeclContext) FUNC() antlr.TerminalNode
+func (s *ExternTypeAliasContext) IDENTIFIER() antlr.TerminalNode
 
-func (s *ExternCppMethodDeclContext) GetParser() antlr.Parser
+func (*ExternTypeAliasContext) IsExternTypeAliasContext()
 
-func (s *ExternCppMethodDeclContext) GetRuleContext() antlr.RuleContext
+func (s *ExternTypeAliasContext) TYPE() antlr.TerminalNode
 
-func (s *ExternCppMethodDeclContext) IDENTIFIER() antlr.TerminalNode
-
-func (*ExternCppMethodDeclContext) IsExternCppMethodDeclContext()
-
-func (s *ExternCppMethodDeclContext) LPAREN() antlr.TerminalNode
-
-func (s *ExternCppMethodDeclContext) RPAREN() antlr.TerminalNode
-
-func (s *ExternCppMethodDeclContext) STATIC() antlr.TerminalNode
-
-func (s *ExternCppMethodDeclContext) STRING_LITERAL() antlr.TerminalNode
-
-func (s *ExternCppMethodDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *ExternCppMethodDeclContext) VIRTUAL() antlr.TerminalNode
-
-type ExternCppMethodParamsContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExternCppMethodParamsContext() *ExternCppMethodParamsContext
-
-func NewExternCppMethodParamsContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppMethodParamsContext
-
-func (s *ExternCppMethodParamsContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExternCppMethodParamsContext) AllCOMMA() []antlr.TerminalNode
-
-func (s *ExternCppMethodParamsContext) AllExternCppParameter() []IExternCppParameterContext
-
-func (s *ExternCppMethodParamsContext) COMMA(i int) antlr.TerminalNode
-
-func (s *ExternCppMethodParamsContext) ExternCppParameter(i int) IExternCppParameterContext
-
-func (s *ExternCppMethodParamsContext) ExternCppParameterList() IExternCppParameterListContext
-
-func (s *ExternCppMethodParamsContext) ExternCppSelfParam() IExternCppSelfParamContext
-
-func (s *ExternCppMethodParamsContext) GetParser() antlr.Parser
-
-func (s *ExternCppMethodParamsContext) GetRuleContext() antlr.RuleContext
-
-func (*ExternCppMethodParamsContext) IsExternCppMethodParamsContext()
-
-func (s *ExternCppMethodParamsContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCppNamespaceDeclContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExternCppNamespaceDeclContext() *ExternCppNamespaceDeclContext
-
-func NewExternCppNamespaceDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppNamespaceDeclContext
-
-func (s *ExternCppNamespaceDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExternCppNamespaceDeclContext) AllExternCppMember() []IExternCppMemberContext
-
-func (s *ExternCppNamespaceDeclContext) ExternCppMember(i int) IExternCppMemberContext
-
-func (s *ExternCppNamespaceDeclContext) ExternNamespacePath() IExternNamespacePathContext
-
-func (s *ExternCppNamespaceDeclContext) GetParser() antlr.Parser
-
-func (s *ExternCppNamespaceDeclContext) GetRuleContext() antlr.RuleContext
-
-func (*ExternCppNamespaceDeclContext) IsExternCppNamespaceDeclContext()
-
-func (s *ExternCppNamespaceDeclContext) LBRACE() antlr.TerminalNode
-
-func (s *ExternCppNamespaceDeclContext) NAMESPACE() antlr.TerminalNode
-
-func (s *ExternCppNamespaceDeclContext) RBRACE() antlr.TerminalNode
-
-func (s *ExternCppNamespaceDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCppParamTypeContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExternCppParamTypeContext() *ExternCppParamTypeContext
-
-func NewExternCppParamTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppParamTypeContext
-
-func (s *ExternCppParamTypeContext) AMP() antlr.TerminalNode
-
-func (s *ExternCppParamTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExternCppParamTypeContext) CONST() antlr.TerminalNode
-
-func (s *ExternCppParamTypeContext) ExternType() IExternTypeContext
-
-func (s *ExternCppParamTypeContext) GetParser() antlr.Parser
-
-func (s *ExternCppParamTypeContext) GetRuleContext() antlr.RuleContext
-
-func (*ExternCppParamTypeContext) IsExternCppParamTypeContext()
-
-func (s *ExternCppParamTypeContext) STAR() antlr.TerminalNode
-
-func (s *ExternCppParamTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCppParameterContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExternCppParameterContext() *ExternCppParameterContext
-
-func NewExternCppParameterContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppParameterContext
-
-func (s *ExternCppParameterContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExternCppParameterContext) COLON() antlr.TerminalNode
-
-func (s *ExternCppParameterContext) ExternCppParamType() IExternCppParamTypeContext
-
-func (s *ExternCppParameterContext) GetParser() antlr.Parser
-
-func (s *ExternCppParameterContext) GetRuleContext() antlr.RuleContext
-
-func (s *ExternCppParameterContext) IDENTIFIER() antlr.TerminalNode
-
-func (*ExternCppParameterContext) IsExternCppParameterContext()
-
-func (s *ExternCppParameterContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCppParameterListContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExternCppParameterListContext() *ExternCppParameterListContext
-
-func NewExternCppParameterListContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppParameterListContext
-
-func (s *ExternCppParameterListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExternCppParameterListContext) AllCOMMA() []antlr.TerminalNode
-
-func (s *ExternCppParameterListContext) AllExternCppParameter() []IExternCppParameterContext
-
-func (s *ExternCppParameterListContext) COMMA(i int) antlr.TerminalNode
-
-func (s *ExternCppParameterListContext) ELLIPSIS() antlr.TerminalNode
-
-func (s *ExternCppParameterListContext) ExternCppParameter(i int) IExternCppParameterContext
-
-func (s *ExternCppParameterListContext) GetParser() antlr.Parser
-
-func (s *ExternCppParameterListContext) GetRuleContext() antlr.RuleContext
-
-func (*ExternCppParameterListContext) IsExternCppParameterListContext()
-
-func (s *ExternCppParameterListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCppSelfParamContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExternCppSelfParamContext() *ExternCppSelfParamContext
-
-func NewExternCppSelfParamContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppSelfParamContext
-
-func (s *ExternCppSelfParamContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExternCppSelfParamContext) CONST() antlr.TerminalNode
-
-func (s *ExternCppSelfParamContext) GetParser() antlr.Parser
-
-func (s *ExternCppSelfParamContext) GetRuleContext() antlr.RuleContext
-
-func (s *ExternCppSelfParamContext) IDENTIFIER() antlr.TerminalNode
-
-func (*ExternCppSelfParamContext) IsExternCppSelfParamContext()
-
-func (s *ExternCppSelfParamContext) SELF() antlr.TerminalNode
-
-func (s *ExternCppSelfParamContext) STAR() antlr.TerminalNode
-
-func (s *ExternCppSelfParamContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternCppTypeAliasContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExternCppTypeAliasContext() *ExternCppTypeAliasContext
-
-func NewExternCppTypeAliasContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternCppTypeAliasContext
-
-func (s *ExternCppTypeAliasContext) ASSIGN() antlr.TerminalNode
-
-func (s *ExternCppTypeAliasContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExternCppTypeAliasContext) ExternType() IExternTypeContext
-
-func (s *ExternCppTypeAliasContext) GetParser() antlr.Parser
-
-func (s *ExternCppTypeAliasContext) GetRuleContext() antlr.RuleContext
-
-func (s *ExternCppTypeAliasContext) IDENTIFIER() antlr.TerminalNode
-
-func (*ExternCppTypeAliasContext) IsExternCppTypeAliasContext()
-
-func (s *ExternCppTypeAliasContext) TYPE() antlr.TerminalNode
-
-func (s *ExternCppTypeAliasContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternFunctionTypeContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExternFunctionTypeContext() *ExternFunctionTypeContext
-
-func NewExternFunctionTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternFunctionTypeContext
-
-func (s *ExternFunctionTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExternFunctionTypeContext) ExternType() IExternTypeContext
-
-func (s *ExternFunctionTypeContext) ExternTypeList() IExternTypeListContext
-
-func (s *ExternFunctionTypeContext) FUNC() antlr.TerminalNode
-
-func (s *ExternFunctionTypeContext) GetParser() antlr.Parser
-
-func (s *ExternFunctionTypeContext) GetRuleContext() antlr.RuleContext
-
-func (*ExternFunctionTypeContext) IsExternFunctionTypeContext()
-
-func (s *ExternFunctionTypeContext) LPAREN() antlr.TerminalNode
-
-func (s *ExternFunctionTypeContext) RPAREN() antlr.TerminalNode
-
-func (s *ExternFunctionTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternNamespacePathContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExternNamespacePathContext() *ExternNamespacePathContext
-
-func NewExternNamespacePathContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternNamespacePathContext
-
-func (s *ExternNamespacePathContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExternNamespacePathContext) AllDOT() []antlr.TerminalNode
-
-func (s *ExternNamespacePathContext) AllIDENTIFIER() []antlr.TerminalNode
-
-func (s *ExternNamespacePathContext) DOT(i int) antlr.TerminalNode
-
-func (s *ExternNamespacePathContext) GetParser() antlr.Parser
-
-func (s *ExternNamespacePathContext) GetRuleContext() antlr.RuleContext
-
-func (s *ExternNamespacePathContext) IDENTIFIER(i int) antlr.TerminalNode
-
-func (*ExternNamespacePathContext) IsExternNamespacePathContext()
-
-func (s *ExternNamespacePathContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternPointerTypeContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExternPointerTypeContext() *ExternPointerTypeContext
-
-func NewExternPointerTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternPointerTypeContext
-
-func (s *ExternPointerTypeContext) AMP() antlr.TerminalNode
-
-func (s *ExternPointerTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExternPointerTypeContext) CONST() antlr.TerminalNode
-
-func (s *ExternPointerTypeContext) ExternType() IExternTypeContext
-
-func (s *ExternPointerTypeContext) GetParser() antlr.Parser
-
-func (s *ExternPointerTypeContext) GetRuleContext() antlr.RuleContext
-
-func (*ExternPointerTypeContext) IsExternPointerTypeContext()
-
-func (s *ExternPointerTypeContext) STAR() antlr.TerminalNode
-
-func (s *ExternPointerTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ExternPrimitiveTypeContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyExternPrimitiveTypeContext() *ExternPrimitiveTypeContext
-
-func NewExternPrimitiveTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternPrimitiveTypeContext
-
-func (s *ExternPrimitiveTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ExternPrimitiveTypeContext) BOOL() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) BYTE() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) CHAR() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) FLOAT32() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) FLOAT64() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) GetParser() antlr.Parser
-
-func (s *ExternPrimitiveTypeContext) GetRuleContext() antlr.RuleContext
-
-func (s *ExternPrimitiveTypeContext) INT16() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) INT32() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) INT64() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) INT8() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) ISIZE() antlr.TerminalNode
-
-func (*ExternPrimitiveTypeContext) IsExternPrimitiveTypeContext()
-
-func (s *ExternPrimitiveTypeContext) STRING() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *ExternPrimitiveTypeContext) UINT16() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) UINT32() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) UINT64() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) UINT8() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) USIZE() antlr.TerminalNode
-
-func (s *ExternPrimitiveTypeContext) VOID() antlr.TerminalNode
+func (s *ExternTypeAliasContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type ExternTypeContext struct {
 	antlr.BaseParserRuleContext
@@ -3212,56 +2579,96 @@ func NewEmptyExternTypeContext() *ExternTypeContext
 
 func NewExternTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternTypeContext
 
+func (s *ExternTypeContext) AMP() antlr.TerminalNode
+
 func (s *ExternTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternTypeContext) AllDOT() []antlr.TerminalNode
+func (s *ExternTypeContext) AllSTAR() []antlr.TerminalNode
 
-func (s *ExternTypeContext) AllIDENTIFIER() []antlr.TerminalNode
+func (s *ExternTypeContext) BOOL() antlr.TerminalNode
 
-func (s *ExternTypeContext) DOT(i int) antlr.TerminalNode
+func (s *ExternTypeContext) BYTE() antlr.TerminalNode
 
-func (s *ExternTypeContext) ExternFunctionType() IExternFunctionTypeContext
+func (s *ExternTypeContext) CHAR() antlr.TerminalNode
 
-func (s *ExternTypeContext) ExternPointerType() IExternPointerTypeContext
+func (s *ExternTypeContext) CONST() antlr.TerminalNode
 
-func (s *ExternTypeContext) ExternPrimitiveType() IExternPrimitiveTypeContext
+func (s *ExternTypeContext) Expression() IExpressionContext
+
+func (s *ExternTypeContext) ExternType() IExternTypeContext
 
 func (s *ExternTypeContext) GetParser() antlr.Parser
 
 func (s *ExternTypeContext) GetRuleContext() antlr.RuleContext
 
-func (s *ExternTypeContext) IDENTIFIER(i int) antlr.TerminalNode
+func (s *ExternTypeContext) ISIZE() antlr.TerminalNode
 
 func (*ExternTypeContext) IsExternTypeContext()
 
+func (s *ExternTypeContext) LBRACKET() antlr.TerminalNode
+
+func (s *ExternTypeContext) PrimitiveType() IPrimitiveTypeContext
+
+func (s *ExternTypeContext) QualifiedName() IQualifiedNameContext
+
+func (s *ExternTypeContext) RBRACKET() antlr.TerminalNode
+
+func (s *ExternTypeContext) STAR(i int) antlr.TerminalNode
+
+func (s *ExternTypeContext) STRING() antlr.TerminalNode
+
 func (s *ExternTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type ExternTypeListContext struct {
+func (s *ExternTypeContext) USIZE() antlr.TerminalNode
+
+func (s *ExternTypeContext) VOID() antlr.TerminalNode
+
+type ExternVirtualMethodContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyExternTypeListContext() *ExternTypeListContext
+func NewEmptyExternVirtualMethodContext() *ExternVirtualMethodContext
 
-func NewExternTypeListContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternTypeListContext
+func NewExternVirtualMethodContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ExternVirtualMethodContext
 
-func (s *ExternTypeListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ExternVirtualMethodContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ExternTypeListContext) AllCOMMA() []antlr.TerminalNode
+func (s *ExternVirtualMethodContext) CallingConvention() ICallingConventionContext
 
-func (s *ExternTypeListContext) AllExternType() []IExternTypeContext
+func (s *ExternVirtualMethodContext) ExternMethodParamList() IExternMethodParamListContext
 
-func (s *ExternTypeListContext) COMMA(i int) antlr.TerminalNode
+func (s *ExternVirtualMethodContext) ExternReturnType() IExternReturnTypeContext
 
-func (s *ExternTypeListContext) ExternType(i int) IExternTypeContext
+func (s *ExternVirtualMethodContext) FUNC() antlr.TerminalNode
 
-func (s *ExternTypeListContext) GetParser() antlr.Parser
+func (s *ExternVirtualMethodContext) GetParser() antlr.Parser
 
-func (s *ExternTypeListContext) GetRuleContext() antlr.RuleContext
+func (s *ExternVirtualMethodContext) GetRuleContext() antlr.RuleContext
 
-func (*ExternTypeListContext) IsExternTypeListContext()
+func (s *ExternVirtualMethodContext) IDENTIFIER() antlr.TerminalNode
 
-func (s *ExternTypeListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (*ExternVirtualMethodContext) IsExternVirtualMethodContext()
+
+func (s *ExternVirtualMethodContext) LPAREN() antlr.TerminalNode
+
+func (s *ExternVirtualMethodContext) RPAREN() antlr.TerminalNode
+
+func (s *ExternVirtualMethodContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *ExternVirtualMethodContext) VIRTUAL() antlr.TerminalNode
+
+type FalseLiteralContext struct {
+	PrimaryContext
+}
+
+func NewFalseLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *FalseLiteralContext
+
+func (s *FalseLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *FalseLiteralContext) FALSE() antlr.TerminalNode
+
+func (s *FalseLiteralContext) GetRuleContext() antlr.RuleContext
 
 type FieldInitContext struct {
 	antlr.BaseParserRuleContext
@@ -3288,87 +2695,224 @@ func (*FieldInitContext) IsFieldInitContext()
 
 func (s *FieldInitContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type ForStmtContext struct {
+type FloatLiteralContext struct {
+	PrimaryContext
+}
+
+func NewFloatLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *FloatLiteralContext
+
+func (s *FloatLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *FloatLiteralContext) FLOAT_LIT() antlr.TerminalNode
+
+func (s *FloatLiteralContext) GetRuleContext() antlr.RuleContext
+
+type ForHeaderContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyForStmtContext() *ForStmtContext
+func NewEmptyForHeaderContext() *ForHeaderContext
 
-func NewForStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ForStmtContext
+func NewForHeaderContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ForHeaderContext
 
-func (s *ForStmtContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ForHeaderContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ForStmtContext) AllAssignmentStmt() []IAssignmentStmtContext
+func (s *ForHeaderContext) AllSEMI() []antlr.TerminalNode
 
-func (s *ForStmtContext) AllExpression() []IExpressionContext
+func (s *ForHeaderContext) Expression() IExpressionContext
 
-func (s *ForStmtContext) AllIDENTIFIER() []antlr.TerminalNode
+func (s *ForHeaderContext) ForInit() IForInitContext
 
-func (s *ForStmtContext) AllSEMICOLON() []antlr.TerminalNode
+func (s *ForHeaderContext) ForIterator() IForIteratorContext
 
-func (s *ForStmtContext) AssignmentStmt(i int) IAssignmentStmtContext
+func (s *ForHeaderContext) ForPost() IForPostContext
 
-func (s *ForStmtContext) Block() IBlockContext
+func (s *ForHeaderContext) GetParser() antlr.Parser
 
-func (s *ForStmtContext) COMMA() antlr.TerminalNode
+func (s *ForHeaderContext) GetRuleContext() antlr.RuleContext
 
-func (s *ForStmtContext) Expression(i int) IExpressionContext
+func (*ForHeaderContext) IsForHeaderContext()
 
-func (s *ForStmtContext) FOR() antlr.TerminalNode
+func (s *ForHeaderContext) SEMI(i int) antlr.TerminalNode
 
-func (s *ForStmtContext) GetParser() antlr.Parser
+func (s *ForHeaderContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *ForStmtContext) GetRuleContext() antlr.RuleContext
-
-func (s *ForStmtContext) IDENTIFIER(i int) antlr.TerminalNode
-
-func (s *ForStmtContext) IN() antlr.TerminalNode
-
-func (*ForStmtContext) IsForStmtContext()
-
-func (s *ForStmtContext) SEMICOLON(i int) antlr.TerminalNode
-
-func (s *ForStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *ForStmtContext) VariableDecl() IVariableDeclContext
-
-type FunctionDeclContext struct {
+type ForInitContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyFunctionDeclContext() *FunctionDeclContext
+func NewEmptyForInitContext() *ForInitContext
 
-func NewFunctionDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *FunctionDeclContext
+func NewForInitContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ForInitContext
 
-func (s *FunctionDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ForInitContext) ASSIGN() antlr.TerminalNode
 
-func (s *FunctionDeclContext) Block() IBlockContext
+func (s *ForInitContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *FunctionDeclContext) ExecutionStrategy() IExecutionStrategyContext
+func (s *ForInitContext) COLON() antlr.TerminalNode
 
-func (s *FunctionDeclContext) FUNC() antlr.TerminalNode
+func (s *ForInitContext) Expression() IExpressionContext
 
-func (s *FunctionDeclContext) GenericParams() IGenericParamsContext
+func (s *ForInitContext) GetParser() antlr.Parser
 
-func (s *FunctionDeclContext) GetParser() antlr.Parser
+func (s *ForInitContext) GetRuleContext() antlr.RuleContext
 
-func (s *FunctionDeclContext) GetRuleContext() antlr.RuleContext
+func (s *ForInitContext) IDENTIFIER() antlr.TerminalNode
 
-func (s *FunctionDeclContext) IDENTIFIER() antlr.TerminalNode
+func (*ForInitContext) IsForInitContext()
 
-func (*FunctionDeclContext) IsFunctionDeclContext()
+func (s *ForInitContext) LET() antlr.TerminalNode
 
-func (s *FunctionDeclContext) LPAREN() antlr.TerminalNode
+func (s *ForInitContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *FunctionDeclContext) ParameterList() IParameterListContext
+func (s *ForInitContext) TypeRef() ITypeRefContext
 
-func (s *FunctionDeclContext) RPAREN() antlr.TerminalNode
+type ForIteratorContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
 
-func (s *FunctionDeclContext) ReturnType() IReturnTypeContext
+func NewEmptyForIteratorContext() *ForIteratorContext
 
-func (s *FunctionDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func NewForIteratorContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ForIteratorContext
+
+func (s *ForIteratorContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ForIteratorContext) AllIDENTIFIER() []antlr.TerminalNode
+
+func (s *ForIteratorContext) COMMA() antlr.TerminalNode
+
+func (s *ForIteratorContext) Expression() IExpressionContext
+
+func (s *ForIteratorContext) GetParser() antlr.Parser
+
+func (s *ForIteratorContext) GetRuleContext() antlr.RuleContext
+
+func (s *ForIteratorContext) IDENTIFIER(i int) antlr.TerminalNode
+
+func (s *ForIteratorContext) IN() antlr.TerminalNode
+
+func (*ForIteratorContext) IsForIteratorContext()
+
+func (s *ForIteratorContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ForPostContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyForPostContext() *ForPostContext
+
+func NewForPostContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ForPostContext
+
+func (s *ForPostContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ForPostContext) AssignOp() IAssignOpContext
+
+func (s *ForPostContext) AssignmentTarget() IAssignmentTargetContext
+
+func (s *ForPostContext) DEC() antlr.TerminalNode
+
+func (s *ForPostContext) Expression() IExpressionContext
+
+func (s *ForPostContext) GetParser() antlr.Parser
+
+func (s *ForPostContext) GetRuleContext() antlr.RuleContext
+
+func (s *ForPostContext) INC() antlr.TerminalNode
+
+func (*ForPostContext) IsForPostContext()
+
+func (s *ForPostContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ForStatementContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyForStatementContext() *ForStatementContext
+
+func NewForStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ForStatementContext
+
+func (s *ForStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ForStatementContext) Block() IBlockContext
+
+func (s *ForStatementContext) FOR() antlr.TerminalNode
+
+func (s *ForStatementContext) ForHeader() IForHeaderContext
+
+func (s *ForStatementContext) GetParser() antlr.Parser
+
+func (s *ForStatementContext) GetRuleContext() antlr.RuleContext
+
+func (*ForStatementContext) IsForStatementContext()
+
+func (s *ForStatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type FuncDeclContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyFuncDeclContext() *FuncDeclContext
+
+func NewFuncDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *FuncDeclContext
+
+func (s *FuncDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *FuncDeclContext) AllFuncModifier() []IFuncModifierContext
+
+func (s *FuncDeclContext) Block() IBlockContext
+
+func (s *FuncDeclContext) FUNC() antlr.TerminalNode
+
+func (s *FuncDeclContext) FuncModifier(i int) IFuncModifierContext
+
+func (s *FuncDeclContext) GenericParams() IGenericParamsContext
+
+func (s *FuncDeclContext) GetParser() antlr.Parser
+
+func (s *FuncDeclContext) GetRuleContext() antlr.RuleContext
+
+func (s *FuncDeclContext) IDENTIFIER() antlr.TerminalNode
+
+func (*FuncDeclContext) IsFuncDeclContext()
+
+func (s *FuncDeclContext) LPAREN() antlr.TerminalNode
+
+func (s *FuncDeclContext) ParamList() IParamListContext
+
+func (s *FuncDeclContext) RPAREN() antlr.TerminalNode
+
+func (s *FuncDeclContext) ReturnType() IReturnTypeContext
+
+func (s *FuncDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type FuncModifierContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyFuncModifierContext() *FuncModifierContext
+
+func NewFuncModifierContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *FuncModifierContext
+
+func (s *FuncModifierContext) ASYNC() antlr.TerminalNode
+
+func (s *FuncModifierContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *FuncModifierContext) GPU() antlr.TerminalNode
+
+func (s *FuncModifierContext) GetParser() antlr.Parser
+
+func (s *FuncModifierContext) GetRuleContext() antlr.RuleContext
+
+func (*FuncModifierContext) IsFuncModifierContext()
+
+func (s *FuncModifierContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type FunctionTypeContext struct {
 	antlr.BaseParserRuleContext
@@ -3379,13 +2923,11 @@ func NewEmptyFunctionTypeContext() *FunctionTypeContext
 
 func NewFunctionTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *FunctionTypeContext
 
+func (s *FunctionTypeContext) ASYNC() antlr.TerminalNode
+
 func (s *FunctionTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *FunctionTypeContext) ExecutionStrategy() IExecutionStrategyContext
-
 func (s *FunctionTypeContext) FUNC() antlr.TerminalNode
-
-func (s *FunctionTypeContext) GenericParams() IGenericParamsContext
 
 func (s *FunctionTypeContext) GetParser() antlr.Parser
 
@@ -3397,59 +2939,11 @@ func (s *FunctionTypeContext) LPAREN() antlr.TerminalNode
 
 func (s *FunctionTypeContext) RPAREN() antlr.TerminalNode
 
-func (s *FunctionTypeContext) ReturnType() IReturnTypeContext
-
 func (s *FunctionTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 func (s *FunctionTypeContext) TypeList() ITypeListContext
 
-type GenericArgContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyGenericArgContext() *GenericArgContext
-
-func NewGenericArgContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *GenericArgContext
-
-func (s *GenericArgContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *GenericArgContext) GetParser() antlr.Parser
-
-func (s *GenericArgContext) GetRuleContext() antlr.RuleContext
-
-func (*GenericArgContext) IsGenericArgContext()
-
-func (s *GenericArgContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *GenericArgContext) Type_() ITypeContext
-
-type GenericArgListContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyGenericArgListContext() *GenericArgListContext
-
-func NewGenericArgListContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *GenericArgListContext
-
-func (s *GenericArgListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *GenericArgListContext) AllCOMMA() []antlr.TerminalNode
-
-func (s *GenericArgListContext) AllGenericArg() []IGenericArgContext
-
-func (s *GenericArgListContext) COMMA(i int) antlr.TerminalNode
-
-func (s *GenericArgListContext) GenericArg(i int) IGenericArgContext
-
-func (s *GenericArgListContext) GetParser() antlr.Parser
-
-func (s *GenericArgListContext) GetRuleContext() antlr.RuleContext
-
-func (*GenericArgListContext) IsGenericArgListContext()
-
-func (s *GenericArgListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *FunctionTypeContext) TypeRef() ITypeRefContext
 
 type GenericArgsContext struct {
 	antlr.BaseParserRuleContext
@@ -3462,9 +2956,11 @@ func NewGenericArgsContext(parser antlr.Parser, parent antlr.ParserRuleContext, 
 
 func (s *GenericArgsContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *GenericArgsContext) GT() antlr.TerminalNode
+func (s *GenericArgsContext) AllCOMMA() []antlr.TerminalNode
 
-func (s *GenericArgsContext) GenericArgList() IGenericArgListContext
+func (s *GenericArgsContext) AllTypeRef() []ITypeRefContext
+
+func (s *GenericArgsContext) COMMA(i int) antlr.TerminalNode
 
 func (s *GenericArgsContext) GetParser() antlr.Parser
 
@@ -3472,63 +2968,13 @@ func (s *GenericArgsContext) GetRuleContext() antlr.RuleContext
 
 func (*GenericArgsContext) IsGenericArgsContext()
 
-func (s *GenericArgsContext) LT() antlr.TerminalNode
+func (s *GenericArgsContext) LBRACKET() antlr.TerminalNode
+
+func (s *GenericArgsContext) RBRACKET() antlr.TerminalNode
 
 func (s *GenericArgsContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type GenericParamContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyGenericParamContext() *GenericParamContext
-
-func NewGenericParamContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *GenericParamContext
-
-func (s *GenericParamContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *GenericParamContext) AllDOT() []antlr.TerminalNode
-
-func (s *GenericParamContext) AllIDENTIFIER() []antlr.TerminalNode
-
-func (s *GenericParamContext) DOT(i int) antlr.TerminalNode
-
-func (s *GenericParamContext) GetParser() antlr.Parser
-
-func (s *GenericParamContext) GetRuleContext() antlr.RuleContext
-
-func (s *GenericParamContext) IDENTIFIER(i int) antlr.TerminalNode
-
-func (*GenericParamContext) IsGenericParamContext()
-
-func (s *GenericParamContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type GenericParamListContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyGenericParamListContext() *GenericParamListContext
-
-func NewGenericParamListContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *GenericParamListContext
-
-func (s *GenericParamListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *GenericParamListContext) AllCOMMA() []antlr.TerminalNode
-
-func (s *GenericParamListContext) AllGenericParam() []IGenericParamContext
-
-func (s *GenericParamListContext) COMMA(i int) antlr.TerminalNode
-
-func (s *GenericParamListContext) GenericParam(i int) IGenericParamContext
-
-func (s *GenericParamListContext) GetParser() antlr.Parser
-
-func (s *GenericParamListContext) GetRuleContext() antlr.RuleContext
-
-func (*GenericParamListContext) IsGenericParamListContext()
-
-func (s *GenericParamListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *GenericArgsContext) TypeRef(i int) ITypeRefContext
 
 type GenericParamsContext struct {
 	antlr.BaseParserRuleContext
@@ -3541,59 +2987,37 @@ func NewGenericParamsContext(parser antlr.Parser, parent antlr.ParserRuleContext
 
 func (s *GenericParamsContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *GenericParamsContext) GT() antlr.TerminalNode
+func (s *GenericParamsContext) AllCOMMA() []antlr.TerminalNode
 
-func (s *GenericParamsContext) GenericParamList() IGenericParamListContext
+func (s *GenericParamsContext) AllIDENTIFIER() []antlr.TerminalNode
+
+func (s *GenericParamsContext) COMMA(i int) antlr.TerminalNode
 
 func (s *GenericParamsContext) GetParser() antlr.Parser
 
 func (s *GenericParamsContext) GetRuleContext() antlr.RuleContext
 
+func (s *GenericParamsContext) IDENTIFIER(i int) antlr.TerminalNode
+
 func (*GenericParamsContext) IsGenericParamsContext()
 
-func (s *GenericParamsContext) LT() antlr.TerminalNode
+func (s *GenericParamsContext) LBRACKET() antlr.TerminalNode
+
+func (s *GenericParamsContext) RBRACKET() antlr.TerminalNode
 
 func (s *GenericParamsContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type IAdditiveExpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllMultiplicativeExpression() []IMultiplicativeExpressionContext
-	MultiplicativeExpression(i int) IMultiplicativeExpressionContext
-	AllPLUS() []antlr.TerminalNode
-	PLUS(i int) antlr.TerminalNode
-	AllMINUS() []antlr.TerminalNode
-	MINUS(i int) antlr.TerminalNode
-
-	// IsAdditiveExpressionContext differentiates from other interfaces.
-	IsAdditiveExpressionContext()
+type HexLiteralContext struct {
+	PrimaryContext
 }
-    IAdditiveExpressionContext is an interface to support dynamic dispatch.
 
-type IAnonymousFuncExpressionContext interface {
-	antlr.ParserRuleContext
+func NewHexLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *HexLiteralContext
 
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
+func (s *HexLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-	// Getter signatures
-	FUNC() antlr.TerminalNode
-	LPAREN() antlr.TerminalNode
-	RPAREN() antlr.TerminalNode
-	Block() IBlockContext
-	ExecutionStrategy() IExecutionStrategyContext
-	GenericParams() IGenericParamsContext
-	ParameterList() IParameterListContext
-	ReturnType() IReturnTypeContext
+func (s *HexLiteralContext) GetRuleContext() antlr.RuleContext
 
-	// IsAnonymousFuncExpressionContext differentiates from other interfaces.
-	IsAnonymousFuncExpressionContext()
-}
-    IAnonymousFuncExpressionContext is an interface to support dynamic dispatch.
+func (s *HexLiteralContext) HEX_LIT() antlr.TerminalNode
 
 type IArgumentContext interface {
 	antlr.ParserRuleContext
@@ -3603,8 +3027,6 @@ type IArgumentContext interface {
 
 	// Getter signatures
 	Expression() IExpressionContext
-	LambdaExpression() ILambdaExpressionContext
-	AnonymousFuncExpression() IAnonymousFuncExpressionContext
 
 	// IsArgumentContext differentiates from other interfaces.
 	IsArgumentContext()
@@ -3628,7 +3050,7 @@ type IArgumentListContext interface {
 }
     IArgumentListContext is an interface to support dynamic dispatch.
 
-type IAssignmentOpContext interface {
+type IAssignOpContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -3636,37 +3058,58 @@ type IAssignmentOpContext interface {
 
 	// Getter signatures
 	ASSIGN() antlr.TerminalNode
-	PLUS_ASSIGN() antlr.TerminalNode
-	MINUS_ASSIGN() antlr.TerminalNode
-	STAR_ASSIGN() antlr.TerminalNode
-	SLASH_ASSIGN() antlr.TerminalNode
-	PERCENT_ASSIGN() antlr.TerminalNode
-	BIT_OR_ASSIGN() antlr.TerminalNode
-	BIT_AND_ASSIGN() antlr.TerminalNode
-	BIT_XOR_ASSIGN() antlr.TerminalNode
+	ADD_ASSIGN() antlr.TerminalNode
+	SUB_ASSIGN() antlr.TerminalNode
+	MUL_ASSIGN() antlr.TerminalNode
+	DIV_ASSIGN() antlr.TerminalNode
+	MOD_ASSIGN() antlr.TerminalNode
+	AND_ASSIGN() antlr.TerminalNode
+	OR_ASSIGN() antlr.TerminalNode
+	XOR_ASSIGN() antlr.TerminalNode
 	SHL_ASSIGN() antlr.TerminalNode
 	SHR_ASSIGN() antlr.TerminalNode
 
-	// IsAssignmentOpContext differentiates from other interfaces.
-	IsAssignmentOpContext()
+	// IsAssignOpContext differentiates from other interfaces.
+	IsAssignOpContext()
 }
-    IAssignmentOpContext is an interface to support dynamic dispatch.
+    IAssignOpContext is an interface to support dynamic dispatch.
 
-type IAssignmentStmtContext interface {
+type IAssignmentStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	UnaryExpression() IUnaryExpressionContext
-	AssignmentOp() IAssignmentOpContext
+	AssignmentTarget() IAssignmentTargetContext
+	AssignOp() IAssignOpContext
 	Expression() IExpressionContext
+	INC() antlr.TerminalNode
+	DEC() antlr.TerminalNode
 
-	// IsAssignmentStmtContext differentiates from other interfaces.
-	IsAssignmentStmtContext()
+	// IsAssignmentStatementContext differentiates from other interfaces.
+	IsAssignmentStatementContext()
 }
-    IAssignmentStmtContext is an interface to support dynamic dispatch.
+    IAssignmentStatementContext is an interface to support dynamic dispatch.
+
+type IAssignmentTargetContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllExpression() []IExpressionContext
+	Expression(i int) IExpressionContext
+	DOT() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	LBRACKET() antlr.TerminalNode
+	RBRACKET() antlr.TerminalNode
+
+	// IsAssignmentTargetContext differentiates from other interfaces.
+	IsAssignmentTargetContext()
+}
+    IAssignmentTargetContext is an interface to support dynamic dispatch.
 
 type IAttributeContext interface {
 	antlr.ParserRuleContext
@@ -3686,56 +3129,33 @@ type IAttributeContext interface {
 }
     IAttributeContext is an interface to support dynamic dispatch.
 
-type IBitAndExpressionContext interface {
+type IBaseTypeContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	AllEqualityExpression() []IEqualityExpressionContext
-	EqualityExpression(i int) IEqualityExpressionContext
-	AllAMP() []antlr.TerminalNode
-	AMP(i int) antlr.TerminalNode
+	PrimitiveType() IPrimitiveTypeContext
+	VOID() antlr.TerminalNode
+	BOOL() antlr.TerminalNode
+	STRING() antlr.TerminalNode
+	BYTE() antlr.TerminalNode
+	CHAR() antlr.TerminalNode
+	QualifiedName() IQualifiedNameContext
+	GenericArgs() IGenericArgsContext
+	VECTOR() antlr.TerminalNode
+	LBRACKET() antlr.TerminalNode
+	AllTypeRef() []ITypeRefContext
+	TypeRef(i int) ITypeRefContext
+	RBRACKET() antlr.TerminalNode
+	MAP() antlr.TerminalNode
+	Expression() IExpressionContext
 
-	// IsBitAndExpressionContext differentiates from other interfaces.
-	IsBitAndExpressionContext()
+	// IsBaseTypeContext differentiates from other interfaces.
+	IsBaseTypeContext()
 }
-    IBitAndExpressionContext is an interface to support dynamic dispatch.
-
-type IBitOrExpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllBitXorExpression() []IBitXorExpressionContext
-	BitXorExpression(i int) IBitXorExpressionContext
-	AllBIT_OR() []antlr.TerminalNode
-	BIT_OR(i int) antlr.TerminalNode
-
-	// IsBitOrExpressionContext differentiates from other interfaces.
-	IsBitOrExpressionContext()
-}
-    IBitOrExpressionContext is an interface to support dynamic dispatch.
-
-type IBitXorExpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllBitAndExpression() []IBitAndExpressionContext
-	BitAndExpression(i int) IBitAndExpressionContext
-	AllBIT_XOR() []antlr.TerminalNode
-	BIT_XOR(i int) antlr.TerminalNode
-
-	// IsBitXorExpressionContext differentiates from other interfaces.
-	IsBitXorExpressionContext()
-}
-    IBitXorExpressionContext is an interface to support dynamic dispatch.
+    IBaseTypeContext is an interface to support dynamic dispatch.
 
 type IBlockContext interface {
 	antlr.ParserRuleContext
@@ -3754,7 +3174,7 @@ type IBlockContext interface {
 }
     IBlockContext is an interface to support dynamic dispatch.
 
-type IBreakStmtContext interface {
+type IBreakStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -3763,146 +3183,28 @@ type IBreakStmtContext interface {
 	// Getter signatures
 	BREAK() antlr.TerminalNode
 
-	// IsBreakStmtContext differentiates from other interfaces.
-	IsBreakStmtContext()
+	// IsBreakStatementContext differentiates from other interfaces.
+	IsBreakStatementContext()
 }
-    IBreakStmtContext is an interface to support dynamic dispatch.
+    IBreakStatementContext is an interface to support dynamic dispatch.
 
-type IBuiltinExpressionContext interface {
+type ICallingConventionContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	AT() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	LPAREN() antlr.TerminalNode
-	RPAREN() antlr.TerminalNode
-	ArgumentList() IArgumentListContext
-
-	// IsBuiltinExpressionContext differentiates from other interfaces.
-	IsBuiltinExpressionContext()
-}
-    IBuiltinExpressionContext is an interface to support dynamic dispatch.
-
-type ICCallingConventionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	STDCALL() antlr.TerminalNode
 	CDECL() antlr.TerminalNode
+	STDCALL() antlr.TerminalNode
+	THISCALL() antlr.TerminalNode
+	VECTORCALL() antlr.TerminalNode
 	FASTCALL() antlr.TerminalNode
 
-	// IsCCallingConventionContext differentiates from other interfaces.
-	IsCCallingConventionContext()
+	// IsCallingConventionContext differentiates from other interfaces.
+	IsCallingConventionContext()
 }
-    ICCallingConventionContext is an interface to support dynamic dispatch.
-
-type ICastExpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	CastTargetType() ICastTargetTypeContext
-	LPAREN() antlr.TerminalNode
-	Expression() IExpressionContext
-	RPAREN() antlr.TerminalNode
-
-	// IsCastExpressionContext differentiates from other interfaces.
-	IsCastExpressionContext()
-}
-    ICastExpressionContext is an interface to support dynamic dispatch.
-
-type ICastTargetTypeContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	PrimitiveType() IPrimitiveTypeContext
-	RAWPTR() antlr.TerminalNode
-
-	// IsCastTargetTypeContext differentiates from other interfaces.
-	IsCastTargetTypeContext()
-}
-    ICastTargetTypeContext is an interface to support dynamic dispatch.
-
-type IClassDeclContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	CLASS() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	LBRACE() antlr.TerminalNode
-	RBRACE() antlr.TerminalNode
-	GenericParams() IGenericParamsContext
-	AllClassMember() []IClassMemberContext
-	ClassMember(i int) IClassMemberContext
-
-	// IsClassDeclContext differentiates from other interfaces.
-	IsClassDeclContext()
-}
-    IClassDeclContext is an interface to support dynamic dispatch.
-
-type IClassFieldContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	IDENTIFIER() antlr.TerminalNode
-	COLON() antlr.TerminalNode
-	Type_() ITypeContext
-
-	// IsClassFieldContext differentiates from other interfaces.
-	IsClassFieldContext()
-}
-    IClassFieldContext is an interface to support dynamic dispatch.
-
-type IClassMemberContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	ClassField() IClassFieldContext
-	FunctionDecl() IFunctionDeclContext
-	DeinitDecl() IDeinitDeclContext
-
-	// IsClassMemberContext differentiates from other interfaces.
-	IsClassMemberContext()
-}
-    IClassMemberContext is an interface to support dynamic dispatch.
-
-type ICollectionTypeContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	IDENTIFIER() antlr.TerminalNode
-	LBRACKET() antlr.TerminalNode
-	AllType_() []ITypeContext
-	Type_(i int) ITypeContext
-	RBRACKET() antlr.TerminalNode
-
-	// IsCollectionTypeContext differentiates from other interfaces.
-	IsCollectionTypeContext()
-}
-    ICollectionTypeContext is an interface to support dynamic dispatch.
+    ICallingConventionContext is an interface to support dynamic dispatch.
 
 type ICompilationUnitContext interface {
 	antlr.ParserRuleContext
@@ -3911,11 +3213,9 @@ type ICompilationUnitContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
+	NamespaceDecl() INamespaceDeclContext
+	Semi() ISemiContext
 	EOF() antlr.TerminalNode
-	AllImportDecl() []IImportDeclContext
-	ImportDecl(i int) IImportDeclContext
-	AllNamespaceDecl() []INamespaceDeclContext
-	NamespaceDecl(i int) INamespaceDeclContext
 	AllTopLevelDecl() []ITopLevelDeclContext
 	TopLevelDecl(i int) ITopLevelDeclContext
 
@@ -3932,18 +3232,36 @@ type IConstDeclContext interface {
 
 	// Getter signatures
 	CONST() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	ASSIGN() antlr.TerminalNode
-	Expression() IExpressionContext
-	COLON() antlr.TerminalNode
-	Type_() ITypeContext
+	AllConstSpec() []IConstSpecContext
+	ConstSpec(i int) IConstSpecContext
+	LPAREN() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
 
 	// IsConstDeclContext differentiates from other interfaces.
 	IsConstDeclContext()
 }
     IConstDeclContext is an interface to support dynamic dispatch.
 
-type IContinueStmtContext interface {
+type IConstSpecContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	IDENTIFIER() antlr.TerminalNode
+	ASSIGN() antlr.TerminalNode
+	Expression() IExpressionContext
+	Semi() ISemiContext
+	COLON() antlr.TerminalNode
+	TypeRef() ITypeRefContext
+
+	// IsConstSpecContext differentiates from other interfaces.
+	IsConstSpecContext()
+}
+    IConstSpecContext is an interface to support dynamic dispatch.
+
+type IContinueStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -3952,47 +3270,12 @@ type IContinueStmtContext interface {
 	// Getter signatures
 	CONTINUE() antlr.TerminalNode
 
-	// IsContinueStmtContext differentiates from other interfaces.
-	IsContinueStmtContext()
+	// IsContinueStatementContext differentiates from other interfaces.
+	IsContinueStatementContext()
 }
-    IContinueStmtContext is an interface to support dynamic dispatch.
+    IContinueStatementContext is an interface to support dynamic dispatch.
 
-type ICppCallingConventionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	STDCALL() antlr.TerminalNode
-	CDECL() antlr.TerminalNode
-	FASTCALL() antlr.TerminalNode
-	VECTORCALL() antlr.TerminalNode
-	THISCALL() antlr.TerminalNode
-
-	// IsCppCallingConventionContext differentiates from other interfaces.
-	IsCppCallingConventionContext()
-}
-    ICppCallingConventionContext is an interface to support dynamic dispatch.
-
-type IDefaultCaseContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	DEFAULT() antlr.TerminalNode
-	COLON() antlr.TerminalNode
-	AllStatement() []IStatementContext
-	Statement(i int) IStatementContext
-
-	// IsDefaultCaseContext differentiates from other interfaces.
-	IsDefaultCaseContext()
-}
-    IDefaultCaseContext is an interface to support dynamic dispatch.
-
-type IDeferStmtContext interface {
+type IDeferStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4000,13 +3283,12 @@ type IDeferStmtContext interface {
 
 	// Getter signatures
 	DEFER() antlr.TerminalNode
-	AssignmentStmt() IAssignmentStmtContext
 	Expression() IExpressionContext
 
-	// IsDeferStmtContext differentiates from other interfaces.
-	IsDeferStmtContext()
+	// IsDeferStatementContext differentiates from other interfaces.
+	IsDeferStatementContext()
 }
-    IDeferStmtContext is an interface to support dynamic dispatch.
+    IDeferStatementContext is an interface to support dynamic dispatch.
 
 type IDeinitDeclContext interface {
 	antlr.ParserRuleContext
@@ -4017,10 +3299,7 @@ type IDeinitDeclContext interface {
 	// Getter signatures
 	DEINIT() antlr.TerminalNode
 	LPAREN() antlr.TerminalNode
-	SELF() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	COLON() antlr.TerminalNode
-	Type_() ITypeContext
+	SelfParam() ISelfParamContext
 	RPAREN() antlr.TerminalNode
 	Block() IBlockContext
 
@@ -4028,23 +3307,6 @@ type IDeinitDeclContext interface {
 	IsDeinitDeclContext()
 }
     IDeinitDeclContext is an interface to support dynamic dispatch.
-
-type IDeleteExpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	DELETE() antlr.TerminalNode
-	LPAREN() antlr.TerminalNode
-	Expression() IExpressionContext
-	RPAREN() antlr.TerminalNode
-
-	// IsDeleteExpressionContext differentiates from other interfaces.
-	IsDeleteExpressionContext()
-}
-    IDeleteExpressionContext is an interface to support dynamic dispatch.
 
 type IEnumDeclContext interface {
 	antlr.ParserRuleContext
@@ -4075,6 +3337,7 @@ type IEnumMemberContext interface {
 
 	// Getter signatures
 	IDENTIFIER() antlr.TerminalNode
+	Semi() ISemiContext
 	ASSIGN() antlr.TerminalNode
 	Expression() IExpressionContext
 
@@ -4083,232 +3346,48 @@ type IEnumMemberContext interface {
 }
     IEnumMemberContext is an interface to support dynamic dispatch.
 
-type IEqualityExpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllRelationalExpression() []IRelationalExpressionContext
-	RelationalExpression(i int) IRelationalExpressionContext
-	AllEQ() []antlr.TerminalNode
-	EQ(i int) antlr.TerminalNode
-	AllNE() []antlr.TerminalNode
-	NE(i int) antlr.TerminalNode
-
-	// IsEqualityExpressionContext differentiates from other interfaces.
-	IsEqualityExpressionContext()
-}
-    IEqualityExpressionContext is an interface to support dynamic dispatch.
-
-type IExecutionStrategyContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	GPU() antlr.TerminalNode
-	ASYNC() antlr.TerminalNode
-	PROCESS() antlr.TerminalNode
-
-	// IsExecutionStrategyContext differentiates from other interfaces.
-	IsExecutionStrategyContext()
-}
-    IExecutionStrategyContext is an interface to support dynamic dispatch.
-
 type IExpressionContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
-
-	// Getter signatures
-	LogicalOrExpression() ILogicalOrExpressionContext
-
 	// IsExpressionContext differentiates from other interfaces.
 	IsExpressionContext()
 }
     IExpressionContext is an interface to support dynamic dispatch.
 
-type IExpressionStmtContext interface {
+type IExpressionListContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	Expression() IExpressionContext
-
-	// IsExpressionStmtContext differentiates from other interfaces.
-	IsExpressionStmtContext()
-}
-    IExpressionStmtContext is an interface to support dynamic dispatch.
-
-type IExternCConstDeclContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	CONST() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	COLON() antlr.TerminalNode
-	ExternType() IExternTypeContext
-	ASSIGN() antlr.TerminalNode
-	Expression() IExpressionContext
-
-	// IsExternCConstDeclContext differentiates from other interfaces.
-	IsExternCConstDeclContext()
-}
-    IExternCConstDeclContext is an interface to support dynamic dispatch.
-
-type IExternCDeclContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	EXTERN() antlr.TerminalNode
-	C_LANG() antlr.TerminalNode
-	LBRACE() antlr.TerminalNode
-	RBRACE() antlr.TerminalNode
-	AllExternCMember() []IExternCMemberContext
-	ExternCMember(i int) IExternCMemberContext
-
-	// IsExternCDeclContext differentiates from other interfaces.
-	IsExternCDeclContext()
-}
-    IExternCDeclContext is an interface to support dynamic dispatch.
-
-type IExternCFunctionDeclContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	FUNC() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	LPAREN() antlr.TerminalNode
-	RPAREN() antlr.TerminalNode
-	CCallingConvention() ICCallingConventionContext
-	STRING_LITERAL() antlr.TerminalNode
-	ExternCParameterList() IExternCParameterListContext
-	ExternType() IExternTypeContext
-
-	// IsExternCFunctionDeclContext differentiates from other interfaces.
-	IsExternCFunctionDeclContext()
-}
-    IExternCFunctionDeclContext is an interface to support dynamic dispatch.
-
-type IExternCMemberContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	ExternCFunctionDecl() IExternCFunctionDeclContext
-	ExternCConstDecl() IExternCConstDeclContext
-	ExternCTypeAlias() IExternCTypeAliasContext
-	ExternCStructDecl() IExternCStructDeclContext
-
-	// IsExternCMemberContext differentiates from other interfaces.
-	IsExternCMemberContext()
-}
-    IExternCMemberContext is an interface to support dynamic dispatch.
-
-type IExternCParameterContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	ExternType() IExternTypeContext
-	IDENTIFIER() antlr.TerminalNode
-	COLON() antlr.TerminalNode
-
-	// IsExternCParameterContext differentiates from other interfaces.
-	IsExternCParameterContext()
-}
-    IExternCParameterContext is an interface to support dynamic dispatch.
-
-type IExternCParameterListContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllExternCParameter() []IExternCParameterContext
-	ExternCParameter(i int) IExternCParameterContext
+	AllExpression() []IExpressionContext
+	Expression(i int) IExpressionContext
 	AllCOMMA() []antlr.TerminalNode
 	COMMA(i int) antlr.TerminalNode
-	ELLIPSIS() antlr.TerminalNode
 
-	// IsExternCParameterListContext differentiates from other interfaces.
-	IsExternCParameterListContext()
+	// IsExpressionListContext differentiates from other interfaces.
+	IsExpressionListContext()
 }
-    IExternCParameterListContext is an interface to support dynamic dispatch.
+    IExpressionListContext is an interface to support dynamic dispatch.
 
-type IExternCStructDeclContext interface {
+type IExpressionStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	STRUCT() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	LBRACE() antlr.TerminalNode
-	RBRACE() antlr.TerminalNode
-	AllExternCStructField() []IExternCStructFieldContext
-	ExternCStructField(i int) IExternCStructFieldContext
+	Expression() IExpressionContext
 
-	// IsExternCStructDeclContext differentiates from other interfaces.
-	IsExternCStructDeclContext()
+	// IsExpressionStatementContext differentiates from other interfaces.
+	IsExpressionStatementContext()
 }
-    IExternCStructDeclContext is an interface to support dynamic dispatch.
+    IExpressionStatementContext is an interface to support dynamic dispatch.
 
-type IExternCStructFieldContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	IDENTIFIER() antlr.TerminalNode
-	COLON() antlr.TerminalNode
-	ExternType() IExternTypeContext
-
-	// IsExternCStructFieldContext differentiates from other interfaces.
-	IsExternCStructFieldContext()
-}
-    IExternCStructFieldContext is an interface to support dynamic dispatch.
-
-type IExternCTypeAliasContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	TYPE() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	ASSIGN() antlr.TerminalNode
-	ExternType() IExternTypeContext
-
-	// IsExternCTypeAliasContext differentiates from other interfaces.
-	IsExternCTypeAliasContext()
-}
-    IExternCTypeAliasContext is an interface to support dynamic dispatch.
-
-type IExternCppClassDeclContext interface {
+type IExternClassContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4320,51 +3399,34 @@ type IExternCppClassDeclContext interface {
 	LBRACE() antlr.TerminalNode
 	RBRACE() antlr.TerminalNode
 	ABSTRACT() antlr.TerminalNode
-	STRING_LITERAL() antlr.TerminalNode
-	AllExternCppClassMember() []IExternCppClassMemberContext
-	ExternCppClassMember(i int) IExternCppClassMemberContext
+	ExternSymbol() IExternSymbolContext
+	AllExternClassMember() []IExternClassMemberContext
+	ExternClassMember(i int) IExternClassMemberContext
 
-	// IsExternCppClassDeclContext differentiates from other interfaces.
-	IsExternCppClassDeclContext()
+	// IsExternClassContext differentiates from other interfaces.
+	IsExternClassContext()
 }
-    IExternCppClassDeclContext is an interface to support dynamic dispatch.
+    IExternClassContext is an interface to support dynamic dispatch.
 
-type IExternCppClassMemberContext interface {
+type IExternClassMemberContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	ExternCppConstructorDecl() IExternCppConstructorDeclContext
-	ExternCppDestructorDecl() IExternCppDestructorDeclContext
-	ExternCppMethodDecl() IExternCppMethodDeclContext
+	ExternVirtualMethod() IExternVirtualMethodContext
+	Semi() ISemiContext
+	ExternStaticMethod() IExternStaticMethodContext
+	ExternConstructor() IExternConstructorContext
+	ExternDestructor() IExternDestructorContext
 
-	// IsExternCppClassMemberContext differentiates from other interfaces.
-	IsExternCppClassMemberContext()
+	// IsExternClassMemberContext differentiates from other interfaces.
+	IsExternClassMemberContext()
 }
-    IExternCppClassMemberContext is an interface to support dynamic dispatch.
+    IExternClassMemberContext is an interface to support dynamic dispatch.
 
-type IExternCppConstDeclContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	CONST() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	COLON() antlr.TerminalNode
-	ExternType() IExternTypeContext
-	ASSIGN() antlr.TerminalNode
-	Expression() IExpressionContext
-
-	// IsExternCppConstDeclContext differentiates from other interfaces.
-	IsExternCppConstDeclContext()
-}
-    IExternCppConstDeclContext is an interface to support dynamic dispatch.
-
-type IExternCppConstructorDeclContext interface {
+type IExternConstructorContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4375,15 +3437,14 @@ type IExternCppConstructorDeclContext interface {
 	LPAREN() antlr.TerminalNode
 	RPAREN() antlr.TerminalNode
 	ExternType() IExternTypeContext
-	ExternCppParameterList() IExternCppParameterListContext
+	ExternParamList() IExternParamListContext
 
-	// IsExternCppConstructorDeclContext differentiates from other interfaces.
-	IsExternCppConstructorDeclContext()
+	// IsExternConstructorContext differentiates from other interfaces.
+	IsExternConstructorContext()
 }
-    IExternCppConstructorDeclContext is an interface to support dynamic
-    dispatch.
+    IExternConstructorContext is an interface to support dynamic dispatch.
 
-type IExternCppDeclContext interface {
+type IExternDeclContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4391,18 +3452,18 @@ type IExternCppDeclContext interface {
 
 	// Getter signatures
 	EXTERN() antlr.TerminalNode
-	CPP_LANG() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
 	LBRACE() antlr.TerminalNode
 	RBRACE() antlr.TerminalNode
-	AllExternCppMember() []IExternCppMemberContext
-	ExternCppMember(i int) IExternCppMemberContext
+	AllExternMember() []IExternMemberContext
+	ExternMember(i int) IExternMemberContext
 
-	// IsExternCppDeclContext differentiates from other interfaces.
-	IsExternCppDeclContext()
+	// IsExternDeclContext differentiates from other interfaces.
+	IsExternDeclContext()
 }
-    IExternCppDeclContext is an interface to support dynamic dispatch.
+    IExternDeclContext is an interface to support dynamic dispatch.
 
-type IExternCppDestructorDeclContext interface {
+type IExternDestructorContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4411,16 +3472,16 @@ type IExternCppDestructorDeclContext interface {
 	// Getter signatures
 	DELETE() antlr.TerminalNode
 	LPAREN() antlr.TerminalNode
-	ExternCppSelfParam() IExternCppSelfParamContext
+	ExternMethodParam() IExternMethodParamContext
 	RPAREN() antlr.TerminalNode
-	ExternType() IExternTypeContext
+	VOID() antlr.TerminalNode
 
-	// IsExternCppDestructorDeclContext differentiates from other interfaces.
-	IsExternCppDestructorDeclContext()
+	// IsExternDestructorContext differentiates from other interfaces.
+	IsExternDestructorContext()
 }
-    IExternCppDestructorDeclContext is an interface to support dynamic dispatch.
+    IExternDestructorContext is an interface to support dynamic dispatch.
 
-type IExternCppFunctionDeclContext interface {
+type IExternFuncDeclContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4431,35 +3492,17 @@ type IExternCppFunctionDeclContext interface {
 	IDENTIFIER() antlr.TerminalNode
 	LPAREN() antlr.TerminalNode
 	RPAREN() antlr.TerminalNode
-	CppCallingConvention() ICppCallingConventionContext
-	STRING_LITERAL() antlr.TerminalNode
-	ExternCppParameterList() IExternCppParameterListContext
-	ExternType() IExternTypeContext
+	CallingConvention() ICallingConventionContext
+	ExternSymbol() IExternSymbolContext
+	ExternParamList() IExternParamListContext
+	ExternReturnType() IExternReturnTypeContext
 
-	// IsExternCppFunctionDeclContext differentiates from other interfaces.
-	IsExternCppFunctionDeclContext()
+	// IsExternFuncDeclContext differentiates from other interfaces.
+	IsExternFuncDeclContext()
 }
-    IExternCppFunctionDeclContext is an interface to support dynamic dispatch.
+    IExternFuncDeclContext is an interface to support dynamic dispatch.
 
-type IExternCppMemberContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	ExternCppNamespaceDecl() IExternCppNamespaceDeclContext
-	ExternCppFunctionDecl() IExternCppFunctionDeclContext
-	ExternCppConstDecl() IExternCppConstDeclContext
-	ExternCppTypeAlias() IExternCppTypeAliasContext
-	ExternCppClassDecl() IExternCppClassDeclContext
-
-	// IsExternCppMemberContext differentiates from other interfaces.
-	IsExternCppMemberContext()
-}
-    IExternCppMemberContext is an interface to support dynamic dispatch.
-
-type IExternCppMethodDeclContext interface {
+type IExternFunctionPtrTypeContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4467,112 +3510,35 @@ type IExternCppMethodDeclContext interface {
 
 	// Getter signatures
 	FUNC() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
 	LPAREN() antlr.TerminalNode
-	ExternCppMethodParams() IExternCppMethodParamsContext
 	RPAREN() antlr.TerminalNode
-	CppCallingConvention() ICppCallingConventionContext
-	VIRTUAL() antlr.TerminalNode
-	STATIC() antlr.TerminalNode
-	STRING_LITERAL() antlr.TerminalNode
-	CONST() antlr.TerminalNode
-	ExternType() IExternTypeContext
+	ExternParamList() IExternParamListContext
+	ExternReturnType() IExternReturnTypeContext
 
-	// IsExternCppMethodDeclContext differentiates from other interfaces.
-	IsExternCppMethodDeclContext()
+	// IsExternFunctionPtrTypeContext differentiates from other interfaces.
+	IsExternFunctionPtrTypeContext()
 }
-    IExternCppMethodDeclContext is an interface to support dynamic dispatch.
+    IExternFunctionPtrTypeContext is an interface to support dynamic dispatch.
 
-type IExternCppMethodParamsContext interface {
+type IExternMemberContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	ExternCppSelfParam() IExternCppSelfParamContext
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
-	AllExternCppParameter() []IExternCppParameterContext
-	ExternCppParameter(i int) IExternCppParameterContext
-	ExternCppParameterList() IExternCppParameterListContext
+	ExternFuncDecl() IExternFuncDeclContext
+	Semi() ISemiContext
+	ExternTypeAlias() IExternTypeAliasContext
+	ExternNamespace() IExternNamespaceContext
+	ExternClass() IExternClassContext
 
-	// IsExternCppMethodParamsContext differentiates from other interfaces.
-	IsExternCppMethodParamsContext()
+	// IsExternMemberContext differentiates from other interfaces.
+	IsExternMemberContext()
 }
-    IExternCppMethodParamsContext is an interface to support dynamic dispatch.
+    IExternMemberContext is an interface to support dynamic dispatch.
 
-type IExternCppNamespaceDeclContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	NAMESPACE() antlr.TerminalNode
-	ExternNamespacePath() IExternNamespacePathContext
-	LBRACE() antlr.TerminalNode
-	RBRACE() antlr.TerminalNode
-	AllExternCppMember() []IExternCppMemberContext
-	ExternCppMember(i int) IExternCppMemberContext
-
-	// IsExternCppNamespaceDeclContext differentiates from other interfaces.
-	IsExternCppNamespaceDeclContext()
-}
-    IExternCppNamespaceDeclContext is an interface to support dynamic dispatch.
-
-type IExternCppParamTypeContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	STAR() antlr.TerminalNode
-	ExternType() IExternTypeContext
-	CONST() antlr.TerminalNode
-	AMP() antlr.TerminalNode
-
-	// IsExternCppParamTypeContext differentiates from other interfaces.
-	IsExternCppParamTypeContext()
-}
-    IExternCppParamTypeContext is an interface to support dynamic dispatch.
-
-type IExternCppParameterContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	ExternCppParamType() IExternCppParamTypeContext
-	IDENTIFIER() antlr.TerminalNode
-	COLON() antlr.TerminalNode
-
-	// IsExternCppParameterContext differentiates from other interfaces.
-	IsExternCppParameterContext()
-}
-    IExternCppParameterContext is an interface to support dynamic dispatch.
-
-type IExternCppParameterListContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllExternCppParameter() []IExternCppParameterContext
-	ExternCppParameter(i int) IExternCppParameterContext
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
-	ELLIPSIS() antlr.TerminalNode
-
-	// IsExternCppParameterListContext differentiates from other interfaces.
-	IsExternCppParameterListContext()
-}
-    IExternCppParameterListContext is an interface to support dynamic dispatch.
-
-type IExternCppSelfParamContext interface {
+type IExternMethodParamContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4580,16 +3546,134 @@ type IExternCppSelfParamContext interface {
 
 	// Getter signatures
 	SELF() antlr.TerminalNode
-	STAR() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
+	ExternType() IExternTypeContext
+
+	// IsExternMethodParamContext differentiates from other interfaces.
+	IsExternMethodParamContext()
+}
+    IExternMethodParamContext is an interface to support dynamic dispatch.
+
+type IExternMethodParamListContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	ExternMethodParam() IExternMethodParamContext
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
+	AllExternParam() []IExternParamContext
+	ExternParam(i int) IExternParamContext
+	ELLIPSIS() antlr.TerminalNode
+
+	// IsExternMethodParamListContext differentiates from other interfaces.
+	IsExternMethodParamListContext()
+}
+    IExternMethodParamListContext is an interface to support dynamic dispatch.
+
+type IExternNamespaceContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	NAMESPACE() antlr.TerminalNode
+	QualifiedName() IQualifiedNameContext
+	LBRACE() antlr.TerminalNode
+	RBRACE() antlr.TerminalNode
+	AllExternMember() []IExternMemberContext
+	ExternMember(i int) IExternMemberContext
+
+	// IsExternNamespaceContext differentiates from other interfaces.
+	IsExternNamespaceContext()
+}
+    IExternNamespaceContext is an interface to support dynamic dispatch.
+
+type IExternParamContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	ExternType() IExternTypeContext
+
+	// IsExternParamContext differentiates from other interfaces.
+	IsExternParamContext()
+}
+    IExternParamContext is an interface to support dynamic dispatch.
+
+type IExternParamListContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllExternParam() []IExternParamContext
+	ExternParam(i int) IExternParamContext
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
+	ELLIPSIS() antlr.TerminalNode
+
+	// IsExternParamListContext differentiates from other interfaces.
+	IsExternParamListContext()
+}
+    IExternParamListContext is an interface to support dynamic dispatch.
+
+type IExternReturnTypeContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	ExternType() IExternTypeContext
 	CONST() antlr.TerminalNode
 
-	// IsExternCppSelfParamContext differentiates from other interfaces.
-	IsExternCppSelfParamContext()
+	// IsExternReturnTypeContext differentiates from other interfaces.
+	IsExternReturnTypeContext()
 }
-    IExternCppSelfParamContext is an interface to support dynamic dispatch.
+    IExternReturnTypeContext is an interface to support dynamic dispatch.
 
-type IExternCppTypeAliasContext interface {
+type IExternStaticMethodContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	STATIC() antlr.TerminalNode
+	FUNC() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	LPAREN() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
+	ExternSymbol() IExternSymbolContext
+	ExternParamList() IExternParamListContext
+	ExternReturnType() IExternReturnTypeContext
+
+	// IsExternStaticMethodContext differentiates from other interfaces.
+	IsExternStaticMethodContext()
+}
+    IExternStaticMethodContext is an interface to support dynamic dispatch.
+
+type IExternSymbolContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	STRING_LIT() antlr.TerminalNode
+
+	// IsExternSymbolContext differentiates from other interfaces.
+	IsExternSymbolContext()
+}
+    IExternSymbolContext is an interface to support dynamic dispatch.
+
+type IExternTypeAliasContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4599,94 +3683,12 @@ type IExternCppTypeAliasContext interface {
 	TYPE() antlr.TerminalNode
 	IDENTIFIER() antlr.TerminalNode
 	ASSIGN() antlr.TerminalNode
-	ExternType() IExternTypeContext
+	ExternFunctionPtrType() IExternFunctionPtrTypeContext
 
-	// IsExternCppTypeAliasContext differentiates from other interfaces.
-	IsExternCppTypeAliasContext()
+	// IsExternTypeAliasContext differentiates from other interfaces.
+	IsExternTypeAliasContext()
 }
-    IExternCppTypeAliasContext is an interface to support dynamic dispatch.
-
-type IExternFunctionTypeContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	FUNC() antlr.TerminalNode
-	LPAREN() antlr.TerminalNode
-	RPAREN() antlr.TerminalNode
-	ExternTypeList() IExternTypeListContext
-	ExternType() IExternTypeContext
-
-	// IsExternFunctionTypeContext differentiates from other interfaces.
-	IsExternFunctionTypeContext()
-}
-    IExternFunctionTypeContext is an interface to support dynamic dispatch.
-
-type IExternNamespacePathContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllIDENTIFIER() []antlr.TerminalNode
-	IDENTIFIER(i int) antlr.TerminalNode
-	AllDOT() []antlr.TerminalNode
-	DOT(i int) antlr.TerminalNode
-
-	// IsExternNamespacePathContext differentiates from other interfaces.
-	IsExternNamespacePathContext()
-}
-    IExternNamespacePathContext is an interface to support dynamic dispatch.
-
-type IExternPointerTypeContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	STAR() antlr.TerminalNode
-	ExternType() IExternTypeContext
-	CONST() antlr.TerminalNode
-	AMP() antlr.TerminalNode
-
-	// IsExternPointerTypeContext differentiates from other interfaces.
-	IsExternPointerTypeContext()
-}
-    IExternPointerTypeContext is an interface to support dynamic dispatch.
-
-type IExternPrimitiveTypeContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	INT8() antlr.TerminalNode
-	INT16() antlr.TerminalNode
-	INT32() antlr.TerminalNode
-	INT64() antlr.TerminalNode
-	UINT8() antlr.TerminalNode
-	UINT16() antlr.TerminalNode
-	UINT32() antlr.TerminalNode
-	UINT64() antlr.TerminalNode
-	USIZE() antlr.TerminalNode
-	ISIZE() antlr.TerminalNode
-	FLOAT32() antlr.TerminalNode
-	FLOAT64() antlr.TerminalNode
-	BYTE() antlr.TerminalNode
-	BOOL() antlr.TerminalNode
-	CHAR() antlr.TerminalNode
-	STRING() antlr.TerminalNode
-	VOID() antlr.TerminalNode
-
-	// IsExternPrimitiveTypeContext differentiates from other interfaces.
-	IsExternPrimitiveTypeContext()
-}
-    IExternPrimitiveTypeContext is an interface to support dynamic dispatch.
+    IExternTypeAliasContext is an interface to support dynamic dispatch.
 
 type IExternTypeContext interface {
 	antlr.ParserRuleContext
@@ -4695,35 +3697,49 @@ type IExternTypeContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	ExternPointerType() IExternPointerTypeContext
-	ExternPrimitiveType() IExternPrimitiveTypeContext
-	ExternFunctionType() IExternFunctionTypeContext
-	AllIDENTIFIER() []antlr.TerminalNode
-	IDENTIFIER(i int) antlr.TerminalNode
-	AllDOT() []antlr.TerminalNode
-	DOT(i int) antlr.TerminalNode
+	AllSTAR() []antlr.TerminalNode
+	STAR(i int) antlr.TerminalNode
+	ExternType() IExternTypeContext
+	CONST() antlr.TerminalNode
+	AMP() antlr.TerminalNode
+	PrimitiveType() IPrimitiveTypeContext
+	VOID() antlr.TerminalNode
+	BOOL() antlr.TerminalNode
+	STRING() antlr.TerminalNode
+	BYTE() antlr.TerminalNode
+	CHAR() antlr.TerminalNode
+	USIZE() antlr.TerminalNode
+	ISIZE() antlr.TerminalNode
+	QualifiedName() IQualifiedNameContext
+	LBRACKET() antlr.TerminalNode
+	Expression() IExpressionContext
+	RBRACKET() antlr.TerminalNode
 
 	// IsExternTypeContext differentiates from other interfaces.
 	IsExternTypeContext()
 }
     IExternTypeContext is an interface to support dynamic dispatch.
 
-type IExternTypeListContext interface {
+type IExternVirtualMethodContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	AllExternType() []IExternTypeContext
-	ExternType(i int) IExternTypeContext
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
+	VIRTUAL() antlr.TerminalNode
+	FUNC() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	LPAREN() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
+	CallingConvention() ICallingConventionContext
+	ExternMethodParamList() IExternMethodParamListContext
+	ExternReturnType() IExternReturnTypeContext
 
-	// IsExternTypeListContext differentiates from other interfaces.
-	IsExternTypeListContext()
+	// IsExternVirtualMethodContext differentiates from other interfaces.
+	IsExternVirtualMethodContext()
 }
-    IExternTypeListContext is an interface to support dynamic dispatch.
+    IExternVirtualMethodContext is an interface to support dynamic dispatch.
 
 type IFieldInitContext interface {
 	antlr.ParserRuleContext
@@ -4741,7 +3757,81 @@ type IFieldInitContext interface {
 }
     IFieldInitContext is an interface to support dynamic dispatch.
 
-type IForStmtContext interface {
+type IForHeaderContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	ForInit() IForInitContext
+	AllSEMI() []antlr.TerminalNode
+	SEMI(i int) antlr.TerminalNode
+	Expression() IExpressionContext
+	ForPost() IForPostContext
+	ForIterator() IForIteratorContext
+
+	// IsForHeaderContext differentiates from other interfaces.
+	IsForHeaderContext()
+}
+    IForHeaderContext is an interface to support dynamic dispatch.
+
+type IForInitContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	LET() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	ASSIGN() antlr.TerminalNode
+	Expression() IExpressionContext
+	COLON() antlr.TerminalNode
+	TypeRef() ITypeRefContext
+
+	// IsForInitContext differentiates from other interfaces.
+	IsForInitContext()
+}
+    IForInitContext is an interface to support dynamic dispatch.
+
+type IForIteratorContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllIDENTIFIER() []antlr.TerminalNode
+	IDENTIFIER(i int) antlr.TerminalNode
+	IN() antlr.TerminalNode
+	Expression() IExpressionContext
+	COMMA() antlr.TerminalNode
+
+	// IsForIteratorContext differentiates from other interfaces.
+	IsForIteratorContext()
+}
+    IForIteratorContext is an interface to support dynamic dispatch.
+
+type IForPostContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	Expression() IExpressionContext
+	AssignmentTarget() IAssignmentTargetContext
+	AssignOp() IAssignOpContext
+	INC() antlr.TerminalNode
+	DEC() antlr.TerminalNode
+
+	// IsForPostContext differentiates from other interfaces.
+	IsForPostContext()
+}
+    IForPostContext is an interface to support dynamic dispatch.
+
+type IForStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4749,25 +3839,15 @@ type IForStmtContext interface {
 
 	// Getter signatures
 	FOR() antlr.TerminalNode
+	ForHeader() IForHeaderContext
 	Block() IBlockContext
-	AllExpression() []IExpressionContext
-	Expression(i int) IExpressionContext
-	AllSEMICOLON() []antlr.TerminalNode
-	SEMICOLON(i int) antlr.TerminalNode
-	VariableDecl() IVariableDeclContext
-	AllAssignmentStmt() []IAssignmentStmtContext
-	AssignmentStmt(i int) IAssignmentStmtContext
-	AllIDENTIFIER() []antlr.TerminalNode
-	IDENTIFIER(i int) antlr.TerminalNode
-	IN() antlr.TerminalNode
-	COMMA() antlr.TerminalNode
 
-	// IsForStmtContext differentiates from other interfaces.
-	IsForStmtContext()
+	// IsForStatementContext differentiates from other interfaces.
+	IsForStatementContext()
 }
-    IForStmtContext is an interface to support dynamic dispatch.
+    IForStatementContext is an interface to support dynamic dispatch.
 
-type IFunctionDeclContext interface {
+type IFuncDeclContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4779,15 +3859,31 @@ type IFunctionDeclContext interface {
 	LPAREN() antlr.TerminalNode
 	RPAREN() antlr.TerminalNode
 	Block() IBlockContext
-	ExecutionStrategy() IExecutionStrategyContext
+	AllFuncModifier() []IFuncModifierContext
+	FuncModifier(i int) IFuncModifierContext
 	GenericParams() IGenericParamsContext
-	ParameterList() IParameterListContext
+	ParamList() IParamListContext
 	ReturnType() IReturnTypeContext
 
-	// IsFunctionDeclContext differentiates from other interfaces.
-	IsFunctionDeclContext()
+	// IsFuncDeclContext differentiates from other interfaces.
+	IsFuncDeclContext()
 }
-    IFunctionDeclContext is an interface to support dynamic dispatch.
+    IFuncDeclContext is an interface to support dynamic dispatch.
+
+type IFuncModifierContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	ASYNC() antlr.TerminalNode
+	GPU() antlr.TerminalNode
+
+	// IsFuncModifierContext differentiates from other interfaces.
+	IsFuncModifierContext()
+}
+    IFuncModifierContext is an interface to support dynamic dispatch.
 
 type IFunctionTypeContext interface {
 	antlr.ParserRuleContext
@@ -4799,46 +3895,14 @@ type IFunctionTypeContext interface {
 	FUNC() antlr.TerminalNode
 	LPAREN() antlr.TerminalNode
 	RPAREN() antlr.TerminalNode
-	ExecutionStrategy() IExecutionStrategyContext
-	GenericParams() IGenericParamsContext
+	ASYNC() antlr.TerminalNode
 	TypeList() ITypeListContext
-	ReturnType() IReturnTypeContext
+	TypeRef() ITypeRefContext
 
 	// IsFunctionTypeContext differentiates from other interfaces.
 	IsFunctionTypeContext()
 }
     IFunctionTypeContext is an interface to support dynamic dispatch.
-
-type IGenericArgContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	Type_() ITypeContext
-
-	// IsGenericArgContext differentiates from other interfaces.
-	IsGenericArgContext()
-}
-    IGenericArgContext is an interface to support dynamic dispatch.
-
-type IGenericArgListContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllGenericArg() []IGenericArgContext
-	GenericArg(i int) IGenericArgContext
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
-
-	// IsGenericArgListContext differentiates from other interfaces.
-	IsGenericArgListContext()
-}
-    IGenericArgListContext is an interface to support dynamic dispatch.
 
 type IGenericArgsContext interface {
 	antlr.ParserRuleContext
@@ -4847,48 +3911,17 @@ type IGenericArgsContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	LT() antlr.TerminalNode
-	GenericArgList() IGenericArgListContext
-	GT() antlr.TerminalNode
+	LBRACKET() antlr.TerminalNode
+	AllTypeRef() []ITypeRefContext
+	TypeRef(i int) ITypeRefContext
+	RBRACKET() antlr.TerminalNode
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
 
 	// IsGenericArgsContext differentiates from other interfaces.
 	IsGenericArgsContext()
 }
     IGenericArgsContext is an interface to support dynamic dispatch.
-
-type IGenericParamContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllIDENTIFIER() []antlr.TerminalNode
-	IDENTIFIER(i int) antlr.TerminalNode
-	AllDOT() []antlr.TerminalNode
-	DOT(i int) antlr.TerminalNode
-
-	// IsGenericParamContext differentiates from other interfaces.
-	IsGenericParamContext()
-}
-    IGenericParamContext is an interface to support dynamic dispatch.
-
-type IGenericParamListContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllGenericParam() []IGenericParamContext
-	GenericParam(i int) IGenericParamContext
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
-
-	// IsGenericParamListContext differentiates from other interfaces.
-	IsGenericParamListContext()
-}
-    IGenericParamListContext is an interface to support dynamic dispatch.
 
 type IGenericParamsContext interface {
 	antlr.ParserRuleContext
@@ -4897,16 +3930,19 @@ type IGenericParamsContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	LT() antlr.TerminalNode
-	GenericParamList() IGenericParamListContext
-	GT() antlr.TerminalNode
+	LBRACKET() antlr.TerminalNode
+	AllIDENTIFIER() []antlr.TerminalNode
+	IDENTIFIER(i int) antlr.TerminalNode
+	RBRACKET() antlr.TerminalNode
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
 
 	// IsGenericParamsContext differentiates from other interfaces.
 	IsGenericParamsContext()
 }
     IGenericParamsContext is an interface to support dynamic dispatch.
 
-type IIfStmtContext interface {
+type IIfStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4922,10 +3958,26 @@ type IIfStmtContext interface {
 	AllELSE() []antlr.TerminalNode
 	ELSE(i int) antlr.TerminalNode
 
-	// IsIfStmtContext differentiates from other interfaces.
-	IsIfStmtContext()
+	// IsIfStatementContext differentiates from other interfaces.
+	IsIfStatementContext()
 }
-    IIfStmtContext is an interface to support dynamic dispatch.
+    IIfStatementContext is an interface to support dynamic dispatch.
+
+type IImportAliasContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	IDENTIFIER() antlr.TerminalNode
+	UNDERSCORE() antlr.TerminalNode
+	DOT() antlr.TerminalNode
+
+	// IsImportAliasContext differentiates from other interfaces.
+	IsImportAliasContext()
+}
+    IImportAliasContext is an interface to support dynamic dispatch.
 
 type IImportDeclContext interface {
 	antlr.ParserRuleContext
@@ -4935,12 +3987,10 @@ type IImportDeclContext interface {
 
 	// Getter signatures
 	IMPORT() antlr.TerminalNode
-	STRING_LITERAL() antlr.TerminalNode
-	LPAREN() antlr.TerminalNode
-	RPAREN() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
 	AllImportSpec() []IImportSpecContext
 	ImportSpec(i int) IImportSpecContext
+	LPAREN() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
 
 	// IsImportDeclContext differentiates from other interfaces.
 	IsImportDeclContext()
@@ -4954,30 +4004,16 @@ type IImportSpecContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	STRING_LITERAL() antlr.TerminalNode
+	STRING_LIT() antlr.TerminalNode
+	Semi() ISemiContext
+	ImportAlias() IImportAliasContext
 
 	// IsImportSpecContext differentiates from other interfaces.
 	IsImportSpecContext()
 }
     IImportSpecContext is an interface to support dynamic dispatch.
 
-type IInitializerEntryContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllExpression() []IExpressionContext
-	Expression(i int) IExpressionContext
-	COLON() antlr.TerminalNode
-
-	// IsInitializerEntryContext differentiates from other interfaces.
-	IsInitializerEntryContext()
-}
-    IInitializerEntryContext is an interface to support dynamic dispatch.
-
-type IInitializerListContext interface {
+type IInitializerBlockContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -4986,37 +4022,56 @@ type IInitializerListContext interface {
 	// Getter signatures
 	LBRACE() antlr.TerminalNode
 	RBRACE() antlr.TerminalNode
-	AllExpression() []IExpressionContext
-	Expression(i int) IExpressionContext
+	AllFieldInit() []IFieldInitContext
+	FieldInit(i int) IFieldInitContext
 	AllCOMMA() []antlr.TerminalNode
 	COMMA(i int) antlr.TerminalNode
-	AllInitializerEntry() []IInitializerEntryContext
-	InitializerEntry(i int) IInitializerEntryContext
+	AllExpression() []IExpressionContext
+	Expression(i int) IExpressionContext
+	AllMapEntry() []IMapEntryContext
+	MapEntry(i int) IMapEntryContext
 
-	// IsInitializerListContext differentiates from other interfaces.
-	IsInitializerListContext()
+	// IsInitializerBlockContext differentiates from other interfaces.
+	IsInitializerBlockContext()
 }
-    IInitializerListContext is an interface to support dynamic dispatch.
+    IInitializerBlockContext is an interface to support dynamic dispatch.
 
-type ILambdaExpressionContext interface {
+type IInterfaceDeclContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	LPAREN() antlr.TerminalNode
-	RPAREN() antlr.TerminalNode
-	FAT_ARROW() antlr.TerminalNode
-	Block() IBlockContext
-	ExecutionStrategy() IExecutionStrategyContext
-	LambdaParamList() ILambdaParamListContext
-	Expression() IExpressionContext
+	INTERFACE() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	LBRACE() antlr.TerminalNode
+	RBRACE() antlr.TerminalNode
+	GenericParams() IGenericParamsContext
+	AllInterfaceField() []IInterfaceFieldContext
+	InterfaceField(i int) IInterfaceFieldContext
 
-	// IsLambdaExpressionContext differentiates from other interfaces.
-	IsLambdaExpressionContext()
+	// IsInterfaceDeclContext differentiates from other interfaces.
+	IsInterfaceDeclContext()
 }
-    ILambdaExpressionContext is an interface to support dynamic dispatch.
+    IInterfaceDeclContext is an interface to support dynamic dispatch.
+
+type IInterfaceFieldContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	IDENTIFIER() antlr.TerminalNode
+	COLON() antlr.TerminalNode
+	TypeRef() ITypeRefContext
+	Semi() ISemiContext
+
+	// IsInterfaceFieldContext differentiates from other interfaces.
+	IsInterfaceFieldContext()
+}
+    IInterfaceFieldContext is an interface to support dynamic dispatch.
 
 type ILambdaParamContext interface {
 	antlr.ParserRuleContext
@@ -5027,7 +4082,7 @@ type ILambdaParamContext interface {
 	// Getter signatures
 	IDENTIFIER() antlr.TerminalNode
 	COLON() antlr.TerminalNode
-	Type_() ITypeContext
+	TypeRef() ITypeRefContext
 
 	// IsLambdaParamContext differentiates from other interfaces.
 	IsLambdaParamContext()
@@ -5051,110 +4106,45 @@ type ILambdaParamListContext interface {
 }
     ILambdaParamListContext is an interface to support dynamic dispatch.
 
-type ILiteralContext interface {
+type ILetStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	INTEGER_LITERAL() antlr.TerminalNode
-	FLOAT_LITERAL() antlr.TerminalNode
-	STRING_LITERAL() antlr.TerminalNode
-	CHAR_LITERAL() antlr.TerminalNode
-	BOOLEAN_LITERAL() antlr.TerminalNode
-	NULL() antlr.TerminalNode
-	InitializerList() IInitializerListContext
-
-	// IsLiteralContext differentiates from other interfaces.
-	IsLiteralContext()
-}
-    ILiteralContext is an interface to support dynamic dispatch.
-
-type ILogicalAndExpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllBitOrExpression() []IBitOrExpressionContext
-	BitOrExpression(i int) IBitOrExpressionContext
-	AllAND() []antlr.TerminalNode
-	AND(i int) antlr.TerminalNode
-
-	// IsLogicalAndExpressionContext differentiates from other interfaces.
-	IsLogicalAndExpressionContext()
-}
-    ILogicalAndExpressionContext is an interface to support dynamic dispatch.
-
-type ILogicalOrExpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllLogicalAndExpression() []ILogicalAndExpressionContext
-	LogicalAndExpression(i int) ILogicalAndExpressionContext
-	AllOR() []antlr.TerminalNode
-	OR(i int) antlr.TerminalNode
-
-	// IsLogicalOrExpressionContext differentiates from other interfaces.
-	IsLogicalOrExpressionContext()
-}
-    ILogicalOrExpressionContext is an interface to support dynamic dispatch.
-
-type IMethodDeclContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	FUNC() antlr.TerminalNode
+	LET() antlr.TerminalNode
+	LPAREN() antlr.TerminalNode
 	AllIDENTIFIER() []antlr.TerminalNode
 	IDENTIFIER(i int) antlr.TerminalNode
-	LPAREN() antlr.TerminalNode
-	SELF() antlr.TerminalNode
-	COLON() antlr.TerminalNode
-	Type_() ITypeContext
 	RPAREN() antlr.TerminalNode
-	Block() IBlockContext
-	ExecutionStrategy() IExecutionStrategyContext
-	GenericParams() IGenericParamsContext
+	ASSIGN() antlr.TerminalNode
+	Expression() IExpressionContext
 	AllCOMMA() []antlr.TerminalNode
 	COMMA(i int) antlr.TerminalNode
-	AllParameter() []IParameterContext
-	Parameter(i int) IParameterContext
-	ReturnType() IReturnTypeContext
+	COLON() antlr.TerminalNode
+	TypeRef() ITypeRefContext
 
-	// IsMethodDeclContext differentiates from other interfaces.
-	IsMethodDeclContext()
+	// IsLetStatementContext differentiates from other interfaces.
+	IsLetStatementContext()
 }
-    IMethodDeclContext is an interface to support dynamic dispatch.
+    ILetStatementContext is an interface to support dynamic dispatch.
 
-type IMultiplicativeExpressionContext interface {
+type IMapEntryContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	AllUnaryExpression() []IUnaryExpressionContext
-	UnaryExpression(i int) IUnaryExpressionContext
-	AllSTAR() []antlr.TerminalNode
-	STAR(i int) antlr.TerminalNode
-	AllSLASH() []antlr.TerminalNode
-	SLASH(i int) antlr.TerminalNode
-	AllPERCENT() []antlr.TerminalNode
-	PERCENT(i int) antlr.TerminalNode
+	AllExpression() []IExpressionContext
+	Expression(i int) IExpressionContext
+	COLON() antlr.TerminalNode
 
-	// IsMultiplicativeExpressionContext differentiates from other interfaces.
-	IsMultiplicativeExpressionContext()
+	// IsMapEntryContext differentiates from other interfaces.
+	IsMapEntryContext()
 }
-    IMultiplicativeExpressionContext is an interface to support dynamic
-    dispatch.
+    IMapEntryContext is an interface to support dynamic dispatch.
 
 type INamespaceDeclContext interface {
 	antlr.ParserRuleContext
@@ -5164,144 +4154,73 @@ type INamespaceDeclContext interface {
 
 	// Getter signatures
 	NAMESPACE() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
+	QualifiedName() IQualifiedNameContext
 
 	// IsNamespaceDeclContext differentiates from other interfaces.
 	IsNamespaceDeclContext()
 }
     INamespaceDeclContext is an interface to support dynamic dispatch.
 
-type INewExpressionContext interface {
+type IParamContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	NEW() antlr.TerminalNode
-	LBRACE() antlr.TerminalNode
-	RBRACE() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	QualifiedIdentifier() IQualifiedIdentifierContext
-	GenericArgs() IGenericArgsContext
-	AllFieldInit() []IFieldInitContext
-	FieldInit(i int) IFieldInitContext
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
-	LBRACKET() antlr.TerminalNode
-	Expression() IExpressionContext
-	RBRACKET() antlr.TerminalNode
-	Type_() ITypeContext
-
-	// IsNewExpressionContext differentiates from other interfaces.
-	IsNewExpressionContext()
-}
-    INewExpressionContext is an interface to support dynamic dispatch.
-
-type IParameterContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
+	SelfParam() ISelfParamContext
 	IDENTIFIER() antlr.TerminalNode
 	COLON() antlr.TerminalNode
-	Type_() ITypeContext
-	SELF() antlr.TerminalNode
-
-	// IsParameterContext differentiates from other interfaces.
-	IsParameterContext()
-}
-    IParameterContext is an interface to support dynamic dispatch.
-
-type IParameterListContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllParameter() []IParameterContext
-	Parameter(i int) IParameterContext
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
+	ParamType() IParamTypeContext
 	ELLIPSIS() antlr.TerminalNode
 
-	// IsParameterListContext differentiates from other interfaces.
-	IsParameterListContext()
+	// IsParamContext differentiates from other interfaces.
+	IsParamContext()
 }
-    IParameterListContext is an interface to support dynamic dispatch.
+    IParamContext is an interface to support dynamic dispatch.
 
-type IPostfixExpressionContext interface {
+type IParamListContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	PrimaryExpression() IPrimaryExpressionContext
-	AllPostfixOp() []IPostfixOpContext
-	PostfixOp(i int) IPostfixOpContext
+	AllParam() []IParamContext
+	Param(i int) IParamContext
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
 
-	// IsPostfixExpressionContext differentiates from other interfaces.
-	IsPostfixExpressionContext()
+	// IsParamListContext differentiates from other interfaces.
+	IsParamListContext()
 }
-    IPostfixExpressionContext is an interface to support dynamic dispatch.
+    IParamListContext is an interface to support dynamic dispatch.
 
-type IPostfixOpContext interface {
+type IParamTypeContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	DOT() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	LPAREN() antlr.TerminalNode
-	RPAREN() antlr.TerminalNode
-	ArgumentList() IArgumentListContext
-	LBRACKET() antlr.TerminalNode
-	AllExpression() []IExpressionContext
-	Expression(i int) IExpressionContext
-	RBRACKET() antlr.TerminalNode
-	RANGE() antlr.TerminalNode
-	INCREMENT() antlr.TerminalNode
-	DECREMENT() antlr.TerminalNode
+	AMP() antlr.TerminalNode
+	MUT() antlr.TerminalNode
+	TypeRef() ITypeRefContext
 
-	// IsPostfixOpContext differentiates from other interfaces.
-	IsPostfixOpContext()
+	// IsParamTypeContext differentiates from other interfaces.
+	IsParamTypeContext()
 }
-    IPostfixOpContext is an interface to support dynamic dispatch.
+    IParamTypeContext is an interface to support dynamic dispatch.
 
-type IPrimaryExpressionContext interface {
+type IPrimaryContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
-
-	// Getter signatures
-	NewExpression() INewExpressionContext
-	DeleteExpression() IDeleteExpressionContext
-	BuiltinExpression() IBuiltinExpressionContext
-	CastExpression() ICastExpressionContext
-	Literal() ILiteralContext
-	StructLiteral() IStructLiteralContext
-	LambdaExpression() ILambdaExpressionContext
-	AnonymousFuncExpression() IAnonymousFuncExpressionContext
-	TupleExpression() ITupleExpressionContext
-	LPAREN() antlr.TerminalNode
-	Expression() IExpressionContext
-	RPAREN() antlr.TerminalNode
-	QualifiedIdentifier() IQualifiedIdentifierContext
-	GenericArgs() IGenericArgsContext
-	ArgumentList() IArgumentListContext
-	IDENTIFIER() antlr.TerminalNode
-
-	// IsPrimaryExpressionContext differentiates from other interfaces.
-	IsPrimaryExpressionContext()
+	// IsPrimaryContext differentiates from other interfaces.
+	IsPrimaryContext()
 }
-    IPrimaryExpressionContext is an interface to support dynamic dispatch.
+    IPrimaryContext is an interface to support dynamic dispatch.
 
 type IPrimitiveTypeContext interface {
 	antlr.ParserRuleContext
@@ -5322,18 +4241,13 @@ type IPrimitiveTypeContext interface {
 	ISIZE() antlr.TerminalNode
 	FLOAT32() antlr.TerminalNode
 	FLOAT64() antlr.TerminalNode
-	BYTE() antlr.TerminalNode
-	BOOL() antlr.TerminalNode
-	CHAR() antlr.TerminalNode
-	STRING() antlr.TerminalNode
-	VOID() antlr.TerminalNode
 
 	// IsPrimitiveTypeContext differentiates from other interfaces.
 	IsPrimitiveTypeContext()
 }
     IPrimitiveTypeContext is an interface to support dynamic dispatch.
 
-type IQualifiedIdentifierContext interface {
+type IQualifiedNameContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -5345,69 +4259,12 @@ type IQualifiedIdentifierContext interface {
 	AllDOT() []antlr.TerminalNode
 	DOT(i int) antlr.TerminalNode
 
-	// IsQualifiedIdentifierContext differentiates from other interfaces.
-	IsQualifiedIdentifierContext()
+	// IsQualifiedNameContext differentiates from other interfaces.
+	IsQualifiedNameContext()
 }
-    IQualifiedIdentifierContext is an interface to support dynamic dispatch.
+    IQualifiedNameContext is an interface to support dynamic dispatch.
 
-type IQualifiedTypeContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllIDENTIFIER() []antlr.TerminalNode
-	IDENTIFIER(i int) antlr.TerminalNode
-	AllDOT() []antlr.TerminalNode
-	DOT(i int) antlr.TerminalNode
-	GenericArgs() IGenericArgsContext
-
-	// IsQualifiedTypeContext differentiates from other interfaces.
-	IsQualifiedTypeContext()
-}
-    IQualifiedTypeContext is an interface to support dynamic dispatch.
-
-type IRangeExpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllAdditiveExpression() []IAdditiveExpressionContext
-	AdditiveExpression(i int) IAdditiveExpressionContext
-	RANGE() antlr.TerminalNode
-
-	// IsRangeExpressionContext differentiates from other interfaces.
-	IsRangeExpressionContext()
-}
-    IRangeExpressionContext is an interface to support dynamic dispatch.
-
-type IRelationalExpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllShiftExpression() []IShiftExpressionContext
-	ShiftExpression(i int) IShiftExpressionContext
-	AllLT() []antlr.TerminalNode
-	LT(i int) antlr.TerminalNode
-	AllLE() []antlr.TerminalNode
-	LE(i int) antlr.TerminalNode
-	AllGT() []antlr.TerminalNode
-	GT(i int) antlr.TerminalNode
-	AllGE() []antlr.TerminalNode
-	GE(i int) antlr.TerminalNode
-
-	// IsRelationalExpressionContext differentiates from other interfaces.
-	IsRelationalExpressionContext()
-}
-    IRelationalExpressionContext is an interface to support dynamic dispatch.
-
-type IReturnStmtContext interface {
+type IReturnStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -5415,13 +4272,17 @@ type IReturnStmtContext interface {
 
 	// Getter signatures
 	RETURN() antlr.TerminalNode
-	TupleExpression() ITupleExpressionContext
-	Expression() IExpressionContext
+	AllExpression() []IExpressionContext
+	Expression(i int) IExpressionContext
+	LPAREN() antlr.TerminalNode
+	RPAREN() antlr.TerminalNode
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
 
-	// IsReturnStmtContext differentiates from other interfaces.
-	IsReturnStmtContext()
+	// IsReturnStatementContext differentiates from other interfaces.
+	IsReturnStatementContext()
 }
-    IReturnStmtContext is an interface to support dynamic dispatch.
+    IReturnStatementContext is an interface to support dynamic dispatch.
 
 type IReturnTypeContext interface {
 	antlr.ParserRuleContext
@@ -5430,34 +4291,47 @@ type IReturnTypeContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	Type_() ITypeContext
-	LPAREN() antlr.TerminalNode
-	TypeList() ITypeListContext
-	RPAREN() antlr.TerminalNode
+	TupleType() ITupleTypeContext
+	TypeRef() ITypeRefContext
 
 	// IsReturnTypeContext differentiates from other interfaces.
 	IsReturnTypeContext()
 }
     IReturnTypeContext is an interface to support dynamic dispatch.
 
-type IShiftExpressionContext interface {
+type ISelfParamContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	AllRangeExpression() []IRangeExpressionContext
-	RangeExpression(i int) IRangeExpressionContext
-	AllLT() []antlr.TerminalNode
-	LT(i int) antlr.TerminalNode
-	AllGT() []antlr.TerminalNode
-	GT(i int) antlr.TerminalNode
+	SELF() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	COLON() antlr.TerminalNode
+	ParamType() IParamTypeContext
+	AMP() antlr.TerminalNode
+	MUT() antlr.TerminalNode
 
-	// IsShiftExpressionContext differentiates from other interfaces.
-	IsShiftExpressionContext()
+	// IsSelfParamContext differentiates from other interfaces.
+	IsSelfParamContext()
 }
-    IShiftExpressionContext is an interface to support dynamic dispatch.
+    ISelfParamContext is an interface to support dynamic dispatch.
+
+type ISemiContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	AllSEMI() []antlr.TerminalNode
+	SEMI(i int) antlr.TerminalNode
+
+	// IsSemiContext differentiates from other interfaces.
+	IsSemiContext()
+}
+    ISemiContext is an interface to support dynamic dispatch.
 
 type IStatementContext interface {
 	antlr.ParserRuleContext
@@ -5466,98 +4340,24 @@ type IStatementContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	Block() IBlockContext
-	ReturnStmt() IReturnStmtContext
-	BreakStmt() IBreakStmtContext
-	ContinueStmt() IContinueStmtContext
-	IfStmt() IIfStmtContext
-	ForStmt() IForStmtContext
-	SwitchStmt() ISwitchStmtContext
-	DeferStmt() IDeferStmtContext
-	VariableDecl() IVariableDeclContext
+	LetStatement() ILetStatementContext
+	Semi() ISemiContext
+	VarStatement() IVarStatementContext
 	ConstDecl() IConstDeclContext
-	AssignmentStmt() IAssignmentStmtContext
-	ExpressionStmt() IExpressionStmtContext
+	ReturnStatement() IReturnStatementContext
+	BreakStatement() IBreakStatementContext
+	ContinueStatement() IContinueStatementContext
+	DeferStatement() IDeferStatementContext
+	IfStatement() IIfStatementContext
+	ForStatement() IForStatementContext
+	SwitchStatement() ISwitchStatementContext
+	AssignmentStatement() IAssignmentStatementContext
+	ExpressionStatement() IExpressionStatementContext
 
 	// IsStatementContext differentiates from other interfaces.
 	IsStatementContext()
 }
     IStatementContext is an interface to support dynamic dispatch.
-
-type IStructDeclContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	STRUCT() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	LBRACE() antlr.TerminalNode
-	RBRACE() antlr.TerminalNode
-	AllAttribute() []IAttributeContext
-	Attribute(i int) IAttributeContext
-	GenericParams() IGenericParamsContext
-	AllStructMember() []IStructMemberContext
-	StructMember(i int) IStructMemberContext
-
-	// IsStructDeclContext differentiates from other interfaces.
-	IsStructDeclContext()
-}
-    IStructDeclContext is an interface to support dynamic dispatch.
-
-type IStructFieldContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	IDENTIFIER() antlr.TerminalNode
-	COLON() antlr.TerminalNode
-	Type_() ITypeContext
-
-	// IsStructFieldContext differentiates from other interfaces.
-	IsStructFieldContext()
-}
-    IStructFieldContext is an interface to support dynamic dispatch.
-
-type IStructLiteralContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	LBRACE() antlr.TerminalNode
-	RBRACE() antlr.TerminalNode
-	IDENTIFIER() antlr.TerminalNode
-	QualifiedIdentifier() IQualifiedIdentifierContext
-	GenericArgs() IGenericArgsContext
-	AllFieldInit() []IFieldInitContext
-	FieldInit(i int) IFieldInitContext
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
-
-	// IsStructLiteralContext differentiates from other interfaces.
-	IsStructLiteralContext()
-}
-    IStructLiteralContext is an interface to support dynamic dispatch.
-
-type IStructMemberContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	StructField() IStructFieldContext
-	FunctionDecl() IFunctionDeclContext
-
-	// IsStructMemberContext differentiates from other interfaces.
-	IsStructMemberContext()
-}
-    IStructMemberContext is an interface to support dynamic dispatch.
 
 type ISwitchCaseContext interface {
 	antlr.ParserRuleContext
@@ -5567,11 +4367,8 @@ type ISwitchCaseContext interface {
 
 	// Getter signatures
 	CASE() antlr.TerminalNode
-	AllExpression() []IExpressionContext
-	Expression(i int) IExpressionContext
+	ExpressionList() IExpressionListContext
 	COLON() antlr.TerminalNode
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
 	AllStatement() []IStatementContext
 	Statement(i int) IStatementContext
 
@@ -5580,7 +4377,24 @@ type ISwitchCaseContext interface {
 }
     ISwitchCaseContext is an interface to support dynamic dispatch.
 
-type ISwitchStmtContext interface {
+type ISwitchDefaultContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	DEFAULT() antlr.TerminalNode
+	COLON() antlr.TerminalNode
+	AllStatement() []IStatementContext
+	Statement(i int) IStatementContext
+
+	// IsSwitchDefaultContext differentiates from other interfaces.
+	IsSwitchDefaultContext()
+}
+    ISwitchDefaultContext is an interface to support dynamic dispatch.
+
+type ISwitchStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -5593,12 +4407,12 @@ type ISwitchStmtContext interface {
 	RBRACE() antlr.TerminalNode
 	AllSwitchCase() []ISwitchCaseContext
 	SwitchCase(i int) ISwitchCaseContext
-	DefaultCase() IDefaultCaseContext
+	SwitchDefault() ISwitchDefaultContext
 
-	// IsSwitchStmtContext differentiates from other interfaces.
-	IsSwitchStmtContext()
+	// IsSwitchStatementContext differentiates from other interfaces.
+	IsSwitchStatementContext()
 }
-    ISwitchStmtContext is an interface to support dynamic dispatch.
+    ISwitchStatementContext is an interface to support dynamic dispatch.
 
 type ITopLevelDeclContext interface {
 	antlr.ParserRuleContext
@@ -5607,59 +4421,63 @@ type ITopLevelDeclContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	FunctionDecl() IFunctionDeclContext
-	StructDecl() IStructDeclContext
-	ClassDecl() IClassDeclContext
-	EnumDecl() IEnumDeclContext
-	MethodDecl() IMethodDeclContext
-	DeinitDecl() IDeinitDeclContext
-	VariableDecl() IVariableDeclContext
+	ImportDecl() IImportDeclContext
+	Semi() ISemiContext
 	ConstDecl() IConstDeclContext
-	ExternCDecl() IExternCDeclContext
-	ExternCppDecl() IExternCppDeclContext
+	TopLevelVarDecl() ITopLevelVarDeclContext
+	TopLevelLetDecl() ITopLevelLetDeclContext
+	FuncDecl() IFuncDeclContext
+	DeinitDecl() IDeinitDeclContext
+	InterfaceDecl() IInterfaceDeclContext
+	AllAttribute() []IAttributeContext
+	Attribute(i int) IAttributeContext
+	EnumDecl() IEnumDeclContext
+	TypeAliasDecl() ITypeAliasDeclContext
+	ExternDecl() IExternDeclContext
 
 	// IsTopLevelDeclContext differentiates from other interfaces.
 	IsTopLevelDeclContext()
 }
     ITopLevelDeclContext is an interface to support dynamic dispatch.
 
-type ITupleExpressionContext interface {
+type ITopLevelLetDeclContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	LPAREN() antlr.TerminalNode
-	AllExpression() []IExpressionContext
-	Expression(i int) IExpressionContext
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
-	RPAREN() antlr.TerminalNode
+	LET() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	ASSIGN() antlr.TerminalNode
+	Expression() IExpressionContext
+	COLON() antlr.TerminalNode
+	TypeRef() ITypeRefContext
 
-	// IsTupleExpressionContext differentiates from other interfaces.
-	IsTupleExpressionContext()
+	// IsTopLevelLetDeclContext differentiates from other interfaces.
+	IsTopLevelLetDeclContext()
 }
-    ITupleExpressionContext is an interface to support dynamic dispatch.
+    ITopLevelLetDeclContext is an interface to support dynamic dispatch.
 
-type ITuplePatternContext interface {
+type ITopLevelVarDeclContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	LPAREN() antlr.TerminalNode
-	AllIDENTIFIER() []antlr.TerminalNode
-	IDENTIFIER(i int) antlr.TerminalNode
-	RPAREN() antlr.TerminalNode
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
+	VAR() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	ASSIGN() antlr.TerminalNode
+	Expression() IExpressionContext
+	COLON() antlr.TerminalNode
+	TypeRef() ITypeRefContext
+	NULL() antlr.TerminalNode
 
-	// IsTuplePatternContext differentiates from other interfaces.
-	IsTuplePatternContext()
+	// IsTopLevelVarDeclContext differentiates from other interfaces.
+	IsTopLevelVarDeclContext()
 }
-    ITuplePatternContext is an interface to support dynamic dispatch.
+    ITopLevelVarDeclContext is an interface to support dynamic dispatch.
 
 type ITupleTypeContext interface {
 	antlr.ParserRuleContext
@@ -5669,40 +4487,34 @@ type ITupleTypeContext interface {
 
 	// Getter signatures
 	LPAREN() antlr.TerminalNode
-	TypeList() ITypeListContext
+	AllTypeRef() []ITypeRefContext
+	TypeRef(i int) ITypeRefContext
 	RPAREN() antlr.TerminalNode
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
 
 	// IsTupleTypeContext differentiates from other interfaces.
 	IsTupleTypeContext()
 }
     ITupleTypeContext is an interface to support dynamic dispatch.
 
-type ITypeContext interface {
+type ITypeAliasDeclContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	LBRACKET() antlr.TerminalNode
-	RBRACKET() antlr.TerminalNode
-	Type_() ITypeContext
-	Expression() IExpressionContext
-	AMP() antlr.TerminalNode
-	VAR() antlr.TerminalNode
-	PrimitiveType() IPrimitiveTypeContext
-	CollectionType() ICollectionTypeContext
-	QualifiedType() IQualifiedTypeContext
-	FunctionType() IFunctionTypeContext
-	RAWPTR() antlr.TerminalNode
+	TYPE() antlr.TerminalNode
 	IDENTIFIER() antlr.TerminalNode
-	GenericArgs() IGenericArgsContext
-	UNDERSCORE() antlr.TerminalNode
+	ASSIGN() antlr.TerminalNode
+	OPAQUE() antlr.TerminalNode
+	TypeRef() ITypeRefContext
 
-	// IsTypeContext differentiates from other interfaces.
-	IsTypeContext()
+	// IsTypeAliasDeclContext differentiates from other interfaces.
+	IsTypeAliasDeclContext()
 }
-    ITypeContext is an interface to support dynamic dispatch.
+    ITypeAliasDeclContext is an interface to support dynamic dispatch.
 
 type ITypeListContext interface {
 	antlr.ParserRuleContext
@@ -5711,8 +4523,8 @@ type ITypeListContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	AllType_() []ITypeContext
-	Type_(i int) ITypeContext
+	AllTypeRef() []ITypeRefContext
+	TypeRef(i int) ITypeRefContext
 	AllCOMMA() []antlr.TerminalNode
 	COMMA(i int) antlr.TerminalNode
 
@@ -5721,88 +4533,112 @@ type ITypeListContext interface {
 }
     ITypeListContext is an interface to support dynamic dispatch.
 
-type IUnaryExpressionContext interface {
+type ITypeRefContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	UnaryExpression() IUnaryExpressionContext
-	MINUS() antlr.TerminalNode
-	NOT() antlr.TerminalNode
-	BIT_NOT() antlr.TerminalNode
-	AMP() antlr.TerminalNode
-	AWAIT() antlr.TerminalNode
-	LPAREN() antlr.TerminalNode
-	Expression() IExpressionContext
-	RPAREN() antlr.TerminalNode
-	INCREMENT() antlr.TerminalNode
-	DECREMENT() antlr.TerminalNode
-	PostfixExpression() IPostfixExpressionContext
+	FunctionType() IFunctionTypeContext
+	BaseType() IBaseTypeContext
 
-	// IsUnaryExpressionContext differentiates from other interfaces.
-	IsUnaryExpressionContext()
+	// IsTypeRefContext differentiates from other interfaces.
+	IsTypeRefContext()
 }
-    IUnaryExpressionContext is an interface to support dynamic dispatch.
+    ITypeRefContext is an interface to support dynamic dispatch.
 
-type IVariableDeclContext interface {
+type IVarStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	LET() antlr.TerminalNode
-	TuplePattern() ITuplePatternContext
+	VAR() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
 	ASSIGN() antlr.TerminalNode
 	Expression() IExpressionContext
 	COLON() antlr.TerminalNode
-	TupleType() ITupleTypeContext
-	IDENTIFIER() antlr.TerminalNode
-	Type_() ITypeContext
+	TypeRef() ITypeRefContext
 	NULL() antlr.TerminalNode
-	VAR() antlr.TerminalNode
 
-	// IsVariableDeclContext differentiates from other interfaces.
-	IsVariableDeclContext()
+	// IsVarStatementContext differentiates from other interfaces.
+	IsVarStatementContext()
 }
-    IVariableDeclContext is an interface to support dynamic dispatch.
+    IVarStatementContext is an interface to support dynamic dispatch.
 
-type IfStmtContext struct {
+type IdentExprContext struct {
+	PrimaryContext
+}
+
+func NewIdentExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *IdentExprContext
+
+func (s *IdentExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *IdentExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *IdentExprContext) IDENTIFIER() antlr.TerminalNode
+
+type IfStatementContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyIfStmtContext() *IfStmtContext
+func NewEmptyIfStatementContext() *IfStatementContext
 
-func NewIfStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *IfStmtContext
+func NewIfStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *IfStatementContext
 
-func (s *IfStmtContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *IfStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *IfStmtContext) AllBlock() []IBlockContext
+func (s *IfStatementContext) AllBlock() []IBlockContext
 
-func (s *IfStmtContext) AllELSE() []antlr.TerminalNode
+func (s *IfStatementContext) AllELSE() []antlr.TerminalNode
 
-func (s *IfStmtContext) AllExpression() []IExpressionContext
+func (s *IfStatementContext) AllExpression() []IExpressionContext
 
-func (s *IfStmtContext) AllIF() []antlr.TerminalNode
+func (s *IfStatementContext) AllIF() []antlr.TerminalNode
 
-func (s *IfStmtContext) Block(i int) IBlockContext
+func (s *IfStatementContext) Block(i int) IBlockContext
 
-func (s *IfStmtContext) ELSE(i int) antlr.TerminalNode
+func (s *IfStatementContext) ELSE(i int) antlr.TerminalNode
 
-func (s *IfStmtContext) Expression(i int) IExpressionContext
+func (s *IfStatementContext) Expression(i int) IExpressionContext
 
-func (s *IfStmtContext) GetParser() antlr.Parser
+func (s *IfStatementContext) GetParser() antlr.Parser
 
-func (s *IfStmtContext) GetRuleContext() antlr.RuleContext
+func (s *IfStatementContext) GetRuleContext() antlr.RuleContext
 
-func (s *IfStmtContext) IF(i int) antlr.TerminalNode
+func (s *IfStatementContext) IF(i int) antlr.TerminalNode
 
-func (*IfStmtContext) IsIfStmtContext()
+func (*IfStatementContext) IsIfStatementContext()
 
-func (s *IfStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *IfStatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ImportAliasContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyImportAliasContext() *ImportAliasContext
+
+func NewImportAliasContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ImportAliasContext
+
+func (s *ImportAliasContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ImportAliasContext) DOT() antlr.TerminalNode
+
+func (s *ImportAliasContext) GetParser() antlr.Parser
+
+func (s *ImportAliasContext) GetRuleContext() antlr.RuleContext
+
+func (s *ImportAliasContext) IDENTIFIER() antlr.TerminalNode
+
+func (*ImportAliasContext) IsImportAliasContext()
+
+func (s *ImportAliasContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *ImportAliasContext) UNDERSCORE() antlr.TerminalNode
 
 type ImportDeclContext struct {
 	antlr.BaseParserRuleContext
@@ -5821,8 +4657,6 @@ func (s *ImportDeclContext) GetParser() antlr.Parser
 
 func (s *ImportDeclContext) GetRuleContext() antlr.RuleContext
 
-func (s *ImportDeclContext) IDENTIFIER() antlr.TerminalNode
-
 func (s *ImportDeclContext) IMPORT() antlr.TerminalNode
 
 func (s *ImportDeclContext) ImportSpec(i int) IImportSpecContext
@@ -5832,8 +4666,6 @@ func (*ImportDeclContext) IsImportDeclContext()
 func (s *ImportDeclContext) LPAREN() antlr.TerminalNode
 
 func (s *ImportDeclContext) RPAREN() antlr.TerminalNode
-
-func (s *ImportDeclContext) STRING_LITERAL() antlr.TerminalNode
 
 func (s *ImportDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
@@ -5852,104 +4684,166 @@ func (s *ImportSpecContext) GetParser() antlr.Parser
 
 func (s *ImportSpecContext) GetRuleContext() antlr.RuleContext
 
+func (s *ImportSpecContext) ImportAlias() IImportAliasContext
+
 func (*ImportSpecContext) IsImportSpecContext()
 
-func (s *ImportSpecContext) STRING_LITERAL() antlr.TerminalNode
+func (s *ImportSpecContext) STRING_LIT() antlr.TerminalNode
+
+func (s *ImportSpecContext) Semi() ISemiContext
 
 func (s *ImportSpecContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type InitializerEntryContext struct {
+type IndexExprContext struct {
+	ExpressionContext
+}
+
+func NewIndexExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *IndexExprContext
+
+func (s *IndexExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *IndexExprContext) AllExpression() []IExpressionContext
+
+func (s *IndexExprContext) Expression(i int) IExpressionContext
+
+func (s *IndexExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *IndexExprContext) LBRACKET() antlr.TerminalNode
+
+func (s *IndexExprContext) RBRACKET() antlr.TerminalNode
+
+type InitializerBlockContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyInitializerEntryContext() *InitializerEntryContext
+func NewEmptyInitializerBlockContext() *InitializerBlockContext
 
-func NewInitializerEntryContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *InitializerEntryContext
+func NewInitializerBlockContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *InitializerBlockContext
 
-func (s *InitializerEntryContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *InitializerBlockContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *InitializerEntryContext) AllExpression() []IExpressionContext
+func (s *InitializerBlockContext) AllCOMMA() []antlr.TerminalNode
 
-func (s *InitializerEntryContext) COLON() antlr.TerminalNode
+func (s *InitializerBlockContext) AllExpression() []IExpressionContext
 
-func (s *InitializerEntryContext) Expression(i int) IExpressionContext
+func (s *InitializerBlockContext) AllFieldInit() []IFieldInitContext
 
-func (s *InitializerEntryContext) GetParser() antlr.Parser
+func (s *InitializerBlockContext) AllMapEntry() []IMapEntryContext
 
-func (s *InitializerEntryContext) GetRuleContext() antlr.RuleContext
+func (s *InitializerBlockContext) COMMA(i int) antlr.TerminalNode
 
-func (*InitializerEntryContext) IsInitializerEntryContext()
+func (s *InitializerBlockContext) Expression(i int) IExpressionContext
 
-func (s *InitializerEntryContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *InitializerBlockContext) FieldInit(i int) IFieldInitContext
 
-type InitializerListContext struct {
+func (s *InitializerBlockContext) GetParser() antlr.Parser
+
+func (s *InitializerBlockContext) GetRuleContext() antlr.RuleContext
+
+func (*InitializerBlockContext) IsInitializerBlockContext()
+
+func (s *InitializerBlockContext) LBRACE() antlr.TerminalNode
+
+func (s *InitializerBlockContext) MapEntry(i int) IMapEntryContext
+
+func (s *InitializerBlockContext) RBRACE() antlr.TerminalNode
+
+func (s *InitializerBlockContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type IntLiteralContext struct {
+	PrimaryContext
+}
+
+func NewIntLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *IntLiteralContext
+
+func (s *IntLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *IntLiteralContext) GetRuleContext() antlr.RuleContext
+
+func (s *IntLiteralContext) INT_LIT() antlr.TerminalNode
+
+type InterfaceDeclContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyInitializerListContext() *InitializerListContext
+func NewEmptyInterfaceDeclContext() *InterfaceDeclContext
 
-func NewInitializerListContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *InitializerListContext
+func NewInterfaceDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *InterfaceDeclContext
 
-func (s *InitializerListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *InterfaceDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *InitializerListContext) AllCOMMA() []antlr.TerminalNode
+func (s *InterfaceDeclContext) AllInterfaceField() []IInterfaceFieldContext
 
-func (s *InitializerListContext) AllExpression() []IExpressionContext
+func (s *InterfaceDeclContext) GenericParams() IGenericParamsContext
 
-func (s *InitializerListContext) AllInitializerEntry() []IInitializerEntryContext
+func (s *InterfaceDeclContext) GetParser() antlr.Parser
 
-func (s *InitializerListContext) COMMA(i int) antlr.TerminalNode
+func (s *InterfaceDeclContext) GetRuleContext() antlr.RuleContext
 
-func (s *InitializerListContext) Expression(i int) IExpressionContext
+func (s *InterfaceDeclContext) IDENTIFIER() antlr.TerminalNode
 
-func (s *InitializerListContext) GetParser() antlr.Parser
+func (s *InterfaceDeclContext) INTERFACE() antlr.TerminalNode
 
-func (s *InitializerListContext) GetRuleContext() antlr.RuleContext
+func (s *InterfaceDeclContext) InterfaceField(i int) IInterfaceFieldContext
 
-func (s *InitializerListContext) InitializerEntry(i int) IInitializerEntryContext
+func (*InterfaceDeclContext) IsInterfaceDeclContext()
 
-func (*InitializerListContext) IsInitializerListContext()
+func (s *InterfaceDeclContext) LBRACE() antlr.TerminalNode
 
-func (s *InitializerListContext) LBRACE() antlr.TerminalNode
+func (s *InterfaceDeclContext) RBRACE() antlr.TerminalNode
 
-func (s *InitializerListContext) RBRACE() antlr.TerminalNode
+func (s *InterfaceDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *InitializerListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type LambdaExpressionContext struct {
+type InterfaceFieldContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyLambdaExpressionContext() *LambdaExpressionContext
+func NewEmptyInterfaceFieldContext() *InterfaceFieldContext
 
-func NewLambdaExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *LambdaExpressionContext
+func NewInterfaceFieldContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *InterfaceFieldContext
 
-func (s *LambdaExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *InterfaceFieldContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *LambdaExpressionContext) Block() IBlockContext
+func (s *InterfaceFieldContext) COLON() antlr.TerminalNode
 
-func (s *LambdaExpressionContext) ExecutionStrategy() IExecutionStrategyContext
+func (s *InterfaceFieldContext) GetParser() antlr.Parser
 
-func (s *LambdaExpressionContext) Expression() IExpressionContext
+func (s *InterfaceFieldContext) GetRuleContext() antlr.RuleContext
 
-func (s *LambdaExpressionContext) FAT_ARROW() antlr.TerminalNode
+func (s *InterfaceFieldContext) IDENTIFIER() antlr.TerminalNode
 
-func (s *LambdaExpressionContext) GetParser() antlr.Parser
+func (*InterfaceFieldContext) IsInterfaceFieldContext()
 
-func (s *LambdaExpressionContext) GetRuleContext() antlr.RuleContext
+func (s *InterfaceFieldContext) Semi() ISemiContext
 
-func (*LambdaExpressionContext) IsLambdaExpressionContext()
+func (s *InterfaceFieldContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *LambdaExpressionContext) LPAREN() antlr.TerminalNode
+func (s *InterfaceFieldContext) TypeRef() ITypeRefContext
 
-func (s *LambdaExpressionContext) LambdaParamList() ILambdaParamListContext
+type LambdaExprContext struct {
+	PrimaryContext
+}
 
-func (s *LambdaExpressionContext) RPAREN() antlr.TerminalNode
+func NewLambdaExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *LambdaExprContext
 
-func (s *LambdaExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *LambdaExprContext) ARROW() antlr.TerminalNode
+
+func (s *LambdaExprContext) ASYNC() antlr.TerminalNode
+
+func (s *LambdaExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *LambdaExprContext) Block() IBlockContext
+
+func (s *LambdaExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *LambdaExprContext) LPAREN() antlr.TerminalNode
+
+func (s *LambdaExprContext) LambdaParamList() ILambdaParamListContext
+
+func (s *LambdaExprContext) RPAREN() antlr.TerminalNode
 
 type LambdaParamContext struct {
 	antlr.BaseParserRuleContext
@@ -5974,7 +4868,7 @@ func (*LambdaParamContext) IsLambdaParamContext()
 
 func (s *LambdaParamContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *LambdaParamContext) Type_() ITypeContext
+func (s *LambdaParamContext) TypeRef() ITypeRefContext
 
 type LambdaParamListContext struct {
 	antlr.BaseParserRuleContext
@@ -6003,178 +4897,180 @@ func (s *LambdaParamListContext) LambdaParam(i int) ILambdaParamContext
 
 func (s *LambdaParamListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type LiteralContext struct {
+type LetStatementContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyLiteralContext() *LiteralContext
+func NewEmptyLetStatementContext() *LetStatementContext
 
-func NewLiteralContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *LiteralContext
+func NewLetStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *LetStatementContext
 
-func (s *LiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *LetStatementContext) ASSIGN() antlr.TerminalNode
 
-func (s *LiteralContext) BOOLEAN_LITERAL() antlr.TerminalNode
+func (s *LetStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *LiteralContext) CHAR_LITERAL() antlr.TerminalNode
+func (s *LetStatementContext) AllCOMMA() []antlr.TerminalNode
 
-func (s *LiteralContext) FLOAT_LITERAL() antlr.TerminalNode
+func (s *LetStatementContext) AllIDENTIFIER() []antlr.TerminalNode
 
-func (s *LiteralContext) GetParser() antlr.Parser
+func (s *LetStatementContext) COLON() antlr.TerminalNode
 
-func (s *LiteralContext) GetRuleContext() antlr.RuleContext
+func (s *LetStatementContext) COMMA(i int) antlr.TerminalNode
 
-func (s *LiteralContext) INTEGER_LITERAL() antlr.TerminalNode
+func (s *LetStatementContext) Expression() IExpressionContext
 
-func (s *LiteralContext) InitializerList() IInitializerListContext
+func (s *LetStatementContext) GetParser() antlr.Parser
 
-func (*LiteralContext) IsLiteralContext()
+func (s *LetStatementContext) GetRuleContext() antlr.RuleContext
 
-func (s *LiteralContext) NULL() antlr.TerminalNode
+func (s *LetStatementContext) IDENTIFIER(i int) antlr.TerminalNode
 
-func (s *LiteralContext) STRING_LITERAL() antlr.TerminalNode
+func (*LetStatementContext) IsLetStatementContext()
 
-func (s *LiteralContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *LetStatementContext) LET() antlr.TerminalNode
 
-type LogicalAndExpressionContext struct {
+func (s *LetStatementContext) LPAREN() antlr.TerminalNode
+
+func (s *LetStatementContext) RPAREN() antlr.TerminalNode
+
+func (s *LetStatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *LetStatementContext) TypeRef() ITypeRefContext
+
+type LogicalAndExprContext struct {
+	ExpressionContext
+}
+
+func NewLogicalAndExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *LogicalAndExprContext
+
+func (s *LogicalAndExprContext) AND() antlr.TerminalNode
+
+func (s *LogicalAndExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *LogicalAndExprContext) AllExpression() []IExpressionContext
+
+func (s *LogicalAndExprContext) Expression(i int) IExpressionContext
+
+func (s *LogicalAndExprContext) GetRuleContext() antlr.RuleContext
+
+type LogicalNotContext struct {
+	ExpressionContext
+}
+
+func NewLogicalNotContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *LogicalNotContext
+
+func (s *LogicalNotContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *LogicalNotContext) BANG() antlr.TerminalNode
+
+func (s *LogicalNotContext) Expression() IExpressionContext
+
+func (s *LogicalNotContext) GetRuleContext() antlr.RuleContext
+
+type LogicalOrExprContext struct {
+	ExpressionContext
+}
+
+func NewLogicalOrExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *LogicalOrExprContext
+
+func (s *LogicalOrExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *LogicalOrExprContext) AllExpression() []IExpressionContext
+
+func (s *LogicalOrExprContext) Expression(i int) IExpressionContext
+
+func (s *LogicalOrExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *LogicalOrExprContext) OR() antlr.TerminalNode
+
+type MapEntryContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyLogicalAndExpressionContext() *LogicalAndExpressionContext
+func NewEmptyMapEntryContext() *MapEntryContext
 
-func NewLogicalAndExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *LogicalAndExpressionContext
+func NewMapEntryContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *MapEntryContext
 
-func (s *LogicalAndExpressionContext) AND(i int) antlr.TerminalNode
+func (s *MapEntryContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *LogicalAndExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *MapEntryContext) AllExpression() []IExpressionContext
 
-func (s *LogicalAndExpressionContext) AllAND() []antlr.TerminalNode
+func (s *MapEntryContext) COLON() antlr.TerminalNode
 
-func (s *LogicalAndExpressionContext) AllBitOrExpression() []IBitOrExpressionContext
+func (s *MapEntryContext) Expression(i int) IExpressionContext
 
-func (s *LogicalAndExpressionContext) BitOrExpression(i int) IBitOrExpressionContext
+func (s *MapEntryContext) GetParser() antlr.Parser
 
-func (s *LogicalAndExpressionContext) GetParser() antlr.Parser
+func (s *MapEntryContext) GetRuleContext() antlr.RuleContext
 
-func (s *LogicalAndExpressionContext) GetRuleContext() antlr.RuleContext
+func (*MapEntryContext) IsMapEntryContext()
 
-func (*LogicalAndExpressionContext) IsLogicalAndExpressionContext()
+func (s *MapEntryContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *LogicalAndExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+type MapLiteralContext struct {
+	PrimaryContext
+}
 
-type LogicalOrExpressionContext struct {
-	antlr.BaseParserRuleContext
+func NewMapLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *MapLiteralContext
+
+func (s *MapLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *MapLiteralContext) AllTypeRef() []ITypeRefContext
+
+func (s *MapLiteralContext) GetRuleContext() antlr.RuleContext
+
+func (s *MapLiteralContext) InitializerBlock() IInitializerBlockContext
+
+func (s *MapLiteralContext) LBRACKET() antlr.TerminalNode
+
+func (s *MapLiteralContext) MAP() antlr.TerminalNode
+
+func (s *MapLiteralContext) RBRACKET() antlr.TerminalNode
+
+func (s *MapLiteralContext) TypeRef(i int) ITypeRefContext
+
+type MemberAccessContext struct {
+	ExpressionContext
+}
+
+func NewMemberAccessContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *MemberAccessContext
+
+func (s *MemberAccessContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *MemberAccessContext) DOT() antlr.TerminalNode
+
+func (s *MemberAccessContext) Expression() IExpressionContext
+
+func (s *MemberAccessContext) GetRuleContext() antlr.RuleContext
+
+func (s *MemberAccessContext) IDENTIFIER() antlr.TerminalNode
+
+type MulExprContext struct {
+	ExpressionContext
 	// Has unexported fields.
 }
 
-func NewEmptyLogicalOrExpressionContext() *LogicalOrExpressionContext
+func NewMulExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *MulExprContext
 
-func NewLogicalOrExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *LogicalOrExpressionContext
+func (s *MulExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *LogicalOrExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *MulExprContext) AllExpression() []IExpressionContext
 
-func (s *LogicalOrExpressionContext) AllLogicalAndExpression() []ILogicalAndExpressionContext
+func (s *MulExprContext) Expression(i int) IExpressionContext
 
-func (s *LogicalOrExpressionContext) AllOR() []antlr.TerminalNode
+func (s *MulExprContext) GetOp() antlr.Token
 
-func (s *LogicalOrExpressionContext) GetParser() antlr.Parser
+func (s *MulExprContext) GetRuleContext() antlr.RuleContext
 
-func (s *LogicalOrExpressionContext) GetRuleContext() antlr.RuleContext
+func (s *MulExprContext) PERCENT() antlr.TerminalNode
 
-func (*LogicalOrExpressionContext) IsLogicalOrExpressionContext()
+func (s *MulExprContext) SLASH() antlr.TerminalNode
 
-func (s *LogicalOrExpressionContext) LogicalAndExpression(i int) ILogicalAndExpressionContext
+func (s *MulExprContext) STAR() antlr.TerminalNode
 
-func (s *LogicalOrExpressionContext) OR(i int) antlr.TerminalNode
-
-func (s *LogicalOrExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type MethodDeclContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyMethodDeclContext() *MethodDeclContext
-
-func NewMethodDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *MethodDeclContext
-
-func (s *MethodDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *MethodDeclContext) AllCOMMA() []antlr.TerminalNode
-
-func (s *MethodDeclContext) AllIDENTIFIER() []antlr.TerminalNode
-
-func (s *MethodDeclContext) AllParameter() []IParameterContext
-
-func (s *MethodDeclContext) Block() IBlockContext
-
-func (s *MethodDeclContext) COLON() antlr.TerminalNode
-
-func (s *MethodDeclContext) COMMA(i int) antlr.TerminalNode
-
-func (s *MethodDeclContext) ExecutionStrategy() IExecutionStrategyContext
-
-func (s *MethodDeclContext) FUNC() antlr.TerminalNode
-
-func (s *MethodDeclContext) GenericParams() IGenericParamsContext
-
-func (s *MethodDeclContext) GetParser() antlr.Parser
-
-func (s *MethodDeclContext) GetRuleContext() antlr.RuleContext
-
-func (s *MethodDeclContext) IDENTIFIER(i int) antlr.TerminalNode
-
-func (*MethodDeclContext) IsMethodDeclContext()
-
-func (s *MethodDeclContext) LPAREN() antlr.TerminalNode
-
-func (s *MethodDeclContext) Parameter(i int) IParameterContext
-
-func (s *MethodDeclContext) RPAREN() antlr.TerminalNode
-
-func (s *MethodDeclContext) ReturnType() IReturnTypeContext
-
-func (s *MethodDeclContext) SELF() antlr.TerminalNode
-
-func (s *MethodDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *MethodDeclContext) Type_() ITypeContext
-
-type MultiplicativeExpressionContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyMultiplicativeExpressionContext() *MultiplicativeExpressionContext
-
-func NewMultiplicativeExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *MultiplicativeExpressionContext
-
-func (s *MultiplicativeExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *MultiplicativeExpressionContext) AllPERCENT() []antlr.TerminalNode
-
-func (s *MultiplicativeExpressionContext) AllSLASH() []antlr.TerminalNode
-
-func (s *MultiplicativeExpressionContext) AllSTAR() []antlr.TerminalNode
-
-func (s *MultiplicativeExpressionContext) AllUnaryExpression() []IUnaryExpressionContext
-
-func (s *MultiplicativeExpressionContext) GetParser() antlr.Parser
-
-func (s *MultiplicativeExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (*MultiplicativeExpressionContext) IsMultiplicativeExpressionContext()
-
-func (s *MultiplicativeExpressionContext) PERCENT(i int) antlr.TerminalNode
-
-func (s *MultiplicativeExpressionContext) SLASH(i int) antlr.TerminalNode
-
-func (s *MultiplicativeExpressionContext) STAR(i int) antlr.TerminalNode
-
-func (s *MultiplicativeExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *MultiplicativeExpressionContext) UnaryExpression(i int) IUnaryExpressionContext
+func (s *MulExprContext) SetOp(v antlr.Token)
 
 type NamespaceDeclContext struct {
 	antlr.BaseParserRuleContext
@@ -6191,235 +5087,217 @@ func (s *NamespaceDeclContext) GetParser() antlr.Parser
 
 func (s *NamespaceDeclContext) GetRuleContext() antlr.RuleContext
 
-func (s *NamespaceDeclContext) IDENTIFIER() antlr.TerminalNode
-
 func (*NamespaceDeclContext) IsNamespaceDeclContext()
 
 func (s *NamespaceDeclContext) NAMESPACE() antlr.TerminalNode
 
+func (s *NamespaceDeclContext) QualifiedName() IQualifiedNameContext
+
 func (s *NamespaceDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type NewExpressionContext struct {
+type NewArrayExprContext struct {
+	PrimaryContext
+}
+
+func NewNewArrayExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *NewArrayExprContext
+
+func (s *NewArrayExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *NewArrayExprContext) Expression() IExpressionContext
+
+func (s *NewArrayExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *NewArrayExprContext) LBRACKET() antlr.TerminalNode
+
+func (s *NewArrayExprContext) NEW() antlr.TerminalNode
+
+func (s *NewArrayExprContext) RBRACKET() antlr.TerminalNode
+
+func (s *NewArrayExprContext) TypeRef() ITypeRefContext
+
+type NewExprContext struct {
+	PrimaryContext
+}
+
+func NewNewExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *NewExprContext
+
+func (s *NewExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *NewExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *NewExprContext) InitializerBlock() IInitializerBlockContext
+
+func (s *NewExprContext) NEW() antlr.TerminalNode
+
+func (s *NewExprContext) TypeRef() ITypeRefContext
+
+type NullLiteralContext struct {
+	PrimaryContext
+}
+
+func NewNullLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *NullLiteralContext
+
+func (s *NullLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *NullLiteralContext) GetRuleContext() antlr.RuleContext
+
+func (s *NullLiteralContext) NULL() antlr.TerminalNode
+
+type ParamContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyNewExpressionContext() *NewExpressionContext
+func NewEmptyParamContext() *ParamContext
 
-func NewNewExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *NewExpressionContext
+func NewParamContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ParamContext
 
-func (s *NewExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ParamContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *NewExpressionContext) AllCOMMA() []antlr.TerminalNode
+func (s *ParamContext) COLON() antlr.TerminalNode
 
-func (s *NewExpressionContext) AllFieldInit() []IFieldInitContext
+func (s *ParamContext) ELLIPSIS() antlr.TerminalNode
 
-func (s *NewExpressionContext) COMMA(i int) antlr.TerminalNode
+func (s *ParamContext) GetParser() antlr.Parser
 
-func (s *NewExpressionContext) Expression() IExpressionContext
+func (s *ParamContext) GetRuleContext() antlr.RuleContext
 
-func (s *NewExpressionContext) FieldInit(i int) IFieldInitContext
+func (s *ParamContext) IDENTIFIER() antlr.TerminalNode
 
-func (s *NewExpressionContext) GenericArgs() IGenericArgsContext
+func (*ParamContext) IsParamContext()
 
-func (s *NewExpressionContext) GetParser() antlr.Parser
+func (s *ParamContext) ParamType() IParamTypeContext
 
-func (s *NewExpressionContext) GetRuleContext() antlr.RuleContext
+func (s *ParamContext) SelfParam() ISelfParamContext
 
-func (s *NewExpressionContext) IDENTIFIER() antlr.TerminalNode
+func (s *ParamContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (*NewExpressionContext) IsNewExpressionContext()
-
-func (s *NewExpressionContext) LBRACE() antlr.TerminalNode
-
-func (s *NewExpressionContext) LBRACKET() antlr.TerminalNode
-
-func (s *NewExpressionContext) NEW() antlr.TerminalNode
-
-func (s *NewExpressionContext) QualifiedIdentifier() IQualifiedIdentifierContext
-
-func (s *NewExpressionContext) RBRACE() antlr.TerminalNode
-
-func (s *NewExpressionContext) RBRACKET() antlr.TerminalNode
-
-func (s *NewExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *NewExpressionContext) Type_() ITypeContext
-
-type ParameterContext struct {
+type ParamListContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyParameterContext() *ParameterContext
+func NewEmptyParamListContext() *ParamListContext
 
-func NewParameterContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ParameterContext
+func NewParamListContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ParamListContext
 
-func (s *ParameterContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ParamListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ParameterContext) COLON() antlr.TerminalNode
+func (s *ParamListContext) AllCOMMA() []antlr.TerminalNode
 
-func (s *ParameterContext) GetParser() antlr.Parser
+func (s *ParamListContext) AllParam() []IParamContext
 
-func (s *ParameterContext) GetRuleContext() antlr.RuleContext
+func (s *ParamListContext) COMMA(i int) antlr.TerminalNode
 
-func (s *ParameterContext) IDENTIFIER() antlr.TerminalNode
+func (s *ParamListContext) GetParser() antlr.Parser
 
-func (*ParameterContext) IsParameterContext()
+func (s *ParamListContext) GetRuleContext() antlr.RuleContext
 
-func (s *ParameterContext) SELF() antlr.TerminalNode
+func (*ParamListContext) IsParamListContext()
 
-func (s *ParameterContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ParamListContext) Param(i int) IParamContext
 
-func (s *ParameterContext) Type_() ITypeContext
+func (s *ParamListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type ParameterListContext struct {
+type ParamTypeContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyParameterListContext() *ParameterListContext
+func NewEmptyParamTypeContext() *ParamTypeContext
 
-func NewParameterListContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ParameterListContext
+func NewParamTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ParamTypeContext
 
-func (s *ParameterListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ParamTypeContext) AMP() antlr.TerminalNode
 
-func (s *ParameterListContext) AllCOMMA() []antlr.TerminalNode
+func (s *ParamTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ParameterListContext) AllParameter() []IParameterContext
+func (s *ParamTypeContext) GetParser() antlr.Parser
 
-func (s *ParameterListContext) COMMA(i int) antlr.TerminalNode
+func (s *ParamTypeContext) GetRuleContext() antlr.RuleContext
 
-func (s *ParameterListContext) ELLIPSIS() antlr.TerminalNode
+func (*ParamTypeContext) IsParamTypeContext()
 
-func (s *ParameterListContext) GetParser() antlr.Parser
+func (s *ParamTypeContext) MUT() antlr.TerminalNode
 
-func (s *ParameterListContext) GetRuleContext() antlr.RuleContext
+func (s *ParamTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (*ParameterListContext) IsParameterListContext()
+func (s *ParamTypeContext) TypeRef() ITypeRefContext
 
-func (s *ParameterListContext) Parameter(i int) IParameterContext
+type ParenExprContext struct {
+	PrimaryContext
+}
 
-func (s *ParameterListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func NewParenExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ParenExprContext
 
-type PostfixExpressionContext struct {
+func (s *ParenExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ParenExprContext) Expression() IExpressionContext
+
+func (s *ParenExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *ParenExprContext) LPAREN() antlr.TerminalNode
+
+func (s *ParenExprContext) RPAREN() antlr.TerminalNode
+
+type PostDecrementContext struct {
+	ExpressionContext
+}
+
+func NewPostDecrementContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *PostDecrementContext
+
+func (s *PostDecrementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *PostDecrementContext) DEC() antlr.TerminalNode
+
+func (s *PostDecrementContext) Expression() IExpressionContext
+
+func (s *PostDecrementContext) GetRuleContext() antlr.RuleContext
+
+type PostIncrementContext struct {
+	ExpressionContext
+}
+
+func NewPostIncrementContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *PostIncrementContext
+
+func (s *PostIncrementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *PostIncrementContext) Expression() IExpressionContext
+
+func (s *PostIncrementContext) GetRuleContext() antlr.RuleContext
+
+func (s *PostIncrementContext) INC() antlr.TerminalNode
+
+type PrimaryContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyPostfixExpressionContext() *PostfixExpressionContext
+func NewEmptyPrimaryContext() *PrimaryContext
 
-func NewPostfixExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *PostfixExpressionContext
+func NewPrimaryContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *PrimaryContext
 
-func (s *PostfixExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *PrimaryContext) CopyAll(ctx *PrimaryContext)
 
-func (s *PostfixExpressionContext) AllPostfixOp() []IPostfixOpContext
+func (s *PrimaryContext) GetParser() antlr.Parser
 
-func (s *PostfixExpressionContext) GetParser() antlr.Parser
+func (s *PrimaryContext) GetRuleContext() antlr.RuleContext
 
-func (s *PostfixExpressionContext) GetRuleContext() antlr.RuleContext
+func (*PrimaryContext) IsPrimaryContext()
 
-func (*PostfixExpressionContext) IsPostfixExpressionContext()
+func (s *PrimaryContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *PostfixExpressionContext) PostfixOp(i int) IPostfixOpContext
-
-func (s *PostfixExpressionContext) PrimaryExpression() IPrimaryExpressionContext
-
-func (s *PostfixExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type PostfixOpContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
+type PrimaryExprContext struct {
+	ExpressionContext
 }
 
-func NewEmptyPostfixOpContext() *PostfixOpContext
+func NewPrimaryExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *PrimaryExprContext
 
-func NewPostfixOpContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *PostfixOpContext
+func (s *PrimaryExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *PostfixOpContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *PrimaryExprContext) GetRuleContext() antlr.RuleContext
 
-func (s *PostfixOpContext) AllExpression() []IExpressionContext
-
-func (s *PostfixOpContext) ArgumentList() IArgumentListContext
-
-func (s *PostfixOpContext) DECREMENT() antlr.TerminalNode
-
-func (s *PostfixOpContext) DOT() antlr.TerminalNode
-
-func (s *PostfixOpContext) Expression(i int) IExpressionContext
-
-func (s *PostfixOpContext) GetParser() antlr.Parser
-
-func (s *PostfixOpContext) GetRuleContext() antlr.RuleContext
-
-func (s *PostfixOpContext) IDENTIFIER() antlr.TerminalNode
-
-func (s *PostfixOpContext) INCREMENT() antlr.TerminalNode
-
-func (*PostfixOpContext) IsPostfixOpContext()
-
-func (s *PostfixOpContext) LBRACKET() antlr.TerminalNode
-
-func (s *PostfixOpContext) LPAREN() antlr.TerminalNode
-
-func (s *PostfixOpContext) RANGE() antlr.TerminalNode
-
-func (s *PostfixOpContext) RBRACKET() antlr.TerminalNode
-
-func (s *PostfixOpContext) RPAREN() antlr.TerminalNode
-
-func (s *PostfixOpContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type PrimaryExpressionContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyPrimaryExpressionContext() *PrimaryExpressionContext
-
-func NewPrimaryExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *PrimaryExpressionContext
-
-func (s *PrimaryExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *PrimaryExpressionContext) AnonymousFuncExpression() IAnonymousFuncExpressionContext
-
-func (s *PrimaryExpressionContext) ArgumentList() IArgumentListContext
-
-func (s *PrimaryExpressionContext) BuiltinExpression() IBuiltinExpressionContext
-
-func (s *PrimaryExpressionContext) CastExpression() ICastExpressionContext
-
-func (s *PrimaryExpressionContext) DeleteExpression() IDeleteExpressionContext
-
-func (s *PrimaryExpressionContext) Expression() IExpressionContext
-
-func (s *PrimaryExpressionContext) GenericArgs() IGenericArgsContext
-
-func (s *PrimaryExpressionContext) GetParser() antlr.Parser
-
-func (s *PrimaryExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (s *PrimaryExpressionContext) IDENTIFIER() antlr.TerminalNode
-
-func (*PrimaryExpressionContext) IsPrimaryExpressionContext()
-
-func (s *PrimaryExpressionContext) LPAREN() antlr.TerminalNode
-
-func (s *PrimaryExpressionContext) LambdaExpression() ILambdaExpressionContext
-
-func (s *PrimaryExpressionContext) Literal() ILiteralContext
-
-func (s *PrimaryExpressionContext) NewExpression() INewExpressionContext
-
-func (s *PrimaryExpressionContext) QualifiedIdentifier() IQualifiedIdentifierContext
-
-func (s *PrimaryExpressionContext) RPAREN() antlr.TerminalNode
-
-func (s *PrimaryExpressionContext) StructLiteral() IStructLiteralContext
-
-func (s *PrimaryExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *PrimaryExpressionContext) TupleExpression() ITupleExpressionContext
+func (s *PrimaryExprContext) Primary() IPrimaryContext
 
 type PrimitiveTypeContext struct {
 	antlr.BaseParserRuleContext
@@ -6431,12 +5309,6 @@ func NewEmptyPrimitiveTypeContext() *PrimitiveTypeContext
 func NewPrimitiveTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *PrimitiveTypeContext
 
 func (s *PrimitiveTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *PrimitiveTypeContext) BOOL() antlr.TerminalNode
-
-func (s *PrimitiveTypeContext) BYTE() antlr.TerminalNode
-
-func (s *PrimitiveTypeContext) CHAR() antlr.TerminalNode
 
 func (s *PrimitiveTypeContext) FLOAT32() antlr.TerminalNode
 
@@ -6458,8 +5330,6 @@ func (s *PrimitiveTypeContext) ISIZE() antlr.TerminalNode
 
 func (*PrimitiveTypeContext) IsPrimitiveTypeContext()
 
-func (s *PrimitiveTypeContext) STRING() antlr.TerminalNode
-
 func (s *PrimitiveTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 func (s *PrimitiveTypeContext) UINT16() antlr.TerminalNode
@@ -6472,152 +5342,162 @@ func (s *PrimitiveTypeContext) UINT8() antlr.TerminalNode
 
 func (s *PrimitiveTypeContext) USIZE() antlr.TerminalNode
 
-func (s *PrimitiveTypeContext) VOID() antlr.TerminalNode
+type PrimitiveTypeExprContext struct {
+	PrimaryContext
+}
 
-type QualifiedIdentifierContext struct {
+func NewPrimitiveTypeExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *PrimitiveTypeExprContext
+
+func (s *PrimitiveTypeExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *PrimitiveTypeExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *PrimitiveTypeExprContext) PrimitiveType() IPrimitiveTypeContext
+
+type ProcessExprContext struct {
+	PrimaryContext
+}
+
+func NewProcessExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ProcessExprContext
+
+func (s *ProcessExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ProcessExprContext) AllLPAREN() []antlr.TerminalNode
+
+func (s *ProcessExprContext) AllRPAREN() []antlr.TerminalNode
+
+func (s *ProcessExprContext) ArgumentList() IArgumentListContext
+
+func (s *ProcessExprContext) Block() IBlockContext
+
+func (s *ProcessExprContext) FUNC() antlr.TerminalNode
+
+func (s *ProcessExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *ProcessExprContext) LPAREN(i int) antlr.TerminalNode
+
+func (s *ProcessExprContext) PROCESS() antlr.TerminalNode
+
+func (s *ProcessExprContext) ParamList() IParamListContext
+
+func (s *ProcessExprContext) RPAREN(i int) antlr.TerminalNode
+
+func (s *ProcessExprContext) ReturnType() IReturnTypeContext
+
+type QualifiedExprContext struct {
+	PrimaryContext
+}
+
+func NewQualifiedExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *QualifiedExprContext
+
+func (s *QualifiedExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *QualifiedExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *QualifiedExprContext) QualifiedName() IQualifiedNameContext
+
+type QualifiedNameContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyQualifiedIdentifierContext() *QualifiedIdentifierContext
+func NewEmptyQualifiedNameContext() *QualifiedNameContext
 
-func NewQualifiedIdentifierContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *QualifiedIdentifierContext
+func NewQualifiedNameContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *QualifiedNameContext
 
-func (s *QualifiedIdentifierContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *QualifiedNameContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *QualifiedIdentifierContext) AllDOT() []antlr.TerminalNode
+func (s *QualifiedNameContext) AllDOT() []antlr.TerminalNode
 
-func (s *QualifiedIdentifierContext) AllIDENTIFIER() []antlr.TerminalNode
+func (s *QualifiedNameContext) AllIDENTIFIER() []antlr.TerminalNode
 
-func (s *QualifiedIdentifierContext) DOT(i int) antlr.TerminalNode
+func (s *QualifiedNameContext) DOT(i int) antlr.TerminalNode
 
-func (s *QualifiedIdentifierContext) GetParser() antlr.Parser
+func (s *QualifiedNameContext) GetParser() antlr.Parser
 
-func (s *QualifiedIdentifierContext) GetRuleContext() antlr.RuleContext
+func (s *QualifiedNameContext) GetRuleContext() antlr.RuleContext
 
-func (s *QualifiedIdentifierContext) IDENTIFIER(i int) antlr.TerminalNode
+func (s *QualifiedNameContext) IDENTIFIER(i int) antlr.TerminalNode
 
-func (*QualifiedIdentifierContext) IsQualifiedIdentifierContext()
+func (*QualifiedNameContext) IsQualifiedNameContext()
 
-func (s *QualifiedIdentifierContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *QualifiedNameContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type QualifiedTypeContext struct {
+type RangeExprContext struct {
+	ExpressionContext
+}
+
+func NewRangeExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *RangeExprContext
+
+func (s *RangeExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *RangeExprContext) AllExpression() []IExpressionContext
+
+func (s *RangeExprContext) Expression(i int) IExpressionContext
+
+func (s *RangeExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *RangeExprContext) RANGE() antlr.TerminalNode
+
+type RelationalExprContext struct {
+	ExpressionContext
+	// Has unexported fields.
+}
+
+func NewRelationalExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *RelationalExprContext
+
+func (s *RelationalExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *RelationalExprContext) AllExpression() []IExpressionContext
+
+func (s *RelationalExprContext) Expression(i int) IExpressionContext
+
+func (s *RelationalExprContext) GE() antlr.TerminalNode
+
+func (s *RelationalExprContext) GT() antlr.TerminalNode
+
+func (s *RelationalExprContext) GetOp() antlr.Token
+
+func (s *RelationalExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *RelationalExprContext) LE() antlr.TerminalNode
+
+func (s *RelationalExprContext) LT() antlr.TerminalNode
+
+func (s *RelationalExprContext) SetOp(v antlr.Token)
+
+type ReturnStatementContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyQualifiedTypeContext() *QualifiedTypeContext
+func NewEmptyReturnStatementContext() *ReturnStatementContext
 
-func NewQualifiedTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *QualifiedTypeContext
+func NewReturnStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ReturnStatementContext
 
-func (s *QualifiedTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *ReturnStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *QualifiedTypeContext) AllDOT() []antlr.TerminalNode
+func (s *ReturnStatementContext) AllCOMMA() []antlr.TerminalNode
 
-func (s *QualifiedTypeContext) AllIDENTIFIER() []antlr.TerminalNode
+func (s *ReturnStatementContext) AllExpression() []IExpressionContext
 
-func (s *QualifiedTypeContext) DOT(i int) antlr.TerminalNode
+func (s *ReturnStatementContext) COMMA(i int) antlr.TerminalNode
 
-func (s *QualifiedTypeContext) GenericArgs() IGenericArgsContext
+func (s *ReturnStatementContext) Expression(i int) IExpressionContext
 
-func (s *QualifiedTypeContext) GetParser() antlr.Parser
+func (s *ReturnStatementContext) GetParser() antlr.Parser
 
-func (s *QualifiedTypeContext) GetRuleContext() antlr.RuleContext
+func (s *ReturnStatementContext) GetRuleContext() antlr.RuleContext
 
-func (s *QualifiedTypeContext) IDENTIFIER(i int) antlr.TerminalNode
+func (*ReturnStatementContext) IsReturnStatementContext()
 
-func (*QualifiedTypeContext) IsQualifiedTypeContext()
+func (s *ReturnStatementContext) LPAREN() antlr.TerminalNode
 
-func (s *QualifiedTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *ReturnStatementContext) RETURN() antlr.TerminalNode
 
-type RangeExpressionContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
+func (s *ReturnStatementContext) RPAREN() antlr.TerminalNode
 
-func NewEmptyRangeExpressionContext() *RangeExpressionContext
-
-func NewRangeExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *RangeExpressionContext
-
-func (s *RangeExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *RangeExpressionContext) AdditiveExpression(i int) IAdditiveExpressionContext
-
-func (s *RangeExpressionContext) AllAdditiveExpression() []IAdditiveExpressionContext
-
-func (s *RangeExpressionContext) GetParser() antlr.Parser
-
-func (s *RangeExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (*RangeExpressionContext) IsRangeExpressionContext()
-
-func (s *RangeExpressionContext) RANGE() antlr.TerminalNode
-
-func (s *RangeExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type RelationalExpressionContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyRelationalExpressionContext() *RelationalExpressionContext
-
-func NewRelationalExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *RelationalExpressionContext
-
-func (s *RelationalExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *RelationalExpressionContext) AllGE() []antlr.TerminalNode
-
-func (s *RelationalExpressionContext) AllGT() []antlr.TerminalNode
-
-func (s *RelationalExpressionContext) AllLE() []antlr.TerminalNode
-
-func (s *RelationalExpressionContext) AllLT() []antlr.TerminalNode
-
-func (s *RelationalExpressionContext) AllShiftExpression() []IShiftExpressionContext
-
-func (s *RelationalExpressionContext) GE(i int) antlr.TerminalNode
-
-func (s *RelationalExpressionContext) GT(i int) antlr.TerminalNode
-
-func (s *RelationalExpressionContext) GetParser() antlr.Parser
-
-func (s *RelationalExpressionContext) GetRuleContext() antlr.RuleContext
-
-func (*RelationalExpressionContext) IsRelationalExpressionContext()
-
-func (s *RelationalExpressionContext) LE(i int) antlr.TerminalNode
-
-func (s *RelationalExpressionContext) LT(i int) antlr.TerminalNode
-
-func (s *RelationalExpressionContext) ShiftExpression(i int) IShiftExpressionContext
-
-func (s *RelationalExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type ReturnStmtContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyReturnStmtContext() *ReturnStmtContext
-
-func NewReturnStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ReturnStmtContext
-
-func (s *ReturnStmtContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *ReturnStmtContext) Expression() IExpressionContext
-
-func (s *ReturnStmtContext) GetParser() antlr.Parser
-
-func (s *ReturnStmtContext) GetRuleContext() antlr.RuleContext
-
-func (*ReturnStmtContext) IsReturnStmtContext()
-
-func (s *ReturnStmtContext) RETURN() antlr.TerminalNode
-
-func (s *ReturnStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *ReturnStmtContext) TupleExpression() ITupleExpressionContext
+func (s *ReturnStatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type ReturnTypeContext struct {
 	antlr.BaseParserRuleContext
@@ -6636,46 +5516,108 @@ func (s *ReturnTypeContext) GetRuleContext() antlr.RuleContext
 
 func (*ReturnTypeContext) IsReturnTypeContext()
 
-func (s *ReturnTypeContext) LPAREN() antlr.TerminalNode
-
-func (s *ReturnTypeContext) RPAREN() antlr.TerminalNode
-
 func (s *ReturnTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *ReturnTypeContext) TypeList() ITypeListContext
+func (s *ReturnTypeContext) TupleType() ITupleTypeContext
 
-func (s *ReturnTypeContext) Type_() ITypeContext
+func (s *ReturnTypeContext) TypeRef() ITypeRefContext
 
-type ShiftExpressionContext struct {
+type SelfParamContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyShiftExpressionContext() *ShiftExpressionContext
+func NewEmptySelfParamContext() *SelfParamContext
 
-func NewShiftExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ShiftExpressionContext
+func NewSelfParamContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *SelfParamContext
 
-func (s *ShiftExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *SelfParamContext) AMP() antlr.TerminalNode
 
-func (s *ShiftExpressionContext) AllGT() []antlr.TerminalNode
+func (s *SelfParamContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *ShiftExpressionContext) AllLT() []antlr.TerminalNode
+func (s *SelfParamContext) COLON() antlr.TerminalNode
 
-func (s *ShiftExpressionContext) AllRangeExpression() []IRangeExpressionContext
+func (s *SelfParamContext) GetParser() antlr.Parser
 
-func (s *ShiftExpressionContext) GT(i int) antlr.TerminalNode
+func (s *SelfParamContext) GetRuleContext() antlr.RuleContext
 
-func (s *ShiftExpressionContext) GetParser() antlr.Parser
+func (s *SelfParamContext) IDENTIFIER() antlr.TerminalNode
 
-func (s *ShiftExpressionContext) GetRuleContext() antlr.RuleContext
+func (*SelfParamContext) IsSelfParamContext()
 
-func (*ShiftExpressionContext) IsShiftExpressionContext()
+func (s *SelfParamContext) MUT() antlr.TerminalNode
 
-func (s *ShiftExpressionContext) LT(i int) antlr.TerminalNode
+func (s *SelfParamContext) ParamType() IParamTypeContext
 
-func (s *ShiftExpressionContext) RangeExpression(i int) IRangeExpressionContext
+func (s *SelfParamContext) SELF() antlr.TerminalNode
 
-func (s *ShiftExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *SelfParamContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type SemiContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptySemiContext() *SemiContext
+
+func NewSemiContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *SemiContext
+
+func (s *SemiContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *SemiContext) AllSEMI() []antlr.TerminalNode
+
+func (s *SemiContext) GetParser() antlr.Parser
+
+func (s *SemiContext) GetRuleContext() antlr.RuleContext
+
+func (*SemiContext) IsSemiContext()
+
+func (s *SemiContext) SEMI(i int) antlr.TerminalNode
+
+func (s *SemiContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+type ShiftExprContext struct {
+	ExpressionContext
+	// Has unexported fields.
+}
+
+func NewShiftExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ShiftExprContext
+
+func (s *ShiftExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *ShiftExprContext) AllExpression() []IExpressionContext
+
+func (s *ShiftExprContext) Expression(i int) IExpressionContext
+
+func (s *ShiftExprContext) GetOp() antlr.Token
+
+func (s *ShiftExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *ShiftExprContext) LSHIFT() antlr.TerminalNode
+
+func (s *ShiftExprContext) RSHIFT() antlr.TerminalNode
+
+func (s *ShiftExprContext) SetOp(v antlr.Token)
+
+type SliceExprContext struct {
+	ExpressionContext
+}
+
+func NewSliceExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *SliceExprContext
+
+func (s *SliceExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *SliceExprContext) AllExpression() []IExpressionContext
+
+func (s *SliceExprContext) Expression(i int) IExpressionContext
+
+func (s *SliceExprContext) GetRuleContext() antlr.RuleContext
+
+func (s *SliceExprContext) LBRACKET() antlr.TerminalNode
+
+func (s *SliceExprContext) RANGE() antlr.TerminalNode
+
+func (s *SliceExprContext) RBRACKET() antlr.TerminalNode
 
 type StatementContext struct {
 	antlr.BaseParserRuleContext
@@ -6688,159 +5630,51 @@ func NewStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, in
 
 func (s *StatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *StatementContext) AssignmentStmt() IAssignmentStmtContext
+func (s *StatementContext) AssignmentStatement() IAssignmentStatementContext
 
-func (s *StatementContext) Block() IBlockContext
-
-func (s *StatementContext) BreakStmt() IBreakStmtContext
+func (s *StatementContext) BreakStatement() IBreakStatementContext
 
 func (s *StatementContext) ConstDecl() IConstDeclContext
 
-func (s *StatementContext) ContinueStmt() IContinueStmtContext
+func (s *StatementContext) ContinueStatement() IContinueStatementContext
 
-func (s *StatementContext) DeferStmt() IDeferStmtContext
+func (s *StatementContext) DeferStatement() IDeferStatementContext
 
-func (s *StatementContext) ExpressionStmt() IExpressionStmtContext
+func (s *StatementContext) ExpressionStatement() IExpressionStatementContext
 
-func (s *StatementContext) ForStmt() IForStmtContext
+func (s *StatementContext) ForStatement() IForStatementContext
 
 func (s *StatementContext) GetParser() antlr.Parser
 
 func (s *StatementContext) GetRuleContext() antlr.RuleContext
 
-func (s *StatementContext) IfStmt() IIfStmtContext
+func (s *StatementContext) IfStatement() IIfStatementContext
 
 func (*StatementContext) IsStatementContext()
 
-func (s *StatementContext) ReturnStmt() IReturnStmtContext
+func (s *StatementContext) LetStatement() ILetStatementContext
 
-func (s *StatementContext) SwitchStmt() ISwitchStmtContext
+func (s *StatementContext) ReturnStatement() IReturnStatementContext
+
+func (s *StatementContext) Semi() ISemiContext
+
+func (s *StatementContext) SwitchStatement() ISwitchStatementContext
 
 func (s *StatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *StatementContext) VariableDecl() IVariableDeclContext
+func (s *StatementContext) VarStatement() IVarStatementContext
 
-type StructDeclContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
+type StringLiteralContext struct {
+	PrimaryContext
 }
 
-func NewEmptyStructDeclContext() *StructDeclContext
+func NewStringLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StringLiteralContext
 
-func NewStructDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *StructDeclContext
+func (s *StringLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *StructDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *StringLiteralContext) GetRuleContext() antlr.RuleContext
 
-func (s *StructDeclContext) AllAttribute() []IAttributeContext
-
-func (s *StructDeclContext) AllStructMember() []IStructMemberContext
-
-func (s *StructDeclContext) Attribute(i int) IAttributeContext
-
-func (s *StructDeclContext) GenericParams() IGenericParamsContext
-
-func (s *StructDeclContext) GetParser() antlr.Parser
-
-func (s *StructDeclContext) GetRuleContext() antlr.RuleContext
-
-func (s *StructDeclContext) IDENTIFIER() antlr.TerminalNode
-
-func (*StructDeclContext) IsStructDeclContext()
-
-func (s *StructDeclContext) LBRACE() antlr.TerminalNode
-
-func (s *StructDeclContext) RBRACE() antlr.TerminalNode
-
-func (s *StructDeclContext) STRUCT() antlr.TerminalNode
-
-func (s *StructDeclContext) StructMember(i int) IStructMemberContext
-
-func (s *StructDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type StructFieldContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyStructFieldContext() *StructFieldContext
-
-func NewStructFieldContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *StructFieldContext
-
-func (s *StructFieldContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *StructFieldContext) COLON() antlr.TerminalNode
-
-func (s *StructFieldContext) GetParser() antlr.Parser
-
-func (s *StructFieldContext) GetRuleContext() antlr.RuleContext
-
-func (s *StructFieldContext) IDENTIFIER() antlr.TerminalNode
-
-func (*StructFieldContext) IsStructFieldContext()
-
-func (s *StructFieldContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *StructFieldContext) Type_() ITypeContext
-
-type StructLiteralContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyStructLiteralContext() *StructLiteralContext
-
-func NewStructLiteralContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *StructLiteralContext
-
-func (s *StructLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *StructLiteralContext) AllCOMMA() []antlr.TerminalNode
-
-func (s *StructLiteralContext) AllFieldInit() []IFieldInitContext
-
-func (s *StructLiteralContext) COMMA(i int) antlr.TerminalNode
-
-func (s *StructLiteralContext) FieldInit(i int) IFieldInitContext
-
-func (s *StructLiteralContext) GenericArgs() IGenericArgsContext
-
-func (s *StructLiteralContext) GetParser() antlr.Parser
-
-func (s *StructLiteralContext) GetRuleContext() antlr.RuleContext
-
-func (s *StructLiteralContext) IDENTIFIER() antlr.TerminalNode
-
-func (*StructLiteralContext) IsStructLiteralContext()
-
-func (s *StructLiteralContext) LBRACE() antlr.TerminalNode
-
-func (s *StructLiteralContext) QualifiedIdentifier() IQualifiedIdentifierContext
-
-func (s *StructLiteralContext) RBRACE() antlr.TerminalNode
-
-func (s *StructLiteralContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-type StructMemberContext struct {
-	antlr.BaseParserRuleContext
-	// Has unexported fields.
-}
-
-func NewEmptyStructMemberContext() *StructMemberContext
-
-func NewStructMemberContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *StructMemberContext
-
-func (s *StructMemberContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
-
-func (s *StructMemberContext) FunctionDecl() IFunctionDeclContext
-
-func (s *StructMemberContext) GetParser() antlr.Parser
-
-func (s *StructMemberContext) GetRuleContext() antlr.RuleContext
-
-func (*StructMemberContext) IsStructMemberContext()
-
-func (s *StructMemberContext) StructField() IStructFieldContext
-
-func (s *StructMemberContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *StringLiteralContext) STRING_LIT() antlr.TerminalNode
 
 type SwitchCaseContext struct {
 	antlr.BaseParserRuleContext
@@ -6853,19 +5687,13 @@ func NewSwitchCaseContext(parser antlr.Parser, parent antlr.ParserRuleContext, i
 
 func (s *SwitchCaseContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *SwitchCaseContext) AllCOMMA() []antlr.TerminalNode
-
-func (s *SwitchCaseContext) AllExpression() []IExpressionContext
-
 func (s *SwitchCaseContext) AllStatement() []IStatementContext
 
 func (s *SwitchCaseContext) CASE() antlr.TerminalNode
 
 func (s *SwitchCaseContext) COLON() antlr.TerminalNode
 
-func (s *SwitchCaseContext) COMMA(i int) antlr.TerminalNode
-
-func (s *SwitchCaseContext) Expression(i int) IExpressionContext
+func (s *SwitchCaseContext) ExpressionList() IExpressionListContext
 
 func (s *SwitchCaseContext) GetParser() antlr.Parser
 
@@ -6877,38 +5705,65 @@ func (s *SwitchCaseContext) Statement(i int) IStatementContext
 
 func (s *SwitchCaseContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-type SwitchStmtContext struct {
+type SwitchDefaultContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptySwitchStmtContext() *SwitchStmtContext
+func NewEmptySwitchDefaultContext() *SwitchDefaultContext
 
-func NewSwitchStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *SwitchStmtContext
+func NewSwitchDefaultContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *SwitchDefaultContext
 
-func (s *SwitchStmtContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *SwitchDefaultContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *SwitchStmtContext) AllSwitchCase() []ISwitchCaseContext
+func (s *SwitchDefaultContext) AllStatement() []IStatementContext
 
-func (s *SwitchStmtContext) DefaultCase() IDefaultCaseContext
+func (s *SwitchDefaultContext) COLON() antlr.TerminalNode
 
-func (s *SwitchStmtContext) Expression() IExpressionContext
+func (s *SwitchDefaultContext) DEFAULT() antlr.TerminalNode
 
-func (s *SwitchStmtContext) GetParser() antlr.Parser
+func (s *SwitchDefaultContext) GetParser() antlr.Parser
 
-func (s *SwitchStmtContext) GetRuleContext() antlr.RuleContext
+func (s *SwitchDefaultContext) GetRuleContext() antlr.RuleContext
 
-func (*SwitchStmtContext) IsSwitchStmtContext()
+func (*SwitchDefaultContext) IsSwitchDefaultContext()
 
-func (s *SwitchStmtContext) LBRACE() antlr.TerminalNode
+func (s *SwitchDefaultContext) Statement(i int) IStatementContext
 
-func (s *SwitchStmtContext) RBRACE() antlr.TerminalNode
+func (s *SwitchDefaultContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *SwitchStmtContext) SWITCH() antlr.TerminalNode
+type SwitchStatementContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
 
-func (s *SwitchStmtContext) SwitchCase(i int) ISwitchCaseContext
+func NewEmptySwitchStatementContext() *SwitchStatementContext
 
-func (s *SwitchStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func NewSwitchStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *SwitchStatementContext
+
+func (s *SwitchStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *SwitchStatementContext) AllSwitchCase() []ISwitchCaseContext
+
+func (s *SwitchStatementContext) Expression() IExpressionContext
+
+func (s *SwitchStatementContext) GetParser() antlr.Parser
+
+func (s *SwitchStatementContext) GetRuleContext() antlr.RuleContext
+
+func (*SwitchStatementContext) IsSwitchStatementContext()
+
+func (s *SwitchStatementContext) LBRACE() antlr.TerminalNode
+
+func (s *SwitchStatementContext) RBRACE() antlr.TerminalNode
+
+func (s *SwitchStatementContext) SWITCH() antlr.TerminalNode
+
+func (s *SwitchStatementContext) SwitchCase(i int) ISwitchCaseContext
+
+func (s *SwitchStatementContext) SwitchDefault() ISwitchDefaultContext
+
+func (s *SwitchStatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type TopLevelDeclContext struct {
 	antlr.BaseParserRuleContext
@@ -6921,7 +5776,9 @@ func NewTopLevelDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext,
 
 func (s *TopLevelDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *TopLevelDeclContext) ClassDecl() IClassDeclContext
+func (s *TopLevelDeclContext) AllAttribute() []IAttributeContext
+
+func (s *TopLevelDeclContext) Attribute(i int) IAttributeContext
 
 func (s *TopLevelDeclContext) ConstDecl() IConstDeclContext
 
@@ -6929,87 +5786,127 @@ func (s *TopLevelDeclContext) DeinitDecl() IDeinitDeclContext
 
 func (s *TopLevelDeclContext) EnumDecl() IEnumDeclContext
 
-func (s *TopLevelDeclContext) ExternCDecl() IExternCDeclContext
+func (s *TopLevelDeclContext) ExternDecl() IExternDeclContext
 
-func (s *TopLevelDeclContext) ExternCppDecl() IExternCppDeclContext
-
-func (s *TopLevelDeclContext) FunctionDecl() IFunctionDeclContext
+func (s *TopLevelDeclContext) FuncDecl() IFuncDeclContext
 
 func (s *TopLevelDeclContext) GetParser() antlr.Parser
 
 func (s *TopLevelDeclContext) GetRuleContext() antlr.RuleContext
 
+func (s *TopLevelDeclContext) ImportDecl() IImportDeclContext
+
+func (s *TopLevelDeclContext) InterfaceDecl() IInterfaceDeclContext
+
 func (*TopLevelDeclContext) IsTopLevelDeclContext()
 
-func (s *TopLevelDeclContext) MethodDecl() IMethodDeclContext
-
-func (s *TopLevelDeclContext) StructDecl() IStructDeclContext
+func (s *TopLevelDeclContext) Semi() ISemiContext
 
 func (s *TopLevelDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *TopLevelDeclContext) VariableDecl() IVariableDeclContext
+func (s *TopLevelDeclContext) TopLevelLetDecl() ITopLevelLetDeclContext
 
-type TupleExpressionContext struct {
+func (s *TopLevelDeclContext) TopLevelVarDecl() ITopLevelVarDeclContext
+
+func (s *TopLevelDeclContext) TypeAliasDecl() ITypeAliasDeclContext
+
+type TopLevelLetDeclContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyTupleExpressionContext() *TupleExpressionContext
+func NewEmptyTopLevelLetDeclContext() *TopLevelLetDeclContext
 
-func NewTupleExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TupleExpressionContext
+func NewTopLevelLetDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TopLevelLetDeclContext
 
-func (s *TupleExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *TopLevelLetDeclContext) ASSIGN() antlr.TerminalNode
 
-func (s *TupleExpressionContext) AllCOMMA() []antlr.TerminalNode
+func (s *TopLevelLetDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *TupleExpressionContext) AllExpression() []IExpressionContext
+func (s *TopLevelLetDeclContext) COLON() antlr.TerminalNode
 
-func (s *TupleExpressionContext) COMMA(i int) antlr.TerminalNode
+func (s *TopLevelLetDeclContext) Expression() IExpressionContext
 
-func (s *TupleExpressionContext) Expression(i int) IExpressionContext
+func (s *TopLevelLetDeclContext) GetParser() antlr.Parser
 
-func (s *TupleExpressionContext) GetParser() antlr.Parser
+func (s *TopLevelLetDeclContext) GetRuleContext() antlr.RuleContext
 
-func (s *TupleExpressionContext) GetRuleContext() antlr.RuleContext
+func (s *TopLevelLetDeclContext) IDENTIFIER() antlr.TerminalNode
 
-func (*TupleExpressionContext) IsTupleExpressionContext()
+func (*TopLevelLetDeclContext) IsTopLevelLetDeclContext()
 
-func (s *TupleExpressionContext) LPAREN() antlr.TerminalNode
+func (s *TopLevelLetDeclContext) LET() antlr.TerminalNode
 
-func (s *TupleExpressionContext) RPAREN() antlr.TerminalNode
+func (s *TopLevelLetDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *TupleExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *TopLevelLetDeclContext) TypeRef() ITypeRefContext
 
-type TuplePatternContext struct {
+type TopLevelVarDeclContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyTuplePatternContext() *TuplePatternContext
+func NewEmptyTopLevelVarDeclContext() *TopLevelVarDeclContext
 
-func NewTuplePatternContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TuplePatternContext
+func NewTopLevelVarDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TopLevelVarDeclContext
 
-func (s *TuplePatternContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *TopLevelVarDeclContext) ASSIGN() antlr.TerminalNode
 
-func (s *TuplePatternContext) AllCOMMA() []antlr.TerminalNode
+func (s *TopLevelVarDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *TuplePatternContext) AllIDENTIFIER() []antlr.TerminalNode
+func (s *TopLevelVarDeclContext) COLON() antlr.TerminalNode
 
-func (s *TuplePatternContext) COMMA(i int) antlr.TerminalNode
+func (s *TopLevelVarDeclContext) Expression() IExpressionContext
 
-func (s *TuplePatternContext) GetParser() antlr.Parser
+func (s *TopLevelVarDeclContext) GetParser() antlr.Parser
 
-func (s *TuplePatternContext) GetRuleContext() antlr.RuleContext
+func (s *TopLevelVarDeclContext) GetRuleContext() antlr.RuleContext
 
-func (s *TuplePatternContext) IDENTIFIER(i int) antlr.TerminalNode
+func (s *TopLevelVarDeclContext) IDENTIFIER() antlr.TerminalNode
 
-func (*TuplePatternContext) IsTuplePatternContext()
+func (*TopLevelVarDeclContext) IsTopLevelVarDeclContext()
 
-func (s *TuplePatternContext) LPAREN() antlr.TerminalNode
+func (s *TopLevelVarDeclContext) NULL() antlr.TerminalNode
 
-func (s *TuplePatternContext) RPAREN() antlr.TerminalNode
+func (s *TopLevelVarDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *TuplePatternContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *TopLevelVarDeclContext) TypeRef() ITypeRefContext
+
+func (s *TopLevelVarDeclContext) VAR() antlr.TerminalNode
+
+type TrueLiteralContext struct {
+	PrimaryContext
+}
+
+func NewTrueLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *TrueLiteralContext
+
+func (s *TrueLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *TrueLiteralContext) GetRuleContext() antlr.RuleContext
+
+func (s *TrueLiteralContext) TRUE() antlr.TerminalNode
+
+type TupleLiteralContext struct {
+	PrimaryContext
+}
+
+func NewTupleLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *TupleLiteralContext
+
+func (s *TupleLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *TupleLiteralContext) AllCOMMA() []antlr.TerminalNode
+
+func (s *TupleLiteralContext) AllExpression() []IExpressionContext
+
+func (s *TupleLiteralContext) COMMA(i int) antlr.TerminalNode
+
+func (s *TupleLiteralContext) Expression(i int) IExpressionContext
+
+func (s *TupleLiteralContext) GetRuleContext() antlr.RuleContext
+
+func (s *TupleLiteralContext) LPAREN() antlr.TerminalNode
+
+func (s *TupleLiteralContext) RPAREN() antlr.TerminalNode
 
 type TupleTypeContext struct {
 	antlr.BaseParserRuleContext
@@ -7021,6 +5918,12 @@ func NewEmptyTupleTypeContext() *TupleTypeContext
 func NewTupleTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TupleTypeContext
 
 func (s *TupleTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *TupleTypeContext) AllCOMMA() []antlr.TerminalNode
+
+func (s *TupleTypeContext) AllTypeRef() []ITypeRefContext
+
+func (s *TupleTypeContext) COMMA(i int) antlr.TerminalNode
 
 func (s *TupleTypeContext) GetParser() antlr.Parser
 
@@ -7034,54 +5937,36 @@ func (s *TupleTypeContext) RPAREN() antlr.TerminalNode
 
 func (s *TupleTypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *TupleTypeContext) TypeList() ITypeListContext
+func (s *TupleTypeContext) TypeRef(i int) ITypeRefContext
 
-type TypeContext struct {
+type TypeAliasDeclContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyTypeContext() *TypeContext
+func NewEmptyTypeAliasDeclContext() *TypeAliasDeclContext
 
-func NewTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TypeContext
+func NewTypeAliasDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TypeAliasDeclContext
 
-func (s *TypeContext) AMP() antlr.TerminalNode
+func (s *TypeAliasDeclContext) ASSIGN() antlr.TerminalNode
 
-func (s *TypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *TypeAliasDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *TypeContext) CollectionType() ICollectionTypeContext
+func (s *TypeAliasDeclContext) GetParser() antlr.Parser
 
-func (s *TypeContext) Expression() IExpressionContext
+func (s *TypeAliasDeclContext) GetRuleContext() antlr.RuleContext
 
-func (s *TypeContext) FunctionType() IFunctionTypeContext
+func (s *TypeAliasDeclContext) IDENTIFIER() antlr.TerminalNode
 
-func (s *TypeContext) GenericArgs() IGenericArgsContext
+func (*TypeAliasDeclContext) IsTypeAliasDeclContext()
 
-func (s *TypeContext) GetParser() antlr.Parser
+func (s *TypeAliasDeclContext) OPAQUE() antlr.TerminalNode
 
-func (s *TypeContext) GetRuleContext() antlr.RuleContext
+func (s *TypeAliasDeclContext) TYPE() antlr.TerminalNode
 
-func (s *TypeContext) IDENTIFIER() antlr.TerminalNode
+func (s *TypeAliasDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (*TypeContext) IsTypeContext()
-
-func (s *TypeContext) LBRACKET() antlr.TerminalNode
-
-func (s *TypeContext) PrimitiveType() IPrimitiveTypeContext
-
-func (s *TypeContext) QualifiedType() IQualifiedTypeContext
-
-func (s *TypeContext) RAWPTR() antlr.TerminalNode
-
-func (s *TypeContext) RBRACKET() antlr.TerminalNode
-
-func (s *TypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
-
-func (s *TypeContext) Type_() ITypeContext
-
-func (s *TypeContext) UNDERSCORE() antlr.TerminalNode
-
-func (s *TypeContext) VAR() antlr.TerminalNode
+func (s *TypeAliasDeclContext) TypeRef() ITypeRefContext
 
 type TypeListContext struct {
 	antlr.BaseParserRuleContext
@@ -7096,7 +5981,7 @@ func (s *TypeListContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
 func (s *TypeListContext) AllCOMMA() []antlr.TerminalNode
 
-func (s *TypeListContext) AllType_() []ITypeContext
+func (s *TypeListContext) AllTypeRef() []ITypeRefContext
 
 func (s *TypeListContext) COMMA(i int) antlr.TerminalNode
 
@@ -7108,87 +5993,111 @@ func (*TypeListContext) IsTypeListContext()
 
 func (s *TypeListContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *TypeListContext) Type_(i int) ITypeContext
+func (s *TypeListContext) TypeRef(i int) ITypeRefContext
 
-type UnaryExpressionContext struct {
+type TypeRefContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyUnaryExpressionContext() *UnaryExpressionContext
+func NewEmptyTypeRefContext() *TypeRefContext
 
-func NewUnaryExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *UnaryExpressionContext
+func NewTypeRefContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TypeRefContext
 
-func (s *UnaryExpressionContext) AMP() antlr.TerminalNode
+func (s *TypeRefContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *UnaryExpressionContext) AWAIT() antlr.TerminalNode
+func (s *TypeRefContext) BaseType() IBaseTypeContext
 
-func (s *UnaryExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *TypeRefContext) FunctionType() IFunctionTypeContext
 
-func (s *UnaryExpressionContext) BIT_NOT() antlr.TerminalNode
+func (s *TypeRefContext) GetParser() antlr.Parser
 
-func (s *UnaryExpressionContext) DECREMENT() antlr.TerminalNode
+func (s *TypeRefContext) GetRuleContext() antlr.RuleContext
 
-func (s *UnaryExpressionContext) Expression() IExpressionContext
+func (*TypeRefContext) IsTypeRefContext()
 
-func (s *UnaryExpressionContext) GetParser() antlr.Parser
+func (s *TypeRefContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *UnaryExpressionContext) GetRuleContext() antlr.RuleContext
+type TypedInitExprContext struct {
+	PrimaryContext
+}
 
-func (s *UnaryExpressionContext) INCREMENT() antlr.TerminalNode
+func NewTypedInitExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *TypedInitExprContext
 
-func (*UnaryExpressionContext) IsUnaryExpressionContext()
+func (s *TypedInitExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *UnaryExpressionContext) LPAREN() antlr.TerminalNode
+func (s *TypedInitExprContext) GenericArgs() IGenericArgsContext
 
-func (s *UnaryExpressionContext) MINUS() antlr.TerminalNode
+func (s *TypedInitExprContext) GetRuleContext() antlr.RuleContext
 
-func (s *UnaryExpressionContext) NOT() antlr.TerminalNode
+func (s *TypedInitExprContext) InitializerBlock() IInitializerBlockContext
 
-func (s *UnaryExpressionContext) PostfixExpression() IPostfixExpressionContext
+func (s *TypedInitExprContext) QualifiedName() IQualifiedNameContext
 
-func (s *UnaryExpressionContext) RPAREN() antlr.TerminalNode
+type UnaryMinusContext struct {
+	ExpressionContext
+}
 
-func (s *UnaryExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func NewUnaryMinusContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *UnaryMinusContext
 
-func (s *UnaryExpressionContext) UnaryExpression() IUnaryExpressionContext
+func (s *UnaryMinusContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-type VariableDeclContext struct {
+func (s *UnaryMinusContext) Expression() IExpressionContext
+
+func (s *UnaryMinusContext) GetRuleContext() antlr.RuleContext
+
+func (s *UnaryMinusContext) MINUS() antlr.TerminalNode
+
+type VarStatementContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
 }
 
-func NewEmptyVariableDeclContext() *VariableDeclContext
+func NewEmptyVarStatementContext() *VarStatementContext
 
-func NewVariableDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *VariableDeclContext
+func NewVarStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *VarStatementContext
 
-func (s *VariableDeclContext) ASSIGN() antlr.TerminalNode
+func (s *VarStatementContext) ASSIGN() antlr.TerminalNode
 
-func (s *VariableDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+func (s *VarStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
-func (s *VariableDeclContext) COLON() antlr.TerminalNode
+func (s *VarStatementContext) COLON() antlr.TerminalNode
 
-func (s *VariableDeclContext) Expression() IExpressionContext
+func (s *VarStatementContext) Expression() IExpressionContext
 
-func (s *VariableDeclContext) GetParser() antlr.Parser
+func (s *VarStatementContext) GetParser() antlr.Parser
 
-func (s *VariableDeclContext) GetRuleContext() antlr.RuleContext
+func (s *VarStatementContext) GetRuleContext() antlr.RuleContext
 
-func (s *VariableDeclContext) IDENTIFIER() antlr.TerminalNode
+func (s *VarStatementContext) IDENTIFIER() antlr.TerminalNode
 
-func (*VariableDeclContext) IsVariableDeclContext()
+func (*VarStatementContext) IsVarStatementContext()
 
-func (s *VariableDeclContext) LET() antlr.TerminalNode
+func (s *VarStatementContext) NULL() antlr.TerminalNode
 
-func (s *VariableDeclContext) NULL() antlr.TerminalNode
+func (s *VarStatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
-func (s *VariableDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+func (s *VarStatementContext) TypeRef() ITypeRefContext
 
-func (s *VariableDeclContext) TuplePattern() ITuplePatternContext
+func (s *VarStatementContext) VAR() antlr.TerminalNode
 
-func (s *VariableDeclContext) TupleType() ITupleTypeContext
+type VectorLiteralContext struct {
+	PrimaryContext
+}
 
-func (s *VariableDeclContext) Type_() ITypeContext
+func NewVectorLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *VectorLiteralContext
 
-func (s *VariableDeclContext) VAR() antlr.TerminalNode
+func (s *VectorLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *VectorLiteralContext) GetRuleContext() antlr.RuleContext
+
+func (s *VectorLiteralContext) InitializerBlock() IInitializerBlockContext
+
+func (s *VectorLiteralContext) LBRACKET() antlr.TerminalNode
+
+func (s *VectorLiteralContext) RBRACKET() antlr.TerminalNode
+
+func (s *VectorLiteralContext) TypeRef() ITypeRefContext
+
+func (s *VectorLiteralContext) VECTOR() antlr.TerminalNode
 

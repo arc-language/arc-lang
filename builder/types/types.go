@@ -130,16 +130,11 @@ func (t *ArrayType) Equal(o Type) bool {
 }
 
 // StructType represents a composite type.
-// It serves as the definition for both 'struct' (value type) and 'class' (reference type).
+// It serves as the definition for 'struct' (value type).
 type StructType struct {
 	Name    string
 	Fields  []Type
 	Packed  bool
-	
-	// IsClass determines the storage strategy.
-	// false = Value Type: Allocated on stack, fields are accessed directly at index i.
-	// true  = Reference Type: Allocated on heap, implicit RefCount at index 0, fields at index i+1.
-	IsClass bool
 }
 
 func (t *StructType) Kind() TypeKind { return StructKind }
@@ -157,12 +152,8 @@ func (t *StructType) DefString() string {
 		fields[i] = f.String()
 	}
 	
-	// If it is a class, implicitly visualize the header for debugging
 	prefix := "{ "
 	suffix := " }"
-	if t.IsClass {
-		fields = append([]string{"i64 (ref)"}, fields...)
-	}
 
 	if t.Packed {
 		prefix = "<{ "
@@ -173,9 +164,6 @@ func (t *StructType) DefString() string {
 
 func (t *StructType) BitSize() int {
 	total := 0
-	if t.IsClass {
-		total += 64 // Implicit RefCount header
-	}
 	for _, f := range t.Fields {
 		total += f.BitSize()
 	}
@@ -195,7 +183,7 @@ func (t *StructType) Equal(o Type) bool {
 				return false
 			}
 		}
-		return t.Packed == ot.Packed && t.IsClass == ot.IsClass
+		return t.Packed == ot.Packed
 	}
 	return false
 }
@@ -328,12 +316,7 @@ func NewArray(elem Type, length int64) *ArrayType {
 
 // NewStruct creates a struct type (Value Type)
 func NewStruct(name string, fields []Type, packed bool) *StructType {
-	return &StructType{Name: name, Fields: fields, Packed: packed, IsClass: false}
-}
-
-// NewClass creates a class type (Reference Type)
-func NewClass(name string, fields []Type, packed bool) *StructType {
-	return &StructType{Name: name, Fields: fields, Packed: packed, IsClass: true}
+	return &StructType{Name: name, Fields: fields, Packed: packed}
 }
 
 // NewFunction creates a function type
