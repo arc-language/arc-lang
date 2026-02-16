@@ -257,16 +257,33 @@ func (a *Analyzer) checkDeclStmt(s *ast.DeclStmt, scope *Scope) {
 	}
 }
 
-// inferCompositeLitType recursively pushes the expected type down into a composite literal.
+// inferCompositeLitType recursively pushes the expected type down into a composite literal
+// and its children (e.g. for multidimensional arrays).
 func (a *Analyzer) inferCompositeLitType(expr ast.Expr, typeRef ast.TypeRef) {
-	lit, ok := expr.(*ast.CompositeLit)
-	if !ok || typeRef == nil {
+	if expr == nil || typeRef == nil {
 		return
 	}
+
+	// Unwrap parens
+	for {
+		if p, ok := expr.(*ast.ParenExpr); ok {
+			expr = p.X
+		} else {
+			break
+		}
+	}
+
+	lit, ok := expr.(*ast.CompositeLit)
+	if !ok {
+		return
+	}
+
+	// Only overwrite if missing
 	if lit.Type == nil {
 		lit.Type = typeRef
 	}
-	// Recurse for container types.
+
+	// Recurse for container types
 	switch t := typeRef.(type) {
 	case *ast.ArrayType:
 		for _, f := range lit.Fields {
@@ -373,6 +390,8 @@ func (a *Analyzer) checkExpr(expr ast.Expr, scope *Scope) {
 	case *ast.DeleteExpr:
 		a.checkExpr(e.X, scope)
 	case *ast.CastExpr:
+		a.checkExpr(e.X, scope)
+	case *ast.ParenExpr:
 		a.checkExpr(e.X, scope)
 	}
 }

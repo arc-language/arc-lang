@@ -68,6 +68,8 @@ func (cg *Codegen) genExpr(expr ast.Expr) ir.Value {
 		handle := cg.genExpr(e.X)
 		inst := cg.Builder.CreateAwaitTask(handle, types.Void, "await")
 		return inst
+	case *ast.ParenExpr:
+		return cg.genExpr(e.X)
 	}
 	return nil
 }
@@ -492,6 +494,8 @@ func (cg *Codegen) genCompositeLit(e *ast.CompositeLit) ir.Value {
 			}
 			val := cg.genExpr(valExpr)
 			if val == nil {
+				// This shouldn't happen if semantic analysis is correct,
+				// but avoiding a hard crash allows debugging bad IR if needed.
 				continue
 			}
 			val = cg.emitCast(val, at.ElementType)
