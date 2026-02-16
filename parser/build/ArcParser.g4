@@ -10,7 +10,7 @@ compilationUnit
     : namespaceDecl topLevelDecl* EOF
     ;
 
-// FIX: Added 'semi' here to consume the inserted semicolon after namespace
+// FIX: Added 'semi' to consume inserted semicolon after namespace
 namespaceDecl
     : NAMESPACE IDENTIFIER (DOT IDENTIFIER)* semi
     ;
@@ -492,6 +492,13 @@ primary
     | TRUE                      # TrueLiteral
     | FALSE                     # FalseLiteral
     | NULL                      # NullLiteral
+
+    // FIX: Moved TypedInitExpr ABOVE IdentExpr and allowed simple IDENTIFIER.
+    // This allows 'routes{}' to be parsed as a struct init instead of variable 'routes'
+    | (qualifiedName | IDENTIFIER) genericArgs? initializerBlock       # TypedInitExpr
+    | VECTOR LBRACKET typeRef RBRACKET initializerBlock                # VectorLiteral
+    | MAP LBRACKET typeRef RBRACKET typeRef initializerBlock           # MapLiteral
+
     | qualifiedName             # QualifiedExpr
     | IDENTIFIER                # IdentExpr
     | primitiveType             # PrimitiveTypeExpr
@@ -503,10 +510,6 @@ primary
     | NEW LBRACKET expression RBRACKET typeRef          # NewArrayExpr
 
     | DELETE LPAREN expression RPAREN                   # DeleteExpr
-
-    | qualifiedName genericArgs? initializerBlock       # TypedInitExpr
-    | VECTOR LBRACKET typeRef RBRACKET initializerBlock # VectorLiteral
-    | MAP LBRACKET typeRef RBRACKET typeRef initializerBlock # MapLiteral
 
     | ASYNC? LPAREN lambdaParamList? RPAREN ARROW block # LambdaExpr
 

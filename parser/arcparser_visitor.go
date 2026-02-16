@@ -326,6 +326,15 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#NullLiteral.
 	VisitNullLiteral(ctx *NullLiteralContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#TypedInitExpr.
+	VisitTypedInitExpr(ctx *TypedInitExprContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#VectorLiteral.
+	VisitVectorLiteral(ctx *VectorLiteralContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#MapLiteral.
+	VisitMapLiteral(ctx *MapLiteralContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#QualifiedExpr.
 	VisitQualifiedExpr(ctx *QualifiedExprContext) interface{}
 
@@ -349,15 +358,6 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#DeleteExpr.
 	VisitDeleteExpr(ctx *DeleteExprContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#TypedInitExpr.
-	VisitTypedInitExpr(ctx *TypedInitExprContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#VectorLiteral.
-	VisitVectorLiteral(ctx *VectorLiteralContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#MapLiteral.
-	VisitMapLiteral(ctx *MapLiteralContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#LambdaExpr.
 	VisitLambdaExpr(ctx *LambdaExprContext) interface{}

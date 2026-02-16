@@ -432,6 +432,18 @@ func (v *BaseArcParserVisitor) VisitNullLiteral(ctx *NullLiteralContext) interfa
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseArcParserVisitor) VisitTypedInitExpr(ctx *TypedInitExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitVectorLiteral(ctx *VectorLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseArcParserVisitor) VisitMapLiteral(ctx *MapLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseArcParserVisitor) VisitQualifiedExpr(ctx *QualifiedExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -461,18 +473,6 @@ func (v *BaseArcParserVisitor) VisitNewArrayExpr(ctx *NewArrayExprContext) inter
 }
 
 func (v *BaseArcParserVisitor) VisitDeleteExpr(ctx *DeleteExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitTypedInitExpr(ctx *TypedInitExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitVectorLiteral(ctx *VectorLiteralContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseArcParserVisitor) VisitMapLiteral(ctx *MapLiteralContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

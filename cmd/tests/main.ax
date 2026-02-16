@@ -1,6 +1,12 @@
 namespace main
 
+interface routes {
+    s: string
+    m: int64
+}
+
 func main() {
 
+    var m = routes{}
 
 }

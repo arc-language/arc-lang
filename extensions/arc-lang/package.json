@@ -2,7 +2,7 @@
   "name": "arc-lang",
   "displayName": "Arc Language Support",
   "description": "Syntax highlighting for Arc",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "arc-lang",
   "repository": { "type": "git", "url": "https://github.com/arc-language/arc-lang" },
   "engines": {
