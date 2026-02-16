@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="./.github/arc_logo.jpeg" alt="Arc Language" width="200px">
+  <img src="./github/arc_logo.png" alt="Arc Language" width="400px">
 </h1>
 
 <h4 align="center">Systems Programming Language<br>High Performance, Native Code, Modern Syntax</h4>
@@ -29,6 +29,7 @@ Arc uses automatic reference counting for memory safety, provides zero-cost abst
 ```arc
 import "ai"
 import "io"
+
 
 func main() {
     // Load model from file
@@ -71,18 +72,18 @@ let d: float64 = 2.71828
 // Slices (view into memory, ptr + length, no allocation)
 let view: []byte = buffer[0..64]
 
-// Mutable references — &var in type, & at call site
-func add_one(x: &var int32) { x += 1 }
+// Mutable references — &mut in type, & at call site
+func add_one(x: &mut int32) { x += 1 }
 add_one(&i)
 
-// Structs (value types)
-struct Point {
+// Interfaces (value types — stack allocated with let)
+interface Point {
     x: int32
     y: int32
 }
 
-// Classes (reference types)
-class Client {
+// Interfaces (reference types — heap allocated with var)
+interface Client {
     name: string
     port: int32
 }
@@ -90,12 +91,13 @@ class Client {
 
 ### Memory Management
 
-Arc uses automatic reference counting for classes and explicit stack allocation for low-level work:
+Arc uses automatic reference counting for `var` declarations and manual allocation for low-level work:
 
 ```arc
-// Stack allocation
-let buffer = alloca(byte, 4096)
-memset(buffer, 0, 4096)
+// Manual heap allocation
+let buf = new [4096]byte
+mem_zero(buf, sizeof(buf))
+defer delete(buf)
 
 // Heap allocation (via FFI)
 extern c {
@@ -108,8 +110,8 @@ defer free(ptr)  // Cleanup on scope exit
 
 // Get address of variable for extern calls
 let val = 42
-let raw = rawptr(&val)    // address of val as raw pointer
-let sentinel = rawptr(-1) // cast integer value to raw pointer
+let raw = memptr(&val)    // address of val as memory pointer
+let sentinel = memptr(-1) // cast integer value to memory pointer
 ```
 
 ### Foreign Function Interface
@@ -165,7 +167,7 @@ async func main() {
 Monomorphized at compile time:
 
 ```arc
-func swap<T>(a: &var T, b: &var T) {
+func swap<T>(a: &mut T, b: &mut T) {
     let tmp: T = a
     a = b
     b = tmp
@@ -175,12 +177,12 @@ let x = 10
 let y = 20
 swap(&x, &y)
 
-struct Box<T> {
+interface Box<T> {
     value: T
-    
-    func get(self b: Box<T>) T {
-        return b.value
-    }
+}
+
+func get(self b: Box<T>) T {
+    return b.value
 }
 ```
 
@@ -197,7 +199,7 @@ import "net"
 import "io"
 
 async func handle_request(conn: net.TcpStream) {
-    let buffer: vector[byte] = {}
+    let buffer: vector[byte] = {1, 2, 3}
     let bytes_read = await conn.read(&buffer)
     
     let response = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK"
@@ -221,8 +223,8 @@ async func main() {
 namespace main
 
 extern c {
-    struct sqlite3 {}
-    struct sqlite3_stmt {}
+    interface sqlite3 {}
+    interface sqlite3_stmt {}
     
     const SQLITE_OK: int32 = 0
     const SQLITE_ROW: int32 = 100
@@ -236,16 +238,16 @@ extern c {
 }
 
 func main() {
-    let db: sqlite3 = null
+    var db: sqlite3 = null
     
-    if sqlite3_open("app.db", rawptr(&db)) != SQLITE_OK {
+    if sqlite3_open("app.db", memptr(&db)) != SQLITE_OK {
         printf("Failed to open database\n")
         return
     }
     defer sqlite3_close(db)
     
-    let stmt: sqlite3_stmt = null
-    sqlite3_prepare_v2(db, "SELECT name FROM users", -1, rawptr(&stmt), null)
+    var stmt: sqlite3_stmt = null
+    sqlite3_prepare_v2(db, "SELECT name FROM users", -1, memptr(&stmt), null)
     
     for sqlite3_step(stmt) == SQLITE_ROW {
         let name = sqlite3_column_text(stmt, 0)
@@ -261,23 +263,23 @@ namespace main
 
 import objc "AppKit"
 
-class AppDelegate: NSApplicationDelegate {
+interface AppDelegate: NSApplicationDelegate {
     window: NSWindow
+}
+
+func applicationDidFinishLaunching(self d: AppDelegate, notif: NSNotification) {
+    let rect = NSMakeRect(0, 0, 800, 600)
+    let style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
     
-    func applicationDidFinishLaunching(self d: AppDelegate, notif: NSNotification) {
-        let rect = NSMakeRect(0, 0, 800, 600)
-        let style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
-        
-        d.window = NSWindow.new(rect, style, NSBackingStoreBuffered, false)
-        d.window.title = NSString.from("Arc Application")
-        d.window.center()
-        d.window.makeKeyAndOrderFront(null)
-    }
+    d.window = NSWindow.new(rect, style, NSBackingStoreBuffered, false)
+    d.window.title = NSString.from("Arc Application")
+    d.window.center()
+    d.window.makeKeyAndOrderFront(null)
 }
 
 func main() {
     let app = NSApplication.sharedApplication()
-    let delegate = AppDelegate{}
+    var delegate = AppDelegate{}
     app.delegate = delegate
     app.run()
 }
@@ -298,7 +300,7 @@ func init_module() int32 {
     
     dev.on_read(func(file: driver.File, buffer: []byte, size: uint64) int64 {
         let data = "Hello from kernel"
-        memcpy(rawptr(&buffer[0]), data.as_bytes(), data.len())
+        mem_copy(memptr(&buffer[0]), data.as_bytes(), data.len())
         return int64(data.len())
     })
     
@@ -377,7 +379,7 @@ gpu func process_tpu(data: Tensor) Tensor {
 }
 
 // Train model on GPU
-gpu func train(model: &var ai.Model, data: Tensor) {
+gpu func train(model: &mut ai.Model, data: Tensor) {
     for epoch in 0..100 {
         let loss = model.forward(data)
         model.backward(loss)

@@ -143,23 +143,38 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#genericArg.
 	VisitGenericArg(ctx *GenericArgContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#type.
+	VisitType(ctx *TypeContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#collectionType.
 	VisitCollectionType(ctx *CollectionTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#functionDecl.
-	VisitFunctionDecl(ctx *FunctionDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#qualifiedType.
+	VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#returnType.
-	VisitReturnType(ctx *ReturnTypeContext) interface{}
+	// Visit a parse tree produced by ArcParser#functionType.
+	VisitFunctionType(ctx *FunctionTypeContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#primitiveType.
+	VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#typeList.
 	VisitTypeList(ctx *TypeListContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#parameterList.
-	VisitParameterList(ctx *ParameterListContext) interface{}
+	// Visit a parse tree produced by ArcParser#returnType.
+	VisitReturnType(ctx *ReturnTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#parameter.
-	VisitParameter(ctx *ParameterContext) interface{}
+	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
+	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#functionDecl.
+	VisitFunctionDecl(ctx *FunctionDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#methodDecl.
+	VisitMethodDecl(ctx *MethodDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#deinitDecl.
+	VisitDeinitDecl(ctx *DeinitDeclContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#structDecl.
 	VisitStructDecl(ctx *StructDeclContext) interface{}
@@ -185,12 +200,6 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#enumMember.
 	VisitEnumMember(ctx *EnumMemberContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#methodDecl.
-	VisitMethodDecl(ctx *MethodDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#deinitDecl.
-	VisitDeinitDecl(ctx *DeinitDeclContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#variableDecl.
 	VisitVariableDecl(ctx *VariableDeclContext) interface{}
 
@@ -203,20 +212,11 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#tupleType.
 	VisitTupleType(ctx *TupleTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#type.
-	VisitType(ctx *TypeContext) interface{}
+	// Visit a parse tree produced by ArcParser#parameterList.
+	VisitParameterList(ctx *ParameterListContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#qualifiedType.
-	VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#functionType.
-	VisitFunctionType(ctx *FunctionTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
-	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#primitiveType.
-	VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
+	// Visit a parse tree produced by ArcParser#parameter.
+	VisitParameter(ctx *ParameterContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#block.
 	VisitBlock(ctx *BlockContext) interface{}
@@ -307,6 +307,12 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#primaryExpression.
 	VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#newExpression.
+	VisitNewExpression(ctx *NewExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#deleteExpression.
+	VisitDeleteExpression(ctx *DeleteExpressionContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#castExpression.
 	VisitCastExpression(ctx *CastExpressionContext) interface{}

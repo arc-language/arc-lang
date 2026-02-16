@@ -1,3 +1,7 @@
+Here's the doc with the entire Linkage section removed:
+
+---
+
 # Foreign Function Interface (`extern`)
 
 Arc provides seamless interoperability with C and C++ libraries through the
@@ -78,17 +82,17 @@ let ptr = alloc(100)
 c_free(ptr)
 ```
 
-### Structs
+### Interfaces for C Types
 
-Arc structs are binary-compatible with C structs. Define matching layouts:
+Arc interfaces are binary-compatible with C structs. Define matching layouts:
 
 ```arc
-struct timeval {
+interface timeval {
     tv_sec: int64
     tv_usec: int64
 }
 
-struct stat {
+interface stat {
     st_dev: uint64
     st_ino: uint64
     st_mode: uint32
@@ -108,14 +112,17 @@ extern c {
 }
 ```
 
-For C types with no accessible fields, declare an empty struct:
+For C types with no accessible fields, declare an empty interface outside the extern block:
 
 ```arc
 // Empty body = opaque layout, can only use as pointer
+interface FILE {}
+interface sqlite3 {}
+interface sqlite3_stmt {}
+
 extern c {
-    struct FILE {}
-    struct sqlite3 {}
-    struct sqlite3_stmt {}
+    func fopen(*byte, *byte) *FILE
+    func sqlite3_open(*byte, **sqlite3) int32
 }
 ```
 
@@ -131,13 +138,15 @@ extern c {
 
 ### Constants
 
+Constants are declared at the top level, not inside `extern` blocks:
+
 ```arc
+const O_RDONLY: int32 = 0
+const O_WRONLY: int32 = 1
+const O_RDWR: int32 = 2
+const O_CREAT: int32 = 64
+
 extern c {
-    const O_RDONLY: int32 = 0
-    const O_WRONLY: int32 = 1
-    const O_RDWR: int32 = 2
-    const O_CREAT: int32 = 64
-    
     func open(*byte, int32, ...) int32
     func close(int32) int32
     func read(int32, *void, usize) isize
@@ -177,8 +186,8 @@ func on_signal(sig: int32) void {
 }
 
 func main() {
-    // rawptr(&data) — get address of data for extern call
-    qsort(rawptr(&data), 5, sizeof(int32), compare_ints)
+    // memptr(&data) — get address of data for extern call
+    qsort(memptr(&data), 5, sizeof(int32), compare_ints)
     signal(SIGINT, on_signal)
 }
 ```
@@ -490,7 +499,7 @@ extern cpp {
     }
 }
 
-func on_event(event: *Event, user_data: *void) void {
+func on_event(event: Event, user_data: memptr) {
     printf("Event received!\n")
 }
 
@@ -503,13 +512,13 @@ func main() {
 
 ---
 
-## Struct Attributes
+## Interface Attributes
 
 ### Alignment
 
 ```arc
 @align(16)
-struct XMVECTOR {
+interface XMVECTOR {
     x: float32
     y: float32
     z: float32
@@ -517,7 +526,7 @@ struct XMVECTOR {
 }
 
 @align(4096)
-struct PageAligned {
+interface PageAligned {
     data: [4096]byte
 }
 ```
@@ -526,7 +535,7 @@ struct PageAligned {
 
 ```arc
 @packed
-struct FileHeader {
+interface FileHeader {
     magic: uint32      // offset 0
     version: uint16    // offset 4
     flags: uint16      // offset 6
@@ -535,7 +544,7 @@ struct FileHeader {
 // Total: 12 bytes (not 16)
 
 @packed
-struct NetworkPacket {
+interface NetworkPacket {
     type: uint8
     length: uint16
     sequence: uint32
@@ -584,7 +593,7 @@ namespace graphics.d3d11
 type HRESULT = int32
 type GUID = [16]byte
 
-struct D3D11_BUFFER_DESC {
+interface D3D11_BUFFER_DESC {
     byte_width: uint32
     usage: uint32
     bind_flags: uint32
@@ -593,7 +602,7 @@ struct D3D11_BUFFER_DESC {
     structure_byte_stride: uint32
 }
 
-struct D3D11_SUBRESOURCE_DATA {
+interface D3D11_SUBRESOURCE_DATA {
     sys_mem: *void
     sys_mem_pitch: uint32
     sys_mem_slice_pitch: uint32
@@ -604,12 +613,12 @@ const D3D_DRIVER_TYPE_HARDWARE: uint32 = 1
 const D3D11_USAGE_DEFAULT: uint32 = 0
 const D3D11_BIND_VERTEX_BUFFER: uint32 = 1
 
+interface IDXGIAdapter {}
+interface ID3D11DeviceContext {}
+interface ID3D11Texture2D {}
+
 extern cpp {
     namespace DirectX {
-        class IDXGIAdapter {}
-        class ID3D11DeviceContext {}
-        class ID3D11Texture2D {}
-        
         func D3D11CreateDevice(
             *IDXGIAdapter,
             uint32,
@@ -648,18 +657,18 @@ extern c {
 }
 
 func main() {
-    let device: DirectX.ID3D11Device = null
-    let context: DirectX.ID3D11DeviceContext = null
+    var device: DirectX.ID3D11Device = null
+    var context: DirectX.ID3D11DeviceContext = null
     
-    // rawptr(&x) — get address of pointer for output params
+    // memptr(&x) — get address of pointer for output params
     let hr = DirectX.D3D11CreateDevice(
         null,
         D3D_DRIVER_TYPE_HARDWARE,
         null, 0, null, 0,
         D3D11_SDK_VERSION,
-        rawptr(&device),   // **ID3D11Device
+        memptr(&device),   // **ID3D11Device
         null,
-        rawptr(&context)   // **ID3D11DeviceContext
+        memptr(&context)   // **ID3D11DeviceContext
     )
     
     if hr != 0 {
@@ -678,9 +687,9 @@ func main() {
         structure_byte_stride: 0
     }
     
-    let buffer: DirectX.ID3D11Buffer = null
+    var buffer: DirectX.ID3D11Buffer = null
     
-    hr = device.CreateBuffer(rawptr(&desc), init_data, rawptr(&buffer))
+    hr = device.CreateBuffer(memptr(&desc), init_data, memptr(&buffer))
     
     if hr == 0 {
         defer buffer.Release()
@@ -694,14 +703,14 @@ func main() {
 ```arc
 namespace main
 
+interface sqlite3 {}
+interface sqlite3_stmt {}
+
+const SQLITE_OK: int32 = 0
+const SQLITE_ROW: int32 = 100
+const SQLITE_DONE: int32 = 101
+
 extern c {
-    struct sqlite3 {}
-    struct sqlite3_stmt {}
-    
-    const SQLITE_OK: int32 = 0
-    const SQLITE_ROW: int32 = 100
-    const SQLITE_DONE: int32 = 101
-    
     func sqlite3_open(*byte, **sqlite3) int32
     func sqlite3_close(*sqlite3) int32
     func sqlite3_errmsg(*sqlite3) *byte
@@ -721,19 +730,19 @@ extern c {
 }
 
 func main() {
-    let db: sqlite3 = null
+    var db: sqlite3 = null
     
-    // rawptr(&db) — pass address of pointer for output param
-    if sqlite3_open("test.db", rawptr(&db)) != SQLITE_OK {
+    // memptr(&db) — pass address of pointer for output param
+    if sqlite3_open("test.db", memptr(&db)) != SQLITE_OK {
         printf("Failed to open: %s\n", sqlite3_errmsg(db))
         return
     }
     defer sqlite3_close(db)
     
-    let stmt: sqlite3_stmt = null
+    var stmt: sqlite3_stmt = null
     let sql = "SELECT id, name FROM users"
     
-    if sqlite3_prepare_v2(db, sql, -1, rawptr(&stmt), null) != SQLITE_OK {
+    if sqlite3_prepare_v2(db, sql, -1, memptr(&stmt), null) != SQLITE_OK {
         printf("Failed to prepare: %s\n", sqlite3_errmsg(db))
         return
     }
@@ -820,38 +829,6 @@ func main() {
 
 ---
 
-## Linkage
-
-Library paths are specified in `build.arc`, not source files:
-
-```arc
-// build.arc
-module graphics {
-    sources: ["src/*.arc"]
-    
-    link: {
-        windows: ["d3d11.lib", "dxgi.lib"]
-        linux:   ["libvulkan.so"]
-        macos:   ["Metal.framework"]
-        
-        sqlite: find("sqlite3")
-    }
-}
-```
-
-Source files just declare the interface:
-
-```arc
-// src/graphics.arc
-extern cpp {
-    namespace DirectX {
-        func CreateDevice(...) HRESULT
-    }
-}
-```
-
----
-
 ## Comparison: `extern c` vs `extern cpp`
 
 | Feature | `extern c` | `extern cpp` |
@@ -878,8 +855,6 @@ extern c {
     func name(types...) ReturnType
     func arc_name "c_symbol" (types...) ReturnType
     type Callback = func(types...) ReturnType
-    const NAME: Type = value
-    struct Handle {}              // empty = opaque layout
     
     stdcall func WinApiFunc(...) int32
 }
@@ -918,14 +893,22 @@ extern cpp {
     vectorcall func SimdFunc(Vec4, Vec4) Vec4
 }
 
-// Struct attributes
+// Opaque C types — declared outside extern, not inside
+interface FILE {}
+interface sqlite3 {}
+
+// Constants — declared at top level, not inside extern
+const SQLITE_OK: int32 = 0
+const O_RDONLY: int32 = 0
+
+// Interface attributes
 @align(16)
-struct Aligned { ... }
+interface Aligned { ... }
 
 @packed
-struct Packed { ... }
+interface Packed { ... }
 
-// rawptr usage
-rawptr(-1)      // cast value to raw pointer
-rawptr(&val)    // get address of val as raw pointer
+// memptr usage
+memptr(-1)      // cast value to memory pointer
+memptr(&val)    // get address of val as memory pointer
 ```

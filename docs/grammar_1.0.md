@@ -1,17 +1,22 @@
-# arc Language Grammar (Version 1.7 - Core Syntax)
+# arc Language Grammar (Version 2.4 - Core Syntax)
 
 Grammar rules:
- * type declaration can only have dot
- * no stars in regular arc code, stars only inside extern blocks
- * `&var` in parameter type signals a mutable reference
- * `&` at call site passes a mutable reference (matches &var param)
+ * `interface` is the single type declaration — no struct/class split
+ * memory model is decided at the callsite, not the declaration
+ * `const` = immutable value, stack, never changes
+ * `let` = stack allocated, copied on assignment
+ * `var` = heap allocated, ref counted, shareable, nullable
+ * `new` = heap allocated, manual, no ref count, you own it
+ * `&mut` in parameter type signals a mutable reference
+ * `&` at call site passes a mutable reference (matches &mut param)
  * passing without `&` is always pass-by-value (caller's variable unaffected)
  * `&` exclusively means mutable reference — there is no immutable reference type
  * `[]T` is a slice view — ptr + length, no allocation
+ * `[N]T` is a fixed-size array
  * `vector[T]` is an owned dynamic array — heap allocated
  * `buf[0..4]` produces a slice view, `buf[0]` produces a single element
- * rawptr(&val) gets address of a variable, rawptr(x) casts a value to pointer
- * null valid for class types only, compiler enforces this
+ * `memptr(&val)` gets address of a variable, `memptr(x)` casts a value to pointer
+ * null valid for var declarations only, compiler enforces this
  * cast uses type(value) syntax, not cast<T>(value)
  * gpu func for accelerator kernels, target set in build config
 
@@ -27,7 +32,6 @@ You usually disallow "empty" initializer lists as statements. An array literal {
 ```
 
 ## Comments
-
 ```arc
 // Single-line comment
 
@@ -38,7 +42,6 @@ You usually disallow "empty" initializer lists as statements. An array literal {
 ```
 
 ## Import, declaration
-
 ```arc
 import "some/path/package"
 
@@ -59,85 +62,163 @@ import (
 ```
 
 ## Namespaces, declaration
-
 ```arc
 namespace main
 ```
 
-## Variables, mutable with type
+## Memory Model
 
+Arc has four declaration keywords that tell you everything about ownership and lifetime.
+The type declaration never carries the memory decision — the callsite does.
+```arc
+const MAX = 100                           // immutable, stack, never changes
+let point = Point{x: 1, y: 2}            // stack allocated, copied on assignment
+var client = Client{name: "x", port: 80}  // heap allocated, ref counted, shareable
+let node = new Node{}                     // heap allocated, manual, you own it
+```
+
+- `const` — value never changes, compiler can inline and optimize freely
+- `let` — lives on the stack, when scope ends it's gone, assignment makes a copy
+- `var` — lives on the heap, ref counted, safe to share across scopes, can be null
+- `new` — lives on the heap, no ref count, no deinit, you manage it manually
+
+The difference between `var` and `new` is ownership:
+```arc
+var node = Node{}       // heap, ref counted — compiler manages lifetime
+let node = new Node{}   // heap, manual — you manage lifetime
+```
+
+## Variables, stack with type
 ```arc
 let x: int32 = 42
 x = 100
 ```
 
-## Variables, mutable with inference
+Stack allocated. When this scope ends, x is gone. Assignment copies the value.
 
+## Variables, stack with inference
 ```arc
 let x = 42
 x = 100
 ```
 
-## Constants, immutable with type
+## Variables, heap ref counted with type
+```arc
+var client: Client = Client{name: "test", port: 8080}
+```
 
+Heap allocated, ref counted. When all references drop, deinit fires and memory is freed.
+Safe to pass around, safe to store in other types. Can be assigned null.
+
+## Variables, heap ref counted with inference
+```arc
+var client = Client{name: "test", port: 8080}
+```
+
+## Variables, nullable
+```arc
+var client: Client = null
+```
+
+Only valid for `var` declarations. The compiler will reject `let x: int32 = null` —
+null only makes sense for heap allocated ref counted types where ownership is shared.
+
+## Constants, immutable with type
 ```arc
 const x: int32 = 42
 ```
 
 ## Constants, immutable with inference
-
 ```arc
 const x = 42
 ```
 
-## Mutable References (&var)
+## new — Manual Heap Allocation
 
-Arc uses `&var` in the parameter type to declare a mutable reference, and `&` at the call site to pass one. There is no immutable reference type — if a function does not need to mutate, it just takes the value directly. `&` exclusively means mutation.
-
+`new` allocates on the heap with no ref counting and no deinit.
+You own it. You free it. Designed for kernel drivers, hot paths, and
+anywhere `var` ref counting is too heavy.
 ```arc
-// pass by value — function gets a copy, caller's variable never changes
-func read(x: int32) {
-    io.print(x)
-}
+// allocate single type, zero initialized
+let node = new Node{}
 
-// &var in the type — this parameter is a mutable reference
-func add_one(x: &var int32) {
-    x += 1  // auto-deref, no star needed
-}
+// allocate with field initialization
+let node = new Node{value: 10, next: null}
 
-let num = 10
+// allocate fixed-size array
+let buf = new [4096]byte
+let ids = new [256]uint32
 
-read(num)       // no & — pass by value, num unchanged
-add_one(&num)   // & at call site — caller knows num will change
-// num is now 11
+// always pair with defer delete
+let node = new Node{}
+defer delete(node)
+
+let buf = new [4096]byte
+defer delete(buf)
 ```
 
-## Slices and Vectors
+- `new` never triggers `deinit` — that is only for `var`
+- `delete` must be called manually — use `defer` to avoid leaks
+- Safe to use in interrupt handlers and spinlock-held sections
+- No ref count overhead — safe in hot paths
 
-Arc has two distinct types for sequences:
-
+## new, common patterns
 ```arc
-// []T — slice view, ptr + length, no heap allocation
-// just a window into existing memory
+// alloc fixed buffer then zero
+let buf = new [4096]byte
+mem_zero(buf, sizeof(buf))
+defer delete(buf)
+
+// alloc struct for C interop
+let addr = new SockAddrIn{}
+mem_zero(addr, sizeof(SockAddrIn))
+defer delete(addr)
+connect(fd, memptr(&addr), uint32(sizeof(SockAddrIn)))
+
+// alloc then use then free
+let node = new Node{value: 42}
+defer delete(node)
+process(node)
+```
+
+## Array and Slice Types
+
+Arc has three distinct sequence types:
+```arc
+// []T — slice view, ptr + length, no allocation
+// a window into existing memory, never owns it
 let view: []byte = ...
 let header: []byte = buffer[0..4]
+
+// [N]T — fixed-size array, size known at compile time
+let buf: [4096]byte = ...
+let ids: [256]uint32 = ...
 
 // vector[T] — owned dynamic array, heap allocated, growable
 let owned: vector[byte] = ...
 let items: vector[int32] = {1, 2, 3, 4, 5}
 ```
 
-Indexing rules:
-
+Fixed-size arrays on the stack:
 ```arc
-let buffer: vector[byte] = ...
+// stack allocated fixed array
+let buf: [1024]byte
+mem_zero(buf, sizeof(buf))
 
-let chunk: []byte = buffer[0..4]   // range index — produces a slice view
-let b: byte = buffer[2]            // single index — produces a single element
+// heap allocated fixed array — manual
+let buf = new [4096]byte
+defer delete(buf)
+```
+
+Indexing rules:
+```arc
+let buffer: [4096]byte = ...
+
+let chunk: []byte  = buffer[0..4]  // range index — produces a slice view
+let b:     byte    = buffer[2]     // single index — produces a single element
 ```
 
 Slices work with any type:
-
 ```arc
 let ints: vector[int32] = {1, 2, 3, 4, 5}
 let middle: []int32 = ints[1..4]   // view of elements 1, 2, 3
@@ -148,7 +229,6 @@ func process(data: []byte) {
 ```
 
 ## Basic Types, Fixed-Width Integers
-
 ```arc
 // Signed: int8, int16, int32, int64
 let i: int32 = -500
@@ -158,7 +238,6 @@ let u: uint64 = 10000
 ```
 
 ## Basic Types, Architecture Dependent
-
 ```arc
 // Unsigned pointer-sized integer (x64 = uint64, x86 = uint32)
 // Use for: Array indexing, Memory sizes, Loop counters
@@ -170,14 +249,12 @@ let offset: isize = -4
 ```
 
 ## Basic Types, Floating Point
-
 ```arc
 let f32: float32 = 3.14
 let f64: float64 = 2.71828
 ```
 
 ## Basic Types, Aliases (Semantic)
-
 ```arc
 // 'byte' is an alias for 'uint8' (Raw data)
 let b: byte = 255
@@ -190,34 +267,29 @@ let r: char = 'a'
 ```
 
 ## Basic Types, String (Composite)
-
 ```arc
 // High-level string (ptr + length)
 let s: string = "hello"
 ```
 
 ## Basic Types, Qualified (Namespaced)
-
 ```arc
-// Type from a specific namespace
 let client: net.Socket = ...
 let config: json.Config = ...
 ```
 
 ## Literals, boolean
-
 ```arc
 let flag: bool = true
 let enabled: bool = false
 ```
 
 ## Literals, null
-
 ```arc
-// null is valid for class types (reference types)
-// compiler error if assigned to struct or primitive
-let client: Socket = null
-let server: net.Server = null
+// null is only valid for var declarations (heap ref counted types)
+// compiler error if assigned to let or const
+var client: Client = null
+var server: net.Server = null
 
 if client == null {
     // handle null case
@@ -225,14 +297,12 @@ if client == null {
 ```
 
 ## Literals, character
-
 ```arc
 let ch: char = 'a'
 let digit: char = '5'
 ```
 
 ## Literals, character escapes
-
 ```arc
 let newline: char = '\n'
 let tab: char = '\t'
@@ -242,14 +312,12 @@ let null_char: char = '\0'
 ```
 
 ## Literals, string
-
 ```arc
 let msg: string = "Hello, World!"
 let empty: string = ""
 ```
 
 ## Literals, string escapes
-
 ```arc
 let msg: string = "Hello\nWorld"
 let path: string = "C:\\Users\\file"
@@ -258,7 +326,6 @@ let tab: string = "Column1\tColumn2"
 ```
 
 ## Functions, basic
-
 ```arc
 func add(a: int32, b: int32) int32 {
     return a + b
@@ -266,7 +333,6 @@ func add(a: int32, b: int32) int32 {
 ```
 
 ## Functions, no return
-
 ```arc
 func print(msg: string) {
     
@@ -274,15 +340,12 @@ func print(msg: string) {
 ```
 
 ## Functions, async
-
 ```arc
-// Async function that returns a value
 async func fetch_data(url: string) string {
     let response = await http.get(url)
     return response.body
 }
 
-// Async function with no return
 async func process_items(items: vector[string]) {
     for item in items {
         await process(item)
@@ -291,7 +354,6 @@ async func process_items(items: vector[string]) {
 ```
 
 ## Functions, await usage
-
 ```arc
 async func main() {
     let data = await fetch_data("https://api.example.com")
@@ -306,27 +368,22 @@ async func main() {
 ```
 
 ## Functions, async callback
-
 ```arc
-// Async callback with single param
 onClick(args, async (item: string) => {
     await process(item)
 })
 
-// Async callback with multiple params
 some.fetch(args, async (url: string, timeout: int32) => {
     let resp = await http.get(url, timeout)
     return resp.body
 })
 
-// Async callback with no params
 button.on_click(async () => {
     await save_state()
 })
 ```
 
 ## Functions, gpu
-
 ```arc
 // All params are gpu bound, compiler maps to build target
 gpu func kernel(data: float32, n: usize) {
@@ -334,14 +391,12 @@ gpu func kernel(data: float32, n: usize) {
     data[idx] = data[idx] * 2.0
 }
 
-// Await a gpu func
 async func main() {
     let result = await kernel(data, n)
 }
 ```
 
 ## Function Return Tuples
-
 ```arc
 func divide(a: int32, b: int32) (int32, bool) {
     if b == 0 {
@@ -353,146 +408,22 @@ func divide(a: int32, b: int32) (int32, bool) {
 let (result, ok) = divide(10, 2)
 ```
 
-## Structs, basic (value type - stack allocated, copied)
-
-```arc
-struct Point {
-    x: int32
-    y: int32
-}
-```
-
-## Structs, initialization
-
-```arc
-// Named field initialization
-let p1: Point = Point{x: 10, y: 20}
-
-// Qualified struct initialization (Namespace.Type)
-let client = net.Socket{fd: -1, connected: false}
-
-// Type inference
-let p2 = Point{x: 5, y: 15}
-
-// Default/zero initialization
-let p3: Point = Point{}
-```
-
-## Structs, field access
-
-```arc
-let p: Point = Point{x: 10, y: 20}
-let x = p.x
-p.y = 30
-```
-
-## Structs, inline methods
-
-```arc
-struct Point {
-    x: int32
-    y: int32
-    
-    func distance(self p: Point) float64 {
-        return float64(p.x * p.x + p.y * p.y)
-    }
-    
-    func move(self p: Point, dx: int32, dy: int32) {
-        p.x += dx
-        p.y += dy
-    }
-}
-```
-
-## Structs, flat methods (alternative style)
-
-```arc
-struct Point {
-    x: int32
-    y: int32
-}
-
-func distance(self p: Point) float64 {
-    return float64(p.x * p.x + p.y * p.y)
-}
-
-func move(self p: Point, dx: int32, dy: int32) {
-    p.x += dx
-    p.y += dy
-}
-```
-
-## Classes, basic (reference type - heap allocated, ref counted)
-
-```arc
-class Client {
-    name: string
-    port: int32
-}
-```
-
-## Classes, inline methods
-
-```arc
-class Client {
-    name: string
-    port: int32
-    
-    func connect(self c: Client, host: string) bool {
-        return true
-    }
-    
-    async func fetch_data(self c: Client) string {
-        let response = await http.get("https://example.com")
-        return response.body
-    }
-    
-    deinit(self c: Client) {
-        // cleanup when ref count hits 0
-    }
-}
-```
-
-## Classes, flat methods (alternative style)
-
-```arc
-class Client {
-    name: string
-    port: int32
-}
-
-func connect(self c: Client, host: string) bool {
-    return true
-}
-
-async func fetch_data(self c: Client) string {
-    let response = await http.get("https://example.com")
-    return response.body
-}
-
-deinit(self c: Client) {
-    // cleanup when ref count hits 0
-}
-```
-
 ## Methods, self pattern declaration
-
 ```arc
-struct Client {
+interface Client {
     port: int32
 }
 
-// 'self' keyword allows dot notation on the instance
-// Colon used for consistency: self name: type
+// 'self' keyword binds the function to the interface as a method
+// allows dot notation on the instance: c.connect("localhost")
 func connect(self c: Client, host: string) bool {
     return true
 }
 ```
 
 ## Methods, usage
-
 ```arc
-let c = Client{port: 8080}
+var c = Client{port: 8080}
 c.connect("localhost")
 
 async func example() {
@@ -500,43 +431,78 @@ async func example() {
 }
 ```
 
-## Type Differences
+## deinit
 
-**class vs struct:**
+`deinit` is called automatically when a `var` declaration's ref count reaches zero.
+It is never called for `let` or `new` declarations.
+```arc
+interface Client {
+    name: string
+    port: int32
+}
 
-* `class` = Reference type (heap allocated, ref counted, null allowed)
-* `struct` = Value type (stack allocated, copied on assignment, null not allowed)
-* Both support methods (inline or flat declaration style)
-* Only `class` supports `deinit` (called when ref count reaches 0)
+deinit(self c: Client) {
+    io.close(c.port)
+    // ref count hit 0 — clean up any resources here
+}
+
+// deinit fires automatically, you never call it manually
+var c = Client{name: "test", port: 8080}
+// ... c goes out of scope, ref count hits 0, deinit fires
+
+// new — deinit never fires, you call delete manually
+let c = new Client{name: "test", port: 8080}
+defer delete(c)
+```
 
 ## Type Casting
-
 ```arc
 // Primitive casts - type(value) syntax
 let x = int32(3.14)     // float to int
 let y = float64(42)     // int to float
 let z = uint8(flags)    // narrow cast
 let n = usize(count)    // to pointer-sized int
+```
 
-// rawptr — two forms
-rawptr(-1)       // cast integer value to raw pointer
-rawptr(&val)     // get address of val as raw pointer (for extern calls)
+## memptr — Two forms
+```arc
+// memptr(&val) — get address of variable as memory pointer
+// memptr(x)    — cast integer value to memory pointer
 
-// Common extern pattern — pass address of variable as output param
-let db: sqlite3 = null
-sqlite3_open("test.db", rawptr(&db))   // extern expects **sqlite3
+// 1. Get address of a variable
+let x = 100
+let p = memptr(&x)
 
-// SQLITE_TRANSIENT = -1 as pointer, tells sqlite to copy the string
-let transient = rawptr(-1)
+// 2. Cast integer value to pointer
+let transient = memptr(-1)
 sqlite3_bind_text(stmt, 1, val, len, transient)
 
-// Pointer arithmetic
-let addr = usize(some_ptr)
-let offset_ptr = rawptr(addr + 16)
+// 3. Pointer arithmetic (via usize)
+let addr     = usize(some_ptr)
+let next_ptr = memptr(addr + 16)
+
+// 4. Pass address to extern output params
+var db: sqlite3 = null
+sqlite3_open("test.db", memptr(&db))
+```
+
+## Raw Memory Operations
+```arc
+// mem_zero — fill memory with zeros
+mem_zero(buf, sizeof(buf))
+mem_zero(addr, sizeof(SockAddrIn))
+
+// mem_copy — copy memory, regions must not overlap
+mem_copy(dest, src, sizeof(Point))
+
+// mem_move — copy memory, overlap safe
+mem_move(dest, src, 1024)
+
+// mem_compare — compare memory regions, 0 = equal
+let diff = mem_compare(a, b, sizeof(Point))
 ```
 
 ## Control Flow, if-else
-
 ```arc
 if condition {
     
@@ -548,7 +514,6 @@ if condition {
 ```
 
 ## Control Flow, for loop (C-style)
-
 ```arc
 for let i = 0; i < 10; i = i + 1 {
     // loop body
@@ -560,7 +525,6 @@ for let i = 0; i < 10; i++ {
 ```
 
 ## Control Flow, for loop (while-style)
-
 ```arc
 let j = 5
 for j > 0 {
@@ -569,7 +533,6 @@ for j > 0 {
 ```
 
 ## Control Flow, for loop (infinite)
-
 ```arc
 let counter = 0
 for {
@@ -581,7 +544,6 @@ for {
 ```
 
 ## Control Flow, for-in loop (iterators)
-
 ```arc
 let items: vector[int32] = {1, 2, 3, 4, 5}
 for item in items {
@@ -596,46 +558,17 @@ for key, value in scores {
 for i in 0..10 {
     // i goes from 0 to 9
 }
-
-for chunk in custom_iterator {
-    // use chunk
-}
 ```
 
-## Control Flow, break
-
+## Control Flow, break / continue / defer / return
 ```arc
-for let i = 0; i < 10; i++ {
-    if i == 5 {
-        break
-    }
-}
-```
-
-## Control Flow, continue
-
-```arc
-for let i = 0; i < 10; i++ {
-    if i == 5 {
-        continue
-    }
-}
-```
-
-## Control Flow, defer
-
-```arc
-defer free(ptr)
-```
-
-## Control Flow, return
-
-```arc
+break
+continue
+defer delete(ptr)
 return value
 ```
 
 ## Control Flow, switch
-
 ```arc
 let status = 2
 
@@ -661,28 +594,25 @@ switch status {
 ```
 
 ## Operators, arithmetic
-
 ```arc
-let sum = a + b
+let sum  = a + b
 let diff = a - b
 let prod = a * b
 let quot = a / b
-let rem = a % b
+let rem  = a % b
 ```
 
 ## Operators, bitwise
-
 ```arc
-let b_or = a | b
+let b_or  = a | b
 let b_xor = a ^ b
 let b_and = a & b
-let shl = a << 2
-let shr = a >> 1
+let shl   = a << 2
+let shr   = a >> 1
 let b_not = ~a
 ```
 
 ## Operators, compound assignment
-
 ```arc
 x += 5
 x -= 3
@@ -692,16 +622,14 @@ x %= 3
 ```
 
 ## Operators, increment/decrement
-
 ```arc
-i++     // post-increment
-++i     // pre-increment
-i--     // post-decrement
---i     // pre-decrement
+i++
+++i
+i--
+--i
 ```
 
 ## Operators, comparison
-
 ```arc
 let eq = a == b
 let ne = a != b
@@ -712,30 +640,21 @@ let ge = a >= b
 ```
 
 ## Operators, logical
-
 ```arc
 let and = a && b
-let or = a || b
+let or  = a || b
 ```
 
 ## Operators, unary
-
 ```arc
 let neg = -value
 let not = !flag
 ```
 
-## Function Calls
-
-```arc
-let result = add(5, 10)
-```
-
 ## Extern, C interoperability
-
 ```arc
-// Stars are required inside extern blocks
-// This is the C/C++ boundary, all pointer details live here
+// Stars are only allowed inside extern blocks
+// This is the C boundary — all raw pointer details live here
 extern c {
     func printf(*byte, ...) int32
     func sleep "usleep" (int32) int32
@@ -746,7 +665,6 @@ printf("hello\n")
 ```
 
 ## Enums
-
 ```arc
 enum Status {
     OK
@@ -761,48 +679,44 @@ enum HttpCode {
 }
 
 enum Color: uint8 {
-    RED = 0xFF0000
+    RED   = 0xFF0000
     GREEN = 0x00FF00
-    BLUE = 0x0000FF
+    BLUE  = 0x0000FF
 }
 ```
 
-## Generics, struct, monomorphizes
-
+## Generics, interface
 ```arc
-struct Box<T> {
+interface Box<T> {
     value: T
-    
-    func get(self b: Box<T>) T {
-        return b.value
-    }
-    
-    func set(self b: Box<T>, val: T) {
-        b.value = val
-    }
+}
+
+func get(self b: Box<T>) T {
+    return b.value
+}
+
+func set(self b: Box<T>, val: T) {
+    b.value = val
 }
 ```
 
-## Generics, multiple type parameters, monomorphizes
-
+## Generics, multiple type parameters
 ```arc
-struct Pair<K, V> {
+interface Pair<K, V> {
     key: K
     value: V
 }
 
-struct Result<T, E> {
+interface Result<T, E> {
     data: T
     error: E
     success: bool
 }
 ```
 
-## Generics, functions, monomorphizes
-
+## Generics, functions
 ```arc
-// &var T — mutable reference, works for any type T
-func swap<T>(a: &var T, b: &var T) {
+func swap<T>(a: &mut T, b: &mut T) {
     let tmp: T = a
     a = b
     b = tmp
@@ -810,7 +724,7 @@ func swap<T>(a: &var T, b: &var T) {
 
 let x = 10
 let y = 20
-swap(&x, &y)    // & at call site — x and y will change
+swap(&x, &y)
 
 func find<T>(arr: vector[T], val: T) isize {
     for let i: usize = 0; i < arr.len; i++ {
@@ -823,7 +737,6 @@ func find<T>(arr: vector[T], val: T) isize {
 ```
 
 ## Execution Context, process
-
 ```arc
 let handle = process func(x: int32) { 
     work(x) 
@@ -835,7 +748,6 @@ process func() {
 ```
 
 ## Execution Context, async
-
 ```arc
 async func(x: int32) { 
     work(x) 
@@ -847,7 +759,6 @@ async func() {
 ```
 
 ## Async Event Handlers (property assignment)
-
 ```arc
 handler.onEvent = (data: EventData) => { 
     process_immediate(data)
@@ -861,7 +772,6 @@ stream.onData = (chunk: []byte) => {
 ```
 
 ## Async Event Handlers (with await capability)
-
 ```arc
 handler.onEvent = async (data: EventData) => { 
     let result = await process_async(data)
@@ -877,7 +787,6 @@ stream.onData = async (chunk: []byte) => {
 ```
 
 ## Async Method Calls (callback parameter)
-
 ```arc
 service.request(args, (result: Result) => {
     fmt.print("Request completed")
@@ -890,7 +799,6 @@ network.fetch(url, timeout, (response: Response) => {
 ```
 
 ## Async Method Calls (callback with await capability)
-
 ```arc
 service.request(args, async (result: Result) => {
     let processed = await transform(result)
@@ -903,24 +811,25 @@ router.handle("/api/data", async (req: Request, res: Response) => {
 })
 ```
 
-**Note:** Both forms are async (run on smart threads). The `async` keyword only determines whether `await` is allowed inside the lambda body. Omitting `async` is ergonomic shorthand for callbacks that don't need to suspend.
+**Note:** Both forms are async (run on smart threads). The `async` keyword only determines
+whether `await` is allowed inside the lambda body. Omitting `async` is ergonomic shorthand
+for callbacks that don't need to suspend.
 
 ## Functions, async callback (indirect invocation)
-
 ```arc
-class Event {
+interface Event {
     onTrigger: async func(string) void
-    
-    func register(self evt: Event, handler: async func(string) void) {
-        evt.onTrigger = handler
-    }
-    
-    func send(self evt: Event, message: string) {
-        evt.onTrigger(message)
-    }
 }
 
-let evt = Event{}
+func register(self evt: Event, handler: async func(string) void) {
+    evt.onTrigger = handler
+}
+
+func send(self evt: Event, message: string) {
+    evt.onTrigger(message)
+}
+
+var evt = Event{}
 
 evt.register(async (msg: string) => {
     let processed = await process_message(msg)
@@ -931,20 +840,19 @@ evt.send("Hello, World!")
 ```
 
 ## Functions, async callback (property assignment style)
-
 ```arc
-class TcpServer {
+interface TcpServer {
     port: int32
     onReceive: async func([]byte) void
-    
-    func handle_data(self s: TcpServer, data: []byte) {
-        if s.onReceive != null {
-            s.onReceive(data)
-        }
+}
+
+func handle_data(self s: TcpServer, data: []byte) {
+    if s.onReceive != null {
+        s.onReceive(data)
     }
 }
 
-let server = TcpServer{port: 8080}
+var server = TcpServer{port: 8080}
 
 server.onReceive = async (data: []byte) => {
     let decoded = await decode_packet(data)
@@ -955,23 +863,61 @@ server.handle_data(received_bytes)
 ```
 
 ## Functions, sync callback (indirect invocation)
-
 ```arc
-class Button {
+interface Button {
     onClick: func(int32, int32) void
-    
-    func press(self b: Button, x: int32, y: int32) {
-        if b.onClick != null {
-            b.onClick(x, y)
-        }
+}
+
+func press(self b: Button, x: int32, y: int32) {
+    if b.onClick != null {
+        b.onClick(x, y)
     }
 }
 
-let button = Button{}
+var button = Button{}
 
 button.onClick = (x: int32, y: int32) => {
     fmt.printf("Clicked at (%d, %d)\n", x, y)
 }
 
 button.press(100, 200)
+```
+
+## Quick Reference
+```arc
+// Memory model at a glance
+const MAX = 100                            // immutable, stack
+let point = Point{x: 1, y: 2}             // stack, copied
+var client = Client{name: "x", port: 80}  // heap, ref counted
+var client: Client = null                  // heap, nullable
+let node = new Node{}                      // heap, manual, you own it
+let buf  = new [4096]byte                  // heap, manual fixed array
+
+// new and delete always paired
+let node = new Node{value: 42}
+defer delete(node)
+
+let buf = new [4096]byte
+defer delete(buf)
+
+// Mutation at a glance
+func read(x: int32) {}        // pass by value, caller unchanged
+func mutate(x: &mut int32) {} // mutable reference, caller changes
+
+let n = 10
+read(n)                        // safe, n unchanged
+mutate(&n)                     // explicit, n will change
+
+// Low level at a glance
+let p    = memptr(&val)        // address of val
+let p    = memptr(-1)          // integer as pointer
+let p    = memptr(addr + 16)   // pointer arithmetic
+let sz   = sizeof(SockAddrIn)  // compile-time size
+let al   = alignof(float64)    // compile-time alignment
+let bits = bitcast(uint32, f)  // reinterpret bits
+let n    = len(s)              // length, type decides cost
+mem_zero(buf, sizeof(buf))     // zero memory
+mem_copy(dst, src, n)          // copy memory, no overlap
+mem_move(dst, src, n)          // copy memory, overlap safe
+mem_compare(a, b, n)           // compare memory, 0 = equal
 ```

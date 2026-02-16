@@ -31,12 +31,12 @@ const (
 	ArcLexerDEFAULT         = 26
 	ArcLexerENUM            = 27
 	ArcLexerRAWPTR          = 28
-	ArcLexerEXTERN          = 29
-	ArcLexerVIRTUAL         = 30
-	ArcLexerSTATIC          = 31
-	ArcLexerABSTRACT        = 32
-	ArcLexerNEW             = 33
-	ArcLexerDELETE          = 34
+	ArcLexerNEW             = 29
+	ArcLexerDELETE          = 30
+	ArcLexerEXTERN          = 31
+	ArcLexerVIRTUAL         = 32
+	ArcLexerSTATIC          = 33
+	ArcLexerABSTRACT        = 34
 	ArcLexerTYPE            = 35
 	ArcLexerSTDCALL         = 36
 	ArcLexerCDECL           = 37
@@ -151,12 +151,12 @@ const (
 	ArcParserDEFAULT         = 26
 	ArcParserENUM            = 27
 	ArcParserRAWPTR          = 28
-	ArcParserEXTERN          = 29
-	ArcParserVIRTUAL         = 30
-	ArcParserSTATIC          = 31
-	ArcParserABSTRACT        = 32
-	ArcParserNEW             = 33
-	ArcParserDELETE          = 34
+	ArcParserNEW             = 29
+	ArcParserDELETE          = 30
+	ArcParserEXTERN          = 31
+	ArcParserVIRTUAL         = 32
+	ArcParserSTATIC          = 33
+	ArcParserABSTRACT        = 34
 	ArcParserTYPE            = 35
 	ArcParserSTDCALL         = 36
 	ArcParserCDECL           = 37
@@ -287,31 +287,31 @@ const (
 	ArcParserRULE_genericArgs              = 42
 	ArcParserRULE_genericArgList           = 43
 	ArcParserRULE_genericArg               = 44
-	ArcParserRULE_collectionType           = 45
-	ArcParserRULE_functionDecl             = 46
-	ArcParserRULE_returnType               = 47
-	ArcParserRULE_typeList                 = 48
-	ArcParserRULE_parameterList            = 49
-	ArcParserRULE_parameter                = 50
-	ArcParserRULE_structDecl               = 51
-	ArcParserRULE_structMember             = 52
-	ArcParserRULE_structField              = 53
-	ArcParserRULE_classDecl                = 54
-	ArcParserRULE_classMember              = 55
-	ArcParserRULE_classField               = 56
-	ArcParserRULE_enumDecl                 = 57
-	ArcParserRULE_enumMember               = 58
-	ArcParserRULE_methodDecl               = 59
-	ArcParserRULE_deinitDecl               = 60
-	ArcParserRULE_variableDecl             = 61
-	ArcParserRULE_constDecl                = 62
-	ArcParserRULE_tuplePattern             = 63
-	ArcParserRULE_tupleType                = 64
-	ArcParserRULE_type                     = 65
-	ArcParserRULE_qualifiedType            = 66
-	ArcParserRULE_functionType             = 67
-	ArcParserRULE_qualifiedIdentifier      = 68
-	ArcParserRULE_primitiveType            = 69
+	ArcParserRULE_type                     = 45
+	ArcParserRULE_collectionType           = 46
+	ArcParserRULE_qualifiedType            = 47
+	ArcParserRULE_functionType             = 48
+	ArcParserRULE_primitiveType            = 49
+	ArcParserRULE_typeList                 = 50
+	ArcParserRULE_returnType               = 51
+	ArcParserRULE_qualifiedIdentifier      = 52
+	ArcParserRULE_functionDecl             = 53
+	ArcParserRULE_methodDecl               = 54
+	ArcParserRULE_deinitDecl               = 55
+	ArcParserRULE_structDecl               = 56
+	ArcParserRULE_structMember             = 57
+	ArcParserRULE_structField              = 58
+	ArcParserRULE_classDecl                = 59
+	ArcParserRULE_classMember              = 60
+	ArcParserRULE_classField               = 61
+	ArcParserRULE_enumDecl                 = 62
+	ArcParserRULE_enumMember               = 63
+	ArcParserRULE_variableDecl             = 64
+	ArcParserRULE_constDecl                = 65
+	ArcParserRULE_tuplePattern             = 66
+	ArcParserRULE_tupleType                = 67
+	ArcParserRULE_parameterList            = 68
+	ArcParserRULE_parameter                = 69
 	ArcParserRULE_block                    = 70
 	ArcParserRULE_statement                = 71
 	ArcParserRULE_assignmentStmt           = 72
@@ -342,22 +342,24 @@ const (
 	ArcParserRULE_postfixExpression        = 97
 	ArcParserRULE_postfixOp                = 98
 	ArcParserRULE_primaryExpression        = 99
-	ArcParserRULE_castExpression           = 100
-	ArcParserRULE_castTargetType           = 101
-	ArcParserRULE_builtinExpression        = 102
-	ArcParserRULE_literal                  = 103
-	ArcParserRULE_initializerList          = 104
-	ArcParserRULE_initializerEntry         = 105
-	ArcParserRULE_structLiteral            = 106
-	ArcParserRULE_fieldInit                = 107
-	ArcParserRULE_argumentList             = 108
-	ArcParserRULE_argument                 = 109
-	ArcParserRULE_lambdaExpression         = 110
-	ArcParserRULE_anonymousFuncExpression  = 111
-	ArcParserRULE_executionStrategy        = 112
-	ArcParserRULE_lambdaParamList          = 113
-	ArcParserRULE_lambdaParam              = 114
-	ArcParserRULE_tupleExpression          = 115
+	ArcParserRULE_newExpression            = 100
+	ArcParserRULE_deleteExpression         = 101
+	ArcParserRULE_castExpression           = 102
+	ArcParserRULE_castTargetType           = 103
+	ArcParserRULE_builtinExpression        = 104
+	ArcParserRULE_literal                  = 105
+	ArcParserRULE_initializerList          = 106
+	ArcParserRULE_initializerEntry         = 107
+	ArcParserRULE_structLiteral            = 108
+	ArcParserRULE_fieldInit                = 109
+	ArcParserRULE_argumentList             = 110
+	ArcParserRULE_argument                 = 111
+	ArcParserRULE_lambdaExpression         = 112
+	ArcParserRULE_anonymousFuncExpression  = 113
+	ArcParserRULE_executionStrategy        = 114
+	ArcParserRULE_lambdaParamList          = 115
+	ArcParserRULE_lambdaParam              = 116
+	ArcParserRULE_tupleExpression          = 117
 )
     ArcParser rules.
 
@@ -431,6 +433,7 @@ func InitEmptyCppCallingConventionContext(p *CppCallingConventionContext)
 func InitEmptyDefaultCaseContext(p *DefaultCaseContext)
 func InitEmptyDeferStmtContext(p *DeferStmtContext)
 func InitEmptyDeinitDeclContext(p *DeinitDeclContext)
+func InitEmptyDeleteExpressionContext(p *DeleteExpressionContext)
 func InitEmptyEnumDeclContext(p *EnumDeclContext)
 func InitEmptyEnumMemberContext(p *EnumMemberContext)
 func InitEmptyEqualityExpressionContext(p *EqualityExpressionContext)
@@ -492,6 +495,7 @@ func InitEmptyLogicalOrExpressionContext(p *LogicalOrExpressionContext)
 func InitEmptyMethodDeclContext(p *MethodDeclContext)
 func InitEmptyMultiplicativeExpressionContext(p *MultiplicativeExpressionContext)
 func InitEmptyNamespaceDeclContext(p *NamespaceDeclContext)
+func InitEmptyNewExpressionContext(p *NewExpressionContext)
 func InitEmptyParameterContext(p *ParameterContext)
 func InitEmptyParameterListContext(p *ParameterListContext)
 func InitEmptyPostfixExpressionContext(p *PostfixExpressionContext)
@@ -661,6 +665,8 @@ func (p *ArcParser) DeferStmt() (localctx IDeferStmtContext)
 
 func (p *ArcParser) DeinitDecl() (localctx IDeinitDeclContext)
 
+func (p *ArcParser) DeleteExpression() (localctx IDeleteExpressionContext)
+
 func (p *ArcParser) EnumDecl() (localctx IEnumDeclContext)
 
 func (p *ArcParser) EnumMember() (localctx IEnumMemberContext)
@@ -782,6 +788,8 @@ func (p *ArcParser) MethodDecl() (localctx IMethodDeclContext)
 func (p *ArcParser) MultiplicativeExpression() (localctx IMultiplicativeExpressionContext)
 
 func (p *ArcParser) NamespaceDecl() (localctx INamespaceDeclContext)
+
+func (p *ArcParser) NewExpression() (localctx INewExpressionContext)
 
 func (p *ArcParser) Parameter() (localctx IParameterContext)
 
@@ -977,23 +985,38 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#genericArg.
 	VisitGenericArg(ctx *GenericArgContext) interface{}
 
+	// Visit a parse tree produced by ArcParser#type.
+	VisitType(ctx *TypeContext) interface{}
+
 	// Visit a parse tree produced by ArcParser#collectionType.
 	VisitCollectionType(ctx *CollectionTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#functionDecl.
-	VisitFunctionDecl(ctx *FunctionDeclContext) interface{}
+	// Visit a parse tree produced by ArcParser#qualifiedType.
+	VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#returnType.
-	VisitReturnType(ctx *ReturnTypeContext) interface{}
+	// Visit a parse tree produced by ArcParser#functionType.
+	VisitFunctionType(ctx *FunctionTypeContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#primitiveType.
+	VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#typeList.
 	VisitTypeList(ctx *TypeListContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#parameterList.
-	VisitParameterList(ctx *ParameterListContext) interface{}
+	// Visit a parse tree produced by ArcParser#returnType.
+	VisitReturnType(ctx *ReturnTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#parameter.
-	VisitParameter(ctx *ParameterContext) interface{}
+	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
+	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#functionDecl.
+	VisitFunctionDecl(ctx *FunctionDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#methodDecl.
+	VisitMethodDecl(ctx *MethodDeclContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#deinitDecl.
+	VisitDeinitDecl(ctx *DeinitDeclContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#structDecl.
 	VisitStructDecl(ctx *StructDeclContext) interface{}
@@ -1019,12 +1042,6 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#enumMember.
 	VisitEnumMember(ctx *EnumMemberContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#methodDecl.
-	VisitMethodDecl(ctx *MethodDeclContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#deinitDecl.
-	VisitDeinitDecl(ctx *DeinitDeclContext) interface{}
-
 	// Visit a parse tree produced by ArcParser#variableDecl.
 	VisitVariableDecl(ctx *VariableDeclContext) interface{}
 
@@ -1037,20 +1054,11 @@ type ArcParserVisitor interface {
 	// Visit a parse tree produced by ArcParser#tupleType.
 	VisitTupleType(ctx *TupleTypeContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#type.
-	VisitType(ctx *TypeContext) interface{}
+	// Visit a parse tree produced by ArcParser#parameterList.
+	VisitParameterList(ctx *ParameterListContext) interface{}
 
-	// Visit a parse tree produced by ArcParser#qualifiedType.
-	VisitQualifiedType(ctx *QualifiedTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#functionType.
-	VisitFunctionType(ctx *FunctionTypeContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#qualifiedIdentifier.
-	VisitQualifiedIdentifier(ctx *QualifiedIdentifierContext) interface{}
-
-	// Visit a parse tree produced by ArcParser#primitiveType.
-	VisitPrimitiveType(ctx *PrimitiveTypeContext) interface{}
+	// Visit a parse tree produced by ArcParser#parameter.
+	VisitParameter(ctx *ParameterContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#block.
 	VisitBlock(ctx *BlockContext) interface{}
@@ -1141,6 +1149,12 @@ type ArcParserVisitor interface {
 
 	// Visit a parse tree produced by ArcParser#primaryExpression.
 	VisitPrimaryExpression(ctx *PrimaryExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#newExpression.
+	VisitNewExpression(ctx *NewExpressionContext) interface{}
+
+	// Visit a parse tree produced by ArcParser#deleteExpression.
+	VisitDeleteExpression(ctx *DeleteExpressionContext) interface{}
 
 	// Visit a parse tree produced by ArcParser#castExpression.
 	VisitCastExpression(ctx *CastExpressionContext) interface{}
@@ -1397,6 +1411,8 @@ func (v *BaseArcParserVisitor) VisitDeferStmt(ctx *DeferStmtContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitDeinitDecl(ctx *DeinitDeclContext) interface{}
 
+func (v *BaseArcParserVisitor) VisitDeleteExpression(ctx *DeleteExpressionContext) interface{}
+
 func (v *BaseArcParserVisitor) VisitEnumDecl(ctx *EnumDeclContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitEnumMember(ctx *EnumMemberContext) interface{}
@@ -1518,6 +1534,8 @@ func (v *BaseArcParserVisitor) VisitMethodDecl(ctx *MethodDeclContext) interface
 func (v *BaseArcParserVisitor) VisitMultiplicativeExpression(ctx *MultiplicativeExpressionContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitNamespaceDecl(ctx *NamespaceDeclContext) interface{}
+
+func (v *BaseArcParserVisitor) VisitNewExpression(ctx *NewExpressionContext) interface{}
 
 func (v *BaseArcParserVisitor) VisitParameter(ctx *ParameterContext) interface{}
 
@@ -2120,6 +2138,33 @@ func (s *DeinitDeclContext) SELF() antlr.TerminalNode
 func (s *DeinitDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 func (s *DeinitDeclContext) Type_() ITypeContext
+
+type DeleteExpressionContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewDeleteExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *DeleteExpressionContext
+
+func NewEmptyDeleteExpressionContext() *DeleteExpressionContext
+
+func (s *DeleteExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *DeleteExpressionContext) DELETE() antlr.TerminalNode
+
+func (s *DeleteExpressionContext) Expression() IExpressionContext
+
+func (s *DeleteExpressionContext) GetParser() antlr.Parser
+
+func (s *DeleteExpressionContext) GetRuleContext() antlr.RuleContext
+
+func (*DeleteExpressionContext) IsDeleteExpressionContext()
+
+func (s *DeleteExpressionContext) LPAREN() antlr.TerminalNode
+
+func (s *DeleteExpressionContext) RPAREN() antlr.TerminalNode
+
+func (s *DeleteExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
 type EnumDeclContext struct {
 	antlr.BaseParserRuleContext
@@ -3984,6 +4029,23 @@ type IDeinitDeclContext interface {
 }
     IDeinitDeclContext is an interface to support dynamic dispatch.
 
+type IDeleteExpressionContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	DELETE() antlr.TerminalNode
+	LPAREN() antlr.TerminalNode
+	Expression() IExpressionContext
+	RPAREN() antlr.TerminalNode
+
+	// IsDeleteExpressionContext differentiates from other interfaces.
+	IsDeleteExpressionContext()
+}
+    IDeleteExpressionContext is an interface to support dynamic dispatch.
+
 type IEnumDeclContext interface {
 	antlr.ParserRuleContext
 
@@ -5109,6 +5171,33 @@ type INamespaceDeclContext interface {
 }
     INamespaceDeclContext is an interface to support dynamic dispatch.
 
+type INewExpressionContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	NEW() antlr.TerminalNode
+	LBRACE() antlr.TerminalNode
+	RBRACE() antlr.TerminalNode
+	IDENTIFIER() antlr.TerminalNode
+	QualifiedIdentifier() IQualifiedIdentifierContext
+	GenericArgs() IGenericArgsContext
+	AllFieldInit() []IFieldInitContext
+	FieldInit(i int) IFieldInitContext
+	AllCOMMA() []antlr.TerminalNode
+	COMMA(i int) antlr.TerminalNode
+	LBRACKET() antlr.TerminalNode
+	Expression() IExpressionContext
+	RBRACKET() antlr.TerminalNode
+	Type_() ITypeContext
+
+	// IsNewExpressionContext differentiates from other interfaces.
+	IsNewExpressionContext()
+}
+    INewExpressionContext is an interface to support dynamic dispatch.
+
 type IParameterContext interface {
 	antlr.ParserRuleContext
 
@@ -5192,6 +5281,8 @@ type IPrimaryExpressionContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
+	NewExpression() INewExpressionContext
+	DeleteExpression() IDeleteExpressionContext
 	BuiltinExpression() IBuiltinExpressionContext
 	CastExpression() ICastExpressionContext
 	Literal() ILiteralContext
@@ -5596,6 +5687,7 @@ type ITypeContext interface {
 	LBRACKET() antlr.TerminalNode
 	RBRACKET() antlr.TerminalNode
 	Type_() ITypeContext
+	Expression() IExpressionContext
 	AMP() antlr.TerminalNode
 	VAR() antlr.TerminalNode
 	PrimitiveType() IPrimitiveTypeContext
@@ -5670,6 +5762,7 @@ type IVariableDeclContext interface {
 	IDENTIFIER() antlr.TerminalNode
 	Type_() ITypeContext
 	NULL() antlr.TerminalNode
+	VAR() antlr.TerminalNode
 
 	// IsVariableDeclContext differentiates from other interfaces.
 	IsVariableDeclContext()
@@ -6106,6 +6199,53 @@ func (s *NamespaceDeclContext) NAMESPACE() antlr.TerminalNode
 
 func (s *NamespaceDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
 
+type NewExpressionContext struct {
+	antlr.BaseParserRuleContext
+	// Has unexported fields.
+}
+
+func NewEmptyNewExpressionContext() *NewExpressionContext
+
+func NewNewExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *NewExpressionContext
+
+func (s *NewExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
+
+func (s *NewExpressionContext) AllCOMMA() []antlr.TerminalNode
+
+func (s *NewExpressionContext) AllFieldInit() []IFieldInitContext
+
+func (s *NewExpressionContext) COMMA(i int) antlr.TerminalNode
+
+func (s *NewExpressionContext) Expression() IExpressionContext
+
+func (s *NewExpressionContext) FieldInit(i int) IFieldInitContext
+
+func (s *NewExpressionContext) GenericArgs() IGenericArgsContext
+
+func (s *NewExpressionContext) GetParser() antlr.Parser
+
+func (s *NewExpressionContext) GetRuleContext() antlr.RuleContext
+
+func (s *NewExpressionContext) IDENTIFIER() antlr.TerminalNode
+
+func (*NewExpressionContext) IsNewExpressionContext()
+
+func (s *NewExpressionContext) LBRACE() antlr.TerminalNode
+
+func (s *NewExpressionContext) LBRACKET() antlr.TerminalNode
+
+func (s *NewExpressionContext) NEW() antlr.TerminalNode
+
+func (s *NewExpressionContext) QualifiedIdentifier() IQualifiedIdentifierContext
+
+func (s *NewExpressionContext) RBRACE() antlr.TerminalNode
+
+func (s *NewExpressionContext) RBRACKET() antlr.TerminalNode
+
+func (s *NewExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string
+
+func (s *NewExpressionContext) Type_() ITypeContext
+
 type ParameterContext struct {
 	antlr.BaseParserRuleContext
 	// Has unexported fields.
@@ -6249,6 +6389,8 @@ func (s *PrimaryExpressionContext) BuiltinExpression() IBuiltinExpressionContext
 
 func (s *PrimaryExpressionContext) CastExpression() ICastExpressionContext
 
+func (s *PrimaryExpressionContext) DeleteExpression() IDeleteExpressionContext
+
 func (s *PrimaryExpressionContext) Expression() IExpressionContext
 
 func (s *PrimaryExpressionContext) GenericArgs() IGenericArgsContext
@@ -6266,6 +6408,8 @@ func (s *PrimaryExpressionContext) LPAREN() antlr.TerminalNode
 func (s *PrimaryExpressionContext) LambdaExpression() ILambdaExpressionContext
 
 func (s *PrimaryExpressionContext) Literal() ILiteralContext
+
+func (s *PrimaryExpressionContext) NewExpression() INewExpressionContext
 
 func (s *PrimaryExpressionContext) QualifiedIdentifier() IQualifiedIdentifierContext
 
@@ -6907,6 +7051,8 @@ func (s *TypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
 func (s *TypeContext) CollectionType() ICollectionTypeContext
 
+func (s *TypeContext) Expression() IExpressionContext
+
 func (s *TypeContext) FunctionType() IFunctionTypeContext
 
 func (s *TypeContext) GenericArgs() IGenericArgsContext
@@ -7043,4 +7189,6 @@ func (s *VariableDeclContext) TuplePattern() ITuplePatternContext
 func (s *VariableDeclContext) TupleType() ITupleTypeContext
 
 func (s *VariableDeclContext) Type_() ITypeContext
+
+func (s *VariableDeclContext) VAR() antlr.TerminalNode
 

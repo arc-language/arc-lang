@@ -1,17 +1,24 @@
+// ArcParser.g4
 parser grammar ArcParser;
 
 options {
-    tokenVocab=ArcLexer;
+    tokenVocab = ArcLexer;
 }
 
+// =============================================================================
+// Top-Level Structure
+// =============================================================================
 compilationUnit
     : (importDecl | namespaceDecl | topLevelDecl)* EOF
     ;
 
-importDecl: IMPORT (IDENTIFIER)? (STRING_LITERAL | LPAREN importSpec* RPAREN);
-importSpec: STRING_LITERAL;
+importDecl
+    : IMPORT (IDENTIFIER)? (STRING_LITERAL | LPAREN importSpec* RPAREN)
+    ;
 
-namespaceDecl: NAMESPACE IDENTIFIER;
+importSpec : STRING_LITERAL;
+
+namespaceDecl : NAMESPACE IDENTIFIER;
 
 topLevelDecl
     : functionDecl
@@ -26,9 +33,15 @@ topLevelDecl
     | externCppDecl
     ;
 
-attribute: AT IDENTIFIER (LPAREN expression RPAREN)?;
+// =============================================================================
+// Attributes
+// =============================================================================
+attribute : AT IDENTIFIER (LPAREN expression RPAREN)?;
 
-externCDecl: EXTERN C_LANG LBRACE externCMember* RBRACE;
+// =============================================================================
+// Extern C
+// =============================================================================
+externCDecl : EXTERN C_LANG LBRACE externCMember* RBRACE;
 
 externCMember
     : externCFunctionDecl
@@ -58,23 +71,16 @@ externCParameter
     | IDENTIFIER COLON externType
     ;
 
-externCConstDecl
-    : CONST IDENTIFIER COLON externType ASSIGN expression
-    ;
+externCConstDecl   : CONST IDENTIFIER COLON externType ASSIGN expression;
+externCTypeAlias   : TYPE IDENTIFIER ASSIGN externType;
 
-externCTypeAlias
-    : TYPE IDENTIFIER ASSIGN externType
-    ;
+externCStructDecl  : STRUCT IDENTIFIER LBRACE externCStructField* RBRACE;
+externCStructField : IDENTIFIER COLON externType;
 
-externCStructDecl
-    : STRUCT IDENTIFIER LBRACE externCStructField* RBRACE
-    ;
-
-externCStructField
-    : IDENTIFIER COLON externType
-    ;
-
-externCppDecl: EXTERN CPP_LANG LBRACE externCppMember* RBRACE;
+// =============================================================================
+// Extern C++
+// =============================================================================
+externCppDecl : EXTERN CPP_LANG LBRACE externCppMember* RBRACE;
 
 externCppMember
     : externCppNamespaceDecl
@@ -88,9 +94,7 @@ externCppNamespaceDecl
     : NAMESPACE externNamespacePath LBRACE externCppMember* RBRACE
     ;
 
-externNamespacePath
-    : IDENTIFIER (DOT IDENTIFIER)*
-    ;
+externNamespacePath : IDENTIFIER (DOT IDENTIFIER)*;
 
 externCppFunctionDecl
     : cppCallingConvention? FUNC IDENTIFIER (STRING_LITERAL)?
@@ -117,20 +121,16 @@ externCppParameter
 
 externCppParamType
     : STAR CONST? externType
-    | AMP CONST? externType
+    | AMP  CONST? externType
     | CONST? externType
     ;
 
-externCppConstDecl
-    : CONST IDENTIFIER COLON externType ASSIGN expression
-    ;
-
-externCppTypeAlias
-    : TYPE IDENTIFIER ASSIGN externType
-    ;
+externCppConstDecl  : CONST IDENTIFIER COLON externType ASSIGN expression;
+externCppTypeAlias  : TYPE IDENTIFIER ASSIGN externType;
 
 externCppClassDecl
-    : ABSTRACT? CLASS IDENTIFIER (STRING_LITERAL)? LBRACE externCppClassMember* RBRACE
+    : ABSTRACT? CLASS IDENTIFIER (STRING_LITERAL)?
+      LBRACE externCppClassMember* RBRACE
     ;
 
 externCppClassMember
@@ -139,10 +139,12 @@ externCppClassMember
     | externCppMethodDecl
     ;
 
+// new(...) return-type  — marks the extern C++ constructor
 externCppConstructorDecl
     : NEW LPAREN externCppParameterList? RPAREN externType
     ;
 
+// delete(self * const c)  — marks the extern C++ destructor
 externCppDestructorDecl
     : DELETE LPAREN externCppSelfParam RPAREN externType?
     ;
@@ -157,10 +159,11 @@ externCppMethodParams
     | externCppParameterList?
     ;
 
-externCppSelfParam
-    : SELF STAR CONST? IDENTIFIER
-    ;
+externCppSelfParam : SELF STAR CONST? IDENTIFIER;
 
+// =============================================================================
+// Extern Types
+// =============================================================================
 externType
     : externPointerType
     | externPrimitiveType
@@ -170,7 +173,7 @@ externType
 
 externPointerType
     : STAR CONST? externType
-    | AMP CONST? externType
+    | AMP  CONST? externType
     ;
 
 externPrimitiveType
@@ -185,70 +188,31 @@ externFunctionType
     : FUNC LPAREN externTypeList? RPAREN externType?
     ;
 
-externTypeList: externType (COMMA externType)*;
+externTypeList : externType (COMMA externType)*;
 
-genericParams: LT genericParamList GT;
+// =============================================================================
+// Generics
+// =============================================================================
+genericParams   : LT genericParamList GT;
 genericParamList: genericParam (COMMA genericParam)*;
-genericParam: IDENTIFIER (DOT IDENTIFIER)*;
+genericParam    : IDENTIFIER (DOT IDENTIFIER)*;
 
-genericArgs: LT genericArgList GT;
-genericArgList: genericArg (COMMA genericArg)*;
-genericArg: type;
-
-collectionType
-    : IDENTIFIER LBRACKET type RBRACKET type?
-    ;
-
-functionDecl
-    : executionStrategy? FUNC IDENTIFIER genericParams?
-      LPAREN parameterList? RPAREN returnType? block
-    ;
-
-returnType: type | LPAREN typeList RPAREN;
-typeList: type (COMMA type)*;
-parameterList: parameter (COMMA parameter)* (COMMA ELLIPSIS)? | ELLIPSIS;
-
-// &var in the type carries all mutability info — no var on the parameter name
-parameter: SELF? IDENTIFIER COLON type;
-
-structDecl: attribute* STRUCT IDENTIFIER genericParams? LBRACE structMember* RBRACE;
-structMember: structField | functionDecl;
-structField: IDENTIFIER COLON type;
-
-classDecl: CLASS IDENTIFIER genericParams? LBRACE classMember* RBRACE;
-classMember: classField | functionDecl | deinitDecl;
-classField: IDENTIFIER COLON type;
-
-enumDecl: ENUM IDENTIFIER (COLON primitiveType)? LBRACE enumMember* RBRACE;
-enumMember: IDENTIFIER (ASSIGN expression)?;
-
-methodDecl
-    : executionStrategy? FUNC IDENTIFIER genericParams?
-      LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN returnType? block
-    ;
-
-deinitDecl: DEINIT LPAREN SELF IDENTIFIER COLON type RPAREN block;
-
-variableDecl
-    : LET tuplePattern (COLON tupleType)? ASSIGN expression
-    | LET IDENTIFIER (COLON type)? ASSIGN expression
-    | LET IDENTIFIER (COLON type)? ASSIGN NULL
-    ;
-
-constDecl: CONST IDENTIFIER (COLON type)? ASSIGN expression;
-tuplePattern: LPAREN IDENTIFIER (COMMA IDENTIFIER)+ RPAREN;
-tupleType: LPAREN typeList RPAREN;
+genericArgs    : LT genericArgList GT;
+genericArgList : genericArg (COMMA genericArg)*;
+genericArg     : type;
 
 // =============================================================================
 // Type System
-//   []byte        — slice view, ptr + length, no allocation
-//   &var int32    — mutable reference, only reference form in arc
-//   vector[byte]  — owned dynamic array, heap allocated
+//
+//   []byte         — slice view, ptr + length, no allocation
+//   [4096]byte     — fixed-size array (used with new / stack)
+//   &var int32     — mutable reference
+//   vector[byte]   — owned dynamic array, heap allocated
 // =============================================================================
-
 type
-    : LBRACKET RBRACKET type    // []byte — slice view, ptr + length, no allocation
-    | AMP VAR type              // &var int32 — mutable reference
+    : LBRACKET RBRACKET type                       // []byte   — slice view
+    | LBRACKET expression RBRACKET type            // [4096]byte — fixed-size array
+    | AMP VAR type                                 // &var int32 — mutable reference
     | primitiveType
     | collectionType
     | qualifiedType
@@ -258,9 +222,9 @@ type
     | UNDERSCORE
     ;
 
-qualifiedType: IDENTIFIER (DOT IDENTIFIER)+ genericArgs?;
-functionType: executionStrategy? FUNC genericParams? LPAREN typeList? RPAREN returnType?;
-qualifiedIdentifier: IDENTIFIER (DOT IDENTIFIER)+;
+collectionType  : IDENTIFIER LBRACKET type RBRACKET type?;
+qualifiedType   : IDENTIFIER (DOT IDENTIFIER)+ genericArgs?;
+functionType    : executionStrategy? FUNC genericParams? LPAREN typeList? RPAREN returnType?;
 
 primitiveType
     : INT8 | INT16 | INT32 | INT64
@@ -270,7 +234,84 @@ primitiveType
     | BYTE | BOOL | CHAR | STRING | VOID
     ;
 
-block: LBRACE statement* RBRACE;
+typeList        : type (COMMA type)*;
+returnType      : type | LPAREN typeList RPAREN;
+qualifiedIdentifier : IDENTIFIER (DOT IDENTIFIER)+;
+
+// =============================================================================
+// Declarations
+// =============================================================================
+functionDecl
+    : executionStrategy? FUNC IDENTIFIER genericParams?
+      LPAREN parameterList? RPAREN returnType? block
+    ;
+
+// self is explicit and typed — no magic this
+methodDecl
+    : executionStrategy? FUNC IDENTIFIER genericParams?
+      LPAREN SELF IDENTIFIER COLON type (COMMA parameter)* RPAREN returnType? block
+    ;
+
+deinitDecl
+    : DEINIT LPAREN SELF IDENTIFIER COLON type RPAREN block
+    ;
+
+structDecl
+    : attribute* STRUCT IDENTIFIER genericParams? LBRACE structMember* RBRACE
+    ;
+
+structMember : structField | functionDecl;
+structField  : IDENTIFIER COLON type;
+
+classDecl
+    : CLASS IDENTIFIER genericParams? LBRACE classMember* RBRACE
+    ;
+
+classMember : classField | functionDecl | deinitDecl;
+classField  : IDENTIFIER COLON type;
+
+enumDecl
+    : ENUM IDENTIFIER (COLON primitiveType)? LBRACE enumMember* RBRACE
+    ;
+
+enumMember : IDENTIFIER (ASSIGN expression)?;
+
+// =============================================================================
+// Variable Declarations
+//
+//   let p = Point{...}    — stack, immutable binding
+//   var p = Point{...}    — heap, ref-counted, mutable
+//
+// The declaration keyword is the memory model. The type is the shape.
+// These are orthogonal concerns kept separate.
+// =============================================================================
+variableDecl
+    : LET tuplePattern (COLON tupleType)? ASSIGN expression
+    | LET IDENTIFIER (COLON type)? ASSIGN expression
+    | LET IDENTIFIER (COLON type)? ASSIGN NULL
+    | VAR IDENTIFIER (COLON type)? ASSIGN expression
+    | VAR IDENTIFIER (COLON type)? ASSIGN NULL
+    ;
+
+constDecl    : CONST IDENTIFIER (COLON type)? ASSIGN expression;
+tuplePattern : LPAREN IDENTIFIER (COMMA IDENTIFIER)+ RPAREN;
+tupleType    : LPAREN typeList RPAREN;
+
+// =============================================================================
+// Parameters
+// &var in the type carries all mutability info — no var on the parameter name
+// =============================================================================
+parameterList
+    : parameter (COMMA parameter)* (COMMA ELLIPSIS)?
+    | ELLIPSIS
+    ;
+
+parameter : SELF? IDENTIFIER COLON type;
+
+// =============================================================================
+// Statements
+// =============================================================================
+block : LBRACE statement* RBRACE;
 
 statement
     : block
@@ -287,7 +328,7 @@ statement
     | expressionStmt
     ;
 
-assignmentStmt: unaryExpression assignmentOp expression;
+assignmentStmt : unaryExpression assignmentOp expression;
 
 assignmentOp
     : ASSIGN
@@ -303,67 +344,75 @@ assignmentOp
     | SHR_ASSIGN
     ;
 
-expressionStmt: expression;
-returnStmt: RETURN tupleExpression | RETURN expression?;
-deferStmt: DEFER (assignmentStmt | expression);
-breakStmt: BREAK;
-continueStmt: CONTINUE;
+expressionStmt : expression;
+returnStmt     : RETURN tupleExpression | RETURN expression?;
+deferStmt      : DEFER (assignmentStmt | expression);
+breakStmt      : BREAK;
+continueStmt   : CONTINUE;
 
-ifStmt: IF expression block (ELSE IF expression block)* (ELSE block)?;
+ifStmt
+    : IF expression block (ELSE IF expression block)* (ELSE block)?
+    ;
 
 forStmt
     : FOR block
     | FOR expression block
     | FOR (variableDecl | assignmentStmt)? SEMICOLON expression?
-      SEMICOLON (assignmentStmt | expression)? block
+          SEMICOLON (assignmentStmt | expression)? block
     | FOR IDENTIFIER IN expression block
     | FOR IDENTIFIER COMMA IDENTIFIER IN expression block
     ;
 
-switchStmt: SWITCH expression LBRACE switchCase* defaultCase? RBRACE;
-switchCase: CASE expression (COMMA expression)* COLON statement*;
-defaultCase: DEFAULT COLON statement*;
-
-expression: logicalOrExpression;
-logicalOrExpression: logicalAndExpression (OR logicalAndExpression)*;
-logicalAndExpression: bitOrExpression (AND bitOrExpression)*;
-bitOrExpression: bitXorExpression (BIT_OR bitXorExpression)*;
-bitXorExpression: bitAndExpression (BIT_XOR bitAndExpression)*;
-bitAndExpression: equalityExpression (AMP equalityExpression)*;
-equalityExpression: relationalExpression ((EQ | NE) relationalExpression)*;
-relationalExpression: shiftExpression ((LT | LE | GT | GE) shiftExpression)*;
-shiftExpression: rangeExpression ((LT LT | GT GT) rangeExpression)*;
-rangeExpression: additiveExpression (RANGE additiveExpression)?;
-additiveExpression: multiplicativeExpression ((PLUS | MINUS) multiplicativeExpression)*;
-multiplicativeExpression: unaryExpression ((STAR | SLASH | PERCENT) unaryExpression)*;
+switchStmt : SWITCH expression LBRACE switchCase* defaultCase? RBRACE;
+switchCase  : CASE expression (COMMA expression)* COLON statement*;
+defaultCase : DEFAULT COLON statement*;
 
 // =============================================================================
-// & in unary position = take address (&val, &num)
-// & in infix position = bitwise AND (a & b) — disambiguated by grammar position
+// Expressions
 // =============================================================================
+expression           : logicalOrExpression;
+logicalOrExpression  : logicalAndExpression (OR  logicalAndExpression)*;
+logicalAndExpression : bitOrExpression      (AND bitOrExpression)*;
+bitOrExpression      : bitXorExpression     (BIT_OR  bitXorExpression)*;
+bitXorExpression     : bitAndExpression     (BIT_XOR bitAndExpression)*;
+bitAndExpression     : equalityExpression   (AMP equalityExpression)*;
+equalityExpression   : relationalExpression ((EQ | NE) relationalExpression)*;
+relationalExpression : shiftExpression      ((LT | LE | GT | GE) shiftExpression)*;
+shiftExpression      : rangeExpression      ((LT LT | GT GT) rangeExpression)*;
+rangeExpression      : additiveExpression   (RANGE additiveExpression)?;
+additiveExpression   : multiplicativeExpression ((PLUS | MINUS) multiplicativeExpression)*;
+multiplicativeExpression : unaryExpression  ((STAR | SLASH | PERCENT) unaryExpression)*;
 
+// =============================================================================
+// Unary Expressions
+//   & in unary position  = take address / pass mutable ref (&val, &n)
+//   & in infix position  = bitwise AND (a & b) — disambiguated by grammar position
+// =============================================================================
 unaryExpression
     : (MINUS | NOT | BIT_NOT) unaryExpression
-    | AMP unaryExpression               // &val — take address or pass mutable reference
+    | AMP unaryExpression                       // &val — address-of / mutable ref at callsite
     | AWAIT (LPAREN expression RPAREN)? unaryExpression
     | INCREMENT unaryExpression
     | DECREMENT unaryExpression
     | postfixExpression
     ;
 
-postfixExpression: primaryExpression postfixOp*;
+postfixExpression : primaryExpression postfixOp*;
+
 postfixOp
     : DOT IDENTIFIER
     | DOT IDENTIFIER LPAREN argumentList? RPAREN
     | LPAREN argumentList? RPAREN
-    | LBRACKET expression RBRACKET      // buf[0]  — single element
-    | LBRACKET expression RANGE expression RBRACKET  // buf[0..4] — slice
+    | LBRACKET expression RBRACKET                         // buf[0]   — single element
+    | LBRACKET expression RANGE expression RBRACKET       // buf[0..4] — slice
     | INCREMENT
     | DECREMENT
     ;
 
 primaryExpression
-    : builtinExpression
+    : newExpression
+    | deleteExpression
+    | builtinExpression
     | castExpression
     | literal
     | structLiteral
@@ -378,24 +427,56 @@ primaryExpression
     ;
 
 // =============================================================================
-// rawptr(x)    — cast value to raw pointer
-// rawptr(&val) — get raw pointer to address of val
+// new — Manual Heap Allocation
+//
+//   new Node{}               — allocate struct, zero-initialised
+//   new Node{value: 10}      — allocate struct with field initialisation
+//   new [4096]byte           — allocate fixed-size array
+//   new [256]uint32          — allocate fixed-size array of any type
+//
+// NOT ref-counted. You own it. Always pair with defer delete(...).
 // =============================================================================
-
-castExpression
-    : castTargetType LPAREN expression RPAREN
+newExpression
+    : NEW (IDENTIFIER | qualifiedIdentifier) genericArgs?
+          LBRACE (fieldInit (COMMA fieldInit)*)? RBRACE   // new Node{...}
+    | NEW LBRACKET expression RBRACKET type               // new [4096]byte
     ;
 
-castTargetType
-    : primitiveType
-    | RAWPTR
+// =============================================================================
+// delete — Manual Heap Deallocation
+//
+//   delete(node)   — free a value allocated with new
+//   delete(buf)    — free an array allocated with new
+//
+// Always called via defer: defer delete(node)
+// Never triggers deinit — that is only for var.
+// =============================================================================
+deleteExpression
+    : DELETE LPAREN expression RPAREN
     ;
 
+// =============================================================================
+// Cast Expression
+//   rawptr(x)    — cast value to raw pointer
+//   rawptr(&val) — get raw pointer to address of val
+//   int32(x)     — numeric cast
+// =============================================================================
+castExpression  : castTargetType LPAREN expression RPAREN;
+castTargetType  : primitiveType | RAWPTR;
+
+// =============================================================================
+// Builtin Expression  (@identifier or @identifier(...))
+// For compiler-level directives that are NOT intrinsic functions.
+// Intrinsics (memptr, sizeof, len, syscall, etc.) resolve as plain identifiers.
+// =============================================================================
 builtinExpression
     : AT IDENTIFIER LPAREN argumentList? RPAREN
     | AT IDENTIFIER
     ;
 
+// =============================================================================
+// Literals
+// =============================================================================
 literal
     : INTEGER_LITERAL
     | FLOAT_LITERAL
@@ -408,22 +489,24 @@ literal
 
 initializerList
     : LBRACE RBRACE
-    | LBRACE expression (COMMA expression)* RBRACE
+    | LBRACE expression  (COMMA expression)*  RBRACE
     | LBRACE initializerEntry (COMMA initializerEntry)* RBRACE
     ;
 
-initializerEntry: expression COLON expression;
+initializerEntry : expression COLON expression;
 
 structLiteral
     : (IDENTIFIER | qualifiedIdentifier) genericArgs?
       LBRACE (fieldInit (COMMA fieldInit)*)? RBRACE
     ;
 
-fieldInit: IDENTIFIER COLON expression;
+fieldInit : IDENTIFIER COLON expression;
 
-argumentList: argument (COMMA argument)*;
-
-argument: expression | lambdaExpression | anonymousFuncExpression;
+// =============================================================================
+// Function Arguments & Lambdas
+// =============================================================================
+argumentList : argument (COMMA argument)*;
+argument     : expression | lambdaExpression | anonymousFuncExpression;
 
 lambdaExpression
     : executionStrategy? LPAREN lambdaParamList? RPAREN FAT_ARROW block
@@ -434,15 +517,14 @@ anonymousFuncExpression
     : executionStrategy? FUNC genericParams? LPAREN parameterList? RPAREN returnType? block
     ;
 
-executionStrategy
-    : GPU
-    | ASYNC
-    | PROCESS
-    ;
+executionStrategy : GPU | ASYNC | PROCESS;
 
-lambdaParamList: lambdaParam (COMMA lambdaParam)*;
-lambdaParam: IDENTIFIER COLON type | IDENTIFIER;
+lambdaParamList : lambdaParam (COMMA lambdaParam)*;
+lambdaParam     : IDENTIFIER COLON type | IDENTIFIER;
 
+// =============================================================================
+// Tuple Expression
+// =============================================================================
 tupleExpression
     : LPAREN expression COMMA expression (COMMA expression)* RPAREN
     ;
