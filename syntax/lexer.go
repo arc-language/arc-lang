@@ -6,14 +6,14 @@ import (
 )
 
 // tokenSliceSource implements antlr.TokenSource backed by a pre-built token slice.
-// The full TokenSource interface requires: NextToken, GetLine, GetCharPositionInLine,
-// GetInputStream, GetSourceName, GetTokenFactory, and SetTokenFactory.
+// It satisfies the interface required by antlr.CommonTokenStream.
 type tokenSliceSource struct {
 	tokens  []antlr.Token
 	index   int
 	factory antlr.TokenFactory
 }
 
+// NextToken returns the next token from the slice or EOF if exhausted.
 func (s *tokenSliceSource) NextToken() antlr.Token {
 	if s.index >= len(s.tokens) {
 		return antlr.CommonTokenFactoryDEFAULT.Create(
@@ -29,19 +29,24 @@ func (s *tokenSliceSource) NextToken() antlr.Token {
 	return t
 }
 
-func (s *tokenSliceSource) GetLine() int                     { return 0 }
-func (s *tokenSliceSource) GetCharPositionInLine() int       { return 0 }
-func (s *tokenSliceSource) GetInputStream() antlr.CharStream { return nil }
-func (s *tokenSliceSource) GetSourceName() string            { return "<slice>" }
+// Required interface methods for antlr.TokenSource
+func (s *tokenSliceSource) GetLine() int                        { return 0 }
+func (s *tokenSliceSource) GetCharPositionInLine() int          { return 0 }
+func (s *tokenSliceSource) GetInputStream() antlr.CharStream    { return nil }
+func (s *tokenSliceSource) GetSourceName() string               { return "<slice>" }
+func (s *tokenSliceSource) SetTokenFactory(f antlr.TokenFactory) { s.factory = f }
+func (s *tokenSliceSource) GetTokenFactory() antlr.TokenFactory { return s.factory }
 
-// GetTokenFactory implements antlr.TokenSource
-func (s *tokenSliceSource) GetTokenFactory() antlr.TokenFactory {
-	return s.factory
+// More is a required method for the TokenSource interface in some ANTLR versions.
+// For a slice playback, this is a no-op.
+func (s *tokenSliceSource) More() {
+	// No-op
 }
 
-// SetTokenFactory implements antlr.TokenSource
-func (s *tokenSliceSource) SetTokenFactory(f antlr.TokenFactory) {
-	s.factory = f
+// Skip is often required alongside More in Lexer interfaces. 
+// We implement it as a no-op safety measure.
+func (s *tokenSliceSource) Skip() {
+	// No-op
 }
 
 // createTokenStream wraps the generated lexer to perform Automatic Semicolon Insertion (ASI).
