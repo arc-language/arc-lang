@@ -5,19 +5,21 @@ import (
 	"github.com/arc-language/arc-lang/parser"
 )
 
-// tokenSliceSource implements antlr.TokenSource backed by a pre-built token slice.
-// It satisfies the interface required by antlr.CommonTokenStream.
+// tokenSliceSource implements antlr.TokenSource by embedding the original lexer.
+// Embedding *parser.ArcLexer ensures we satisfy ALL interface requirements
+// (including private methods like setTokenFactory) automatically.
 type tokenSliceSource struct {
-	tokens  []antlr.Token
-	index   int
-	factory antlr.TokenFactory
+	*parser.ArcLexer
+	tokens []antlr.Token
+	index  int
 }
 
-// NextToken returns the next token from the slice or EOF if exhausted.
+// NextToken overrides the embedded lexer's method to serve tokens from our slice.
 func (s *tokenSliceSource) NextToken() antlr.Token {
 	if s.index >= len(s.tokens) {
+		// Create a proper EOF token using the embedded lexer's source pair
 		return antlr.CommonTokenFactoryDEFAULT.Create(
-			&antlr.TokenSourceCharStreamPair{},
+			s.GetTokenSourceCharStreamPair(),
 			antlr.TokenEOF,
 			"<EOF>",
 			antlr.TokenDefaultChannel,
@@ -27,26 +29,6 @@ func (s *tokenSliceSource) NextToken() antlr.Token {
 	t := s.tokens[s.index]
 	s.index++
 	return t
-}
-
-// Required interface methods for antlr.TokenSource
-func (s *tokenSliceSource) GetLine() int                        { return 0 }
-func (s *tokenSliceSource) GetCharPositionInLine() int          { return 0 }
-func (s *tokenSliceSource) GetInputStream() antlr.CharStream    { return nil }
-func (s *tokenSliceSource) GetSourceName() string               { return "<slice>" }
-func (s *tokenSliceSource) SetTokenFactory(f antlr.TokenFactory) { s.factory = f }
-func (s *tokenSliceSource) GetTokenFactory() antlr.TokenFactory { return s.factory }
-
-// More is a required method for the TokenSource interface in some ANTLR versions.
-// For a slice playback, this is a no-op.
-func (s *tokenSliceSource) More() {
-	// No-op
-}
-
-// Skip is often required alongside More in Lexer interfaces. 
-// We implement it as a no-op safety measure.
-func (s *tokenSliceSource) Skip() {
-	// No-op
 }
 
 // createTokenStream wraps the generated lexer to perform Automatic Semicolon Insertion (ASI).
@@ -81,14 +63,16 @@ func createTokenStream(input string) *antlr.CommonTokenStream {
 		}
 	}
 
-	// 3. Build a stream from the original lexer (satisfies the Lexer type requirement),
-	//    then swap the token source for our pre-built slice.
-	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
-	stream.SetTokenSource(&tokenSliceSource{
-		tokens:  processedTokens,
-		factory: antlr.CommonTokenFactoryDEFAULT,
-	})
-	return stream
+	// 3. Create a wrapper that embeds the original lexer but serves the processed tokens.
+	// This wrapper is now fully compatible with the TokenSource interface.
+	wrapper := &tokenSliceSource{
+		ArcLexer: lexer,
+		tokens:   processedTokens,
+		index:    0,
+	}
+
+	// 4. Create the stream using our wrapper as the source.
+	return antlr.NewCommonTokenStream(wrapper, antlr.TokenDefaultChannel)
 }
 
 // shouldInsertSemi determines if a SEMI token should be inserted after token t.
