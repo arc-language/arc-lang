@@ -17,7 +17,6 @@ type tokenSliceSource struct {
 // NextToken overrides the embedded lexer's method to serve tokens from our slice.
 func (s *tokenSliceSource) NextToken() antlr.Token {
 	if s.index >= len(s.tokens) {
-		// Create a proper EOF token using the embedded lexer's source pair
 		return antlr.CommonTokenFactoryDEFAULT.Create(
 			s.GetTokenSourceCharStreamPair(),
 			antlr.TokenEOF,
@@ -38,7 +37,7 @@ func createTokenStream(input string) *antlr.CommonTokenStream {
 	lexer := parser.NewArcLexer(inputStream)
 	lexer.RemoveErrorListeners()
 
-	// 1. Fetch all raw tokens from the ANTLR lexer.
+	// 1. Fetch all raw tokens from the ANTLR lexer (includes hidden channel tokens).
 	allTokens := lexer.GetAllTokens()
 	var processedTokens []antlr.Token
 
@@ -64,7 +63,6 @@ func createTokenStream(input string) *antlr.CommonTokenStream {
 	}
 
 	// 3. Create a wrapper that embeds the original lexer but serves the processed tokens.
-	// This wrapper is now fully compatible with the TokenSource interface.
 	wrapper := &tokenSliceSource{
 		ArcLexer: lexer,
 		tokens:   processedTokens,
@@ -76,15 +74,30 @@ func createTokenStream(input string) *antlr.CommonTokenStream {
 }
 
 // shouldInsertSemi determines if a SEMI token should be inserted after token t.
+// It skips hidden-channel tokens (NL, comments, whitespace) when looking for
+// the next visible token, so that line comparisons are made against real tokens only.
 func shouldInsertSemi(t antlr.Token, index int, all []antlr.Token) bool {
-	isLast := index >= len(all)-1
-	if !isLast {
-		next := all[index+1]
-		if next.GetLine() == t.GetLine() {
-			return false
+	// Only consider tokens on the default channel as trigger candidates.
+	if t.GetChannel() != antlr.TokenDefaultChannel {
+		return false
+	}
+
+	// Find the next token on the default channel, skipping hidden ones.
+	var next antlr.Token
+	for j := index + 1; j < len(all); j++ {
+		if all[j].GetChannel() == antlr.TokenDefaultChannel {
+			next = all[j]
+			break
 		}
 	}
 
+	// If the next visible token is on the same line, no semi needed.
+	if next != nil && next.GetLine() == t.GetLine() {
+		return false
+	}
+
+	// next == nil means EOF; otherwise next is on a later line.
+	// Either way, check whether this token type triggers insertion.
 	switch t.GetTokenType() {
 	case parser.ArcLexerIDENTIFIER,
 		parser.ArcLexerINT_LIT,
