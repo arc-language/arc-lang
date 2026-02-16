@@ -112,7 +112,7 @@ func (cg *Codegen) genAssignStmt(s *ast.AssignStmt) error {
 	if s.Op == "++" || s.Op == "--" {
 		ptr := cg.genLValue(s.Target)
 		if ptr == nil {
-			return fmt.Errorf("assignment target is not an l-value")
+			return fmt.Errorf("genAssignStmt: increment/decrement target is not an l-value")
 		}
 		pt := ptr.Type().(*types.PointerType)
 		cur := cg.Builder.CreateLoad(pt.ElementType, ptr, "")
@@ -134,25 +134,26 @@ func (cg *Codegen) genAssignStmt(s *ast.AssignStmt) error {
 
 	rhs := cg.genExpr(s.Value)
 	if rhs == nil {
-		return fmt.Errorf("assignment rhs is nil")
+		return fmt.Errorf("genAssignStmt: rhs expression produced nil value")
 	}
 
 	if s.Op != "=" {
 		lhsVal := cg.genExpr(s.Target)
 		if lhsVal == nil {
-			return fmt.Errorf("compound assignment lhs is nil")
+			return fmt.Errorf("genAssignStmt: compound assignment lhs produced nil value")
 		}
 		rhs = cg.genCompoundOp(s.Op, lhsVal, rhs)
 	}
 
 	ptr := cg.genLValue(s.Target)
 	if ptr == nil {
-		return fmt.Errorf("assignment target is not an l-value")
+		return fmt.Errorf("genAssignStmt: assignment target is not an l-value")
 	}
 	cg.Builder.CreateStore(rhs, ptr)
 	return nil
 }
 
+// In stmt.go
 func (cg *Codegen) genLValue(expr ast.Expr) ir.Value {
 	switch e := expr.(type) {
 	case *ast.Ident:
@@ -171,7 +172,7 @@ func (cg *Codegen) genLValue(expr ast.Expr) ir.Value {
 		if !ok {
 			return nil
 		}
-		idx := fieldIndex(st, e.Sel)
+		idx := cg.TypeGen.FieldIndex(st.Name, e.Sel)
 		if idx < 0 {
 			return nil
 		}
@@ -187,12 +188,17 @@ func (cg *Codegen) genLValue(expr ast.Expr) ir.Value {
 			return nil
 		}
 		idxVal := cg.genExpr(e.Index)
+		if idxVal == nil {
+			return nil
+		}
 
+		// Handle array types: [N]T requires [0, idx] indexing
 		if _, ok := pt.ElementType.(*types.ArrayType); ok {
 			zero := cg.Builder.ConstInt(types.I32, 0)
 			return cg.Builder.CreateInBoundsGEP(pt.ElementType, basePtr, []ir.Value{zero, idxVal}, "elem.ptr")
 		}
 
+		// Handle slice/vector: extract data pointer, then index into it
 		if st, ok := pt.ElementType.(*types.StructType); ok && (st.Name == "slice" || st.Name == "vector") {
 			dataPtrPtr := cg.Builder.CreateStructGEP(st, basePtr, 0, "data.ptr.ptr")
 			dpt := dataPtrPtr.Type().(*types.PointerType)
@@ -201,12 +207,14 @@ func (cg *Codegen) genLValue(expr ast.Expr) ir.Value {
 			return cg.Builder.CreateInBoundsGEP(elemPtrType.ElementType, dataPtr, []ir.Value{idxVal}, "elem.ptr")
 		}
 
+		// Handle pointer-to-pointer: dereference then index
 		if _, ok := pt.ElementType.(*types.PointerType); ok {
 			loadedPtr := cg.Builder.CreateLoad(pt.ElementType, basePtr, "ptr.val")
 			lpt := loadedPtr.Type().(*types.PointerType)
 			return cg.Builder.CreateInBoundsGEP(lpt.ElementType, loadedPtr, []ir.Value{idxVal}, "elem.ptr")
 		}
 
+		// Direct pointer indexing (shouldn't normally reach here for arrays)
 		return cg.Builder.CreateInBoundsGEP(pt.ElementType, basePtr, []ir.Value{idxVal}, "elem.ptr")
 	}
 	return nil
