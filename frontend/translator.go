@@ -40,7 +40,11 @@ func (t *translator) file(ctx parser.ICompilationUnitContext) *ast.File {
 	f := &ast.File{Start: t.pos(ctx.GetStart())}
 
 	if ns := ctx.NamespaceDecl(); ns != nil {
-		f.Namespace = ns.QualifiedName().GetText()
+		parts := make([]string, 0, len(ns.AllIDENTIFIER()))
+		for _, id := range ns.AllIDENTIFIER() {
+			parts = append(parts, id.GetText())
+		}
+		f.Namespace = strings.Join(parts, ".")
 	}
 
 	for _, tld := range ctx.AllTopLevelDecl() {
@@ -430,8 +434,12 @@ func (t *translator) externTypeAlias(ctx parser.IExternTypeAliasContext) *ast.Ex
 }
 
 func (t *translator) externNamespace(ctx parser.IExternNamespaceContext) *ast.ExternNamespace {
+	parts := make([]string, 0, len(ctx.AllIDENTIFIER()))
+	for _, id := range ctx.AllIDENTIFIER() {
+		parts = append(parts, id.GetText())
+	}
 	en := &ast.ExternNamespace{
-		Name:  ctx.QualifiedName().GetText(),
+		Name:  strings.Join(parts, "."),
 		Start: t.pos(ctx.GetStart()),
 	}
 	for _, m := range ctx.AllExternMember() {
