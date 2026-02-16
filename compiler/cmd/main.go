@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/arc-language/arc-lang/codegen"
 	"github.com/arc-language/arc-lang/frontend"
@@ -13,93 +14,72 @@ import (
 )
 
 func main() {
-	// 1. CLI Arguments
+	// ── CLI flags ─────────────────────────────────────────────────────────────
 	sourceFile := flag.String("src", "main.ax", "Source file to compile")
 	outputFile := flag.String("o", "", "Output IR file (default: stdout)")
-	debugAST := flag.Bool("debug-ast", false, "Print the AST before generation")
+	debugAST   := flag.Bool("debug-ast", false, "Print the lowered AST before codegen")
 	flag.Parse()
 
-	// 2. Read Source Code
+	// ── Read source ───────────────────────────────────────────────────────────
 	code, err := os.ReadFile(*sourceFile)
 	if err != nil {
-		fmt.Printf("Error reading file '%s': %v\n", *sourceFile, err)
+		fmt.Fprintf(os.Stderr, "error: cannot read '%s': %v\n", *sourceFile, err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("Compiling %s...\n", *sourceFile)
-
-	// =========================================================================
-	// Phase 1: Syntax Analysis (Lexing & Parsing)
-	// =========================================================================
-	// syntax.Parse handles the "Auto-Semicolon Insertion" and ANTLR logic
+	// ── Phase 1: Syntax (Lex + Parse) ─────────────────────────────────────────
 	parseResult := syntax.Parse(string(code))
-
 	if len(parseResult.Errors) > 0 {
-		fmt.Println("Syntax Errors:")
+		fmt.Fprintln(os.Stderr, "syntax errors:")
 		for _, e := range parseResult.Errors {
-			fmt.Println(e)
+			fmt.Fprintln(os.Stderr, " ", e)
 		}
 		os.Exit(1)
 	}
 
-	// =========================================================================
-	// Phase 2: Frontend (Translation & Semantics)
-	// =========================================================================
-	// 2a. Translate CST (ANTLR tree) -> AST (Our clean structs)
+	// ── Phase 2: Frontend (Translate CST → AST, then Semantic Analysis) ───────
 	astFile := frontend.Translate(parseResult.Root)
-	
-	// 2b. Semantic Analysis (Symbol Table & Type Checking)
+
 	analyzer := frontend.NewAnalyzer()
 	if err := analyzer.Analyze(astFile); err != nil {
-		fmt.Printf("Semantic Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "semantic error: %v\n", err)
 		os.Exit(1)
 	}
 
-	// =========================================================================
-	// Phase 3: Lowering (Arc Magic)
-	// =========================================================================
-	// Transforms high-level features into explicit logic:
-	// - Async -> State Machines / Thread Spawning
-	// - Defer -> Explicit calls at exit points
-	// - Var   -> Reference counting injection
-	low := lower.NewLowerer(astFile)
-	low.Apply()
+	// ── Phase 3: Lowering ─────────────────────────────────────────────────────
+	// Rewrites high-level constructs into explicit IR-ready logic:
+	//   async fn  → coroutine state-machine / thread spawn
+	//   defer     → explicit calls at all exit points
+	//   var       → reference-count increment/decrement injection
+	lower.NewLowerer(astFile).Apply()
 
 	if *debugAST {
-		// You would implement a pretty printer for the AST here
-		fmt.Println("--- Lowered AST (Debug) ---")
-		fmt.Printf("%+v\n", astFile)
-		fmt.Println("---------------------------")
+		fmt.Fprintln(os.Stderr, "── lowered AST ──────────────────────────────")
+		fmt.Fprintf(os.Stderr, "%+v\n", astFile)
+		fmt.Fprintln(os.Stderr, "─────────────────────────────────────────────")
 	}
 
-	// =========================================================================
-	// Phase 4: Code Generation (AST -> IR)
-	// =========================================================================
-	// Initialize the generator with the module name (filename without ext)
-	moduleName := filepath.Base(*sourceFile)
-	moduleName = moduleName[:len(moduleName)-len(filepath.Ext(moduleName))]
-	
+	// ── Phase 4: Code Generation (AST → IR) ───────────────────────────────────
+	ext        := filepath.Ext(*sourceFile)
+	moduleName := strings.TrimSuffix(filepath.Base(*sourceFile), ext)
+
 	gen := codegen.New(moduleName)
 	irModule, err := gen.Generate(astFile)
 	if err != nil {
-		fmt.Printf("Codegen Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "codegen error: %v\n", err)
 		os.Exit(1)
 	}
 
-	// =========================================================================
-	// Phase 5: Output
-	// =========================================================================
-	irOutput := irModule.String()
+	// ── Phase 5: Emit IR ──────────────────────────────────────────────────────
+	ir := irModule.String()
 
 	if *outputFile != "" {
-		if err := os.WriteFile(*outputFile, []byte(irOutput), 0644); err != nil {
-			fmt.Printf("Error writing output: %v\n", err)
+		if err := os.WriteFile(*outputFile, []byte(ir), 0o644); err != nil {
+			fmt.Fprintf(os.Stderr, "error: cannot write '%s': %v\n", *outputFile, err)
 			os.Exit(1)
 		}
-		fmt.Printf("Successfully compiled to %s\n", *outputFile)
+		fmt.Printf("compiled '%s'  →  %s\n", *sourceFile, *outputFile)
 	} else {
-		// Default: Print IR to stdout
-		fmt.Println("--- Generated IR ---")
-		fmt.Println(irOutput)
+		fmt.Print(ir)
 	}
 }
