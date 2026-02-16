@@ -208,16 +208,44 @@ func (cg *Codegen) genLValue(expr ast.Expr) ir.Value {
 
 	case *ast.IndexExpr:
 		// e.X[e.Index]
-		ptr := cg.genLValue(e.X)
-		if ptr == nil {
+		basePtr := cg.genLValue(e.X)
+		if basePtr == nil {
 			return nil
 		}
-		pt, ok := ptr.Type().(*types.PointerType)
+		pt, ok := basePtr.Type().(*types.PointerType)
 		if !ok {
 			return nil
 		}
 		idxVal := cg.genExpr(e.Index)
-		return cg.Builder.CreateInBoundsGEP(pt.ElementType, ptr, []ir.Value{idxVal}, "elem.ptr")
+
+		// 1. Array access: *[N]T -> GEP 0, i
+		if _, ok := pt.ElementType.(*types.ArrayType); ok {
+			zero := cg.Builder.ConstInt(types.I32, 0)
+			return cg.Builder.CreateInBoundsGEP(pt.ElementType, basePtr, []ir.Value{zero, idxVal}, "elem.ptr")
+		}
+
+		// 2. Slice/Vector access: *{ *T, len, ... } -> load ptr, GEP i
+		if st, ok := pt.ElementType.(*types.StructType); ok && (st.Name == "slice" || st.Name == "vector") {
+			// Field 0 is the data pointer (*T)
+			dataPtrPtr := cg.Builder.CreateStructGEP(st, basePtr, 0, "data.ptr.ptr")
+			// dataPtrPtr is **T
+			dpt := dataPtrPtr.Type().(*types.PointerType)
+			// Load *T
+			dataPtr := cg.Builder.CreateLoad(dpt.ElementType, dataPtrPtr, "data.ptr")
+			// Index *T
+			elemPtrType := dpt.ElementType.(*types.PointerType)
+			return cg.Builder.CreateInBoundsGEP(elemPtrType.ElementType, dataPtr, []ir.Value{idxVal}, "elem.ptr")
+		}
+
+		// 3. Pointer access: **T (pointer variable) -> load *T, GEP i
+		if _, ok := pt.ElementType.(*types.PointerType); ok {
+			loadedPtr := cg.Builder.CreateLoad(pt.ElementType, basePtr, "ptr.val")
+			lpt := loadedPtr.Type().(*types.PointerType)
+			return cg.Builder.CreateInBoundsGEP(lpt.ElementType, loadedPtr, []ir.Value{idxVal}, "elem.ptr")
+		}
+
+		// Fallback: simple pointer arithmetic (only correct if basePtr is already the element pointer)
+		return cg.Builder.CreateInBoundsGEP(pt.ElementType, basePtr, []ir.Value{idxVal}, "elem.ptr")
 	}
 	return nil
 }

@@ -5,3 +5,4 @@ cmd/test_runner
 cmd/arc
 cmd/tests.log
 cmd/tests.log
+cmd/main

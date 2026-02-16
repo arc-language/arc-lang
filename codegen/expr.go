@@ -238,31 +238,17 @@ func (cg *Codegen) exprName(e ast.Expr) string {
 // ─── Index ────────────────────────────────────────────────────────────────────
 
 func (cg *Codegen) genIndex(e *ast.IndexExpr) ir.Value {
-	basePtr := cg.genLValue(e.X)
-	if basePtr == nil {
+	// Delegate to genLValue to handle proper address calculation for arrays/slices.
+	ptr := cg.genLValue(e)
+	if ptr == nil {
 		return nil
 	}
-	idxVal := cg.genExpr(e.Index)
-	pt := basePtr.Type().(*types.PointerType)
-
-	switch elem := pt.ElementType.(type) {
-	case *types.ArrayType:
-		zero := cg.Builder.ConstInt(types.I32, 0)
-		elemPtr := cg.Builder.CreateInBoundsGEP(elem, basePtr, []ir.Value{zero, idxVal}, "elem.ptr")
-		eptr := elemPtr.Type().(*types.PointerType)
-		return cg.Builder.CreateLoad(eptr.ElementType, elemPtr, "elem")
-
-	case *types.StructType:
-		// vector/slice: data is field 0 (*T), length is field 1 (i64).
-		dataPtrPtr := cg.Builder.CreateStructGEP(elem, basePtr, 0, "data.ptr.ptr")
-		dataPtr := cg.Builder.CreateLoad(dataPtrPtr.Type().(*types.PointerType).ElementType, dataPtrPtr, "data.ptr")
-		if dp, ok := dataPtr.Type().(*types.PointerType); ok {
-			elemPtr := cg.Builder.CreateInBoundsGEP(dp.ElementType, dataPtr, []ir.Value{idxVal}, "elem.ptr")
-			eptr := elemPtr.Type().(*types.PointerType)
-			return cg.Builder.CreateLoad(eptr.ElementType, elemPtr, "elem")
-		}
+	// The result of genLValue is the address of the element. We just load it.
+	pt, ok := ptr.Type().(*types.PointerType)
+	if !ok {
+		return nil
 	}
-	return nil
+	return cg.Builder.CreateLoad(pt.ElementType, ptr, "elem")
 }
 
 // ─── Unary ────────────────────────────────────────────────────────────────────
