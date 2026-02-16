@@ -24,20 +24,15 @@ func SizeOf(t types.Type) int {
 		return int(at.Length) * SizeOf(at.ElementType)
 	case types.StructKind:
 		st := t.(*types.StructType)
-		size := 0
-		
-		// --- FIX: Handle Class Header ---
-		if st.IsClass {
-			size = 8 // Implicit i64 RefCount header
-		}
 
 		if st.Packed {
+			size := 0
 			for _, f := range st.Fields { size += SizeOf(f) }
 			if size == 0 { return 1 }
 			return size
 		}
-		
-		// Aligned size
+
+		size := 0
 		for _, f := range st.Fields {
 			align := AlignOf(f)
 			if size%align != 0 {
@@ -45,10 +40,9 @@ func SizeOf(t types.Type) int {
 			}
 			size += SizeOf(f)
 		}
-		
+
 		if size == 0 { size = 1 }
 
-		// Pad end
 		sa := AlignOf(st)
 		if size%sa != 0 {
 			size += sa - (size % sa)
@@ -69,18 +63,10 @@ func AlignOf(t types.Type) int {
 		return 8
 	case types.StructKind:
 		st := t.(*types.StructType)
-		
-		// FIX: Packed structs must have alignment 1
 		if st.Packed {
 			return 1
 		}
-
 		max := 1
-		// Classes are always at least 8-byte aligned due to header
-		if st.IsClass {
-			max = 8
-		}
-
 		for _, f := range st.Fields {
 			a := AlignOf(f)
 			if a > max { max = a }
@@ -95,24 +81,11 @@ func AlignOf(t types.Type) int {
 	}
 }
 
-// GetStructFieldOffset calculates the byte offset of a field
+// GetStructFieldOffset calculates the byte offset of a field at idx.
 func GetStructFieldOffset(st *types.StructType, idx int) int {
 	off := 0
-	
-	// --- FIX: Handle Class Header and Index Shifting ---
-	targetIdx := idx
-	
-	if st.IsClass {
-		// Index 0 refers to the RefCount Header
-		if idx == 0 {
-			return 0
-		}
-		// Index 1 refers to Fields[0], Index 2 to Fields[1], etc.
-		off = 8 // Start after header
-		targetIdx = idx - 1 // Shift index for the loop below
-	}
 
-	for i := 0; i < targetIdx; i++ {
+	for i := 0; i < idx; i++ {
 		f := st.Fields[i]
 		if !st.Packed {
 			a := AlignOf(f)
@@ -120,10 +93,10 @@ func GetStructFieldOffset(st *types.StructType, idx int) int {
 		}
 		off += SizeOf(f)
 	}
-	
-	// Align target
-	if !st.Packed && targetIdx < len(st.Fields) {
-		a := AlignOf(st.Fields[targetIdx])
+
+	// Align the target field itself
+	if !st.Packed && idx < len(st.Fields) {
+		a := AlignOf(st.Fields[idx])
 		if off%a != 0 { off += a - (off % a) }
 	}
 	return off

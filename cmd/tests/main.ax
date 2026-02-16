@@ -7,6 +7,9 @@ interface routes {
 
 func main() {
 
-    var m = routes{}
+    var m = routes{
+        s: "Building Arc compiler...",
+        m: 1000,
+    }
 
 }

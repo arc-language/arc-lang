@@ -426,24 +426,10 @@ func (c *compiler) compileInst(inst ir.Instruction) error {
 					if offset != 0 {
 						c.asm.Add(RegOp(RAX), ImmOp(int64(offset)))
 					}
-					
-					if st.IsClass {
-						if idx == 0 {
-							currentType = types.I64
-						} else {
-							fieldIdx := idx - 1
-							if fieldIdx >= 0 && fieldIdx < len(st.Fields) {
-								currentType = st.Fields[fieldIdx]
-							} else {
-								currentType = types.I8
-							}
-						}
+					if idx >= 0 && idx < len(st.Fields) {
+						currentType = st.Fields[idx]
 					} else {
-						if idx >= 0 && idx < len(st.Fields) {
-							currentType = st.Fields[idx]
-						} else {
-							return fmt.Errorf("field index %d out of bounds for struct %s", idx, st.Name)
-						}
+						return fmt.Errorf("field index %d out of bounds for struct %s", idx, st.Name)
 					}
 				} else {
 					return fmt.Errorf("non-constant struct index in GEP")
