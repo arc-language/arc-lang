@@ -7,7 +7,7 @@ extern c {
 
 func main() int32 {
     let value: int32 = 100
-    let ptr: *int32 = &value
+    let ptr: memptr = memptr(&value)
     printf("value=%d\n", *ptr)
     return 0
 }

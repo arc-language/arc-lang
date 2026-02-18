@@ -1,4 +1,4 @@
-//@test(expect = "sum=10")
+//@test(expect = "value=100")
 namespace main
 
 extern c {
@@ -6,12 +6,7 @@ extern c {
 }
 
 func main() int32 {
-
-    let sum = 0
-    for let i = 0; i < 5; i++ {
-        sum += i
-    }
-    printf("sum=%d\n", sum)
-
+    let value: int32 = 100
+    printf("value=%d\n", memptr(&value))
     return 0
 }

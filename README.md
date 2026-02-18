@@ -440,7 +440,7 @@ The compiler detects your platform and downloads the appropriate packages to `~/
 ## Installation
 
 ```bash
-git clone [https://github.com/arc-language/arc-lang](https://github.com/arc-language/arc-lang)
+git clone https://github.com/arc-language/arc-lang
 cd arc-lang/cmd
 ./build build
 ./test_runner
